@@ -1,0 +1,53 @@
+name: shogaku_kore_programming
+description: "小学コレ！プログラミング - コード探険でプログラミングを楽しく学ぼう！"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_core:
+    path: ../shared_core
+
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+  shared_preferences: ^2.3.0
+  firebase_core: ^3.13.1
+  firebase_auth: ^5.5.4
+  confetti: ^0.8.0
+  audioplayers: ^5.2.0
+  flutter_animate: ^4.5.0
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+  flutter_highlight: ^0.7.0
+  highlight: ^0.7.0
+  fl_chart: ^0.70.2
+
+  # HTTP クライアント（AI コーチ API 呼び出し用）
+  http: ^1.2.2
+
+  # 環境変数
+  flutter_dotenv: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.1
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#1ABC9C"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/

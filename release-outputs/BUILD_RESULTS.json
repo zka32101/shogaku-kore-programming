@@ -1,0 +1,33 @@
+{
+  "build_date": "2026-06-08",
+  "version": "1.0.0",
+  "version_code": 1,
+  "android": {
+    "success": true,
+    "result": {
+      "aab": "G:\\マイドライブ\\apk\\shogaku-kore-programming-v1.0.0-release.aab",
+      "aab_size_mb": 45.4,
+      "aab_worktree_path": "C:\\Users\\Administrator\\OneDrive\\subwork\\smartphone\\smart-claude-code\\.claude\\worktrees\\sleepy-turing-cfe7d8\\apps\\shogaku-kore-programming\\build\\app\\outputs\\bundle\\release\\app-release.aab"
+    },
+    "error": null,
+    "build_notes": "Built from ASCII-path worktree to avoid Dart AOT snapshotter issue with Japanese path (G:\\マイドライブ). JVM: SerialGC + Xmx1024m."
+  },
+  "ios": {
+    "success": false,
+    "result": null,
+    "error": "Windows 環境では iOS ビルド不可。Mac が必要。"
+  },
+  "project_info": {
+    "app_type": "education",
+    "total_stages": 55,
+    "has_firebase": false,
+    "has_sentry": false,
+    "has_ads": false,
+    "has_iap": true,
+    "has_ai_coaching": true
+  },
+  "known_issues": {
+    "japanese_path": "G:\\マイドライブ の日本語パスは Dart AOT スナップショッターが処理できない。ビルドは ASCII パスのワークツリーから実行すること。",
+    "jvm_oom": "元の -Xmx1536m では OOM クラッシュが発生。gradle.properties を -Xmx1024m -XX:+UseSerialGC に変更済み。"
+  }
+}
