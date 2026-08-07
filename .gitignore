@@ -43,3 +43,27 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase & Configuration (SECURITY: Keep secrets out of public repo)
+google-services.json
+google-services*.json
+**/GoogleService-Info.plist
+.env
+.env.local
+*.xcconfig.local
+
+# iOS build secrets
+ios/**/*.mobileprovision
+ios/**/*.p12
+ios/**/*.cer
+ios/**/*.key
+ios/Runner.xcworkspace/xcuserdata/
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Xcode build artifacts
+build/
+DerivedData/
+*.xcarchive

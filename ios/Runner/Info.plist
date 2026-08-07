@@ -68,3 +68,51 @@
 	</array>
 </dict>
 </plist>
+
+	<!-- App Transport Security -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsArbitraryLoadsInMedia</key>
+		<false/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<false/>
+	</dict>
+
+	<!-- Firebase Configuration (from firebase_options.dart) -->
+	<key>GOOGLE_APP_ID</key>
+	<string>1:492221061005:ios:placeholder</string>
+	<key>GOOGLE_API_KEY</key>
+	<string>AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>492221061005</string>
+	<key>FIREBASE_PROJECT_ID</key>
+	<string>petit-works-education</string>
+	<key>FIREBASE_STORAGE_BUCKET</key>
+	<string>petit-works-education.firebasestorage.app</string>
+
+	<!-- Notifications Support (Local & Remote) -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+
+	<!-- Privacy & Permissions -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Your learning progress photos are stored securely in your device.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access allows you to take screenshots of learning achievements.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Local network access helps with offline learning features.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_http._tcp</string>
+		<string>_https._tcp</string>
+	</array>
+
+	<!-- Minimum Version -->
+	<key>MinimumOSVersion</key>
+	<string>14.0</string>
+</dict>
+</plist>
