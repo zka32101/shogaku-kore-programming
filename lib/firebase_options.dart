@@ -39,6 +39,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '492221061005',
     projectId: 'petit-works-education',
     storageBucket: 'petit-works-education.firebasestorage.app',
-    iosBundleId: 'com.petitworksapps.shougakukore.programming',
+    iosBundleId: 'com.schoolcode.programming',
   );
 }
