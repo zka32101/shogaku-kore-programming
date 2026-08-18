@@ -21,6 +21,8 @@ import 'badge_unlock_screen.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/app_dialog.dart';
 import '../providers/coin_provider.dart';
+import '../providers/character_provider.dart';
+import '../widgets/character_reaction_widget.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Challenge challenge;
@@ -39,6 +41,30 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   DateTime? _sessionStart;
   bool _timeRecorded = false;
   Block? _lastAddedBlock;
+  CharacterMood _characterMood = CharacterMood.idle;
+  String? _characterMessage;
+  int _reactionToken = 0;
+  final math.Random _rng = math.Random();
+
+  /// キャラクターのリアクションを一時的に切り替え、しばらくしたらアイドルに戻す
+  void _reactCharacter(
+    CharacterMood mood, {
+    String? message,
+    Duration hold = const Duration(milliseconds: 2200),
+  }) {
+    final token = ++_reactionToken;
+    setState(() {
+      _characterMood = mood;
+      _characterMessage = message;
+    });
+    Future.delayed(hold, () {
+      if (!mounted || token != _reactionToken) return;
+      setState(() {
+        _characterMood = CharacterMood.idle;
+        _characterMessage = null;
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -187,6 +213,26 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   void _showResult(bool isCorrect) {
     final isFirstComplete =
         !(ref.read(progressProvider)[widget.challenge.id]?.isCompleted ?? false);
+
+    if (isCorrect) {
+      // キャラクターが喜んでくれる & 育成が進む
+      _reactCharacter(
+        CharacterMood.celebrating,
+        message: kCelebrationMessages[_rng.nextInt(kCelebrationMessages.length)],
+        hold: const Duration(seconds: 4),
+      );
+      ref.read(characterProvider.notifier).growFromCorrectAnswer(
+            challengeType: 'visual',
+            difficulty: widget.challenge.level,
+          );
+    } else {
+      // 不正解でも責めず、応援する
+      _reactCharacter(
+        CharacterMood.encouraging,
+        message: kEncouragementMessages[_rng.nextInt(kEncouragementMessages.length)],
+        hold: const Duration(seconds: 4),
+      );
+    }
 
     if (isCorrect) {
       final levelBefore = ref.read(progressProvider.notifier).currentLevel;
@@ -482,6 +528,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               children: [
                 // ヘッダー
                 _buildHeader(context),
+            // キャラクターのひとこと（見守り役）
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+                child: CharacterReactionWidget(
+                  mood: _characterMood,
+                  message: _characterMessage,
+                ),
+              ),
+            ),
             // 課題説明
             Container(
               width: double.infinity,
@@ -692,6 +749,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     Future.delayed(const Duration(seconds: 2), () {
                       if (mounted) setState(() => _lastAddedBlock = null);
                     });
+                    // 最初のブロックを置いたときだけ、そっと応援する
+                    if (ref.read(editorProvider).scriptBlocks.length == 1) {
+                      _reactCharacter(
+                        CharacterMood.thinking,
+                        message: kThinkingMessages[_rng.nextInt(kThinkingMessages.length)],
+                      );
+                    }
                   },
                 );
               },
@@ -1003,7 +1067,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             child: OutlinedButton.icon(
               onPressed: editorState.scriptBlocks.isEmpty
                   ? null
-                  : () => ref.read(editorProvider.notifier).executeScript(),
+                  : () {
+                      ref.read(editorProvider.notifier).executeScript();
+                      _reactCharacter(CharacterMood.excited, message: 'どうなるかな…！');
+                    },
               icon: const Text('▶', style: TextStyle(fontSize: 12)),
               label: const Text('実行'),
               style: OutlinedButton.styleFrom(
