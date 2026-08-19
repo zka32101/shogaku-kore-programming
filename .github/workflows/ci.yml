@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@e2f20f10a21f43b30e5bbdc72f4f04c02e75c57c  # v4.0.0
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2  # v4.0.0
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@db9f90a3c7e67c82fb80146d312b6699e5dff5c8  # v2.14.0
+        uses: subosito/flutter-action@7814e4f6c70abd7a5641333f613efa098fe34381  # v2.14.0
         with:
           flutter-version: '3.x'
           cache: true
