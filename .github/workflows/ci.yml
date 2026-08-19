@@ -1,0 +1,70 @@
+name: CI (Analyze & Test)
+
+# Every PR and every push to main gets a real `flutter analyze` / `flutter test`
+# pass — this is what deploy.yml (tag-triggered only) cannot catch before merge.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same PR/branch to save CI minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Limit permissions to minimum required (security best practice).
+permissions:
+  contents: read
+
+jobs:
+  analyze-and-test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@e2f20f10a21f43b30e5bbdc72f4f04c02e75c57c  # v4.0.0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@db9f90a3c7e67c82fb80146d312b6699e5dff5c8  # v2.14.0
+        with:
+          flutter-version: '3.x'
+          cache: true
+
+      # Firebase credentials are required at analyze/build time by
+      # lib/firebase_options.dart (loaded via flutter_dotenv), but analyze/test
+      # never actually talk to Firebase. Non-secret CI-only placeholder values
+      # keep the pipeline runnable on forks/PRs where Repository Secrets
+      # aren't available, without ever touching real credentials.
+      - name: Create CI placeholder .env
+        run: |
+          cat > .env << 'EOF'
+          FIREBASE_API_KEY=ci-placeholder
+          FIREBASE_WEB_APP_ID=ci-placeholder
+          FIREBASE_ANDROID_APP_ID=ci-placeholder
+          FIREBASE_IOS_APP_ID=ci-placeholder
+          FIREBASE_MESSAGING_SENDER_ID=ci-placeholder
+          FIREBASE_PROJECT_ID=ci-placeholder
+          FIREBASE_STORAGE_BUCKET=ci-placeholder.appspot.com
+          FIREBASE_IOS_BUNDLE_ID=com.schoolcode.programming
+          EOF
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Check formatting (informational — does not fail the build)
+        run: dart format --output=none --set-exit-if-changed .
+        continue-on-error: true
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+# Security notes:
+# - 3rd-party actions pinned to commit SHA (matches deploy.yml's convention).
+# - Permissions limited to read-only (this workflow never writes/publishes anything).
+# - No real secrets used — .env is CI-only placeholder data, never committed.
