@@ -199,15 +199,25 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
 
+    // 現在開いているタブ（初級/中級/上級）のレベルに絞り込む
+    const levels = [
+      StageLevel.beginner,
+      StageLevel.intermediate,
+      StageLevel.advanced,
+    ];
+    final currentLevel = levels[_tabController.index];
+    final levelChallenges =
+        allChallenges.where((c) => c.level == currentLevel).toList();
+
     // 未完了の無料チャレンジから選ぶ
-    final pool = allChallenges
+    final pool = levelChallenges
         .where((c) => c.isFree && !(progressMap[c.id]?.isCompleted ?? false))
         .toList();
 
-    // 未完了がなければ全無料から選ぶ
+    // 未完了がなければ現在レベルの全無料から選ぶ
     final source = pool.isNotEmpty
         ? pool
-        : allChallenges.where((c) => c.isFree).toList();
+        : levelChallenges.where((c) => c.isFree).toList();
 
     if (source.isEmpty) return;
     final pick = source[math.Random().nextInt(source.length)];
@@ -519,74 +529,99 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
         Container(
           color: context.cardBg,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _FilterChip(
-                  label: '全て ($totalInLevel)',
-                  isSelected: _filter == _CompletionFilter.all,
-                  onTap: () {
-                    HapticService.selectionClick();
-                    setState(() => _filter = _CompletionFilter.all);
-                  },
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _FilterChip(
+                      label: '全て ($totalInLevel)',
+                      isSelected: _filter == _CompletionFilter.all,
+                      onTap: () {
+                        HapticService.selectionClick();
+                        setState(() => _filter = _CompletionFilter.all);
+                      },
+                    ),
+                    const SizedBox(width: 6),
+                    _FilterChip(
+                      label: '未完了 (${totalInLevel - completedInLevel})',
+                      isSelected: _filter == _CompletionFilter.incomplete,
+                      color: const Color(0xFFE67E22),
+                      onTap: () {
+                        HapticService.selectionClick();
+                        setState(() => _filter = _CompletionFilter.incomplete);
+                      },
+                    ),
+                    const SizedBox(width: 6),
+                    _FilterChip(
+                      label: 'クリア ($completedInLevel)',
+                      isSelected: _filter == _CompletionFilter.completed,
+                      color: const Color(0xFF27AE60),
+                      onTap: () {
+                        HapticService.selectionClick();
+                        setState(() => _filter = _CompletionFilter.completed);
+                      },
+                    ),
+                    const SizedBox(width: 6),
+                    _FilterChip(
+                      label: '★3未満 ($notPerfectCount)',
+                      isSelected: _filter == _CompletionFilter.notPerfect,
+                      color: const Color(0xFFF39C12),
+                      onTap: () {
+                        HapticService.selectionClick();
+                        setState(() => _filter = _CompletionFilter.notPerfect);
+                      },
+                    ),
+                    if (favCount > 0) ...[
+                      const SizedBox(width: 6),
+                      _FilterChip(
+                        label: '⭐ お気に入り ($favCount)',
+                        isSelected: _filter == _CompletionFilter.favorites,
+                        color: Colors.pink.shade400,
+                        onTap: () {
+                          HapticService.selectionClick();
+                          setState(() => _filter = _CompletionFilter.favorites);
+                        },
+                      ),
+                    ],
+                    if (wrongStageIds.isNotEmpty) ...[
+                      const SizedBox(width: 6),
+                      _FilterChip(
+                        label: '🔥 苦手 (${wrongStageIds.length})',
+                        isSelected: _filter == _CompletionFilter.wrongAnswers,
+                        color: const Color(0xFFFF6B35),
+                        onTap: () {
+                          HapticService.selectionClick();
+                          setState(() => _filter = _CompletionFilter.wrongAnswers);
+                        },
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(width: 6),
-                _FilterChip(
-                  label: '未完了 (${totalInLevel - completedInLevel})',
-                  isSelected: _filter == _CompletionFilter.incomplete,
-                  color: const Color(0xFFE67E22),
-                  onTap: () {
-                    HapticService.selectionClick();
-                    setState(() => _filter = _CompletionFilter.incomplete);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _FilterChip(
-                  label: 'クリア ($completedInLevel)',
-                  isSelected: _filter == _CompletionFilter.completed,
-                  color: const Color(0xFF27AE60),
-                  onTap: () {
-                    HapticService.selectionClick();
-                    setState(() => _filter = _CompletionFilter.completed);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _FilterChip(
-                  label: '⭐未満 ($notPerfectCount)',
-                  isSelected: _filter == _CompletionFilter.notPerfect,
-                  color: const Color(0xFFF39C12),
-                  onTap: () {
-                    HapticService.selectionClick();
-                    setState(() => _filter = _CompletionFilter.notPerfect);
-                  },
-                ),
-                if (favCount > 0) ...[
-                  const SizedBox(width: 6),
-                  _FilterChip(
-                    label: '⭐ お気に入り ($favCount)',
-                    isSelected: _filter == _CompletionFilter.favorites,
-                    color: const Color(0xFFE67E22),
-                    onTap: () {
-                      HapticService.selectionClick();
-                      setState(() => _filter = _CompletionFilter.favorites);
-                    },
+              ),
+              // 右端フェード：横スクロールできることを示すヒント
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 20,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          context.cardBg.withValues(alpha: 0),
+                          context.cardBg,
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-                if (wrongStageIds.isNotEmpty) ...[
-                  const SizedBox(width: 6),
-                  _FilterChip(
-                    label: '🔥 苦手 (${wrongStageIds.length})',
-                    isSelected: _filter == _CompletionFilter.wrongAnswers,
-                    color: const Color(0xFFFF6B35),
-                    onTap: () {
-                      HapticService.selectionClick();
-                      setState(() => _filter = _CompletionFilter.wrongAnswers);
-                    },
-                  ),
-                ],
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
         ),
         _LevelProgressBanner(
