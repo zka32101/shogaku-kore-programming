@@ -122,7 +122,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                             child: Image.memory(
                               Uri.parse(work.resultImage).data!.contentAsBytes(),
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(
+                              errorBuilder: (_, _, _) => const Icon(
                                 Icons.broken_image,
                                 color: Colors.grey,
                               ),
@@ -183,7 +183,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                               .data!
                               .contentAsBytes(),
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, _, _) => const Icon(
                             Icons.broken_image,
                             color: Colors.grey,
                           ),

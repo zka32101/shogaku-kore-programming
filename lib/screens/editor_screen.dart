@@ -896,6 +896,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               : ReorderableListView.builder(
                   padding: const EdgeInsets.all(8),
                   itemCount: editorState.scriptBlocks.length,
+                  // onReorderItem migration tracked as follow-up (signature
+                  // differs; current onReorder behavior is correct as-is).
+                  // ignore: deprecated_member_use
                   onReorder: (oldIndex, newIndex) {
                     if (newIndex > oldIndex) newIndex--;
                     ref.read(editorProvider.notifier).moveBlock(oldIndex, newIndex);

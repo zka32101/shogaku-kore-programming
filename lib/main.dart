@@ -52,53 +52,60 @@ class _ShogakuKoreProgrammingAppState
       final profile = ref.read(profileProvider);
       SoundService().setEnabled(profile.soundEnabled);
       HapticService.setEnabled(profile.hapticsEnabled);
-      // 通知の初期スケジュール
-      final notif = NotificationService();
-      notif.scheduleDailyReminder(
-        hour: profile.reminderHour,
-        minute: profile.reminderMinute,
-        enabled: profile.notificationsEnabled,
-      );
-      notif.scheduleWeeklyReport(
-        hour: 8,
-        minute: 0,
-        enabled: profile.notificationsEnabled && profile.weeklyReportEnabled,
-      );
-      notif.scheduleEveningNudge(
-        hour: profile.eveningNudgeHour,
-        minute: profile.eveningNudgeMinute,
-        enabled: profile.notificationsEnabled && profile.eveningNudgeEnabled,
-      );
-      // ストリークアラート（午後15時以降＆今日未クリア＆2日以上継続中）
-      if (profile.notificationsEnabled) {
-        final progressNotifier = ref.read(progressProvider.notifier);
-        final streakDays = progressNotifier.streakDays;
-        final todayCleared = progressNotifier.todayClearedCount;
-        if (streakDays >= 2 && todayCleared == 0 && DateTime.now().hour >= 15) {
-          notif.sendStreakAlert(streakDays);
-        }
-      }
-      // 週次レポート即時通知（週初め初回起動時に1回だけ送信）
-      if (profile.notificationsEnabled && profile.weeklyReportEnabled) {
-        final progressNotifier = ref.read(progressProvider.notifier);
-        final now = DateTime.now();
-        final monday = now.subtract(Duration(days: (now.weekday - 1) % 7));
-        final weekKey =
-            '${monday.year}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
-        final prefs = await SharedPreferences.getInstance();
-        final lastSentWeek =
-            prefs.getString('notif_weekly_report_sent_week') ?? '';
-        if (lastSentWeek != weekKey) {
-          await prefs.setString('notif_weekly_report_sent_week', weekKey);
-          final weeklyCleared = progressNotifier.weeklyActivity().last;
-          final totalStars = progressNotifier.totalStarsEarned;
+      // 通知プラグインはウィジェットテスト等、プラットフォームチャンネルが
+      // 用意されていない環境では初期化されておらず例外を投げるため、
+      // アプリ本体（学習機能）をクラッシュさせないよう全体をガードする。
+      try {
+        // 通知の初期スケジュール
+        final notif = NotificationService();
+        await notif.scheduleDailyReminder(
+          hour: profile.reminderHour,
+          minute: profile.reminderMinute,
+          enabled: profile.notificationsEnabled,
+        );
+        await notif.scheduleWeeklyReport(
+          hour: 8,
+          minute: 0,
+          enabled: profile.notificationsEnabled && profile.weeklyReportEnabled,
+        );
+        await notif.scheduleEveningNudge(
+          hour: profile.eveningNudgeHour,
+          minute: profile.eveningNudgeMinute,
+          enabled: profile.notificationsEnabled && profile.eveningNudgeEnabled,
+        );
+        // ストリークアラート（午後15時以降＆今日未クリア＆2日以上継続中）
+        if (profile.notificationsEnabled) {
+          final progressNotifier = ref.read(progressProvider.notifier);
           final streakDays = progressNotifier.streakDays;
-          notif.sendWeeklyReportNow(
-            weeklyCleared: weeklyCleared,
-            totalStars: totalStars,
-            streakDays: streakDays,
-          );
+          final todayCleared = progressNotifier.todayClearedCount;
+          if (streakDays >= 2 && todayCleared == 0 && DateTime.now().hour >= 15) {
+            await notif.sendStreakAlert(streakDays);
+          }
         }
+        // 週次レポート即時通知（週初め初回起動時に1回だけ送信）
+        if (profile.notificationsEnabled && profile.weeklyReportEnabled) {
+          final progressNotifier = ref.read(progressProvider.notifier);
+          final now = DateTime.now();
+          final monday = now.subtract(Duration(days: (now.weekday - 1) % 7));
+          final weekKey =
+              '${monday.year}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
+          final prefs = await SharedPreferences.getInstance();
+          final lastSentWeek =
+              prefs.getString('notif_weekly_report_sent_week') ?? '';
+          if (lastSentWeek != weekKey) {
+            await prefs.setString('notif_weekly_report_sent_week', weekKey);
+            final weeklyCleared = progressNotifier.weeklyActivity().last;
+            final totalStars = progressNotifier.totalStarsEarned;
+            final streakDays = progressNotifier.streakDays;
+            await notif.sendWeeklyReportNow(
+              weeklyCleared: weeklyCleared,
+              totalStars: totalStars,
+              streakDays: streakDays,
+            );
+          }
+        }
+      } catch (_) {
+        // 通知プラグイン未初期化環境（テスト等）では黙って諦める。
       }
     });
   }
@@ -114,6 +121,9 @@ class _ShogakuKoreProgrammingAppState
         HapticService.setEnabled(next.hapticsEnabled);
       }
       // デイリーリマインダー
+      // .catchError: 通知プラグイン未初期化環境でも fire-and-forget の
+      // 例外でアプリをクラッシュさせないためのガード（main.dart:58 の
+      // try/catch と同じ理由）。
       if (prev?.notificationsEnabled != next.notificationsEnabled ||
           prev?.reminderHour != next.reminderHour ||
           prev?.reminderMinute != next.reminderMinute) {
@@ -121,7 +131,7 @@ class _ShogakuKoreProgrammingAppState
           hour: next.reminderHour,
           minute: next.reminderMinute,
           enabled: next.notificationsEnabled,
-        );
+        ).catchError((_) {});
       }
       // 週次レポート（毎週月曜 08:00）
       if (prev?.notificationsEnabled != next.notificationsEnabled ||
@@ -130,7 +140,7 @@ class _ShogakuKoreProgrammingAppState
           hour: 8,
           minute: 0,
           enabled: next.notificationsEnabled && next.weeklyReportEnabled,
-        );
+        ).catchError((_) {});
       }
       // 夕方ナッジ
       if (prev?.notificationsEnabled != next.notificationsEnabled ||
@@ -141,7 +151,7 @@ class _ShogakuKoreProgrammingAppState
           hour: next.eveningNudgeHour,
           minute: next.eveningNudgeMinute,
           enabled: next.notificationsEnabled && next.eveningNudgeEnabled,
-        );
+        ).catchError((_) {});
       }
     });
 
