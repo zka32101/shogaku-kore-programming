@@ -127,7 +127,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
     if (key == LogicalKeyboardKey.enter) {
       final editorState = ref.read(editorProvider);
-      if (editorState.scriptBlocks.isNotEmpty) {
+      if (editorState.scriptBlocks.isNotEmpty && !editorState.hasSubmitted) {
         HapticService.lightImpact();
         ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput);
         Future.delayed(const Duration(milliseconds: 100), () {
@@ -210,7 +210,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     );
   }
 
-  void _showResult(bool isCorrect) {
+  Future<void> _showResult(bool isCorrect) async {
     final isFirstComplete =
         !(ref.read(progressProvider)[widget.challenge.id]?.isCompleted ?? false);
 
@@ -221,10 +221,21 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         message: kCelebrationMessages[_rng.nextInt(kCelebrationMessages.length)],
         hold: const Duration(seconds: 4),
       );
-      ref.read(characterProvider.notifier).growFromCorrectAnswer(
+      await ref.read(characterProvider.notifier).growFromCorrectAnswer(
             challengeType: 'visual',
             difficulty: widget.challenge.level,
           );
+      if (!mounted) return;
+      final charState = ref.read(characterProvider);
+      if (charState.didStageUp && charState.lastGrowthMessage != null) {
+        // ステージアップ！ 特別なリアクションで進化の瞬間を演出
+        _reactCharacter(
+          CharacterMood.celebrating,
+          message: charState.lastGrowthMessage!,
+          hold: const Duration(seconds: 4),
+        );
+        ref.read(characterProvider.notifier).clearGrowthMessage();
+      }
     } else {
       // 不正解でも責めず、応援する
       _reactCharacter(
@@ -1085,7 +1096,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           Expanded(
             flex: 2,
             child: ElevatedButton.icon(
-              onPressed: editorState.scriptBlocks.isEmpty
+              onPressed: (editorState.scriptBlocks.isEmpty || editorState.hasSubmitted)
                   ? null
                   : () {
                       ref

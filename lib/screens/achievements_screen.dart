@@ -534,9 +534,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         name: 'パーフェクトクリア',
         description: '全${AppConstants.totalStages}ステージ3つ星（${AppConstants.totalStages * 3}ポイント満点）',
         category: 'stars',
-        isUnlocked: totalStars >= 120,
-        progressCurrent: totalStars.clamp(0, 120),
-        progressTarget: 120,
+        isUnlocked: totalStars >= AppConstants.totalStages * 3,
+        progressCurrent: totalStars.clamp(0, AppConstants.totalStages * 3),
+        progressTarget: AppConstants.totalStages * 3,
       ),
       // 3つ星バッジ
       _Badge(

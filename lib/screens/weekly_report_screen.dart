@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../config/constants.dart';
 import '../providers/weekly_report_provider.dart';
 import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
 import '../services/sound_service.dart';
 import '../services/haptic_service.dart';
 
@@ -19,6 +21,11 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
   Widget build(BuildContext context) {
     final reportState = ref.watch(weeklyReportProvider);
     final profileState = ref.watch(profileProvider);
+    ref.watch(progressProvider); // 進捗の変化でリビルドさせる
+    final progressNotifier = ref.read(progressProvider.notifier);
+    final completedCount = progressNotifier.completedCount;
+    final currentLevel = progressNotifier.currentLevel;
+    final streakDays = progressNotifier.streakDays;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,11 +70,11 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
                     const SizedBox(height: 12),
                     Text('お子さんの名前: ${profileState.nickname}'),
                     const SizedBox(height: 4),
-                    Text('完了ステージ: 0 / 55'),
+                    Text('完了ステージ: $completedCount / ${AppConstants.totalStages}'),
                     const SizedBox(height: 4),
-                    Text('現在レベル: 1'),
+                    Text('現在レベル: $currentLevel'),
                     const SizedBox(height: 4),
-                    Text('学習ストリーク: 0 日'),
+                    Text('学習ストリーク: $streakDays 日'),
                   ],
                 ),
               ),
@@ -199,16 +206,23 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
     HapticService.lightImpact();
     SoundService().playTap();
 
-    // サンプルデータ（実装では Providers から取得）
+    final progressNotifier = ref.read(progressProvider.notifier);
+    final completedCount = progressNotifier.completedCount;
+    final currentLevel = progressNotifier.currentLevel;
+    final streakDays = progressNotifier.streakDays;
+    final completedThisWeek = progressNotifier.weeklyActivity(weeks: 1).last;
+
     await ref.read(weeklyReportProvider.notifier).generateReport(
       profileState.nickname ?? 'お子さん',
-      5, // completedThisWeek
-      10, // totalCompleted
-      ['if文', 'ループ'],
-      ['配列操作'],
-      1, // currentLevel
-      0, // streakDays
+      completedThisWeek,
+      completedCount, // totalCompleted
+      const ['if文', 'ループ'],
+      const ['配列操作'],
+      currentLevel,
+      streakDays,
     );
+
+    if (!mounted) return;
 
     setState(() {
       _reportGenerated = true;

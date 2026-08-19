@@ -143,7 +143,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
       return KeyEventResult.ignored;
     }
 
-    if (_isLoading) return KeyEventResult.ignored;
+    if (_isLoading || _questions.isEmpty) return KeyEventResult.ignored;
 
     // 回答済みのとき: Enter/Space で次へ
     if (_hasAnswered) {
@@ -556,6 +556,8 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                 const Expanded(child: Center(child: CircularProgressIndicator()))
               else if (_sessionDone)
                 Expanded(child: _buildResult(context))
+              else if (_questions.isEmpty)
+                Expanded(child: _buildEmptyState(context))
               else
                 Expanded(child: _buildQuiz(context)),
             ],
@@ -643,7 +645,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                   ],
                 ),
               ),
-              if (!_sessionDone && !_isLoading) ...[
+              if (!_sessionDone && !_isLoading && _questions.isNotEmpty) ...[
                 if (_displaySeconds > 0)
                   Text(
                     _displaySeconds >= 60
@@ -659,7 +661,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
               ],
             ],
           ),
-          if (!_sessionDone && !_isLoading) ...[
+          if (!_sessionDone && !_isLoading && _questions.isNotEmpty) ...[
             const SizedBox(height: 8),
             TweenAnimationBuilder<double>(
               tween: Tween(begin: 0.0, end: (_currentIndex + 1) / _questions.length),
@@ -677,6 +679,42 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('🌱', style: TextStyle(fontSize: 56)),
+            const SizedBox(height: 16),
+            Text(
+              'まだ復習できる問題がありません。\nステージをクリアしよう！',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: context.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.arrow_back, size: 18),
+              label: const Text('もどる'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -768,17 +806,19 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                         );
                         showDialog(
                           context: context,
-                          builder: (ctx) {
-                            final coachState =
-                                ref.watch(aiProgrammingCoachProvider);
-                            return AIResponseDialog(
-                              title: '💡 AI デバッグヒント',
-                              content: coachState.content,
-                              isLoading: coachState.isLoading,
-                              error: coachState.error,
-                              onDismiss: () => Navigator.pop(ctx),
-                            );
-                          },
+                          builder: (ctx) => Consumer(
+                            builder: (context, ref, _) {
+                              final coachState =
+                                  ref.watch(aiProgrammingCoachProvider);
+                              return AIResponseDialog(
+                                title: '💡 AI デバッグヒント',
+                                content: coachState.content,
+                                isLoading: coachState.isLoading,
+                                error: coachState.error,
+                                onDismiss: () => Navigator.pop(ctx),
+                              );
+                            },
+                          ),
                         );
                       },
                       child: Container(

@@ -63,6 +63,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
   DateTime? _sessionStart;            // セッション開始時刻（学習時間計測用）
   bool _timeRecorded = false;         // 学習時間の二重記録防止フラグ
   Timer? _timer;
+  Timer? _timeoutAdvanceTimer;        // タイムアウト後の自動次問タイマー
   final FocusNode _focusNode = FocusNode(); // キーボードショートカット用
 
   // カウントダウンバーアニメーション
@@ -102,6 +103,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
   @override
   void dispose() {
     _timer?.cancel();
+    _timeoutAdvanceTimer?.cancel();
     // 通常完了以外（中途終了）の場合も学習時間を記録
     if (!_timeRecorded && _sessionStart != null) {
       final elapsed = DateTime.now().difference(_sessionStart!).inSeconds;
@@ -557,7 +559,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
       _combo = 0;
       _showComboAnim = false;
     });
-    Future.delayed(const Duration(seconds: 2), () {
+    _timeoutAdvanceTimer = Timer(const Duration(seconds: 2), () {
       if (mounted) _nextQuestion();
     });
   }
@@ -621,6 +623,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
   }
 
   void _nextQuestion() {
+    _timeoutAdvanceTimer?.cancel();
     _timer?.cancel();
     if (_currentIndex < _questions.length - 1) {
       setState(() {
@@ -638,6 +641,11 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
 
   Future<void> _showResult() async {
     if (_score > 0) SoundService().playComplete();
+
+    // recordResult() が provider state を更新する前に「更新前」の値を退避しておく。
+    // （更新後に taState から逆算すると isNewRecord==true のケースで old==new に潰れてしまうため）
+    final oldBestCorrect = ref.read(timeAttackProvider).bestCorrect;
+    final oldBestCombo = ref.read(timeAttackProvider).bestMaxCombo;
 
     final (isNewRecord, isNewCombo) = await ref
         .read(timeAttackProvider.notifier)
@@ -677,8 +685,6 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     // TAマイルストーンバッジ（プレイ数・スコア・コンボ）
     final taState = ref.read(timeAttackProvider);
     final newPlayCount = taState.playCount;
-    final oldBestCorrect = taState.bestCorrect - (isNewRecord ? _score - taState.bestCorrect : 0);
-    final oldBestCombo   = taState.bestMaxCombo;
     final taBadges = <(String, String, String, String)>[];
 
     // プレイ数バッジ

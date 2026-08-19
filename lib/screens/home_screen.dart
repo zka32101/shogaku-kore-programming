@@ -16,6 +16,8 @@ import 'badge_unlock_screen.dart';
 import 'stage_list_screen.dart';
 import 'editor_screen.dart';
 import 'quiz_screen.dart';
+import 'paywall_screen.dart';
+import '../widgets/app_dialog.dart';
 import 'daily_review_screen.dart';
 import 'time_attack_screen.dart';
 import 'ranking_screen.dart';
@@ -1960,25 +1962,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  /// プレミアム限定ステージなら課金モーダルを表示し、無料ステージなら
+  /// エディタ／クイズ画面へ遷移する共通ヘルパー。
+  ///
+  /// 「今日のチャレンジ」カード・連続記録危機バナー・おかえりバナーの
+  /// 3箇所から呼び出され、プレミアムロックの回避（ペイウォールバイパス）を防ぐ。
+  void _openChallengeOrShowPaywall(BuildContext context, Challenge challenge) {
+    if (!challenge.isFree) {
+      HapticService.lightImpact();
+      SoundService().playTap();
+      AppDialog.confirm(
+        context,
+        emoji: '🔒',
+        title: 'プレミアム限定ステージ',
+        message: 'このステージはプレミアム会員限定です。\nアップグレードしてすべてのステージを解放しよう！',
+        okLabel: 'アップグレード',
+        cancelLabel: 'とじる',
+      ).then((upgrade) {
+        if (upgrade && context.mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PaywallScreen()),
+          );
+        }
+      });
+      return;
+    }
+    HapticService.lightImpact();
+    SoundService().playTap();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => challenge.type == ChallengeType.visual
+            ? EditorScreen(challenge: challenge)
+            : QuizScreen(challenge: challenge),
+      ),
+    );
+  }
+
   Widget _buildStreakDangerBanner(BuildContext context) {
     final streakDays = ref.read(progressProvider.notifier).streakDays;
     final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        HapticService.mediumImpact();
-        SoundService().playTap();
         final next = allChallenges.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
           orElse: () => allChallenges.first,
         );
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => next.type == ChallengeType.visual
-                ? EditorScreen(challenge: next)
-                : QuizScreen(challenge: next),
-          ),
-        );
+        _openChallengeOrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2142,19 +2172,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        HapticService.lightImpact();
-        SoundService().playTap();
         final next = allChallenges.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
           orElse: () => allChallenges.first,
         );
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => next.type == ChallengeType.visual
-                ? EditorScreen(challenge: next)
-                : QuizScreen(challenge: next),
-          ),
-        );
+        _openChallengeOrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2986,16 +3008,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildDailyMission(BuildContext context, Challenge challenge) {
     void openChallenge() {
-      if (!challenge.isFree) return;
-      HapticService.lightImpact();
-      SoundService().playTap();
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => challenge.type == ChallengeType.visual
-              ? EditorScreen(challenge: challenge)
-              : QuizScreen(challenge: challenge),
-        ),
-      );
+      _openChallengeOrShowPaywall(context, challenge);
     }
 
     return GestureDetector(
