@@ -232,17 +232,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       subtitle: '毎日の学習通知',
                       value: profile.notificationsEnabled,
                       onChanged: (v) async {
-                        ref.read(profileProvider.notifier).setNotificationsEnabled(v);
                         if (v) {
                           final granted = await NotificationService().requestPermission();
                           if (granted) {
+                            ref.read(profileProvider.notifier).setNotificationsEnabled(true);
                             await NotificationService().scheduleDailyReminder(
                               hour: profile.reminderHour,
                               minute: profile.reminderMinute,
                               enabled: true,
                             );
+                          } else {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('通知の許可が必要です。端末の設定から許可してください。')),
+                              );
+                            }
                           }
                         } else {
+                          ref.read(profileProvider.notifier).setNotificationsEnabled(false);
                           await NotificationService().cancelAll();
                         }
                       },

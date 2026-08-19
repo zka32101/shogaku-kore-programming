@@ -505,9 +505,9 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
         .where((c) => favorites.isFavorite(c.id))
         .length;
 
-    // 現在のステージ（最初の未完了）
+    // 現在のステージ（最初の未完了かつ未ロックのステージ）
     final currentIndex = allChallenges.indexWhere(
-      (c) => !(progressMap[c.id]?.isCompleted ?? false),
+      (c) => !(progressMap[c.id]?.isCompleted ?? false) && c.isFree,
     );
 
     final completedInLevel = allChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;

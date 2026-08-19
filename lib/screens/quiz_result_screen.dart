@@ -28,7 +28,6 @@ class QuizResultScreen extends ConsumerStatefulWidget {
   final int totalCount;
   final int stars;
   final bool isFirstComplete;
-  final VoidCallback onRetry;
   final Challenge? nextChallenge;
   final int completedCount;   // ステージ完了数（バッジ判定用）
   final int sessionSeconds;   // セッション所要時間（秒）
@@ -48,7 +47,6 @@ class QuizResultScreen extends ConsumerStatefulWidget {
     required this.totalCount,
     required this.stars,
     required this.isFirstComplete,
-    required this.onRetry,
     this.nextChallenge,
     this.completedCount = 0,
     this.sessionSeconds = 0,
@@ -386,6 +384,16 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     super.dispose();
   }
 
+  // もう一度挑戦する。QuizResultScreen自身の有効なcontextでナビゲーションするため、
+  // quiz_screen.dart側の破棄済みcontextを閉じ込めたコールバックには依存しない。
+  void _retry(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => QuizScreen(challenge: widget.challenge),
+      ),
+    );
+  }
+
   void _shareResult(BuildContext context) {
     HapticService.lightImpact();
     final nickname = ref.read(profileProvider).nickname;
@@ -436,8 +444,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
           ),
         );
       } else {
-        Navigator.of(context).pop();
-        widget.onRetry();
+        _retry(context);
       }
       return KeyEventResult.handled;
     }
@@ -455,8 +462,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     }
     // R → もう一度
     if (key == LogicalKeyboardKey.keyR) {
-      Navigator.of(context).pop();
-      widget.onRetry();
+      _retry(context);
       return KeyEventResult.handled;
     }
     // W → 間違い問題の復習（不正解がある場合のみ）
@@ -1421,10 +1427,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    widget.onRetry();
-                  },
+                  onPressed: () => _retry(context),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(

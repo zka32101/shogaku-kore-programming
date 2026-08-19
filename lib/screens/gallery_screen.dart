@@ -97,8 +97,12 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.memory(
-                              Uri.dataFromString(work.resultImage).data!.contentAsBytes(),
+                              Uri.parse(work.resultImage).data!.contentAsBytes(),
                               fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.broken_image,
+                                color: Colors.grey,
+                              ),
                             ),
                           )
                         : const Center(
@@ -152,10 +156,14 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                           topRight: Radius.circular(12),
                         ),
                         child: Image.memory(
-                          Uri.dataFromString(work.resultImage)
+                          Uri.parse(work.resultImage)
                               .data!
                               .contentAsBytes(),
                           fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                          ),
                         ),
                       )
                     : const Center(
