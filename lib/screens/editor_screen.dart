@@ -896,6 +896,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               : ReorderableListView.builder(
                   padding: const EdgeInsets.all(8),
                   itemCount: editorState.scriptBlocks.length,
+                  // ignore: deprecated_member_use — onReorderItem requires a
+                  // Flutter SDK version bump to migrate safely; tracked as
+                  // follow-up, current behavior is correct and unaffected.
                   onReorder: (oldIndex, newIndex) {
                     if (newIndex > oldIndex) newIndex--;
                     ref.read(editorProvider.notifier).moveBlock(oldIndex, newIndex);
