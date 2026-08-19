@@ -648,7 +648,7 @@ class _WrongAnswerCard extends StatelessWidget {
                       onPressed: onResolve,
                       icon: const Text('🎉',
                           style: TextStyle(fontSize: 12)),
-                      label: const Text('克服済みにする',
+                      label: const Text('できるようになった！',
                           style: TextStyle(fontSize: 11)),
                       style: TextButton.styleFrom(
                         foregroundColor: const Color(0xFF27AE60),

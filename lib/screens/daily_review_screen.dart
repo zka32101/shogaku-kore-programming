@@ -212,27 +212,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
 
     // F → 苦手フラグ（苦手リストに追加）
     if (key == LogicalKeyboardKey.keyF && !_flagged && !_hasAnswered) {
-      HapticService.lightImpact();
-      final q = _questions[_currentIndex];
-      ref.read(wrongAnswersProvider.notifier).addWrongAnswers([
-        QuizAnswer(
-          questionText: q.question.text,
-          isCorrect: false,
-          selectedAnswer: '📌 手動追加',
-          correctAnswer: q.question.options[q.question.correctIndex],
-          explanation: q.question.explanation,
-          codeSnippet: q.question.codeSnippet,
-          hintUsed: _hintShown,
-        ),
-      ]);
-      setState(() => _flagged = true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('📌 苦手リストに追加しました'),
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _flagCurrentQuestion();
       return KeyEventResult.handled;
     }
 
@@ -254,6 +234,31 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
     }
 
     return KeyEventResult.ignored;
+  }
+
+  /// 現在の問題を苦手リストに追加する（Fキー・ヘッダーのボタン共通ロジック）
+  void _flagCurrentQuestion() {
+    HapticService.lightImpact();
+    final q = _questions[_currentIndex];
+    ref.read(wrongAnswersProvider.notifier).addWrongAnswers([
+      QuizAnswer(
+        questionText: q.question.text,
+        isCorrect: false,
+        selectedAnswer: '📌 手動追加',
+        correctAnswer: q.question.options[q.question.correctIndex],
+        explanation: q.question.explanation,
+        codeSnippet: q.question.codeSnippet,
+        hintUsed: _hintShown,
+      ),
+    ]);
+    setState(() => _flagged = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('📌 苦手リストに追加しました'),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   Future<void> _init() async {
@@ -646,6 +651,31 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                 ),
               ),
               if (!_sessionDone && !_isLoading && _questions.isNotEmpty) ...[
+                if (!_hasAnswered)
+                  Tooltip(
+                    message: _flagged ? '苦手リストに追加済み' : '苦手リストに追加',
+                    child: GestureDetector(
+                      onTap: _flagged ? null : _flagCurrentQuestion,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: 30,
+                        height: 30,
+                        margin: const EdgeInsets.only(right: 4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _flagged
+                              ? Colors.red.withValues(alpha: 0.8)
+                              : Colors.white.withValues(alpha: 0.22),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _flagged ? '🚩' : '🏳️',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 if (_displaySeconds > 0)
                   Text(
                     _displaySeconds >= 60
@@ -838,7 +868,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                             Text('💡', style: TextStyle(fontSize: 14)),
                             SizedBox(width: 6),
                             Text(
-                              'AI に別の視点からのヒントをもらう',
+                              'AIにもうすこしヒントをもらう',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,

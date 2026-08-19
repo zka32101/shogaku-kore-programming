@@ -220,6 +220,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                       '−${item.price}コイン',
                       style: const TextStyle(fontSize: 11),
                     ),
+                    if (!item.isConsumable)
+                      const Text(
+                        '設定画面で使えるよ！',
+                        style: TextStyle(fontSize: 11),
+                      ),
                   ],
                 ),
               ),
@@ -228,6 +233,13 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           backgroundColor: kPrimaryColor,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 3),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('購入できませんでした。もう一度確認してね'),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }

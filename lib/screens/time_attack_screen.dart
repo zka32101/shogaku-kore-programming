@@ -179,27 +179,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
 
     // F → 苦手フラグ（苦手リストに追加）
     if (key == LogicalKeyboardKey.keyF && !_flagged) {
-      HapticService.lightImpact();
-      final q = _questions[_currentIndex];
-      ref.read(wrongAnswersProvider.notifier).addWrongAnswers([
-        QuizAnswer(
-          questionText: q.question.text,
-          isCorrect: false,
-          selectedAnswer: '📌 手動追加',
-          correctAnswer: q.question.options[q.question.correctIndex],
-          explanation: q.question.explanation,
-          codeSnippet: q.question.codeSnippet,
-          hintUsed: false,
-        ),
-      ]);
-      setState(() => _flagged = true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('📌 苦手リストに追加しました'),
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _flagCurrentQuestion();
       return KeyEventResult.handled;
     }
 
@@ -225,6 +205,31 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     }
 
     return KeyEventResult.ignored;
+  }
+
+  /// 現在の問題を苦手リストに追加する（Fキー・ヘッダーのボタン共通ロジック）
+  void _flagCurrentQuestion() {
+    HapticService.lightImpact();
+    final q = _questions[_currentIndex];
+    ref.read(wrongAnswersProvider.notifier).addWrongAnswers([
+      QuizAnswer(
+        questionText: q.question.text,
+        isCorrect: false,
+        selectedAnswer: '📌 手動追加',
+        correctAnswer: q.question.options[q.question.correctIndex],
+        explanation: q.question.explanation,
+        codeSnippet: q.question.codeSnippet,
+        hintUsed: false,
+      ),
+    ]);
+    setState(() => _flagged = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('📌 苦手リストに追加しました'),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   // ────────────────────────────────────────────────────────────────────────
@@ -501,7 +506,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     _timer = Timer.periodic(const Duration(milliseconds: 100), (t) {
       if (!mounted) return;
       setState(() => _timeLeft -= 0.1);
-      if (!_urgentHapticFired && _timeLeft <= 10 && _timeLeft > 0) {
+      if (!_urgentHapticFired && _timeLeft <= _secondsPerQ * 0.25 && _timeLeft > 0) {
         _urgentHapticFired = true;
         HapticService.mediumImpact();
       }
@@ -808,7 +813,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     }
 
     final q = _questions[_currentIndex];
-    final isUrgent = _timeLeft <= 10;
+    final isUrgent = _timeLeft <= _secondsPerQ * 0.25;
     final urgentColor = isUrgent ? Colors.red : kPrimaryColor;
 
     return Focus(
@@ -953,6 +958,31 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
               ],
             ),
           ),
+          // 苦手フラグボタン（タッチ操作でも押せるように）
+          Tooltip(
+            message: _flagged ? '苦手リストに追加済み' : '苦手リストに追加',
+            child: GestureDetector(
+              onTap: _flagged ? null : _flagCurrentQuestion,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _flagged
+                      ? Colors.red.withValues(alpha: 0.8)
+                      : Colors.white.withValues(alpha: 0.25),
+                ),
+                child: Center(
+                  child: Text(
+                    _flagged ? '🚩' : '🏳️',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           // スコア表示
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1252,7 +1282,7 @@ class _TimeAttackResultScreenState
         return KeyEventResult.handled;
       }
     }
-    // S → シェア
+    // S → スコアをコピー
     if (key == LogicalKeyboardKey.keyS) {
       _shareScore(context);
       return KeyEventResult.handled;
@@ -1269,7 +1299,7 @@ class _TimeAttackResultScreenState
       showShortcutsHelpDialog(context, shortcuts: const [
         ('Enter / Space / R', 'もう一度プレイ'),
         ('W', '間違えた問題を復習'),
-        ('S', 'スコアをシェア'),
+        ('S', 'スコアをコピー'),
         ('Esc / Backspace', 'ホームへ戻る'),
         ('?', 'このヘルプを表示'),
       ]);
@@ -1526,13 +1556,13 @@ class _TimeAttackResultScreenState
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Column(
                 children: [
-                  // シェアボタン
+                  // スコアコピーボタン
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () => _shareScore(context),
-                      icon: const Icon(Icons.share_outlined, size: 18),
-                      label: const Text('スコアをシェア'),
+                      icon: const Icon(Icons.copy, size: 18),
+                      label: const Text('スコアをコピー'),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(

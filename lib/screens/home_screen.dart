@@ -58,6 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int? _prevStreak;
   bool _goalCelebrated = false;
   bool _codeKingChecked = false; // セッション内でコード王チェック済みか
+  bool _showMoreStats = false; // 「もっと見る」で表示する補助カード群の開閉状態
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -444,12 +445,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: completedCount > 0
           ? Builder(builder: (ctx) {
               final hasWrong = !wrongAnswersState.isEmpty;
-              return FloatingActionButton.small(
+              return FloatingActionButton.extended(
                 heroTag: 'quick_quiz_fab',
                 onPressed: () => _showRandomQuickQuiz(context, allChallenges, progressMap),
                 backgroundColor: hasWrong ? const Color(0xFFFF6B35) : kPrimaryColor,
                 tooltip: hasWrong ? '🔥 苦手問題優先でランダム1問チャレンジ' : 'ランダム1問チャレンジ',
-                child: Text(hasWrong ? '🔥' : '🎲', style: const TextStyle(fontSize: 18)),
+                icon: Text(hasWrong ? '🔥' : '🎲', style: const TextStyle(fontSize: 18)),
+                label: Text(hasWrong ? '苦手' : '1問！', style: const TextStyle(fontSize: 11)),
               );
             })
           : null,
@@ -542,6 +544,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ];
                   }(),
 
+                  // 苦手問題復習カード（過去の間違い問題がある場合のみ）
+                  if (!wrongAnswersState.isEmpty) ...[
+                    _buildWrongAnswersCard(context, wrongAnswersState.count)
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 90.ms)
+                        .slideY(begin: 0.12, curve: Curves.easeOut),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // お気に入りステージカード
+                  if (favoritesState.count > 0) ...[
+                    _buildFavoritesCard(context, favoritesState.count, allChallenges, favoritesState.favoriteIds)
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 95.ms)
+                        .slideY(begin: 0.12, curve: Curves.easeOut),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // もっと見る（学習ストリーク・週間チャレンジなど詳細統計）
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        HapticService.lightImpact();
+                        setState(() => _showMoreStats = !_showMoreStats);
+                      },
+                      icon: Icon(
+                        _showMoreStats ? Icons.expand_less : Icons.expand_more,
+                        size: 18,
+                      ),
+                      label: Text(
+                        _showMoreStats ? 'とじる' : 'もっと見る',
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  if (_showMoreStats) ...[
                   // 学習ストリークカード（1日以上の連続記録がある場合のみ表示）
                   if (streakDays > 0) ...[
                     Container(
@@ -681,24 +721,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: 12),
                   ],
 
-                  // 苦手問題復習カード（過去の間違い問題がある場合のみ）
-                  if (!wrongAnswersState.isEmpty) ...[
-                    _buildWrongAnswersCard(context, wrongAnswersState.count)
-                        .animate()
-                        .fadeIn(duration: 350.ms, delay: 90.ms)
-                        .slideY(begin: 0.12, curve: Curves.easeOut),
-                    const SizedBox(height: 12),
-                  ],
-
-                  // お気に入りステージカード
-                  if (favoritesState.count > 0) ...[
-                    _buildFavoritesCard(context, favoritesState.count, allChallenges, favoritesState.favoriteIds)
-                        .animate()
-                        .fadeIn(duration: 350.ms, delay: 95.ms)
-                        .slideY(begin: 0.12, curve: Curves.easeOut),
-                    const SizedBox(height: 12),
-                  ],
-
                   // フラッシュカード復習スケジュール（7日以上前に習得したカテゴリーがある場合）
                   ...() {
                     if (masteredCards == 0) return <Widget>[];
@@ -756,6 +778,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       .fadeIn(duration: 350.ms, delay: 120.ms)
                       .slideY(begin: 0.12, curve: Curves.easeOut),
                   const SizedBox(height: 16),
+
+                  ],
 
                   // ミニゲーム（タイムアタック・ランキング）
                   _buildMiniGames(context)
@@ -2336,7 +2360,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         weeklyClearedCount.clamp(0, 7), 7,
       ),
       (
-        '💫', '3つ星コレクター', '累計 3つ星ステージを 3 つ取ろう',
+        '💫', '今週の3つ星チャレンジ', '累計 3つ星ステージを 3 つ取ろう',
         perfectCount.clamp(0, 3), 3,
       ),
       (
