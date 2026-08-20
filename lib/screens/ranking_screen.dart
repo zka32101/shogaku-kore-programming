@@ -212,7 +212,15 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
             _buildHeader(context, myEntry, rankings),
             // ランキングリスト（＋週間チャレンジ）
             Expanded(
-              child: ListView.builder(
+              child: RefreshIndicator(
+                color: kPrimaryColor,
+                onRefresh: () async {
+                  ref.invalidate(progressProvider);
+                  ref.invalidate(profileProvider);
+                  await Future.delayed(const Duration(milliseconds: 400));
+                },
+                child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 itemCount: flatItems.length + (showChallenges ? 1 : 0),
                 itemBuilder: (context, index) {
@@ -249,6 +257,7 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                         ),
                       );
                 },
+                ),
               ),
             ),
           ],

@@ -260,7 +260,14 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _BadgesTab(badges: badges),
+                  _BadgesTab(
+                    badges: badges,
+                    onRefresh: () async {
+                      ref.invalidate(progressProvider);
+                      ref.invalidate(allChallengesProvider);
+                      await Future.delayed(const Duration(milliseconds: 400));
+                    },
+                  ),
                   _CompletedTab(
                     allChallenges: allChallenges,
                     progressMap: progressMap,
@@ -1026,7 +1033,8 @@ enum _BadgeFilter { all, unlocked, locked }
 
 class _BadgesTab extends StatefulWidget {
   final List<_Badge> badges;
-  const _BadgesTab({required this.badges});
+  final Future<void> Function() onRefresh;
+  const _BadgesTab({required this.badges, required this.onRefresh});
 
   @override
   State<_BadgesTab> createState() => _BadgesTabState();
@@ -1054,7 +1062,11 @@ class _BadgesTabState extends State<_BadgesTab> {
       _BadgeFilter.all      => widget.badges,
     };
 
-    return ListView(
+    return RefreshIndicator(
+      color: kPrimaryColor,
+      onRefresh: widget.onRefresh,
+      child: ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: [
         // フィルターチップ
@@ -1174,6 +1186,7 @@ class _BadgesTabState extends State<_BadgesTab> {
             ),
         ],
       ],
+      ),
     );
   }
 }

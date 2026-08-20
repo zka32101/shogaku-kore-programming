@@ -18,6 +18,7 @@ import 'paywall_screen.dart';
 import 'flashcard_screen.dart';
 import 'badge_unlock_screen.dart';
 import '../widgets/shortcut_help.dart';
+import '../widgets/tap_scale.dart';
 
 class StageListScreen extends ConsumerStatefulWidget {
   final String? initialLevel;
@@ -663,24 +664,32 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
           )
         else
           Expanded(
-            child: _StagePathView(
-              challenges: challenges,
-              progressMap: progressMap,
-              currentIndex: _filter == _CompletionFilter.all ? currentIndex : -1,
-              level: widget.level,
-              favoriteIds: favorites.favoriteIds,
-              wrongAnswerStageIds: wrongStageIds,
-              onFavoriteToggle: (id) async {
-                final (wasAdded, newCount) = await ref.read(favoritesProvider.notifier).toggle(id);
-                if (!mounted) return;
-                checkFavoriteMilestoneBadge(context, wasAdded: wasAdded, newCount: newCount); // ignore: use_build_context_synchronously
+            child: RefreshIndicator(
+              color: kPrimaryColor,
+              onRefresh: () async {
+                ref.invalidate(progressProvider);
+                ref.invalidate(allChallengesProvider);
+                await Future.delayed(const Duration(milliseconds: 400));
               },
-              onStageTap: (ctx, challenge) {
-                final stars = progressMap[challenge.id]?.starsEarned ?? 0;
-                final isCompleted = progressMap[challenge.id]?.isCompleted ?? false;
-                final completedAt = progressMap[challenge.id]?.completedAt;
-                _openChallenge(ctx, challenge, stars, isCompleted, completedAt);
-              },
+              child: _StagePathView(
+                challenges: challenges,
+                progressMap: progressMap,
+                currentIndex: _filter == _CompletionFilter.all ? currentIndex : -1,
+                level: widget.level,
+                favoriteIds: favorites.favoriteIds,
+                wrongAnswerStageIds: wrongStageIds,
+                onFavoriteToggle: (id) async {
+                  final (wasAdded, newCount) = await ref.read(favoritesProvider.notifier).toggle(id);
+                  if (!mounted) return;
+                  checkFavoriteMilestoneBadge(context, wasAdded: wasAdded, newCount: newCount); // ignore: use_build_context_synchronously
+                },
+                onStageTap: (ctx, challenge) {
+                  final stars = progressMap[challenge.id]?.starsEarned ?? 0;
+                  final isCompleted = progressMap[challenge.id]?.isCompleted ?? false;
+                  final completedAt = progressMap[challenge.id]?.completedAt;
+                  _openChallenge(ctx, challenge, stars, isCompleted, completedAt);
+                },
+              ),
             ),
           ),
       ],
@@ -811,7 +820,9 @@ class _StagePathView extends StatelessWidget {
       final totalHeight = challenges.length * _rowHeight + _topPadding * 2 + 60;
 
       return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         padding: const EdgeInsets.only(top: 8, bottom: 32),
         child: SizedBox(
           width: w,
@@ -1263,13 +1274,14 @@ class _StageNodeState extends State<_StageNode>
 
     final typeEmoji = widget.challenge.type == ChallengeType.quiz ? '🐍' : '🧩';
 
-    Widget circle = GestureDetector(
+    Widget circle = TapScale(
       onTap: widget.onTap,
-      onLongPress: !widget.isLocked ? () {
-        HapticService.mediumImpact();
-        _showContextMenu(context);
-      } : null,
-      child: Stack(
+      child: GestureDetector(
+        onLongPress: !widget.isLocked ? () {
+          HapticService.mediumImpact();
+          _showContextMenu(context);
+        } : null,
+        child: Stack(
         clipBehavior: Clip.none,
         children: [
           Container(
@@ -1384,6 +1396,7 @@ class _StageNodeState extends State<_StageNode>
               ),
             ),
         ],
+        ),
       ),
     );
 
