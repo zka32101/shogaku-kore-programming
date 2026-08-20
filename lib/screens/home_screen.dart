@@ -34,6 +34,7 @@ import '../providers/flashcard_provider.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/daily_puzzle_card.dart';
+import '../widgets/tap_scale.dart';
 import 'why_programming_screen.dart';
 import 'programming_basics_screen.dart';
 import 'shop_screen.dart';
@@ -44,6 +45,7 @@ import 'character_screen.dart';
 import '../providers/coin_provider.dart';
 import '../providers/character_provider.dart';
 import '../models/character_model.dart';
+import '../utils/page_transitions.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -86,28 +88,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyT) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TimeAttackScreen()));
+      Navigator.of(context).push(smoothPageRoute(const TimeAttackScreen()));
       return KeyEventResult.handled;
     }
     // R → ランキング
     if (key == LogicalKeyboardKey.keyR) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RankingScreen()));
+      Navigator.of(context).push(smoothPageRoute(const RankingScreen()));
       return KeyEventResult.handled;
     }
     // F → フラッシュカード
     if (key == LogicalKeyboardKey.keyF) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FlashcardScreen()));
+      Navigator.of(context).push(smoothPageRoute(const FlashcardScreen()));
       return KeyEventResult.handled;
     }
     // S → ステージ一覧
     if (key == LogicalKeyboardKey.keyS) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const StageListScreen()));
+      Navigator.of(context).push(smoothPageRoute(const StageListScreen()));
       return KeyEventResult.handled;
     }
     // D → 今日の復習
@@ -116,7 +118,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (!doneToday) {
         HapticService.lightImpact();
         SoundService().playTap();
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DailyReviewScreen()));
+        Navigator.of(context).push(smoothPageRoute(const DailyReviewScreen()));
         return KeyEventResult.handled;
       }
     }
@@ -124,28 +126,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyV) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReverseTeachingScreen()));
+      Navigator.of(context).push(smoothPageRoute(const ReverseTeachingScreen()));
       return KeyEventResult.handled;
     }
     // G → ギャラリー
     if (key == LogicalKeyboardKey.keyG) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GalleryScreen()));
+      Navigator.of(context).push(smoothPageRoute(const GalleryScreen()));
       return KeyEventResult.handled;
     }
     // E → 週次レポート
     if (key == LogicalKeyboardKey.keyE) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WeeklyReportScreen()));
+      Navigator.of(context).push(smoothPageRoute(const WeeklyReportScreen()));
       return KeyEventResult.handled;
     }
     // C → キャラクター育成
     if (key == LogicalKeyboardKey.keyC) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CharacterScreen()));
+      Navigator.of(context).push(smoothPageRoute(const CharacterScreen()));
       return KeyEventResult.handled;
     }
     // N → 次のTips
@@ -164,7 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyA) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AchievementsScreen()));
+      Navigator.of(context).push(smoothPageRoute(const AchievementsScreen()));
       return KeyEventResult.handled;
     }
     // W → 苦手問題復習（苦手リストがある場合のみ）
@@ -174,7 +176,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => QuizReviewScreen(wrongAnswers: answers)),
+          smoothPageRoute(QuizReviewScreen(wrongAnswers: answers)),
         );
         return KeyEventResult.handled;
       }
@@ -183,7 +185,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyP) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
+      Navigator.of(context).push(smoothPageRoute(const ProfileScreen()));
       return KeyEventResult.handled;
     }
     // ? → キーボードショートカット一覧
@@ -847,9 +849,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             HapticService.lightImpact();
                             SoundService().playTap();
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const WhyProgrammingScreen(),
-                              ),
+                              smoothPageRoute(const WhyProgrammingScreen()),
                             );
                           },
                           icon: const Text('🎓', style: TextStyle(fontSize: 16)),
@@ -872,9 +872,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             HapticService.lightImpact();
                             SoundService().playTap();
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const ProgrammingBasicsScreen(),
-                              ),
+                              smoothPageRoute(const ProgrammingBasicsScreen()),
                             );
                           },
                           icon: const Text('📚', style: TextStyle(fontSize: 16)),
@@ -901,23 +899,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // CTA ボタン（全幅）
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        HapticService.lightImpact();
-                        SoundService().playTap();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const StageListScreen(),
+                    child: TapScale(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          HapticService.lightImpact();
+                          SoundService().playTap();
+                          Navigator.of(context).push(
+                            smoothPageRoute(const StageListScreen()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
+                        child: const Text('チャレンジを開始', style: TextStyle(fontSize: 15)),
                       ),
-                      child: const Text('チャレンジを開始', style: TextStyle(fontSize: 15)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -1060,7 +1058,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       HapticService.lightImpact();
                       SoundService().playTap();
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ShopScreen()),
+                        smoothPageRoute(const ShopScreen()),
                       );
                     },
                     child: Container(
@@ -1272,9 +1270,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     SoundService().playTap();
                     final answers = ref.read(wrongAnswersProvider).answers;
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => QuizReviewScreen(wrongAnswers: answers),
-                      ),
+                      smoothPageRoute(QuizReviewScreen(wrongAnswers: answers)),
                     );
                   },
                   style: OutlinedButton.styleFrom(
@@ -1314,9 +1310,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 HapticService.selectionClick();
                 SoundService().playTap();
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const WrongAnswersListScreen(),
-                  ),
+                  smoothPageRoute(const WrongAnswersListScreen()),
                 );
               },
               style: TextButton.styleFrom(
@@ -1380,7 +1374,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => QuizScreen(challenge: challenge)),
+      smoothPageRoute(QuizScreen(challenge: challenge)),
     );
   }
 
@@ -1400,7 +1394,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const StageListScreen(openFavorites: true)),
+          smoothPageRoute(const StageListScreen(openFavorites: true)),
         );
       },
       child: Container(
@@ -1755,7 +1749,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+                    smoothPageRoute(const FlashcardScreen()),
                   );
                 },
                 child: const Icon(Icons.chevron_right, color: Color(0xFF8E44AB)),
@@ -1777,7 +1771,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // TODO: Navigate to FlashcardScreen with category pre-selected
                   // For now, just open the flashcard screen
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+                    smoothPageRoute(const FlashcardScreen()),
                   );
                 },
                 child: Container(
@@ -1917,8 +1911,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => c.type == ChallengeType.visual
+                    smoothPageRoute(
+                      c.type == ChallengeType.visual
                           ? EditorScreen(challenge: c)
                           : QuizScreen(challenge: c),
                     ),
@@ -2005,7 +1999,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ).then((upgrade) {
         if (upgrade && context.mounted) {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const PaywallScreen()),
+            smoothPageRoute(const PaywallScreen()),
           );
         }
       });
@@ -2014,8 +2008,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     HapticService.lightImpact();
     SoundService().playTap();
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => challenge.type == ChallengeType.visual
+      smoothPageRoute(
+        challenge.type == ChallengeType.visual
             ? EditorScreen(challenge: challenge)
             : QuizScreen(challenge: challenge),
       ),
@@ -2105,7 +2099,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const WhyProgrammingScreen()),
+          smoothPageRoute(const WhyProgrammingScreen()),
         );
       },
       child: Container(
@@ -2733,7 +2727,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onTap: () {
               HapticService.selectionClick();
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AchievementsScreen()),
+                smoothPageRoute(const AchievementsScreen()),
               );
             },
             child: Row(
@@ -3035,7 +3029,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _openChallengeOrShowPaywall(context, challenge);
     }
 
-    return GestureDetector(
+    return TapScale(
       onTap: openChallenge,
       child: Container(
         decoration: BoxDecoration(
@@ -3411,7 +3405,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ShopScreen()),
+          smoothPageRoute(const ShopScreen()),
         );
       },
       child: Container(
@@ -3518,7 +3512,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const TimeAttackScreen()),
+                    smoothPageRoute(const TimeAttackScreen()),
                   );
                 },
               ),
@@ -3534,7 +3528,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const RankingScreen()),
+                    smoothPageRoute(const RankingScreen()),
                   );
                 },
               ),
@@ -3551,7 +3545,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             HapticService.lightImpact();
             SoundService().playTap();
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+              smoothPageRoute(const FlashcardScreen()),
             );
           },
         ),
@@ -3566,9 +3560,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               HapticService.mediumImpact();
               SoundService().playTap();
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const TimeAttackScreen(initialWeakMode: true),
-                ),
+                smoothPageRoute(const TimeAttackScreen(initialWeakMode: true)),
               );
             },
           ),
@@ -3594,7 +3586,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const CharacterScreen()),
+          smoothPageRoute(const CharacterScreen()),
         );
       },
       child: Container(
@@ -3643,7 +3635,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               HapticService.lightImpact();
               SoundService().playTap();
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const DailyReviewScreen()),
+                smoothPageRoute(const DailyReviewScreen()),
               );
             },
       child: Opacity(
@@ -3796,9 +3788,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => StageListScreen(initialLevel: level),
-          ),
+          smoothPageRoute(StageListScreen(initialLevel: level)),
         );
       },
       child: Container(
