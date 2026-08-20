@@ -37,6 +37,17 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // NOTE: R8によるコード圧縮・難読化(minify)は、GitHub Actionsの
+            // 標準ランナー(16GB RAM)上で org.gradle.jvmargs のヒープを
+            // 2048m→3072m→4608m→7168mと段階的に増やしても
+            // "OutOfMemoryError: Java heap space" が解消しなかったため、
+            // 暫定的に無効化している。APKサイズは大きくなり、難読化されない。
+            // 将来的に対応する場合の選択肢:
+            //   - self-hosted runner等、より大きなメモリのビルド環境を使う
+            //   - R8Task が実際に使用しているワーカーのメモリ制御方法を
+            //     Android Gradle Plugin側で個別に調査・設定する
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
