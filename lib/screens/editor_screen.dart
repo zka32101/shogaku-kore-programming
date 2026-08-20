@@ -905,6 +905,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   },
                   itemBuilder: (context, index) {
                     final block = editorState.scriptBlocks[index];
+                    // NOTE: ReorderableListView.builder は itemBuilder が返す
+                    // 一番外側のウィジェットに一意なキーを持つことを要求する。
+                    // 以前は .animate() が一番外側になっており、そのラッパーに
+                    // キーが付いていなかったため、ブロックの同一性を正しく
+                    // 追跡できず、追加したブロックが一瞬表示されてすぐ消える
+                    // 不具合が発生していた。.animate(key: ...) で明示的に
+                    // 一番外側のウィジェットにもキーを渡すことで修正する。
                     return Dismissible(
                       key: ValueKey('dismiss_${block.id}'),
                       direction: DismissDirection.endToStart,
@@ -942,7 +949,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         },
                         onTap: () => _showParamEditor(context, block),
                       ),
-                    ).animate().fadeIn(duration: 250.ms).slideX(
+                    ).animate(key: ValueKey(block.id)).fadeIn(duration: 250.ms).slideX(
                           begin: -0.1,
                           curve: Curves.easeOut,
                           duration: 250.ms,

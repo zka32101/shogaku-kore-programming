@@ -53,3 +53,22 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/
+  fonts:
+    # 漢字が正しい字形(日本語字形)で表示されない不具合の修正。
+    # fontFamily: 'NotoSansJP' はテーマ(theme.dart)で指定されているが、
+    # 実際のフォントファイルが同梱されていなかったため、Flutterが
+    # フォントを解決できずOS標準フォントにフォールバックしていた。
+    # 端末によっては中国語(簡体字)向けの字形でCJK漢字が描画される等、
+    # 見た目が崩れる原因になっていた。可変フォント(Variable Font)を
+    # 同梱し、weightごとに参照することでRegular/Boldとも正しい
+    # 日本語字形で表示されるようにする。
+    - family: NotoSansJP
+      fonts:
+        - asset: assets/fonts/NotoSansJP-VariableWeight.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSansJP-VariableWeight.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSansJP-VariableWeight.ttf
+          weight: 700
+        - asset: assets/fonts/NotoSansJP-VariableWeight.ttf
+          weight: 900
