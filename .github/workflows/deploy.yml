@@ -37,12 +37,23 @@ jobs:
       - name: Analyze code
         run: flutter analyze
 
-      # デバッグ用: ビルド中20秒おきにメモリ使用状況を記録する。
-      # これまで繰り返し発生している "JVM garbage collector is
-      # thrashing" の原因調査のため、実際のメモリ推移を可視化する。
+      # デバッグ用: ビルド中20秒おきにメモリ使用状況・javaプロセスを
+      # ファイルに記録する（前回、バックグラウンド出力が後続ステップの
+      # ログに混ざらず失われたため、ファイルへのリダイレクト＋失敗時に
+      # 明示的にダンプする方式に変更）。
       - name: Start memory monitor (debug)
         run: |
-          (while true; do echo "=== $(date -u +%H:%M:%S) ==="; free -h; sleep 20; done) &
+          (
+            while true; do
+              echo "=== $(date -u +%H:%M:%S) ==="
+              free -h
+              echo "--- java/kotlin processes ---"
+              ps -eo pid,ppid,rss,cmd | grep -E "java|kotlin" | grep -v grep
+              echo
+              sleep 20
+            done
+          ) >> /tmp/mem_monitor.log 2>&1 &
+          disown
           echo $! > /tmp/mem_monitor.pid
 
       - name: Build APK (Release)
@@ -64,6 +75,10 @@ jobs:
       - name: Stop memory monitor (debug)
         if: always()
         run: kill "$(cat /tmp/mem_monitor.pid)" 2>/dev/null || true
+
+      - name: Dump memory monitor log (debug, only on failure)
+        if: failure()
+        run: cat /tmp/mem_monitor.log || echo "(mem_monitor.log not found)"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
