@@ -26,6 +26,7 @@ import '../widgets/character_reaction_widget.dart';
 import '../providers/step_executor_provider.dart';
 import '../widgets/step_execution_controls.dart';
 import '../widgets/variable_viewer.dart';
+import '../widgets/scoring_result_widget.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Challenge challenge;
@@ -49,6 +50,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   int _reactionToken = 0;
   final math.Random _rng = math.Random();
   bool _stepExecutionMode = false;
+  ScoringResult? _lastScoringResult;
 
   /// キャラクターのリアクションを一時的に切り替え、しばらくしたらアイドルに戻す
   void _reactCharacter(
@@ -1125,17 +1127,29 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             Consumer(
               builder: (context, ref, child) {
                 final execState = ref.watch(stepExecutorProvider);
+                final isExecutionComplete =
+                    execState.currentStepIndex >= editorState.scriptBlocks.length;
+
+                // 実行完了時に採点結果を計算
+                if (isExecutionComplete && _lastScoringResult == null) {
+                  _lastScoringResult = ref
+                      .read(stepExecutorProvider.notifier)
+                      .checkGoal(widget.challenge.goalCondition);
+                }
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Column(
                     children: [
-                      StepExecutionControls(
-                        totalBlocks: editorState.scriptBlocks.length,
-                        onStepForward: () {
-                          // ステップ実行時にハイライト更新
-                          setState(() {});
-                        },
-                      ),
+                      if (!isExecutionComplete)
+                        StepExecutionControls(
+                          totalBlocks: editorState.scriptBlocks.length,
+                          onStepForward: () {
+                            setState(() {});
+                          },
+                        )
+                      else if (_lastScoringResult != null)
+                        ScoringResultWidget(result: _lastScoringResult!),
                       const SizedBox(height: 12),
                       VariableViewer(variables: execState.variables),
                     ],
@@ -1185,6 +1199,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           HapticService.selectionClick();
                           setState(() {
                             _stepExecutionMode = !_stepExecutionMode;
+                            _lastScoringResult = null;
                             if (!_stepExecutionMode) {
                               ref.read(stepExecutorProvider.notifier).reset();
                             }

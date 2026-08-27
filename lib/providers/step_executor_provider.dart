@@ -170,6 +170,62 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     return state.breakpoints.contains(blockIndex);
   }
 
+  // ─── 採点 ─────────────────────────────────────────────────────────────
+
+  /// チャレンジの目標条件をチェック
+  ScoringResult checkGoal(Map<String, dynamic>? goalCondition) {
+    if (goalCondition == null) {
+      return ScoringResult.noGoal();
+    }
+
+    final goalX = (goalCondition['goalX'] as num?)?.toDouble();
+    final goalY = (goalCondition['goalY'] as num?)?.toDouble();
+    final tolerance = (goalCondition['tolerance'] as num?)?.toDouble() ?? 0.5;
+    final expectedAngle = (goalCondition['expectedAngle'] as num?)?.toDouble();
+    final angleToleranceDeg = (goalCondition['angleToleranceDeg'] as num?)?.toDouble() ?? 45;
+
+    bool isPositionCorrect = false;
+    bool isAngleCorrect = false;
+
+    // 位置チェック
+    if (goalX != null && goalY != null) {
+      final dist = math.sqrt(
+        math.pow(state.robotX - goalX, 2) + math.pow(state.robotY - goalY, 2),
+      );
+      isPositionCorrect = dist <= tolerance;
+    } else {
+      isPositionCorrect = true; // 位置指定がない場合は OK
+    }
+
+    // 角度チェック
+    if (expectedAngle != null) {
+      var angleDiff = (state.robotAngle - expectedAngle).abs();
+      // 360度ラップアラウンド対応
+      if (angleDiff > 180) {
+        angleDiff = 360 - angleDiff;
+      }
+      isAngleCorrect = angleDiff <= angleToleranceDeg;
+    } else {
+      isAngleCorrect = true; // 角度指定がない場合は OK
+    }
+
+    final isAchieved = isPositionCorrect && isAngleCorrect;
+
+    return ScoringResult(
+      isAchieved: isAchieved,
+      currentX: state.robotX,
+      currentY: state.robotY,
+      currentAngle: state.robotAngle,
+      goalX: goalX,
+      goalY: goalY,
+      expectedAngle: expectedAngle,
+      tolerance: tolerance,
+      angleToleranceDeg: angleToleranceDeg,
+      isPositionCorrect: isPositionCorrect,
+      isAngleCorrect: isAngleCorrect,
+    );
+  }
+
   /// ステップ実行：1ブロック前に進む
   Future<void> stepForward() async {
     if (_scriptBlocks.isEmpty || state.currentStepIndex >= _scriptBlocks.length) {
@@ -327,6 +383,64 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     // 速度レベルに応じた実行時間（ミリ秒）
     // 遅い（1）: 1000ms、速い（5）: 200ms
     return 1200 - (speedLevel - 1) * 200;
+  }
+}
+
+// ─── 採点結果 ──────────────────────────────────────────────────────────
+
+class ScoringResult {
+  final bool isAchieved;
+  final double? currentX;
+  final double? currentY;
+  final double? currentAngle;
+  final double? goalX;
+  final double? goalY;
+  final double? expectedAngle;
+  final double? tolerance;
+  final double? angleToleranceDeg;
+  final bool isPositionCorrect;
+  final bool isAngleCorrect;
+
+  const ScoringResult({
+    required this.isAchieved,
+    this.currentX,
+    this.currentY,
+    this.currentAngle,
+    this.goalX,
+    this.goalY,
+    this.expectedAngle,
+    this.tolerance,
+    this.angleToleranceDeg,
+    this.isPositionCorrect = true,
+    this.isAngleCorrect = true,
+  });
+
+  factory ScoringResult.noGoal() {
+    return const ScoringResult(
+      isAchieved: false,
+      isPositionCorrect: true,
+      isAngleCorrect: true,
+    );
+  }
+
+  String getMessage() {
+    if (!isPositionCorrect && !isAngleCorrect) {
+      return '❌ 位置と角度が異なります';
+    } else if (!isPositionCorrect) {
+      return '❌ 位置がずれています';
+    } else if (!isAngleCorrect) {
+      return '❌ 角度が異なります';
+    } else if (isAchieved) {
+      return '✅ 成功！目標に到達しました！';
+    }
+    return '';
+  }
+
+  String getDetailMessage() {
+    if (goalX == null || goalY == null) {
+      return '目標条件が設定されていません';
+    }
+    return '現在位置: ($currentX, $currentY)\n目標位置: ($goalX, $goalY)';
   }
 }
 

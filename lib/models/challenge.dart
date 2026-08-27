@@ -56,6 +56,16 @@ class Challenge {
   final String expectedOutput;
   final List<String> hints;
 
+  // 自動採点用
+  final Map<String, dynamic>? goalCondition;
+  // goalCondition の例: {
+  //   'goalX': 3.5,
+  //   'goalY': 3.5,
+  //   'tolerance': 0.5,  // 位置の許容誤差
+  //   'expectedAngle': 0, // （任意）最終角度
+  //   'angleToleranceDeg': 45, // （任意）角度の許容誤差
+  // }
+
   const Challenge({
     required this.id,
     required this.stageNumber,
@@ -71,6 +81,7 @@ class Challenge {
     this.availableBlocks = const [],
     this.expectedOutput = '',
     this.hints = const [],
+    this.goalCondition,
   });
 }
 
