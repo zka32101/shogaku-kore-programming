@@ -33,6 +33,9 @@ class ExecutionState {
   // 変数管理
   final Map<String, dynamic> variables;
 
+  // ブレークポイント管理
+  final Set<int> breakpoints; // ブレークポイントを設定したブロックのインデックス
+
   const ExecutionState({
     this.isRunning = false,
     this.isPaused = false,
@@ -48,6 +51,7 @@ class ExecutionState {
     this.currentLoopIteration = 0,
     this.totalLoopIterations = 0,
     this.variables = const {},
+    this.breakpoints = const {},
   });
 
   ExecutionState copyWith({
@@ -65,6 +69,7 @@ class ExecutionState {
     int? currentLoopIteration,
     int? totalLoopIterations,
     Map<String, dynamic>? variables,
+    Set<int>? breakpoints,
   }) {
     return ExecutionState(
       isRunning: isRunning ?? this.isRunning,
@@ -81,6 +86,7 @@ class ExecutionState {
       currentLoopIteration: currentLoopIteration ?? this.currentLoopIteration,
       totalLoopIterations: totalLoopIterations ?? this.totalLoopIterations,
       variables: variables ?? this.variables,
+      breakpoints: breakpoints ?? this.breakpoints,
     );
   }
 }
@@ -150,6 +156,20 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     }
   }
 
+  void toggleBreakpoint(int blockIndex) {
+    final newBreakpoints = Set<int>.from(state.breakpoints);
+    if (newBreakpoints.contains(blockIndex)) {
+      newBreakpoints.remove(blockIndex);
+    } else {
+      newBreakpoints.add(blockIndex);
+    }
+    state = state.copyWith(breakpoints: newBreakpoints);
+  }
+
+  bool hasBreakpoint(int blockIndex) {
+    return state.breakpoints.contains(blockIndex);
+  }
+
   /// ステップ実行：1ブロック前に進む
   Future<void> stepForward() async {
     if (_scriptBlocks.isEmpty || state.currentStepIndex >= _scriptBlocks.length) {
@@ -167,10 +187,14 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       nextBlockId = _scriptBlocks[nextIndex].id;
     }
 
+    // ブレークポイントをチェック
+    bool hasBreakpointOnNext = state.breakpoints.contains(nextIndex);
+
     state = state.copyWith(
       currentStepIndex: nextIndex,
       currentBlockId: nextBlockId,
       outputMessage: _getExecutionMessage(currentBlock),
+      isPaused: hasBreakpointOnNext, // ブレークポイントで一時停止
     );
   }
 

@@ -948,6 +948,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           final execState = consumerRef.watch(stepExecutorProvider);
                           final isCurrentBlock =
                               _stepExecutionMode && execState.currentBlockId == block.id;
+                          final hasBreakpoint = execState.breakpoints.contains(index);
 
                           return _ScriptBlockItem(
                             key: ValueKey(block.id),
@@ -959,6 +960,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             },
                             onTap: () => _showParamEditor(context, block),
                             isCurrentExecutingBlock: isCurrentBlock,
+                            hasBreakpoint: hasBreakpoint,
+                            onToggleBreakpoint: () {
+                              HapticService.lightImpact();
+                              consumerRef
+                                  .read(stepExecutorProvider.notifier)
+                                  .toggleBreakpoint(index);
+                            },
                           );
                         },
                       ),
@@ -1347,6 +1355,8 @@ class _ScriptBlockItem extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onTap;
   final bool isCurrentExecutingBlock;
+  final bool hasBreakpoint;
+  final VoidCallback onToggleBreakpoint;
 
   const _ScriptBlockItem({
     super.key,
@@ -1355,6 +1365,8 @@ class _ScriptBlockItem extends StatelessWidget {
     required this.onDelete,
     required this.onTap,
     this.isCurrentExecutingBlock = false,
+    this.hasBreakpoint = false,
+    required this.onToggleBreakpoint,
   });
 
   Color get _color => _categoryColor(block.category);
@@ -1439,7 +1451,23 @@ class _ScriptBlockItem extends StatelessWidget {
               ),
             ),
             const Icon(Icons.drag_handle, color: Colors.grey, size: 20),
-            // 44x44 タッチエリアの削除ボタン
+            // ブレークポイントボタン
+            SizedBox(
+              width: 44,
+              height: 44,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  hasBreakpoint ? Icons.stop_circle : Icons.stop_circle_outlined,
+                  color: hasBreakpoint ? Colors.orange : Colors.grey,
+                  size: 20,
+                ),
+                onPressed: onToggleBreakpoint,
+                splashRadius: 20,
+                tooltip: hasBreakpoint ? 'ブレークポイント削除' : 'ブレークポイント設定',
+              ),
+            ),
+            // 削除ボタン
             SizedBox(
               width: 44,
               height: 44,
