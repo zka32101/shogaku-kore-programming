@@ -25,6 +25,7 @@ import '../providers/character_provider.dart';
 import '../widgets/character_reaction_widget.dart';
 import '../providers/step_executor_provider.dart';
 import '../widgets/step_execution_controls.dart';
+import '../widgets/variable_viewer.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Challenge challenge;
@@ -1113,15 +1114,26 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         children: [
           // ─── ステップ実行モード表示 ────────────────────────────────────
           if (_stepExecutionMode)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: StepExecutionControls(
-                totalBlocks: editorState.scriptBlocks.length,
-                onStepForward: () {
-                  // ステップ実行時にハイライト更新
-                  setState(() {});
-                },
-              ),
+            Consumer(
+              builder: (context, ref, child) {
+                final execState = ref.watch(stepExecutorProvider);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    children: [
+                      StepExecutionControls(
+                        totalBlocks: editorState.scriptBlocks.length,
+                        onStepForward: () {
+                          // ステップ実行時にハイライト更新
+                          setState(() {});
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      VariableViewer(variables: execState.variables),
+                    ],
+                  ),
+                );
+              },
             ),
 
           // ─── 実行・回答ボタン ──────────────────────────────────────────

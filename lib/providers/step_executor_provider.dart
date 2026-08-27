@@ -30,6 +30,9 @@ class ExecutionState {
   final int currentLoopIteration; // 0 = ループ外
   final int totalLoopIterations;
 
+  // 変数管理
+  final Map<String, dynamic> variables;
+
   const ExecutionState({
     this.isRunning = false,
     this.isPaused = false,
@@ -44,6 +47,7 @@ class ExecutionState {
     this.currentBlockId,
     this.currentLoopIteration = 0,
     this.totalLoopIterations = 0,
+    this.variables = const {},
   });
 
   ExecutionState copyWith({
@@ -60,6 +64,7 @@ class ExecutionState {
     String? currentBlockId,
     int? currentLoopIteration,
     int? totalLoopIterations,
+    Map<String, dynamic>? variables,
   }) {
     return ExecutionState(
       isRunning: isRunning ?? this.isRunning,
@@ -75,6 +80,7 @@ class ExecutionState {
       currentBlockId: currentBlockId ?? this.currentBlockId,
       currentLoopIteration: currentLoopIteration ?? this.currentLoopIteration,
       totalLoopIterations: totalLoopIterations ?? this.totalLoopIterations,
+      variables: variables ?? this.variables,
     );
   }
 }
@@ -104,6 +110,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       robotPath: const [Offset(_kGridSize / 2, _kGridSize / 2)],
       outputMessage: 'ステップ実行の準備ができました',
       currentBlockId: _scriptBlocks.isNotEmpty ? _scriptBlocks[0].id : null,
+      variables: {},
     );
   }
 
@@ -180,33 +187,15 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     double y = _kGridSize / 2;
     double angle = 0;
     final path = <Offset>[Offset(x, y)];
+    final variables = <String, dynamic>{};
 
-    // ループ前のブロックを実行
-    for (int i = 0; i < _loopStartIndex && i < targetStep; i++) {
+    // 初期ステップまでのすべてのブロックを実行
+    for (int i = 0; i < targetStep && i < _scriptBlocks.length; i++) {
       _simulateBlock(_scriptBlocks[i], path, (nx, ny, na) {
         x = nx;
         y = ny;
         angle = na;
-      }, x, y, angle);
-    }
-
-    // ループ内のブロックを実行
-    if (_loopStartIndex >= 0 && targetStep > _loopStartIndex) {
-      final loopBlock = _scriptBlocks[_loopStartIndex];
-      final loopTimes =
-          (loopBlock.params['times'] as num?)?.toInt() ?? 3;
-
-      for (int iteration = 0; iteration < loopTimes; iteration++) {
-        for (int i = _loopStartIndex + 1;
-            i <= _loopEndIndex && i < targetStep;
-            i++) {
-          _simulateBlock(_scriptBlocks[i], path, (nx, ny, na) {
-            x = nx;
-            y = ny;
-            angle = na;
-          }, x, y, angle);
-        }
-      }
+      }, x, y, angle, variables);
     }
 
     x = path.last.dx;
@@ -224,6 +213,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       robotAngle: angle,
       robotPath: path,
       currentBlockId: nextBlockId,
+      variables: variables,
     );
   }
 
@@ -234,12 +224,13 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     double x = state.robotX;
     double y = state.robotY;
     double angle = state.robotAngle;
+    final variables = Map<String, dynamic>.from(state.variables);
 
     _simulateBlock(block, path, (nx, ny, na) {
       x = nx;
       y = ny;
       angle = na;
-    }, x, y, angle);
+    }, x, y, angle, variables);
 
     x = path.last.dx;
     y = path.last.dy;
@@ -250,6 +241,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       robotAngle: angle,
       robotPath: path,
       lastExecutionSuccess: true,
+      variables: variables,
     );
   }
 
@@ -260,6 +252,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     double x,
     double y,
     double angle,
+    Map<String, dynamic> variables,
   ) {
     final baseId = block.id.split('@').first;
     switch (baseId) {
@@ -277,6 +270,11 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       case 'turn_left':
         final deg = (block.params['degrees'] as num?)?.toDouble() ?? 90;
         update(x, y, angle - deg);
+      case 'set_variable':
+        final value = block.params['value'] ?? 0;
+        variables['count'] = value;
+      case 'add_variable':
+        variables['count'] = ((variables['count'] as num?) ?? 0) + 1;
       default:
         break;
     }
