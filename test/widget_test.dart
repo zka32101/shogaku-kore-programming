@@ -1,11 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shogaku_kore_programming/main.dart';
+import 'package:shogaku_kore_programming/providers/auth_provider.dart';
 
 void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
-      const ProviderScope(child: ShogakuKoreProgrammingApp()),
+      ProviderScope(
+        overrides: [
+          // Override currentUserProvider to return null during test
+          currentUserProvider.overrideWithValue(null),
+        ],
+        child: const ShogakuKoreProgrammingApp(),
+      ),
     );
     expect(find.byType(ShogakuKoreProgrammingApp), findsOneWidget);
 

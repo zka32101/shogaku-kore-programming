@@ -30,7 +30,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@7814e4f6c70abd7a5641333f613efa098fe34381  # v2.14.0
         with:
-          flutter-version: '3.x'
+          flutter-version: '3.47.1'
           cache: true
 
       # Firebase credentials are required at analyze/build time by
