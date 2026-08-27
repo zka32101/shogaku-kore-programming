@@ -287,13 +287,13 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     switch (baseId) {
       case 'move_forward':
         final steps = block.params['steps'] ?? 100;
-        return '▶ ${steps}歩進めました';
+        return '▶ $steps歩進めました';
       case 'turn_right':
         final deg = block.params['degrees'] ?? 90;
-        return '▶ 右に${deg}°回転しました';
+        return '▶ 右に$deg°回転しました';
       case 'turn_left':
         final deg = block.params['degrees'] ?? 90;
-        return '▶ 左に${deg}°回転しました';
+        return '▶ 左に$deg°回転しました';
       case 'print_block':
         return '▶ メッセージを表示しました';
       default:

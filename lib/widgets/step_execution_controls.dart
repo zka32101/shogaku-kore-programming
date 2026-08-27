@@ -8,10 +8,10 @@ class StepExecutionControls extends ConsumerWidget {
   final VoidCallback onStepForward;
 
   const StepExecutionControls({
-    Key? key,
+    super.key,
     required this.totalBlocks,
     required this.onStepForward,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
