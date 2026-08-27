@@ -123,8 +123,6 @@ class ExecutionState {
 
 class StepExecutor extends StateNotifier<ExecutionState> {
   List<Block> _scriptBlocks = [];
-  int _loopStartIndex = -1;
-  int _loopEndIndex = -1;
 
   StepExecutor() : super(const ExecutionState());
 
@@ -132,7 +130,6 @@ class StepExecutor extends StateNotifier<ExecutionState> {
 
   void initializeExecution(List<Block> blocks) {
     _scriptBlocks = blocks;
-    _findLoopBoundaries();
 
     state = ExecutionState(
       isRunning: false,
@@ -146,17 +143,6 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       currentBlockId: _scriptBlocks.isNotEmpty ? _scriptBlocks[0].id : null,
       variables: {},
     );
-  }
-
-  void _findLoopBoundaries() {
-    for (int i = 0; i < _scriptBlocks.length; i++) {
-      final baseId = _scriptBlocks[i].id.split('@').first;
-      if (baseId == 'repeat' || baseId == 'while_loop') {
-        _loopStartIndex = i;
-        _loopEndIndex = _scriptBlocks.length - 1;
-        break;
-      }
-    }
   }
 
   // ─── 実行制御 ────────────────────────────────────────────────────────────

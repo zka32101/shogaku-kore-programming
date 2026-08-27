@@ -11,8 +11,6 @@ class VariableViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDark;
-
     if (variables.isEmpty) {
       return _buildEmptyState(context);
     }
@@ -55,7 +53,7 @@ class VariableViewer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${entry.key}',
+                    entry.key,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -73,7 +71,7 @@ class VariableViewer extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      '${entry.value}',
+                      entry.value.toString(),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -84,7 +82,7 @@ class VariableViewer extends StatelessWidget {
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

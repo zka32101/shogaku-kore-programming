@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart';
 
 enum AppLanguage {
   japanese('ja'),
@@ -207,12 +206,12 @@ final localizationProvider = Provider<LocalizationStrings>((ref) {
   return LocalizationStrings(strings);
 });
 
-// ─── 便利な拡張 ───────────────────────────────────────────────────────────
+// ─── 便利な拡張（今後使用時に有効化可能）──────────────────────────────────
 
-extension LocalizationX on String {
-  /// 翻訳キーから翻訳文字列を取得する
-  /// 使用例: 'app_title'.tr(ref)
-  String tr(WidgetRef ref) {
-    return ref.read(localizationProvider).get(this);
-  }
-}
+// extension LocalizationX on String {
+//   /// 翻訳キーから翻訳文字列を取得する
+//   /// 使用例: 'app_title'.tr(ref)
+//   String tr(WidgetRef ref) {
+//     return ref.read(localizationProvider).get(this);
+//   }
+// }
