@@ -23,6 +23,8 @@ import '../widgets/app_dialog.dart';
 import '../providers/coin_provider.dart';
 import '../providers/character_provider.dart';
 import '../widgets/character_reaction_widget.dart';
+import '../providers/step_executor_provider.dart';
+import '../widgets/step_execution_controls.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Challenge challenge;
@@ -45,6 +47,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   String? _characterMessage;
   int _reactionToken = 0;
   final math.Random _rng = math.Random();
+  bool _stepExecutionMode = false;
 
   /// キャラクターのリアクションを一時的に切り替え、しばらくしたらアイドルに戻す
   void _reactCharacter(
@@ -939,15 +942,24 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                       onDismissed: (_) {
                         ref.read(editorProvider.notifier).removeBlock(index);
                       },
-                      child: _ScriptBlockItem(
-                        key: ValueKey(block.id),
-                        block: block,
-                        index: index,
-                        onDelete: () {
-                          HapticService.lightImpact();
-                          ref.read(editorProvider.notifier).removeBlock(index);
+                      child: Consumer(
+                        builder: (ctx, consumerRef, _) {
+                          final execState = consumerRef.watch(stepExecutorProvider);
+                          final isCurrentBlock =
+                              _stepExecutionMode && execState.currentBlockId == block.id;
+
+                          return _ScriptBlockItem(
+                            key: ValueKey(block.id),
+                            block: block,
+                            index: index,
+                            onDelete: () {
+                              HapticService.lightImpact();
+                              ref.read(editorProvider.notifier).removeBlock(index);
+                            },
+                            onTap: () => _showParamEditor(context, block),
+                            isCurrentExecutingBlock: isCurrentBlock,
+                          );
                         },
-                        onTap: () => _showParamEditor(context, block),
                       ),
                     ).animate(key: ValueKey(block.id)).fadeIn(duration: 250.ms).slideX(
                           begin: -0.1,
@@ -963,39 +975,53 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   // ロボットキャンバス: ブロック追加時に即時表示（実行不要）
   Widget _buildRobotPreview(EditorState editorState) {
-    final isCorrect = editorState.isCorrect && editorState.hasSubmitted;
-    final isWrong = !editorState.isCorrect && editorState.hasSubmitted;
+    return Consumer(
+      builder: (ctx, consumerRef, _) {
+        // ステップ実行モードの場合は step executor の状態を使用
+        final execState = _stepExecutionMode
+            ? consumerRef.watch(stepExecutorProvider)
+            : null;
 
-    return Container(
-      height: 130,
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: context.isDark ? const Color(0xFF1A2A2A) : const Color(0xFFF8FFFE),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isCorrect
-              ? kPrimaryColor.withValues(alpha: 0.4)
-              : isWrong
-                  ? Colors.red.withValues(alpha: 0.3)
-                  : context.borderColor,
-          width: 1.5,
-        ),
-      ),
-      // RepaintBoundary: ロボットアニメーション(毎フレーム再描画)を
-      // 親ウィジェットツリーから分離し、不要な再描画を防ぐ
-      child: RepaintBoundary(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(11),
-          child: RobotCanvasWidget(
-            path: editorState.robotPath,
-            finalAngle: editorState.robotAngle,
-            hasSubmitted: editorState.hasSubmitted,
-            isCorrect: editorState.isCorrect,
+        final robotPath =
+            _stepExecutionMode && execState != null ? execState.robotPath : editorState.robotPath;
+        final robotAngle =
+            _stepExecutionMode && execState != null ? execState.robotAngle : editorState.robotAngle;
+
+        final isCorrect = editorState.isCorrect && editorState.hasSubmitted;
+        final isWrong = !editorState.isCorrect && editorState.hasSubmitted;
+
+        return Container(
+          height: 130,
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: context.isDark ? const Color(0xFF1A2A2A) : const Color(0xFFF8FFFE),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isCorrect
+                  ? kPrimaryColor.withValues(alpha: 0.4)
+                  : isWrong
+                      ? Colors.red.withValues(alpha: 0.3)
+                      : context.borderColor,
+              width: 1.5,
+            ),
           ),
-        ),
-      ),
-    ).animate().fadeIn(duration: 250.ms);
+          // RepaintBoundary: ロボットアニメーション(毎フレーム再描画)を
+          // 親ウィジェットツリーから分離し、不要な再描画を防ぐ
+          child: RepaintBoundary(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(11),
+              child: RobotCanvasWidget(
+                path: robotPath,
+                finalAngle: robotAngle,
+                hasSubmitted: editorState.hasSubmitted,
+                isCorrect: editorState.isCorrect,
+              ),
+            ),
+          ),
+        ).animate().fadeIn(duration: 250.ms);
+      },
+    );
   }
 
   // テキスト出力: 実行・回答後のみ表示
@@ -1082,50 +1108,111 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           BoxShadow(color: context.shadowColor, blurRadius: 8, offset: const Offset(0, -2)),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: editorState.scriptBlocks.isEmpty
-                  ? null
-                  : () {
-                      ref.read(editorProvider.notifier).executeScript();
-                      _reactCharacter(CharacterMood.excited, message: 'どうなるかな…！');
-                    },
-              icon: const Text('▶', style: TextStyle(fontSize: 12)),
-              label: const Text('実行'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+          // ─── ステップ実行モード表示 ────────────────────────────────────
+          if (_stepExecutionMode)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: StepExecutionControls(
+                totalBlocks: editorState.scriptBlocks.length,
+                onStepForward: () {
+                  // ステップ実行時にハイライト更新
+                  setState(() {});
+                },
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            flex: 2,
-            child: ElevatedButton.icon(
-              onPressed: (editorState.scriptBlocks.isEmpty || editorState.hasSubmitted)
-                  ? null
-                  : () {
-                      ref
-                          .read(editorProvider.notifier)
-                          .submitScript(widget.challenge.expectedOutput);
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        final s = ref.read(editorProvider);
-                        if (s.hasSubmitted) _showResult(s.isCorrect);
-                      });
-                    },
-              icon: const Icon(Icons.check, size: 16),
-              label: const Text('回答する'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+
+          // ─── 実行・回答ボタン ──────────────────────────────────────────
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: editorState.scriptBlocks.isEmpty
+                      ? null
+                      : () {
+                          if (_stepExecutionMode) {
+                            // ステップ実行モード開始
+                            ref.read(stepExecutorProvider.notifier)
+                                .initializeExecution(editorState.scriptBlocks);
+                            setState(() {});
+                          } else {
+                            // 通常実行
+                            ref.read(editorProvider.notifier).executeScript();
+                            _reactCharacter(CharacterMood.excited, message: 'どうなるかな…！');
+                          }
+                        },
+                  icon: const Text('▶', style: TextStyle(fontSize: 12)),
+                  label: Text(_stepExecutionMode ? 'ステップ準備' : '実行'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 8),
+              // ステップ実行モード切り替え
+              SizedBox(
+                height: 48,
+                width: 48,
+                child: OutlinedButton(
+                  onPressed: editorState.scriptBlocks.isEmpty
+                      ? null
+                      : () {
+                          HapticService.selectionClick();
+                          setState(() {
+                            _stepExecutionMode = !_stepExecutionMode;
+                            if (!_stepExecutionMode) {
+                              ref.read(stepExecutorProvider.notifier).reset();
+                            }
+                          });
+                        },
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: BorderSide(
+                      color: _stepExecutionMode ? kPrimaryColor : Colors.grey.withValues(alpha: 0.3),
+                      width: _stepExecutionMode ? 2 : 1,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.slow_motion_video,
+                    size: 20,
+                    color: _stepExecutionMode ? kPrimaryColor : context.textSecondary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton.icon(
+                  onPressed: (editorState.scriptBlocks.isEmpty || editorState.hasSubmitted || _stepExecutionMode)
+                      ? null
+                      : () {
+                          ref
+                              .read(editorProvider.notifier)
+                              .submitScript(widget.challenge.expectedOutput);
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            final s = ref.read(editorProvider);
+                            if (s.hasSubmitted) _showResult(s.isCorrect);
+                          });
+                        },
+                  icon: const Icon(Icons.check, size: 16),
+                  label: const Text('回答する'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1247,6 +1334,7 @@ class _ScriptBlockItem extends StatelessWidget {
   final int index;
   final VoidCallback onDelete;
   final VoidCallback onTap;
+  final bool isCurrentExecutingBlock;
 
   const _ScriptBlockItem({
     super.key,
@@ -1254,6 +1342,7 @@ class _ScriptBlockItem extends StatelessWidget {
     required this.index,
     required this.onDelete,
     required this.onTap,
+    this.isCurrentExecutingBlock = false,
   });
 
   Color get _color => _categoryColor(block.category);
@@ -1267,9 +1356,25 @@ class _ScriptBlockItem extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),
         decoration: BoxDecoration(
-          color: _color.withValues(alpha: 0.12),
+          color: isCurrentExecutingBlock
+              ? kPrimaryColor.withValues(alpha: 0.2)
+              : _color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _color.withValues(alpha: 0.45)),
+          border: Border.all(
+            color: isCurrentExecutingBlock
+                ? kPrimaryColor.withValues(alpha: 0.8)
+                : _color.withValues(alpha: 0.45),
+            width: isCurrentExecutingBlock ? 2 : 1,
+          ),
+          boxShadow: isCurrentExecutingBlock
+              ? [
+                  BoxShadow(
+                    color: kPrimaryColor.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  )
+                ]
+              : null,
         ),
         child: Row(
           children: [
