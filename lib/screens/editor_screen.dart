@@ -1158,7 +1158,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           currentHistoryIndex: (execState.currentStepIndex - 1)
                               .clamp(0, execState.executionHistory.length - 1),
                           onTimelineChanged: (index) {
-                            consumerRef
+                            ref
                                 .read(stepExecutorProvider.notifier)
                                 .goToHistoryPoint(index);
                             setState(() {});

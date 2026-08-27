@@ -123,8 +123,6 @@ class ExecutionState {
 
 class StepExecutor extends StateNotifier<ExecutionState> {
   List<Block> _scriptBlocks = [];
-  int _loopStartIndex = -1;
-  int _loopEndIndex = -1;
 
   StepExecutor() : super(const ExecutionState());
 
