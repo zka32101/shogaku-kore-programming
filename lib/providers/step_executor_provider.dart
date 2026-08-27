@@ -6,6 +6,28 @@ import '../models/block_model.dart';
 const double _kGridSize = 7.0;
 const double _kStepsPerCell = 50.0;
 
+// ─── 実行履歴スナップショット ────────────────────────────────────────────────
+
+class ExecutionSnapshot {
+  final int stepIndex;
+  final double robotX;
+  final double robotY;
+  final double robotAngle;
+  final List<Offset> robotPath;
+  final Map<String, dynamic> variables;
+  final String outputMessage;
+
+  const ExecutionSnapshot({
+    required this.stepIndex,
+    required this.robotX,
+    required this.robotY,
+    required this.robotAngle,
+    required this.robotPath,
+    required this.variables,
+    required this.outputMessage,
+  });
+}
+
 // ─── ステップ実行状態 ──────────────────────────────────────────────────────
 
 class ExecutionState {
@@ -30,6 +52,15 @@ class ExecutionState {
   final int currentLoopIteration; // 0 = ループ外
   final int totalLoopIterations;
 
+  // 変数管理
+  final Map<String, dynamic> variables;
+
+  // ブレークポイント管理
+  final Set<int> breakpoints; // ブレークポイントを設定したブロックのインデックス
+
+  // 実行履歴
+  final List<ExecutionSnapshot> executionHistory;
+
   const ExecutionState({
     this.isRunning = false,
     this.isPaused = false,
@@ -44,6 +75,9 @@ class ExecutionState {
     this.currentBlockId,
     this.currentLoopIteration = 0,
     this.totalLoopIterations = 0,
+    this.variables = const {},
+    this.breakpoints = const {},
+    this.executionHistory = const [],
   });
 
   ExecutionState copyWith({
@@ -60,6 +94,9 @@ class ExecutionState {
     String? currentBlockId,
     int? currentLoopIteration,
     int? totalLoopIterations,
+    Map<String, dynamic>? variables,
+    Set<int>? breakpoints,
+    List<ExecutionSnapshot>? executionHistory,
   }) {
     return ExecutionState(
       isRunning: isRunning ?? this.isRunning,
@@ -75,6 +112,9 @@ class ExecutionState {
       currentBlockId: currentBlockId ?? this.currentBlockId,
       currentLoopIteration: currentLoopIteration ?? this.currentLoopIteration,
       totalLoopIterations: totalLoopIterations ?? this.totalLoopIterations,
+      variables: variables ?? this.variables,
+      breakpoints: breakpoints ?? this.breakpoints,
+      executionHistory: executionHistory ?? this.executionHistory,
     );
   }
 }
@@ -104,6 +144,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       robotPath: const [Offset(_kGridSize / 2, _kGridSize / 2)],
       outputMessage: 'ステップ実行の準備ができました',
       currentBlockId: _scriptBlocks.isNotEmpty ? _scriptBlocks[0].id : null,
+      variables: {},
     );
   }
 
@@ -133,14 +174,122 @@ class StepExecutor extends StateNotifier<ExecutionState> {
   }
 
   void reset() {
-    state = const ExecutionState();
-    initializeExecution(_scriptBlocks);
+    resetToStart();
   }
 
   void setExecutionSpeed(int speed) {
     if (speed >= 1 && speed <= 5) {
       state = state.copyWith(executionSpeed: speed);
     }
+  }
+
+  void toggleBreakpoint(int blockIndex) {
+    final newBreakpoints = Set<int>.from(state.breakpoints);
+    if (newBreakpoints.contains(blockIndex)) {
+      newBreakpoints.remove(blockIndex);
+    } else {
+      newBreakpoints.add(blockIndex);
+    }
+    state = state.copyWith(breakpoints: newBreakpoints);
+  }
+
+  bool hasBreakpoint(int blockIndex) {
+    return state.breakpoints.contains(blockIndex);
+  }
+
+  // ─── 履歴リプレイ ───────────────────────────────────────────────────────
+
+  /// 履歴内の特定のポイントに移動
+  void goToHistoryPoint(int historyIndex) {
+    if (historyIndex < 0 || historyIndex >= state.executionHistory.length) {
+      return;
+    }
+
+    final snapshot = state.executionHistory[historyIndex];
+
+    state = state.copyWith(
+      currentStepIndex: snapshot.stepIndex + 1,
+      robotX: snapshot.robotX,
+      robotY: snapshot.robotY,
+      robotAngle: snapshot.robotAngle,
+      robotPath: snapshot.robotPath,
+      variables: snapshot.variables,
+      outputMessage: snapshot.outputMessage,
+    );
+  }
+
+  /// 最初の状態に戻す
+  void resetToStart() {
+    state = ExecutionState(
+      isRunning: false,
+      isPaused: false,
+      currentStepIndex: 0,
+      robotX: _kGridSize / 2,
+      robotY: _kGridSize / 2,
+      robotAngle: 0,
+      robotPath: const [Offset(_kGridSize / 2, _kGridSize / 2)],
+      outputMessage: 'ステップ実行の準備ができました',
+      currentBlockId: _scriptBlocks.isNotEmpty ? _scriptBlocks[0].id : null,
+      variables: {},
+      breakpoints: state.breakpoints,
+      executionHistory: [],
+    );
+  }
+
+  // ─── 採点 ─────────────────────────────────────────────────────────────
+
+  /// チャレンジの目標条件をチェック
+  ScoringResult checkGoal(Map<String, dynamic>? goalCondition) {
+    if (goalCondition == null) {
+      return ScoringResult.noGoal();
+    }
+
+    final goalX = (goalCondition['goalX'] as num?)?.toDouble();
+    final goalY = (goalCondition['goalY'] as num?)?.toDouble();
+    final tolerance = (goalCondition['tolerance'] as num?)?.toDouble() ?? 0.5;
+    final expectedAngle = (goalCondition['expectedAngle'] as num?)?.toDouble();
+    final angleToleranceDeg = (goalCondition['angleToleranceDeg'] as num?)?.toDouble() ?? 45;
+
+    bool isPositionCorrect = false;
+    bool isAngleCorrect = false;
+
+    // 位置チェック
+    if (goalX != null && goalY != null) {
+      final dist = math.sqrt(
+        math.pow(state.robotX - goalX, 2) + math.pow(state.robotY - goalY, 2),
+      );
+      isPositionCorrect = dist <= tolerance;
+    } else {
+      isPositionCorrect = true; // 位置指定がない場合は OK
+    }
+
+    // 角度チェック
+    if (expectedAngle != null) {
+      var angleDiff = (state.robotAngle - expectedAngle).abs();
+      // 360度ラップアラウンド対応
+      if (angleDiff > 180) {
+        angleDiff = 360 - angleDiff;
+      }
+      isAngleCorrect = angleDiff <= angleToleranceDeg;
+    } else {
+      isAngleCorrect = true; // 角度指定がない場合は OK
+    }
+
+    final isAchieved = isPositionCorrect && isAngleCorrect;
+
+    return ScoringResult(
+      isAchieved: isAchieved,
+      currentX: state.robotX,
+      currentY: state.robotY,
+      currentAngle: state.robotAngle,
+      goalX: goalX,
+      goalY: goalY,
+      expectedAngle: expectedAngle,
+      tolerance: tolerance,
+      angleToleranceDeg: angleToleranceDeg,
+      isPositionCorrect: isPositionCorrect,
+      isAngleCorrect: isAngleCorrect,
+    );
   }
 
   /// ステップ実行：1ブロック前に進む
@@ -160,10 +309,29 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       nextBlockId = _scriptBlocks[nextIndex].id;
     }
 
+    // ブレークポイントをチェック
+    bool hasBreakpointOnNext = state.breakpoints.contains(nextIndex);
+
+    // 実行履歴に現在の状態をスナップショットとして記録
+    final newHistory = List<ExecutionSnapshot>.from(state.executionHistory);
+    newHistory.add(
+      ExecutionSnapshot(
+        stepIndex: state.currentStepIndex,
+        robotX: state.robotX,
+        robotY: state.robotY,
+        robotAngle: state.robotAngle,
+        robotPath: List<Offset>.from(state.robotPath),
+        variables: Map<String, dynamic>.from(state.variables),
+        outputMessage: _getExecutionMessage(currentBlock),
+      ),
+    );
+
     state = state.copyWith(
       currentStepIndex: nextIndex,
       currentBlockId: nextBlockId,
       outputMessage: _getExecutionMessage(currentBlock),
+      isPaused: hasBreakpointOnNext,
+      executionHistory: newHistory,
     );
   }
 
@@ -180,33 +348,15 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     double y = _kGridSize / 2;
     double angle = 0;
     final path = <Offset>[Offset(x, y)];
+    final variables = <String, dynamic>{};
 
-    // ループ前のブロックを実行
-    for (int i = 0; i < _loopStartIndex && i < targetStep; i++) {
+    // 初期ステップまでのすべてのブロックを実行
+    for (int i = 0; i < targetStep && i < _scriptBlocks.length; i++) {
       _simulateBlock(_scriptBlocks[i], path, (nx, ny, na) {
         x = nx;
         y = ny;
         angle = na;
-      }, x, y, angle);
-    }
-
-    // ループ内のブロックを実行
-    if (_loopStartIndex >= 0 && targetStep > _loopStartIndex) {
-      final loopBlock = _scriptBlocks[_loopStartIndex];
-      final loopTimes =
-          (loopBlock.params['times'] as num?)?.toInt() ?? 3;
-
-      for (int iteration = 0; iteration < loopTimes; iteration++) {
-        for (int i = _loopStartIndex + 1;
-            i <= _loopEndIndex && i < targetStep;
-            i++) {
-          _simulateBlock(_scriptBlocks[i], path, (nx, ny, na) {
-            x = nx;
-            y = ny;
-            angle = na;
-          }, x, y, angle);
-        }
-      }
+      }, x, y, angle, variables);
     }
 
     x = path.last.dx;
@@ -224,6 +374,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       robotAngle: angle,
       robotPath: path,
       currentBlockId: nextBlockId,
+      variables: variables,
     );
   }
 
@@ -234,12 +385,13 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     double x = state.robotX;
     double y = state.robotY;
     double angle = state.robotAngle;
+    final variables = Map<String, dynamic>.from(state.variables);
 
     _simulateBlock(block, path, (nx, ny, na) {
       x = nx;
       y = ny;
       angle = na;
-    }, x, y, angle);
+    }, x, y, angle, variables);
 
     x = path.last.dx;
     y = path.last.dy;
@@ -250,6 +402,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       robotAngle: angle,
       robotPath: path,
       lastExecutionSuccess: true,
+      variables: variables,
     );
   }
 
@@ -260,6 +413,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     double x,
     double y,
     double angle,
+    Map<String, dynamic> variables,
   ) {
     final baseId = block.id.split('@').first;
     switch (baseId) {
@@ -277,6 +431,11 @@ class StepExecutor extends StateNotifier<ExecutionState> {
       case 'turn_left':
         final deg = (block.params['degrees'] as num?)?.toDouble() ?? 90;
         update(x, y, angle - deg);
+      case 'set_variable':
+        final value = block.params['value'] ?? 0;
+        variables['count'] = value;
+      case 'add_variable':
+        variables['count'] = ((variables['count'] as num?) ?? 0) + 1;
       default:
         break;
     }
@@ -305,6 +464,64 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     // 速度レベルに応じた実行時間（ミリ秒）
     // 遅い（1）: 1000ms、速い（5）: 200ms
     return 1200 - (speedLevel - 1) * 200;
+  }
+}
+
+// ─── 採点結果 ──────────────────────────────────────────────────────────
+
+class ScoringResult {
+  final bool isAchieved;
+  final double? currentX;
+  final double? currentY;
+  final double? currentAngle;
+  final double? goalX;
+  final double? goalY;
+  final double? expectedAngle;
+  final double? tolerance;
+  final double? angleToleranceDeg;
+  final bool isPositionCorrect;
+  final bool isAngleCorrect;
+
+  const ScoringResult({
+    required this.isAchieved,
+    this.currentX,
+    this.currentY,
+    this.currentAngle,
+    this.goalX,
+    this.goalY,
+    this.expectedAngle,
+    this.tolerance,
+    this.angleToleranceDeg,
+    this.isPositionCorrect = true,
+    this.isAngleCorrect = true,
+  });
+
+  factory ScoringResult.noGoal() {
+    return const ScoringResult(
+      isAchieved: false,
+      isPositionCorrect: true,
+      isAngleCorrect: true,
+    );
+  }
+
+  String getMessage() {
+    if (!isPositionCorrect && !isAngleCorrect) {
+      return '❌ 位置と角度が異なります';
+    } else if (!isPositionCorrect) {
+      return '❌ 位置がずれています';
+    } else if (!isAngleCorrect) {
+      return '❌ 角度が異なります';
+    } else if (isAchieved) {
+      return '✅ 成功！目標に到達しました！';
+    }
+    return '';
+  }
+
+  String getDetailMessage() {
+    if (goalX == null || goalY == null) {
+      return '目標条件が設定されていません';
+    }
+    return '現在位置: ($currentX, $currentY)\n目標位置: ($goalX, $goalY)';
   }
 }
 

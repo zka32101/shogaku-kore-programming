@@ -25,6 +25,9 @@ import '../providers/character_provider.dart';
 import '../widgets/character_reaction_widget.dart';
 import '../providers/step_executor_provider.dart';
 import '../widgets/step_execution_controls.dart';
+import '../widgets/variable_viewer.dart';
+import '../widgets/scoring_result_widget.dart';
+import '../widgets/execution_timeline.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Challenge challenge;
@@ -48,6 +51,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   int _reactionToken = 0;
   final math.Random _rng = math.Random();
   bool _stepExecutionMode = false;
+  ScoringResult? _lastScoringResult;
 
   /// キャラクターのリアクションを一時的に切り替え、しばらくしたらアイドルに戻す
   void _reactCharacter(
@@ -947,6 +951,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           final execState = consumerRef.watch(stepExecutorProvider);
                           final isCurrentBlock =
                               _stepExecutionMode && execState.currentBlockId == block.id;
+                          final hasBreakpoint = execState.breakpoints.contains(index);
 
                           return _ScriptBlockItem(
                             key: ValueKey(block.id),
@@ -958,6 +963,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             },
                             onTap: () => _showParamEditor(context, block),
                             isCurrentExecutingBlock: isCurrentBlock,
+                            hasBreakpoint: hasBreakpoint,
+                            onToggleBreakpoint: () {
+                              HapticService.lightImpact();
+                              consumerRef
+                                  .read(stepExecutorProvider.notifier)
+                                  .toggleBreakpoint(index);
+                            },
                           );
                         },
                       ),
@@ -1113,15 +1125,53 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         children: [
           // ─── ステップ実行モード表示 ────────────────────────────────────
           if (_stepExecutionMode)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: StepExecutionControls(
-                totalBlocks: editorState.scriptBlocks.length,
-                onStepForward: () {
-                  // ステップ実行時にハイライト更新
-                  setState(() {});
-                },
-              ),
+            Consumer(
+              builder: (context, ref, child) {
+                final execState = ref.watch(stepExecutorProvider);
+                final isExecutionComplete =
+                    execState.currentStepIndex >= editorState.scriptBlocks.length;
+
+                // 実行完了時に採点結果を計算
+                if (isExecutionComplete && _lastScoringResult == null) {
+                  _lastScoringResult = ref
+                      .read(stepExecutorProvider.notifier)
+                      .checkGoal(widget.challenge.goalCondition);
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    children: [
+                      if (!isExecutionComplete)
+                        StepExecutionControls(
+                          totalBlocks: editorState.scriptBlocks.length,
+                          onStepForward: () {
+                            setState(() {});
+                          },
+                        )
+                      else if (_lastScoringResult != null)
+                        ScoringResultWidget(result: _lastScoringResult!),
+                      if (execState.executionHistory.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        ExecutionTimeline(
+                          history: execState.executionHistory,
+                          currentHistoryIndex: (execState.currentStepIndex - 1)
+                              .clamp(0, execState.executionHistory.length - 1),
+                          onTimelineChanged: (index) {
+                            consumerRef
+                                .read(stepExecutorProvider.notifier)
+                                .goToHistoryPoint(index);
+                            setState(() {});
+                          },
+                          totalBlocks: editorState.scriptBlocks.length,
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                      VariableViewer(variables: execState.variables),
+                    ],
+                  ),
+                );
+              },
             ),
 
           // ─── 実行・回答ボタン ──────────────────────────────────────────
@@ -1165,6 +1215,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           HapticService.selectionClick();
                           setState(() {
                             _stepExecutionMode = !_stepExecutionMode;
+                            _lastScoringResult = null;
                             if (!_stepExecutionMode) {
                               ref.read(stepExecutorProvider.notifier).reset();
                             }
@@ -1335,6 +1386,8 @@ class _ScriptBlockItem extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onTap;
   final bool isCurrentExecutingBlock;
+  final bool hasBreakpoint;
+  final VoidCallback onToggleBreakpoint;
 
   const _ScriptBlockItem({
     super.key,
@@ -1343,6 +1396,8 @@ class _ScriptBlockItem extends StatelessWidget {
     required this.onDelete,
     required this.onTap,
     this.isCurrentExecutingBlock = false,
+    this.hasBreakpoint = false,
+    required this.onToggleBreakpoint,
   });
 
   Color get _color => _categoryColor(block.category);
@@ -1427,7 +1482,23 @@ class _ScriptBlockItem extends StatelessWidget {
               ),
             ),
             const Icon(Icons.drag_handle, color: Colors.grey, size: 20),
-            // 44x44 タッチエリアの削除ボタン
+            // ブレークポイントボタン
+            SizedBox(
+              width: 44,
+              height: 44,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  hasBreakpoint ? Icons.stop_circle : Icons.stop_circle_outlined,
+                  color: hasBreakpoint ? Colors.orange : Colors.grey,
+                  size: 20,
+                ),
+                onPressed: onToggleBreakpoint,
+                splashRadius: 20,
+                tooltip: hasBreakpoint ? 'ブレークポイント削除' : 'ブレークポイント設定',
+              ),
+            ),
+            // 削除ボタン
             SizedBox(
               width: 44,
               height: 44,

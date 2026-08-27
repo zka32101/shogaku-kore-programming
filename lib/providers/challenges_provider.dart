@@ -49,6 +49,13 @@ List<Challenge> _buildChallenges() {
           description: 'ロボットを前に進める',
         ),
       ],
+      goalCondition: {
+        'goalX': 3.5,
+        'goalY': 3.5,
+        'tolerance': 0.5,
+        'expectedAngle': 0,
+        'angleToleranceDeg': 45,
+      },
     ),
     Challenge(
       id: 'stage_02',
@@ -61,6 +68,13 @@ List<Challenge> _buildChallenges() {
       isFree: true,
       expectedOutput: 'move_forward(100)\nturn_right(90)',
       hints: ['2つのブロックを順番に並べよう', '先に進んでから回転しよう'],
+      goalCondition: {
+        'goalX': 3.5,
+        'goalY': 3.5,
+        'tolerance': 0.5,
+        'expectedAngle': 270,
+        'angleToleranceDeg': 45,
+      },
     ),
     Challenge(
       id: 'stage_03',
@@ -73,6 +87,13 @@ List<Challenge> _buildChallenges() {
       isFree: true,
       expectedOutput: 'repeat(4):\n  move_forward(100)\n  turn_right(90)',
       hints: ['「繰り返す」ブロックを使おう', '中に「前に進む」と「右に回転」を入れよう'],
+      goalCondition: {
+        'goalX': 3.5,
+        'goalY': 3.5,
+        'tolerance': 0.5,
+        'expectedAngle': 0,
+        'angleToleranceDeg': 45,
+      },
     ),
     Challenge(
       id: 'stage_04',
