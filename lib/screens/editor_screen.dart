@@ -27,6 +27,7 @@ import '../providers/step_executor_provider.dart';
 import '../widgets/step_execution_controls.dart';
 import '../widgets/variable_viewer.dart';
 import '../widgets/scoring_result_widget.dart';
+import '../widgets/execution_timeline.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Challenge challenge;
@@ -1150,6 +1151,21 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         )
                       else if (_lastScoringResult != null)
                         ScoringResultWidget(result: _lastScoringResult!),
+                      if (execState.executionHistory.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        ExecutionTimeline(
+                          history: execState.executionHistory,
+                          currentHistoryIndex: (execState.currentStepIndex - 1)
+                              .clamp(0, execState.executionHistory.length - 1),
+                          onTimelineChanged: (index) {
+                            consumerRef
+                                .read(stepExecutorProvider.notifier)
+                                .goToHistoryPoint(index);
+                            setState(() {});
+                          },
+                          totalBlocks: editorState.scriptBlocks.length,
+                        ),
+                      ],
                       const SizedBox(height: 12),
                       VariableViewer(variables: execState.variables),
                     ],

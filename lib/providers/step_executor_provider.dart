@@ -6,6 +6,28 @@ import '../models/block_model.dart';
 const double _kGridSize = 7.0;
 const double _kStepsPerCell = 50.0;
 
+// ─── 実行履歴スナップショット ────────────────────────────────────────────────
+
+class ExecutionSnapshot {
+  final int stepIndex;
+  final double robotX;
+  final double robotY;
+  final double robotAngle;
+  final List<Offset> robotPath;
+  final Map<String, dynamic> variables;
+  final String outputMessage;
+
+  const ExecutionSnapshot({
+    required this.stepIndex,
+    required this.robotX,
+    required this.robotY,
+    required this.robotAngle,
+    required this.robotPath,
+    required this.variables,
+    required this.outputMessage,
+  });
+}
+
 // ─── ステップ実行状態 ──────────────────────────────────────────────────────
 
 class ExecutionState {
@@ -36,6 +58,9 @@ class ExecutionState {
   // ブレークポイント管理
   final Set<int> breakpoints; // ブレークポイントを設定したブロックのインデックス
 
+  // 実行履歴
+  final List<ExecutionSnapshot> executionHistory;
+
   const ExecutionState({
     this.isRunning = false,
     this.isPaused = false,
@@ -52,6 +77,7 @@ class ExecutionState {
     this.totalLoopIterations = 0,
     this.variables = const {},
     this.breakpoints = const {},
+    this.executionHistory = const [],
   });
 
   ExecutionState copyWith({
@@ -70,6 +96,7 @@ class ExecutionState {
     int? totalLoopIterations,
     Map<String, dynamic>? variables,
     Set<int>? breakpoints,
+    List<ExecutionSnapshot>? executionHistory,
   }) {
     return ExecutionState(
       isRunning: isRunning ?? this.isRunning,
@@ -87,6 +114,7 @@ class ExecutionState {
       totalLoopIterations: totalLoopIterations ?? this.totalLoopIterations,
       variables: variables ?? this.variables,
       breakpoints: breakpoints ?? this.breakpoints,
+      executionHistory: executionHistory ?? this.executionHistory,
     );
   }
 }
@@ -146,8 +174,7 @@ class StepExecutor extends StateNotifier<ExecutionState> {
   }
 
   void reset() {
-    state = const ExecutionState();
-    initializeExecution(_scriptBlocks);
+    resetToStart();
   }
 
   void setExecutionSpeed(int speed) {
@@ -168,6 +195,45 @@ class StepExecutor extends StateNotifier<ExecutionState> {
 
   bool hasBreakpoint(int blockIndex) {
     return state.breakpoints.contains(blockIndex);
+  }
+
+  // ─── 履歴リプレイ ───────────────────────────────────────────────────────
+
+  /// 履歴内の特定のポイントに移動
+  void goToHistoryPoint(int historyIndex) {
+    if (historyIndex < 0 || historyIndex >= state.executionHistory.length) {
+      return;
+    }
+
+    final snapshot = state.executionHistory[historyIndex];
+
+    state = state.copyWith(
+      currentStepIndex: snapshot.stepIndex + 1,
+      robotX: snapshot.robotX,
+      robotY: snapshot.robotY,
+      robotAngle: snapshot.robotAngle,
+      robotPath: snapshot.robotPath,
+      variables: snapshot.variables,
+      outputMessage: snapshot.outputMessage,
+    );
+  }
+
+  /// 最初の状態に戻す
+  void resetToStart() {
+    state = ExecutionState(
+      isRunning: false,
+      isPaused: false,
+      currentStepIndex: 0,
+      robotX: _kGridSize / 2,
+      robotY: _kGridSize / 2,
+      robotAngle: 0,
+      robotPath: const [Offset(_kGridSize / 2, _kGridSize / 2)],
+      outputMessage: 'ステップ実行の準備ができました',
+      currentBlockId: _scriptBlocks.isNotEmpty ? _scriptBlocks[0].id : null,
+      variables: {},
+      breakpoints: state.breakpoints,
+      executionHistory: [],
+    );
   }
 
   // ─── 採点 ─────────────────────────────────────────────────────────────
@@ -246,11 +312,26 @@ class StepExecutor extends StateNotifier<ExecutionState> {
     // ブレークポイントをチェック
     bool hasBreakpointOnNext = state.breakpoints.contains(nextIndex);
 
+    // 実行履歴に現在の状態をスナップショットとして記録
+    final newHistory = List<ExecutionSnapshot>.from(state.executionHistory);
+    newHistory.add(
+      ExecutionSnapshot(
+        stepIndex: state.currentStepIndex,
+        robotX: state.robotX,
+        robotY: state.robotY,
+        robotAngle: state.robotAngle,
+        robotPath: List<Offset>.from(state.robotPath),
+        variables: Map<String, dynamic>.from(state.variables),
+        outputMessage: _getExecutionMessage(currentBlock),
+      ),
+    );
+
     state = state.copyWith(
       currentStepIndex: nextIndex,
       currentBlockId: nextBlockId,
       outputMessage: _getExecutionMessage(currentBlock),
-      isPaused: hasBreakpointOnNext, // ブレークポイントで一時停止
+      isPaused: hasBreakpointOnNext,
+      executionHistory: newHistory,
     );
   }
 
