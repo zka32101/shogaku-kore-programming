@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/challenge.dart';
 import '../config/theme.dart';
+import '../config/constants.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/auth_provider.dart';
@@ -22,7 +23,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentUser = ref.watch(currentUserProvider);
     final progress = ref.watch(progressProvider);
     final challengeProgress = progress[challenge.id] ??
         UserProgress(challengeId: challenge.id);

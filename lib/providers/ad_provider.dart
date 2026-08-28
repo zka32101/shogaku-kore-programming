@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/ad_service.dart';
@@ -35,9 +36,8 @@ final isRewardedAdReadyProvider = StateProvider<bool>((ref) {
 /// 広告初期化
 class AdInitializerNotifier extends StateNotifier<AsyncValue<void>> {
   final AdService _adService;
-  final WidgetRef _ref;
 
-  AdInitializerNotifier(this._adService, this._ref)
+  AdInitializerNotifier(this._adService)
       : super(const AsyncValue.loading()) {
     _initialize();
   }
@@ -55,7 +55,7 @@ class AdInitializerNotifier extends StateNotifier<AsyncValue<void>> {
 final adInitializerProvider =
     StateNotifierProvider<AdInitializerNotifier, AsyncValue<void>>((ref) {
   final adService = ref.watch(adServiceProvider);
-  return AdInitializerNotifier(adService, ref);
+  return AdInitializerNotifier(adService);
 });
 
 /// インタースティシャル広告を表示（チャレンジ完了時など）
