@@ -25,8 +25,6 @@ class BannerAdWidget extends ConsumerWidget {
     return bannerAdAsync.when(
       loading: () => _buildLoadingPlaceholder(),
       error: (error, stack) {
-        // エラーログはあるが、エラー表示はしない（ユーザーエクスペリエンス重視）
-        print('❌ Banner ad error: $error');
         return const SizedBox.shrink();
       },
       data: (bannerAd) {

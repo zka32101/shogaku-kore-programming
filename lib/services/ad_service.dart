@@ -65,9 +65,9 @@ class AdService {
     try {
       await MobileAds.instance.initialize();
       _adsInitialized = true;
-      print('✅ Google Mobile Ads initialized successfully');
     } catch (e) {
-      print('❌ Error initializing Google Mobile Ads: $e');
+      // Error initializing Google Mobile Ads
+      rethrow;
     }
   }
 
@@ -86,11 +86,9 @@ class AdService {
         request: const AdRequest(),
         listener: BannerAdListener(
           onAdLoaded: (ad) {
-            print('✅ Banner ad loaded');
             _isBannerAdLoaded = true;
           },
           onAdFailedToLoad: (ad, error) {
-            print('❌ Banner ad failed to load: ${error.message}');
             ad.dispose();
             _isBannerAdLoaded = false;
           },
@@ -127,12 +125,10 @@ class AdService {
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
-            print('✅ Interstitial ad loaded');
             _interstitialAd = ad;
             _isInterstitialAdLoaded = true;
           },
           onAdFailedToLoad: (LoadAdError error) {
-            print('❌ Interstitial ad failed to load: ${error.message}');
             _isInterstitialAdLoaded = false;
           },
         ),
@@ -148,24 +144,20 @@ class AdService {
     VoidCallback? onAdDismissedCallback,
   }) async {
     if (_interstitialAd == null || !_isInterstitialAdLoaded) {
-      print('⚠️ Interstitial ad not loaded');
-      await loadInterstitialAd(); // 再度ロード
+      await loadInterstitialAd();
       return;
     }
 
     try {
       _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
-          print('✅ Interstitial ad dismissed');
           ad.dispose();
           _interstitialAd = null;
           _isInterstitialAdLoaded = false;
           onAdDismissedCallback?.call();
-          // 次回表示用に再ロード
           loadInterstitialAd();
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
-          print('❌ Interstitial ad failed to show: ${error.message}');
           ad.dispose();
           _interstitialAd = null;
           _isInterstitialAdLoaded = false;
@@ -174,7 +166,8 @@ class AdService {
 
       await _interstitialAd!.show();
     } catch (e) {
-      print('❌ Error showing interstitial ad: $e');
+      // Error showing interstitial ad
+      rethrow;
     }
   }
 
@@ -192,12 +185,10 @@ class AdService {
         request: const AdRequest(),
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (ad) {
-            print('✅ Rewarded ad loaded');
             _rewardedAd = ad;
             _isRewardedAdLoaded = true;
           },
           onAdFailedToLoad: (LoadAdError error) {
-            print('❌ Rewarded ad failed to load: ${error.message}');
             _isRewardedAdLoaded = false;
           },
         ),
@@ -214,8 +205,7 @@ class AdService {
     VoidCallback? onAdDismissedCallback,
   }) async {
     if (_rewardedAd == null || !_isRewardedAdLoaded) {
-      print('⚠️ Rewarded ad not loaded');
-      await loadRewardedAd(); // 再度ロード
+      await loadRewardedAd();
       return false;
     }
 
@@ -224,16 +214,13 @@ class AdService {
 
       _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
-          print('✅ Rewarded ad dismissed (earned: $userEarnedReward)');
           ad.dispose();
           _rewardedAd = null;
           _isRewardedAdLoaded = false;
           onAdDismissedCallback?.call();
-          // 次回表示用に再ロード
           loadRewardedAd();
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
-          print('❌ Rewarded ad failed to show: ${error.message}');
           ad.dispose();
           _rewardedAd = null;
           _isRewardedAdLoaded = false;
@@ -242,7 +229,6 @@ class AdService {
 
       await _rewardedAd!.show(
         onUserEarnedReward: (ad, reward) {
-          print('✅ User earned reward: $reward');
           userEarnedReward = true;
           onUserEarnedReward?.call();
         },
@@ -250,7 +236,6 @@ class AdService {
 
       return userEarnedReward;
     } catch (e) {
-      print('❌ Error showing rewarded ad: $e');
       return false;
     }
   }

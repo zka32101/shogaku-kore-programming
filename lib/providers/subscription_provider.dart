@@ -53,7 +53,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         shouldShowAds: shouldShowAds,
       );
     } catch (e) {
-      print('Error initializing subscription: $e');
       state = const SubscriptionState();
     }
   }
@@ -75,7 +74,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         shouldShowAds: false,
       );
     } catch (e) {
-      print('Error starting trial: $e');
+      // Error starting trial
     }
   }
 
@@ -93,7 +92,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         shouldShowAds: false,
       );
     } catch (e) {
-      print('Error setting premium subscription: $e');
+      // Error setting premium subscription
     }
   }
 
@@ -109,7 +108,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         shouldShowAds: !state.isTrialActive,
       );
     } catch (e) {
-      print('Error canceling premium subscription: $e');
+      // Error canceling premium subscription
     }
   }
 
