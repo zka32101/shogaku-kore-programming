@@ -19,6 +19,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@e2f20f10a21f43b30e5bbdc72f4f04c02e75c57c  # v4.0.0
 
+      - name: Setup Java
+        uses: actions/setup-java@b36c23c0d45c41e40d352c7286cf7196c94f91d6  # v4.0.0
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@db9f90a3c7e67c82fb80146d312b6699e5dff5c8  # v2.14.0
         with:
