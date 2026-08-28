@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/challenge.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
-import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/auth_provider.dart';
 import 'quiz_screen.dart';

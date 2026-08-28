@@ -61,7 +61,7 @@ final adInitializerProvider =
 /// インタースティシャル広告を表示（チャレンジ完了時など）
 class InterstitialAdController {
   final AdService _adService;
-  final WidgetRef _ref;
+  final Ref _ref;
 
   InterstitialAdController(this._adService, this._ref);
 
@@ -93,7 +93,7 @@ class InterstitialAdController {
 /// リワード広告コントローラー
 class RewardedAdController {
   final AdService _adService;
-  final WidgetRef _ref;
+  final Ref _ref;
 
   RewardedAdController(this._adService, this._ref);
 
