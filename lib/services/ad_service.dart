@@ -98,7 +98,6 @@ class AdService {
       await _bannerAd.load();
       return _bannerAd;
     } catch (e) {
-      print('❌ Error loading banner ad: $e');
       return null;
     }
   }
@@ -134,7 +133,6 @@ class AdService {
         ),
       );
     } catch (e) {
-      print('❌ Error loading interstitial ad: $e');
       _isInterstitialAdLoaded = false;
     }
   }
@@ -194,7 +192,6 @@ class AdService {
         ),
       );
     } catch (e) {
-      print('❌ Error loading rewarded ad: $e');
       _isRewardedAdLoaded = false;
     }
   }
