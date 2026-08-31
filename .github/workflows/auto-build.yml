@@ -22,7 +22,7 @@ jobs:
       should-build: ${{ steps.check-tag.outputs.should-build }}
     steps:
       - name: Checkout
-        uses: actions/checkout@e2f20f10a21f43b30e5bbdc72f4f04c02e75c57c
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2  # v4.0.0
         with:
           fetch-depth: 0
 
@@ -51,28 +51,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@e2f20f10a21f43b30e5bbdc72f4f04c02e75c57c
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2  # v4.0.0
 
-      - name: Create Git tag
+      - name: Create Git tag and release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git tag -a ${{ needs.version-check.outputs.version }} -m "Release ${{ needs.version-check.outputs.version }}"
           git push origin ${{ needs.version-check.outputs.version }}
 
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.version-check.outputs.version }}
-          release_name: "Release ${{ needs.version-check.outputs.version }}"
-          body: |
-            Automatic release triggered by version change in pubspec.yaml
+          gh release create ${{ needs.version-check.outputs.version }} \
+            --title "Release ${{ needs.version-check.outputs.version }}" \
+            --notes "Automatic release triggered by version change in pubspec.yaml
 
-            Build artifacts will be available once the build workflow completes.
-          draft: false
-          prerelease: false
+Build artifacts will be available once the build workflow completes." \
+            --repo ${{ github.repository }}
 
   build-status:
     needs: [version-check, create-release]
