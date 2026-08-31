@@ -34,8 +34,15 @@ jobs:
       - name: Update CocoaPods repo
         run: cd ios && pod repo update && cd ..
 
+      - name: Check iOS environment
+        run: |
+          xcode-select -p
+          flutter precache --ios
+          echo "Flutter iOS plugins:"
+          find . -path ./ios -prune -o -name "ios" -type d -print | grep -i plugin
+
       - name: Build iOS
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign -v
 
       - name: Upload iOS build to artifacts
         uses: actions/upload-artifact@v4
