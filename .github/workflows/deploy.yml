@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name to build (e.g., v0.1.0)'
+        required: false
+        type: string
 
 # Limit permissions to minimum required (security best practice)
 permissions:
