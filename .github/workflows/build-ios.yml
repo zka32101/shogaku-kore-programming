@@ -43,10 +43,19 @@ jobs:
         run: |
           xcode-select -p
           flutter precache --ios
+          flutter doctor -v
           echo "iOS environment check complete"
 
+      - name: Regenerate iOS build files
+        run: |
+          cd ios
+          rm -rf Pods Podfile.lock .symlinks/ Flutter/Flutter.framework Flutter/Flutter.podspec
+          cd ..
+          flutter clean
+          flutter pub get
+
       - name: Build iOS
-        run: flutter build ios --release --no-codesign -v
+        run: flutter build ios --release --no-codesign -v 2>&1 | tail -100
 
       - name: Upload iOS build to artifacts
         uses: actions/upload-artifact@v4
