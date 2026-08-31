@@ -61,14 +61,7 @@ jobs:
           git config --global user.email "actions@github.com"
           git tag -a ${{ needs.version-check.outputs.version }} -m "Release ${{ needs.version-check.outputs.version }}"
           git push origin ${{ needs.version-check.outputs.version }}
-
-          NOTES="Automatic release triggered by version change in pubspec.yaml
-
-Build artifacts will be available once the build workflow completes."
-          gh release create ${{ needs.version-check.outputs.version }} \
-            --title "Release ${{ needs.version-check.outputs.version }}" \
-            --notes "$NOTES" \
-            --repo ${{ github.repository }}
+          gh release create ${{ needs.version-check.outputs.version }} --title "Release ${{ needs.version-check.outputs.version }}" --notes "Automatic release triggered by version change in pubspec.yaml. Build artifacts will be available once the build workflow completes."
 
   build-status:
     needs: [version-check, create-release]
