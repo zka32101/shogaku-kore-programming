@@ -32,7 +32,12 @@ jobs:
         run: flutter clean
 
       - name: Update CocoaPods repo
-        run: cd ios && pod repo update && cd ..
+        run: |
+          cd ios
+          pod repo update
+          # Clean pods to ensure fresh install
+          rm -rf Pods Podfile.lock
+          cd ..
 
       - name: Check iOS environment
         run: |
