@@ -2,7 +2,7 @@ name: shogaku_kore_programming
 description: "小学コレ！プログラミング - コード探険でプログラミングを楽しく学ぼう！"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 0.1.0+1
 
 environment:
   sdk: ^3.11.5
