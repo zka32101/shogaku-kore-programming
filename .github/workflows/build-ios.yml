@@ -38,8 +38,7 @@ jobs:
         run: |
           xcode-select -p
           flutter precache --ios
-          echo "Flutter iOS plugins:"
-          find . -path ./ios -prune -o -name "ios" -type d -print | grep -i plugin
+          echo "iOS environment check complete"
 
       - name: Build iOS
         run: flutter build ios --release --no-codesign -v
