@@ -1,5 +1,46 @@
 import 'learning_analytics.dart';
 
+/// クイズの質問
+class Question {
+  final String id;
+  final String text;
+  final String? codeSnippet;
+  final List<String> options;
+  final int correctIndex;
+  final String explanation;
+  final String? hint; // ヒント（任意）
+
+  const Question({
+    required this.id,
+    required this.text,
+    this.codeSnippet,
+    required this.options,
+    required this.correctIndex,
+    required this.explanation,
+    this.hint,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'text': text,
+        'codeSnippet': codeSnippet,
+        'options': options,
+        'correctIndex': correctIndex,
+        'explanation': explanation,
+        'hint': hint,
+      };
+
+  factory Question.fromJson(Map<String, dynamic> json) => Question(
+        id: json['id'] as String,
+        text: json['text'] as String,
+        codeSnippet: json['codeSnippet'] as String?,
+        options: List<String>.from(json['options'] as List),
+        correctIndex: json['correctIndex'] as int,
+        explanation: json['explanation'] as String,
+        hint: json['hint'] as String?,
+      );
+}
+
 /// チャレンジの種類
 enum ChallengeType {
   daily,      // 日次チャレンジ
