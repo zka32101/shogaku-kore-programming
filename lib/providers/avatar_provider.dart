@@ -174,16 +174,19 @@ class AvatarNotifier extends StateNotifier<AvatarState> {
     }
 
     // Get coin provider and deduct coins
-    final coinNotifier = _ref.read(coinNotifierProvider.notifier);
-    final currentBalance = _ref.read(coinNotifierProvider).balance;
+    final coinNotifier = _ref.read(coinProvider.notifier);
+    final currentBalance = _ref.read(coinProvider).balance;
 
     if (currentBalance < avatar.price) {
       return false; // Not enough coins
     }
 
     try {
-      // Deduct coins
-      await coinNotifier.deductCoins(avatar.price);
+      // Deduct coins using purchaseItem method (handles persistence)
+      final success = await coinNotifier.purchaseItem(avatarId, avatar.price);
+      if (!success) {
+        return false;
+      }
 
       // Add to owned avatars
       final updatedOwned = {...state.ownedAvatarIds, avatarId};

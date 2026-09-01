@@ -171,44 +171,45 @@ void main() {
   });
 
   group('AvatarNotifier', () {
-    test('initialization sets default values', (WidgetTester tester) async {
-      final container = ProviderContainer();
-      final notifier = AvatarNotifier(container.ref);
+    late ProviderContainer container;
+
+    setUp(() {
+      container = ProviderContainer();
+    });
+
+    test('initialization sets default values', () {
+      final notifier = container.read(avatarProvider.notifier);
 
       expect(notifier.state.selectedAvatarId, 'avatar_1');
       expect(notifier.state.ownedAvatarIds.isEmpty, true);
       expect(notifier.state.allAvatars.length, 8); // 4 default + 4 premium
     });
 
-    test('getAvatarById returns correct avatar', (WidgetTester tester) {
-      final container = ProviderContainer();
-      final notifier = AvatarNotifier(container.ref);
+    test('getAvatarById returns correct avatar', () {
+      final notifier = container.read(avatarProvider.notifier);
 
       final avatar = notifier.getAvatarById('avatar_1');
       expect(avatar?.id, 'avatar_1');
       expect(avatar?.name, 'Ninja');
     });
 
-    test('getAvatarById returns null for invalid ID', (WidgetTester tester) {
-      final container = ProviderContainer();
-      final notifier = AvatarNotifier(container.ref);
+    test('getAvatarById returns null for invalid ID', () {
+      final notifier = container.read(avatarProvider.notifier);
 
       final avatar = notifier.getAvatarById('invalid_id');
       expect(avatar, null);
     });
 
-    test('addOwnedAvatarForTesting adds avatar to owned', (WidgetTester tester) {
-      final container = ProviderContainer();
-      final notifier = AvatarNotifier(container.ref);
+    test('addOwnedAvatarForTesting adds avatar to owned', () {
+      final notifier = container.read(avatarProvider.notifier);
 
       notifier.addOwnedAvatarForTesting('avatar_5');
 
       expect(notifier.state.ownedAvatarIds.contains('avatar_5'), true);
     });
 
-    test('clearOwnedAvatarsForTesting clears owned avatars', (WidgetTester tester) {
-      final container = ProviderContainer();
-      final notifier = AvatarNotifier(container.ref);
+    test('clearOwnedAvatarsForTesting clears owned avatars', () {
+      final notifier = container.read(avatarProvider.notifier);
 
       notifier.addOwnedAvatarForTesting('avatar_5');
       notifier.addOwnedAvatarForTesting('avatar_6');
@@ -217,9 +218,8 @@ void main() {
       expect(notifier.state.ownedAvatarIds.isEmpty, true);
     });
 
-    test('all default avatars are accessible', (WidgetTester tester) {
-      final container = ProviderContainer();
-      final notifier = AvatarNotifier(container.ref);
+    test('all default avatars are accessible', () {
+      final notifier = container.read(avatarProvider.notifier);
 
       final defaultAvatars =
           notifier.state.allAvatars.where((a) => a.isDefault).toList();
@@ -228,9 +228,8 @@ void main() {
       expect(defaultAvatars.every((a) => a.price == 0), true);
     });
 
-    test('all premium avatars have prices', (WidgetTester tester) {
-      final container = ProviderContainer();
-      final notifier = AvatarNotifier(container.ref);
+    test('all premium avatars have prices', () {
+      final notifier = container.read(avatarProvider.notifier);
 
       final premiumAvatars =
           notifier.state.allAvatars.where((a) => !a.isDefault).toList();

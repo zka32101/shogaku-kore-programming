@@ -32,6 +32,8 @@ class ProfileState {
   final int flashcardAutoFlipSecs;   // 自動めくり間隔（秒）（3/5/10）
   final int quizTimerSeconds;              // クイズ1問あたりの制限時間（秒）（30/45/60/90）
   final bool wrongAnswerReminderEnabled;   // 苦手問題リマインダー通知
+  final bool rankingNamePublic;            // ランキングで名前を公表するか（デフォルト: false）
+  final String anonymousId;                // 匿名ID（ランキング表示用）
 
   const ProfileState({
     this.nickname = 'たんけんか',
@@ -56,6 +58,8 @@ class ProfileState {
     this.flashcardAutoFlipSecs = 5,
     this.quizTimerSeconds = 60,
     this.wrongAnswerReminderEnabled = false,
+    this.rankingNamePublic = false,
+    this.anonymousId = '',
   });
 
   ProfileState copyWith({
@@ -81,6 +85,8 @@ class ProfileState {
     int? flashcardAutoFlipSecs,
     int? quizTimerSeconds,
     bool? wrongAnswerReminderEnabled,
+    bool? rankingNamePublic,
+    String? anonymousId,
   }) {
     return ProfileState(
       nickname: nickname ?? this.nickname,
@@ -105,6 +111,8 @@ class ProfileState {
       flashcardAutoFlipSecs: flashcardAutoFlipSecs ?? this.flashcardAutoFlipSecs,
       quizTimerSeconds: quizTimerSeconds ?? this.quizTimerSeconds,
       wrongAnswerReminderEnabled: wrongAnswerReminderEnabled ?? this.wrongAnswerReminderEnabled,
+      rankingNamePublic: rankingNamePublic ?? this.rankingNamePublic,
+      anonymousId: anonymousId ?? this.anonymousId,
     );
   }
 }
@@ -136,6 +144,8 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   static const _keyFlashcardAutoFlipSecs  = 'profile_flashcard_auto_flip_secs';
   static const _keyQuizTimerSeconds       = 'profile_quiz_timer_seconds';
   static const _keyWrongAnswerReminder    = 'profile_wrong_answer_reminder';
+  static const _keyRankingNamePublic      = 'profile_ranking_name_public';
+  static const _keyAnonymousId            = 'profile_anonymous_id';
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -162,7 +172,13 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       flashcardAutoFlipSecs: prefs.getInt(_keyFlashcardAutoFlipSecs) ?? 5,
       quizTimerSeconds: prefs.getInt(_keyQuizTimerSeconds) ?? 60,
       wrongAnswerReminderEnabled: prefs.getBool(_keyWrongAnswerReminder) ?? false,
+      rankingNamePublic: prefs.getBool(_keyRankingNamePublic) ?? false,
+      anonymousId: prefs.getString(_keyAnonymousId) ?? _generateAnonymousId(),
     );
+    // anonymousId が保存されていなければ保存
+    if (!prefs.containsKey(_keyAnonymousId)) {
+      await prefs.setString(_keyAnonymousId, state.anonymousId);
+    }
     // HapticService に反映
     HapticService.setEnabled(state.hapticsEnabled);
   }
@@ -283,6 +299,23 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     state = state.copyWith(wrongAnswerReminderEnabled: enabled);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyWrongAnswerReminder, enabled);
+  }
+
+  /// ランキング名前公表設定を変更
+  Future<void> setRankingNamePublic(bool isPublic) async {
+    state = state.copyWith(rankingNamePublic: isPublic);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyRankingNamePublic, isPublic);
+  }
+
+  /// 匿名 ID を生成（初回のみ）
+  static String _generateAnonymousId() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    String result = '';
+    for (int i = 0; i < 6; i++) {
+      result += chars[(DateTime.now().microsecond + i) % chars.length];
+    }
+    return result;
   }
 
   Future<void> completeOnboarding({

@@ -16,7 +16,7 @@ class AvatarSelectionScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final avatarState = ref.watch(avatarProvider);
-    final coinState = ref.watch(coinNotifierProvider);
+    final coinState = ref.watch(coinProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +81,7 @@ class AvatarSelectionScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
@@ -137,7 +137,7 @@ class AvatarSelectionScreen extends ConsumerWidget {
       required bool isSelectable,
       required CoinState coinState,
       required AvatarState avatarState,
-    },
+    }
   ) {
     return GridView.builder(
       shrinkWrap: true,
@@ -174,7 +174,7 @@ class AvatarSelectionScreen extends ConsumerWidget {
       required bool isSelected,
       required bool isSelectable,
       required bool canAfford,
-    },
+    }
   ) {
     return GestureDetector(
       onTap: () {
