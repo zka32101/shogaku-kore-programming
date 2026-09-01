@@ -304,6 +304,34 @@ class LearningGoal {
     return diff.inDays;
   }
 
+  LearningGoal copyWith({
+    String? goalId,
+    String? childId,
+    String? title,
+    String? description,
+    LearningCategory? category,
+    double? targetAccuracy,
+    int? targetQuizzesCount,
+    DateTime? deadline,
+    bool? isCompleted,
+    DateTime? createdAt,
+    DateTime? completedAt,
+  }) {
+    return LearningGoal(
+      goalId: goalId ?? this.goalId,
+      childId: childId ?? this.childId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      targetAccuracy: targetAccuracy ?? this.targetAccuracy,
+      targetQuizzesCount: targetQuizzesCount ?? this.targetQuizzesCount,
+      deadline: deadline ?? this.deadline,
+      isCompleted: isCompleted ?? this.isCompleted,
+      createdAt: createdAt ?? this.createdAt,
+      completedAt: completedAt ?? this.completedAt,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'goalId': goalId,
     'childId': childId,

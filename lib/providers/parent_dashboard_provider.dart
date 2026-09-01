@@ -4,7 +4,7 @@ library parent_dashboard_provider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:uuid/uuid.dart';
+import 'dart:math';
 import '../models/parent_dashboard.dart';
 import '../models/learning_analytics.dart';
 
@@ -217,9 +217,8 @@ class ParentDashboardNotifier extends StateNotifier<ParentDashboardState> {
     int targetQuizzesCount,
     DateTime deadline,
   ) async {
-    const uuid = Uuid();
     final goal = LearningGoal(
-      goalId: uuid.v4(),
+      goalId: _generateId('goal'),
       childId: childId,
       title: title,
       description: description,
@@ -266,9 +265,8 @@ class ParentDashboardNotifier extends StateNotifier<ParentDashboardState> {
     String message,
     ParentAlertType alertType,
   ) async {
-    const uuid = Uuid();
     final alert = ParentAlert(
-      alertId: uuid.v4(),
+      alertId: _generateId('alert'),
       parentId: 'parent_id', // 実装時は実際の親IDを使用
       childId: childId,
       alertType: alertType,
@@ -400,6 +398,13 @@ class ParentDashboardNotifier extends StateNotifier<ParentDashboardState> {
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// ユニークなIDを生成
+  String _generateId(String prefix) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final random = Random().nextInt(100000);
+    return '${prefix}_${timestamp}_$random';
   }
 }
 
