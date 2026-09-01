@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/badge.dart';
-import '../providers/profile_provider.dart';
 
 /// バッジの状態を保持するクラス
 class BadgeState {
@@ -368,7 +367,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
     final isUnlocked = state.unlockedBadgeIds.contains(badgeId);
     final remainingValue = (badge.requiredValue - currentValue).abs();
     final progressPercentage =
-        (currentValue / badge.requiredValue * 100).clamp(0, 100);
+        (currentValue / badge.requiredValue * 100).clamp(0.0, 100.0);
 
     return BadgeProgressInfo(
       badge: badge,

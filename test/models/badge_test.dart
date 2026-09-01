@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shogaku_kore_programming/models/badge.dart';
-import 'dart:convert';
 
 void main() {
   group('Badge Model Tests', () {
