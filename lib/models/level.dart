@@ -1,6 +1,3 @@
-/// レベルシステムのモデル定義
-library level;
-
 import 'dart:math' show pow;
 
 /// レベルの難易度

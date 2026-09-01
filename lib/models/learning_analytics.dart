@@ -1,6 +1,3 @@
-/// 学習分析システムのモデル定義
-library learning_analytics;
-
 /// 学習分析の時間単位
 enum AnalyticsTimeUnit {
   daily,    // 日単位

@@ -1,6 +1,3 @@
-/// 保護者ダッシュボードシステムのモデル定義
-library parent_dashboard;
-
 import 'learning_analytics.dart';
 
 /// 子どもプロファイル

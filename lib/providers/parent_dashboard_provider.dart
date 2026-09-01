@@ -1,6 +1,3 @@
-/// 保護者ダッシュボード状態管理プロバイダ
-library parent_dashboard_provider;
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -236,17 +233,15 @@ class ParentDashboardNotifier extends StateNotifier<ParentDashboardState> {
 
   /// 学習目標を完了
   Future<void> completeGoal(String goalId) async {
-    final completedGoal = state.learningGoals.firstWhere(
-      (g) => g.goalId == goalId,
-      orElse: () => null as dynamic,
-    );
+    LearningGoal? completedGoal;
 
     final updatedGoals = state.learningGoals.map((goal) {
       if (goal.goalId == goalId) {
-        return goal.copyWith(
+        completedGoal = goal.copyWith(
           isCompleted: true,
           completedAt: DateTime.now(),
         );
+        return completedGoal!;
       }
       return goal;
     }).toList();
@@ -257,9 +252,9 @@ class ParentDashboardNotifier extends StateNotifier<ParentDashboardState> {
     // 目標達成アラートを追加
     if (completedGoal != null) {
       await addAlert(
-        completedGoal.childId,
+        completedGoal!.childId,
         'goal達成',
-        '${completedGoal.title}を達成しました！',
+        '${completedGoal!.title}を達成しました！',
         ParentAlertType.goalCompleted,
       );
     }
