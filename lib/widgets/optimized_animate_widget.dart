@@ -54,11 +54,7 @@ extension OptimizedAnimateExtension on Widget {
           duration: adjustedDuration,
           curve: curve,
           delay: delay,
-        )
-        .then()
-        .callback(() {
-          // Optional callback on animation complete
-        });
+        );
   }
 
   /// Apply scale animation with battery optimization
@@ -105,10 +101,10 @@ extension OptimizedAnimateExtension on Widget {
 }
 
 /// Throttled animation controller for expensive animations
+/// Limits animation frame rate based on battery level
 class ThrottledAnimationController extends TickerProvider {
   final TickerProvider vsync;
   final int targetFps;
-  late Ticker _ticker;
   late Duration _lastUpdate;
 
   ThrottledAnimationController({
