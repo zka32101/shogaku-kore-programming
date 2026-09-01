@@ -38,9 +38,6 @@ dependencies:
   # Google Mobile Ads（広告システム）
   google_mobile_ads: ^6.0.0
 
-  # Battery monitoring for performance optimization
-  battery_plus: ^1.1.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
