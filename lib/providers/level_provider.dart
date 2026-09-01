@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import '../models/level.dart';
 
 /// ユーザーレベルの状態
@@ -210,7 +209,7 @@ final levelProvider = StateNotifierProvider<LevelNotifier, LevelState>(
 
 /// レベル進捗情報プロバイダ
 final levelProgressProvider = FutureProvider<UserLevelProgress>((ref) async {
-  final levelState = ref.watch(levelProvider);
+  ref.watch(levelProvider);
   final notifier = ref.read(levelProvider.notifier);
 
   // 状態が更新されるたびに再計算

@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shogaku_kore_programming/providers/level_provider.dart';
-import 'package:shogaku_kore_programming/models/level.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

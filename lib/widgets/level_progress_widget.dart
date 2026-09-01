@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/level.dart';
-import '../providers/level_provider.dart';
 
 /// レベル進捗表示ウィジェット
 class LevelProgressWidget extends StatelessWidget {
@@ -190,7 +189,7 @@ class LevelBadgeWidget extends StatelessWidget {
             style: TextStyle(fontSize: size * 0.4),
           ),
           Text(
-            'Lv${levelNumber}',
+            'Lv$levelNumber',
             style: TextStyle(
               fontSize: size * 0.2,
               fontWeight: FontWeight.bold,
@@ -255,7 +254,7 @@ class LevelHeaderWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Level ${currentLevel}',
+                  'Level $currentLevel',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: _getLevelColor(level.tier),

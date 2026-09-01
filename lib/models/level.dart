@@ -1,4 +1,7 @@
 /// レベルシステムのモデル定義
+library level;
+
+import 'dart:math' show pow;
 
 /// レベルの難易度
 enum LevelTier {
@@ -105,7 +108,7 @@ class UserLevelProgress {
     // 指数関数的な成長: 各レベルは前のレベルより1.15倍のXPが必要
     // レベル1: 100XP, レベル2: 115XP, ..., レベル50: 数千XP
     int baseXp = 100;
-    return (baseXp * (1.15 ^ (nextLevelNumber - 1))).toInt();
+    return (baseXp * pow(1.15, nextLevelNumber - 1)).toInt();
   }
 
   @override
@@ -211,7 +214,7 @@ class DefaultLevels {
     // 指数関数的成長: 各レベルは1.15倍のXPが必要
     // レベル1: 100XP, レベル2: 115XP, ..., レベル50: ~50,000 XP
     const baseXp = 100;
-    return (baseXp * (1.15 ^ (levelNumber - 1))).toInt();
+    return (baseXp * pow(1.15, levelNumber - 1)).toInt();
   }
 
   /// デフォルトレベルを取得
