@@ -61,6 +61,11 @@ class OptimizedHttpClient extends http.BaseClient {
     }
     return normalInterval;
   }
+
+  /// Set battery level for testing purposes
+  void setBatteryLevelForTesting(int level) {
+    _batteryService.setBatteryLevelForTesting(level);
+  }
 }
 
 /// API polling service with battery-aware throttling
@@ -87,5 +92,10 @@ class APIPollingService {
   bool shouldFetchHighResAssets() {
     // Only fetch high-res assets when battery is above 50%
     return !_batteryService.isMediumBattery && !_batteryService.isLowBattery;
+  }
+
+  /// Set battery level for testing purposes
+  void setBatteryLevelForTesting(int level) {
+    _batteryService.setBatteryLevelForTesting(level);
   }
 }

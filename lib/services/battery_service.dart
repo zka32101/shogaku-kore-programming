@@ -1,21 +1,23 @@
-import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/foundation.dart';
 
-/// Service for monitoring device battery level
+/// Service for monitoring device battery level (lightweight implementation)
 /// Adjusts animation performance based on battery state
+///
+/// Note: This is a lightweight implementation that doesn't require
+/// platform-specific battery plugins. In production, this should be
+/// extended with actual battery monitoring using platform channels.
 class BatteryService with ChangeNotifier {
   static final BatteryService _instance = BatteryService._internal();
 
   factory BatteryService() => _instance;
   BatteryService._internal();
 
-  final _battery = Battery();
-  late BatteryState _batteryState;
   int _batteryLevel = 100;
   bool _isLowBattery = false;
   bool _isMediumBattery = false;
 
   /// Get current battery level (0-100)
+  /// Default: 100 (full battery) - actual level requires platform channel
   int get batteryLevel => _batteryLevel;
 
   /// Check if device is in low battery mode
@@ -46,22 +48,18 @@ class BatteryService with ChangeNotifier {
 
   /// Initialize battery monitoring
   Future<void> initialize() async {
-    _batteryState = await _battery.batteryState;
-    _batteryLevel = await _battery.batteryLevel;
+    // In a real implementation, this would use platform channels
+    // to get actual battery level from the device
     _updateBatteryState();
-
-    // Listen to battery state changes
-    _battery.onBatteryStateChanged.listen((BatteryState state) {
-      _batteryState = state;
-      notifyListeners();
-    });
+    notifyListeners();
   }
 
   /// Update battery level and thresholds
-  Future<void> updateBatteryLevel() async {
-    final level = await _battery.batteryLevel;
-    if (level != _batteryLevel) {
-      _batteryLevel = level;
+  /// Can be called periodically or when battery state changes
+  Future<void> updateBatteryLevel([int? level]) async {
+    final newLevel = level ?? _batteryLevel;
+    if (newLevel != _batteryLevel) {
+      _batteryLevel = newLevel;
       _updateBatteryState();
       notifyListeners();
     }
@@ -71,5 +69,12 @@ class BatteryService with ChangeNotifier {
   void _updateBatteryState() {
     _isLowBattery = _batteryLevel < 20;
     _isMediumBattery = _batteryLevel >= 20 && _batteryLevel < 50;
+  }
+
+  /// Set battery level for testing purposes
+  void setBatteryLevelForTesting(int level) {
+    _batteryLevel = level;
+    _updateBatteryState();
+    notifyListeners();
   }
 }
