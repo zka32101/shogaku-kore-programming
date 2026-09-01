@@ -72,7 +72,6 @@ class BatteryService with ChangeNotifier {
   }
 
   /// Set battery level for testing purposes
-  @visibleForTesting
   void setBatteryLevelForTesting(int level) {
     _batteryLevel = level;
     _updateBatteryState();
