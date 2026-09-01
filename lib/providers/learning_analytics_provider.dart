@@ -446,9 +446,8 @@ final learningAnalyticsProvider =
 /// 総合進捗プロバイダ
 final learningProgressProvider =
     FutureProvider<OverallLearningProgress>((ref) async {
-  ref.watch(learningAnalyticsProvider);
-  final notifier = ref.read(learningAnalyticsProvider.notifier);
-  return notifier.state.progress;
+  final state = ref.watch(learningAnalyticsProvider);
+  return state.progress;
 });
 
 /// 週間レポートプロバイダ
