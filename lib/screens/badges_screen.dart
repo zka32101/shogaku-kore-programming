@@ -129,7 +129,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
                 final remainingValue = (badge.requiredValue - currentValue).abs();
                 final progressPercentage =
                     (currentValue / badge.requiredValue * 100)
-                        .clamp(0, 100);
+                        .clamp(0.0, 100.0);
 
                 final badgeInfo = BadgeProgressInfo(
                   badge: badge,
@@ -482,16 +482,12 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
   }
 
   Color _getDifficultyColor(BadgeDifficulty difficulty) {
-    switch (difficulty) {
-      case BadgeDifficulty.bronze:
-        return Colors.brown;
-      case BadgeDifficulty.silver:
-        return Colors.grey;
-      case BadgeDifficulty.gold:
-        return Colors.amber;
-      case BadgeDifficulty.platinum:
-        return Colors.purple;
-    }
+    return switch (difficulty) {
+      BadgeDifficulty.bronze => Colors.brown,
+      BadgeDifficulty.silver => Colors.grey,
+      BadgeDifficulty.gold => Colors.amber,
+      BadgeDifficulty.platinum => Colors.purple,
+    };
   }
 
   String _formatDate(DateTime date) {

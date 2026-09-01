@@ -99,7 +99,6 @@ void main() {
   group('BadgeNotifier Tests', () {
     test('BadgeNotifier initializes with default badges', () async {
       final container = ProviderContainer();
-      final notifier = container.read(badgeProvider.notifier);
 
       // Wait for initialization
       await Future.delayed(const Duration(milliseconds: 100));
