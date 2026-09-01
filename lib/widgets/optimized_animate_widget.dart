@@ -73,8 +73,6 @@ extension OptimizedAnimateExtension on Widget {
           duration: adjustedDuration,
           curve: curve,
           delay: delay,
-          begin: begin,
-          end: end,
         );
   }
 
@@ -100,31 +98,33 @@ extension OptimizedAnimateExtension on Widget {
   }
 }
 
-/// Throttled animation controller for expensive animations
-/// Limits animation frame rate based on battery level
-class ThrottledAnimationController extends TickerProvider {
-  final TickerProvider vsync;
+/// Throttled animation controller configuration for expensive animations
+/// Note: Limits animation frame rate based on battery level
+/// Implementation: Use with TickerProvider from Flutter framework
+class ThrottledAnimationConfig {
   final int targetFps;
   late Duration _lastUpdate;
 
-  ThrottledAnimationController({
-    required this.vsync,
+  ThrottledAnimationConfig({
     this.targetFps = 60,
   });
 
-  @override
-  Ticker createTicker(TickerCallback onTick) {
-    final Duration frameDuration = Duration(
-      microseconds: (1000000 / targetFps).toInt(),
-    );
+  /// Get frame duration for target FPS
+  Duration get frameDuration => Duration(
+    microseconds: (1000000 / targetFps).toInt(),
+  );
 
+  /// Reset animation state
+  void reset() {
     _lastUpdate = Duration.zero;
+  }
 
-    return Ticker((Duration elapsed) {
-      if (elapsed - _lastUpdate >= frameDuration) {
-        _lastUpdate = elapsed;
-        onTick(elapsed);
-      }
-    });
+  /// Check if frame should render based on elapsed time
+  bool shouldRenderFrame(Duration elapsed) {
+    if (elapsed - _lastUpdate >= frameDuration) {
+      _lastUpdate = elapsed;
+      return true;
+    }
+    return false;
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'battery_service.dart';
 
@@ -64,7 +63,6 @@ class OptimizedHttpClient extends http.BaseClient {
   }
 
   /// Set battery level for testing purposes
-  @visibleForTesting
   void setBatteryLevelForTesting(int level) {
     _batteryService.setBatteryLevelForTesting(level);
   }
@@ -97,7 +95,6 @@ class APIPollingService {
   }
 
   /// Set battery level for testing purposes
-  @visibleForTesting
   void setBatteryLevelForTesting(int level) {
     _batteryService.setBatteryLevelForTesting(level);
   }
