@@ -131,7 +131,6 @@ class LearningAnalyticsNotifier extends StateNotifier<LearningAnalyticsState> {
 
     // 今日のデータを取得または作成
     var todayStats = _getTodayStats();
-    final accuracy = totalCount > 0 ? (correctCount / totalCount * 100) : 0.0;
 
     todayStats = DailyLearningStats(
       date: now,

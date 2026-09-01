@@ -2,8 +2,6 @@
 library parent_dashboard;
 
 import 'learning_analytics.dart';
-import 'badge.dart';
-import 'level.dart';
 
 /// 子どもプロファイル
 class ChildProfile {
@@ -131,7 +129,7 @@ class ParentDashboardData {
   });
 
   /// 学習時間（時間単位）
-  double get totalLearningHours => learningProgress.totalTimeSpent.inHours;
+  double get totalLearningHours => learningProgress.totalTimeSpent.inMilliseconds / (1000 * 60 * 60);
 
   /// 正答率
   double get overallAccuracy => learningProgress.overallAccuracy;

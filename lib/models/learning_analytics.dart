@@ -269,6 +269,31 @@ class OverallLearningProgress {
               ),
             ),
       );
+
+  /// Copy with updated fields
+  OverallLearningProgress copyWith({
+    int? totalQuizzesCompleted,
+    int? totalQuizzesCorrect,
+    Duration? totalTimeSpent,
+    double? overallAccuracy,
+    int? longestStreak,
+    int? currentStreak,
+    DateTime? lastStudyDate,
+    int? totalDaysLearned,
+    Map<LearningCategory, int>? categoryStats,
+  }) {
+    return OverallLearningProgress(
+      totalQuizzesCompleted: totalQuizzesCompleted ?? this.totalQuizzesCompleted,
+      totalQuizzesCorrect: totalQuizzesCorrect ?? this.totalQuizzesCorrect,
+      totalTimeSpent: totalTimeSpent ?? this.totalTimeSpent,
+      overallAccuracy: overallAccuracy ?? this.overallAccuracy,
+      longestStreak: longestStreak ?? this.longestStreak,
+      currentStreak: currentStreak ?? this.currentStreak,
+      lastStudyDate: lastStudyDate ?? this.lastStudyDate,
+      totalDaysLearned: totalDaysLearned ?? this.totalDaysLearned,
+      categoryStats: categoryStats ?? this.categoryStats,
+    );
+  }
 }
 
 /// 学習レポート

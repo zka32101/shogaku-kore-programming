@@ -236,6 +236,11 @@ class ParentDashboardNotifier extends StateNotifier<ParentDashboardState> {
 
   /// 学習目標を完了
   Future<void> completeGoal(String goalId) async {
+    final completedGoal = state.learningGoals.firstWhere(
+      (g) => g.goalId == goalId,
+      orElse: () => null as dynamic,
+    );
+
     final updatedGoals = state.learningGoals.map((goal) {
       if (goal.goalId == goalId) {
         return goal.copyWith(
@@ -250,12 +255,14 @@ class ParentDashboardNotifier extends StateNotifier<ParentDashboardState> {
     await _saveLearningGoals(updatedGoals);
 
     // 目標達成アラートを追加
-    await addAlert(
-      goal.childId,
-      'goal達成',
-      '${state.learningGoals.firstWhere((g) => g.goalId == goalId).title}を達成しました！',
-      ParentAlertType.goalCompleted,
-    );
+    if (completedGoal != null) {
+      await addAlert(
+        completedGoal.childId,
+        'goal達成',
+        '${completedGoal.title}を達成しました！',
+        ParentAlertType.goalCompleted,
+      );
+    }
   }
 
   /// アラートを追加
