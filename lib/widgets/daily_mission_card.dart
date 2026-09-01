@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/daily_mission.dart';
-import '../providers/daily_mission_provider.dart';
 
 /// 毎日ミッションカードウィジェット
 class DailyMissionCard extends StatelessWidget {

@@ -50,7 +50,6 @@ class DailyMissionNotifier extends StateNotifier<DailyMissionState> {
   Future<void> _initializeMissions() async {
     final prefs = await SharedPreferences.getInstance();
     final now = DateTime.now();
-    final dateKey = '${now.year}-${now.month}-${now.day}';
 
     // 保存されたミッションを読み込む
     final savedMissionsJson = prefs.getStringList(_missionsKey) ?? [];
@@ -263,7 +262,6 @@ class DailyMissionNotifier extends StateNotifier<DailyMissionState> {
     final mission = state.todayMissions!.missions
         .firstWhere((m) => m.id == missionId);
     final currentValue = state.missionProgress[missionId] ?? 0;
-    final remainingValue = (mission.targetValue - currentValue).abs();
     final progressPercentage =
         (currentValue / mission.targetValue * 100).clamp(0.0, 100.0);
 
