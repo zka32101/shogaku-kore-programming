@@ -232,7 +232,7 @@ void main() {
 
       final tier = container.read(bestTierProvider);
       expect(tier.isNotEmpty, true);
-      expect(tier, 'ビギナー');
+      expect(tier == 'ビギナー', true);
     });
 
     test('overallRankProvider returns rank', () async {
