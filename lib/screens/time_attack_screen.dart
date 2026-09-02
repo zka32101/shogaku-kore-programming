@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/constants.dart';
 import '../config/theme.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/time_attack_provider.dart';
@@ -465,7 +466,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
       final wrongTexts = wrongState.answers.map((a) => a.questionText).toSet();
       final allQs = <_TAQuestion>[];
       for (final c in allChallenges) {
-        if (c.type == ChallengeType.quiz) {
+        if (c.type == Stage?Type.quiz) {
           for (final q in c.questions) {
             if (wrongTexts.contains(q.text)) {
               allQs.add(_TAQuestion(question: q, challengeTitle: c.title));
@@ -485,7 +486,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     // クイズ形式かつ質問が1問以上あるステージから全問を収集（レベルフィルター適用）
     final allQs = <_TAQuestion>[];
     for (final c in allChallenges) {
-      if (c.type == ChallengeType.quiz &&
+      if (c.type == Stage?Type.quiz &&
           (_selectedLevel == null || c.level == _selectedLevel)) {
         for (final q in c.questions) {
           allQs.add(_TAQuestion(question: q, challengeTitle: c.title));

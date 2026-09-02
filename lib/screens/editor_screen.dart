@@ -5,9 +5,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math' as math;
-import '../config/constants.dart';
+import '../config/constants.dart' as constants;
 import '../config/theme.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/gallery_provider.dart';
 import '../models/block_model.dart';
 import '../providers/editor_provider.dart';
@@ -30,7 +31,7 @@ import '../widgets/scoring_result_widget.dart';
 import '../widgets/execution_timeline.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
-  final Challenge challenge;
+  final Stage challenge;
 
   const EditorScreen({super.key, required this.challenge});
 
@@ -254,7 +255,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
     if (isCorrect) {
       final levelBefore = ref.read(progressProvider.notifier).currentLevel;
-      ref.read(progressProvider.notifier).completeChallenge(
+      ref.read(progressProvider.notifier).completeStage?(
             widget.challenge.id,
             3,
           );
@@ -299,12 +300,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final allChallenges = ref.read(allChallengesProvider);
     final currentIndex =
         allChallenges.indexWhere((c) => c.id == widget.challenge.id);
-    Challenge? nextChallenge;
+    Stage? nextStage;
     if (isCorrect && currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
       for (int i = currentIndex + 1; i < allChallenges.length; i++) {
         final c = allChallenges[i];
-        if (c.type == ChallengeType.visual && c.isFree) {
-          nextChallenge = c;
+        if (c.type == constants.ChallengeType.visual && c.isFree) {
+          nextStage = c;
           break;
         }
       }
@@ -326,7 +327,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         isCorrect: isCorrect,
         elapsedSeconds: elapsedSec,
         challengeTitle: widget.challenge.title,
-        nextChallenge: nextChallenge,
+        nextStage: nextStage,
         onRetry: () {
           Navigator.pop(ctx);
           ref.read(editorProvider.notifier).reset();
@@ -335,13 +336,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           Navigator.pop(ctx);
           Navigator.pop(context);
         },
-        onNext: nextChallenge != null
+        onNext: nextStage != null
             ? () {
                 Navigator.pop(ctx);
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (_) =>
-                        EditorScreen(challenge: nextChallenge!),
+                        EditorScreen(challenge: nextStage!),
                   ),
                 );
               }
@@ -474,10 +475,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   void _checkUnitCompleteBadge(String level) {
     final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
-    final unitChallenges = allChallenges.where((c) => c.level == level).toList();
-    if (unitChallenges.isEmpty) return;
-    final completedInUnit = unitChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    if (completedInUnit < unitChallenges.length) return;
+    final unitStage?s = allChallenges.where((c) => c.level == level).toList();
+    if (unitStage?s.isEmpty) return;
+    final completedInUnit = unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    if (completedInUnit < unitStage?s.length) return;
 
     final (icon, name, message, goal) = switch (level) {
       StageLevel.beginner     => ('🧩', '初級ユニット制覇！', 'ブロックプログラミング基礎を完全マスター！', '中級Pythonに挑戦しよう！'),
@@ -1786,7 +1787,7 @@ class _EditorResultSheet extends StatefulWidget {
   final bool isCorrect;
   final VoidCallback onRetry;
   final VoidCallback onComplete;
-  final Challenge? nextChallenge;
+  final Stage?? nextStage?;
   final VoidCallback? onNext;
   final int elapsedSeconds;
   final String challengeTitle;
@@ -1795,7 +1796,7 @@ class _EditorResultSheet extends StatefulWidget {
     required this.isCorrect,
     required this.onRetry,
     required this.onComplete,
-    this.nextChallenge,
+    this.nextStage?,
     this.onNext,
     this.elapsedSeconds = 0,
     this.challengeTitle = '',
@@ -1849,7 +1850,7 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
     final key = event.logicalKey;
     // Enter/Space → 次のステージ（あれば）or 完了
     if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.space) {
-      if (widget.isCorrect && widget.nextChallenge != null && widget.onNext != null) {
+      if (widget.isCorrect && widget.nextStage? != null && widget.onNext != null) {
         widget.onNext!();
       } else if (widget.isCorrect) {
         widget.onComplete();
@@ -1959,14 +1960,14 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
           ],
           const SizedBox(height: 20),
           // 次のステージへ（正解かつ次のステージがある）
-          if (widget.isCorrect && widget.nextChallenge != null && widget.onNext != null) ...[
+          if (widget.isCorrect && widget.nextStage? != null && widget.onNext != null) ...[
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: widget.onNext,
                 icon: const Text('🚀', style: TextStyle(fontSize: 16)),
                 label: Text(
-                  '次へ: ${widget.nextChallenge!.title}',
+                  '次へ: ${widget.nextStage?!.title}',
                   overflow: TextOverflow.ellipsis,
                 ),
                 style: ElevatedButton.styleFrom(

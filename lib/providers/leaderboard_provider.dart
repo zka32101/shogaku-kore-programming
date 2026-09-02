@@ -520,8 +520,8 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
     if (trimmed.startsWith('[')) {
       return _parseJsonArray(trimmed);
     }
-    final num = num.tryParse(trimmed);
-    if (num != null) return num;
+    final parsedNum = num.tryParse(trimmed);
+    if (parsedNum != null) return parsedNum;
     return trimmed;
   }
 }

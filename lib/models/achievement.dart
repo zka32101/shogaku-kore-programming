@@ -270,6 +270,8 @@ class AchievementCollection {
   AchievementProgress? getProgress(String achievementId) {
     try {
       final achievement = getAchievement(achievementId);
+      if (achievement == null) return null;
+
       final userAchievement = stats.unlockedAchievements
           .firstWhere((a) => a.achievementId == achievementId);
 

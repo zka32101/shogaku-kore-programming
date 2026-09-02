@@ -10,6 +10,7 @@ import '../config/constants.dart';
 import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
@@ -1240,7 +1241,7 @@ class _FilterChip extends StatelessWidget {
 enum _CompletedSort { date, stars, level }
 
 class _CompletedTab extends StatefulWidget {
-  final List<Challenge> allChallenges;
+  final List<Stage> allChallenges;
   final Map<String, UserProgress> progressMap;
   final int completedCount;
 
@@ -1430,7 +1431,7 @@ class _CompletedTabState extends State<_CompletedTab> {
 // ──────────── クリア統計サマリーバー ─────────────────────────────────────────────
 
 class _CompletedStatsBar extends StatelessWidget {
-  final List<Challenge> completed;
+  final List<Stage> completed;
   final Map<String, UserProgress> progressMap;
 
   const _CompletedStatsBar({
@@ -1824,7 +1825,7 @@ class _BadgeCard extends StatelessWidget {
 }
 
 class _CompletedStageCard extends StatelessWidget {
-  final Challenge challenge;
+  final Stage challenge;
   final int starsEarned;
   final DateTime? completedAt;
 
@@ -2133,7 +2134,7 @@ class _Badge {
 
 class _StatsTab extends ConsumerWidget {
   final List<int> weeklyData;
-  final List<Challenge> allChallenges;
+  final List<Stage> allChallenges;
   final Map<String, UserProgress> progressMap;
   final int streakDays;
   final int longestStreak;

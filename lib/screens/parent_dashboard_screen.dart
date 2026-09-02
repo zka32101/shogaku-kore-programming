@@ -9,6 +9,7 @@ import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../widgets/weekly_chart.dart';
 import '../widgets/learning_calendar.dart';
 import '../providers/wrong_answers_provider.dart';
@@ -961,7 +962,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
 
   Widget _buildRecentlyCompleted(
     BuildContext context,
-    List<Challenge> stages,
+    List<Stage> stages,
     Map<String, UserProgress> progressMap,
   ) {
     return Column(

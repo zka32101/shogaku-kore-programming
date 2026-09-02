@@ -623,13 +623,18 @@ class ActivityFeedNotifier extends StateNotifier<ActivityFeedState> {
   int getUnreadActivityCount() => state.collection?.feed.feed.length ?? 0;
 
   /// Get total comments count
-  int getTotalCommentsCount() =>
-      state.collection?.feed.comments.values.fold(0, (sum, comments) => sum + comments.length) ??
-      0;
+  int getTotalCommentsCount() {
+    final feed = state.collection?.feed;
+    if (feed == null) return 0;
+    return feed.comments.values.fold(0, (sum, comments) => sum + comments.length);
+  }
 
   /// Get total likes count
-  int getTotalLikesCount() =>
-      state.collection?.feed.feed.fold(0, (sum, activity) => sum + activity.likeCount) ?? 0;
+  int getTotalLikesCount() {
+    final feed = state.collection?.feed;
+    if (feed == null) return 0;
+    return feed.feed.fold(0, (sum, activity) => sum + activity.likeCount);
+  }
 
   /// Clear recently created
   void clearRecentlyCreated() {

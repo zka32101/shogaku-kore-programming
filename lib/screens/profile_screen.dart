@@ -14,6 +14,7 @@ import '../providers/favorites_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../config/constants.dart';
 import '../widgets/shortcut_help.dart';
@@ -542,7 +543,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildLevelProgressCard(
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
     Map<String, UserProgress> progressMap,
   ) {
     final levels = [
@@ -1349,7 +1350,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildAILearningPathCard(
-      List<Challenge> allChallenges, Map<String, UserProgress> progressMap, int level) {
+      List<Stage> allChallenges, Map<String, UserProgress> progressMap, int level) {
     // 学習パスデータの集計
     final masterTopics = <String>[];
     final struggleTopics = <String>[];
@@ -1583,7 +1584,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildRecentlyCompletedCard(
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
     Map<String, UserProgress> progressMap,
   ) {
     // 完了済みかつcompletedAtがあるものを新しい順に最大5件取得

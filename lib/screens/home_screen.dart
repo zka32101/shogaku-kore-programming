@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/profile_provider.dart';
@@ -417,7 +418,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     // 次の未完了ステージを探す
-    final nextChallenge = allChallenges.firstWhere(
+    final nextStage? = allChallenges.firstWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
       orElse: () => allChallenges.first,
     );
@@ -502,7 +503,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut)
                   else
-                    _buildDailyMission(context, nextChallenge)
+                    _buildDailyMission(context, nextStage?)
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut),
@@ -758,7 +759,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // 今週のチャレンジ
                   if (completedCount > 0) ...[
-                    _buildWeeklyChallenge(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
+                    _buildWeeklyStage?(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 97.ms)
                         .slideY(begin: 0.12, curve: Curves.easeOut),
@@ -1361,12 +1362,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }).toList();
 
-    final challenge = Challenge(
+    final challenge = Stage?(
       id: 'wrong_answers_quiz',
       stageNumber: 0,
       title: '苦手問題クイズ',
       description: '間違えた問題をもう一度解こう！',
-      type: ChallengeType.quiz,
+      type: Stage?Type.quiz,
       level: StageLevel.beginner,
       icon: '📝',
       isFree: true,
@@ -1381,7 +1382,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildFavoritesCard(
     BuildContext context,
     int count,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
     Set<String> favoriteIds,
   ) {
     final favorites = allChallenges
@@ -1832,7 +1833,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildWeakStagesCard(
     BuildContext context,
-    List<Challenge> weakStages,
+    List<Stage> weakStages,
     Map<String, UserProgress> progressMap,
   ) {
     return Container(
@@ -1901,7 +1902,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     : const Color(0xFFE67E22);
             // 苦手問題があるか確認
             final wrongState = ref.read(wrongAnswersProvider);
-            final wrongCount = c.type == ChallengeType.quiz
+            final wrongCount = c.type == Stage?Type.quiz
                 ? c.questions.fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
                 : 0;
             return Padding(
@@ -1912,7 +1913,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   SoundService().playTap();
                   Navigator.of(context).push(
                     smoothPageRoute(
-                      c.type == ChallengeType.visual
+                      c.type == Stage?Type.visual
                           ? EditorScreen(challenge: c)
                           : QuizScreen(challenge: c),
                     ),
@@ -1985,7 +1986,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ///
   /// 「今日のチャレンジ」カード・連続記録危機バナー・おかえりバナーの
   /// 3箇所から呼び出され、プレミアムロックの回避（ペイウォールバイパス）を防ぐ。
-  void _openChallengeOrShowPaywall(BuildContext context, Challenge challenge) {
+  void _openStage?OrShowPaywall(BuildContext context, Stage challenge) {
     if (!challenge.isFree) {
       HapticService.lightImpact();
       SoundService().playTap();
@@ -2009,7 +2010,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     SoundService().playTap();
     Navigator.of(context).push(
       smoothPageRoute(
-        challenge.type == ChallengeType.visual
+        challenge.type == Stage?Type.visual
             ? EditorScreen(challenge: challenge)
             : QuizScreen(challenge: challenge),
       ),
@@ -2026,7 +2027,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
           orElse: () => allChallenges.first,
         );
-        _openChallengeOrShowPaywall(context, next);
+        _openStage?OrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2194,7 +2195,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
           orElse: () => allChallenges.first,
         );
-        _openChallengeOrShowPaywall(context, next);
+        _openStage?OrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2281,7 +2282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildWeeklyChallenge(
+  Widget _buildWeeklyStage?(
     BuildContext context,
     ProgressNotifier notifier,
     int completedCount,
@@ -2919,7 +2920,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _showRandomQuickQuiz(
     BuildContext context,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
     Map<String, UserProgress> progressMap,
   ) async {
     HapticService.mediumImpact();
@@ -2927,7 +2928,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // 完了済みのクイズ型チャレンジの問題を収集
     final pool = <(Question, String)>[];
     for (final c in allChallenges) {
-      if (c.type == ChallengeType.quiz &&
+      if (c.type == Stage?Type.quiz &&
           (progressMap[c.id]?.isCompleted ?? false) &&
           c.questions.isNotEmpty) {
         for (final q in c.questions) {
@@ -3024,13 +3025,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  Widget _buildDailyMission(BuildContext context, Challenge challenge) {
-    void openChallenge() {
-      _openChallengeOrShowPaywall(context, challenge);
+  Widget _buildDailyMission(BuildContext context, Stage challenge) {
+    void openStage?() {
+      _openStage?OrShowPaywall(context, challenge);
     }
 
     return TapScale(
-      onTap: openChallenge,
+      onTap: openStage?,
       child: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
@@ -3068,13 +3069,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
-                          challenge.type == ChallengeType.visual ? '🧩 ビジュアル' : '❓ クイズ',
+                          challenge.type == Stage?Type.visual ? '🧩 ビジュアル' : '❓ クイズ',
                           style: const TextStyle(fontSize: 9, color: Colors.white70),
                         ),
                       ),
                       // 苦手問題がある場合に🔥バッジを表示
                       Builder(builder: (ctx) {
-                        if (challenge.type != ChallengeType.quiz) return const SizedBox.shrink();
+                        if (challenge.type != Stage?Type.quiz) return const SizedBox.shrink();
                         final wrongState = ref.read(wrongAnswersProvider);
                         final hasWrong = challenge.questions.any(
                           (q) => wrongState.wrongCountFor(q.text) > 0,
@@ -3158,7 +3159,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             delay: 1200.ms,
                             color: Colors.white.withValues(alpha: 0.3),
                           ),
-                        if (challenge.type == ChallengeType.quiz &&
+                        if (challenge.type == Stage?Type.quiz &&
                             challenge.questions.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           Text(
@@ -3743,7 +3744,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     BuildContext context,
     String level,
     Map<String, UserProgress> progressMap,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
   ) {
     final String unitTitle;
     final String unitNumber;
@@ -3766,20 +3767,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         unitIcon = '🚀';
     }
 
-    final unitChallenges = allChallenges.where((c) => c.level == level).toList();
+    final unitStage?s = allChallenges.where((c) => c.level == level).toList();
     final completedInUnit =
-        unitChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    final totalInUnit = unitChallenges.length;
+        unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    final totalInUnit = unitStage?s.length;
     final progressText =
         completedInUnit == 0 ? '未開始' : '$completedInUnit/$totalInUnit完了';
     // このユニットの苦手問題数
     final wrongState = ref.read(wrongAnswersProvider);
-    final unitWrongCount = unitChallenges
-        .where((c) => c.type == ChallengeType.quiz)
+    final unitWrongCount = unitStage?s
+        .where((c) => c.type == Stage?Type.quiz)
         .fold<int>(0, (sum, c) => sum + c.questions.fold<int>(
           0, (s, q) => s + wrongState.wrongCountFor(q.text)));
-    final unitWrongStages = unitChallenges
-        .where((c) => c.type == ChallengeType.quiz &&
+    final unitWrongStages = unitStage?s
+        .where((c) => c.type == Stage?Type.quiz &&
             c.questions.any((q) => wrongState.wrongCountFor(q.text) > 0))
         .length;
 

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/constants.dart';
 import '../config/theme.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/wrong_answers_provider.dart';
@@ -25,7 +26,7 @@ import '../providers/bgm_provider.dart';
 import '../providers/character_provider.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
-  final Challenge challenge;
+  final Stage challenge;
   /// 指定した場合、challenge.questions の代わりにこのリストを使用する（再挑戦用）
   final List<Question>? overrideQuestions;
 
@@ -251,7 +252,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     return KeyEventResult.ignored;
   }
 
-  String _getChallengeType(Challenge challenge) {
+  String _getStage?Type(Stage challenge) {
     final title = challenge.title.toLowerCase();
     if (title.contains('if') || title.contains('分岐') || title.contains('条件')) return 'branch';
     if (title.contains('ループ') || title.contains('for') || title.contains('while')) return 'loop';
@@ -345,7 +346,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       }
       // キャラクター成長トリガー
       ref.read(characterProvider.notifier).growFromCorrectAnswer(
-        challengeType: _getChallengeType(widget.challenge),
+        challengeType: _getStage?Type(widget.challenge),
         difficulty: widget.challenge.level,
       );
     }
@@ -478,7 +479,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     final levelBefore = ref.read(progressProvider.notifier).currentLevel;
 
     // 進捗を保存
-    ref.read(progressProvider.notifier).completeChallenge(
+    ref.read(progressProvider.notifier).completeStage?(
           widget.challenge.id,
           stars,
         );
@@ -517,13 +518,13 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     final allChallenges = ref.read(allChallengesProvider);
     final currentIndex =
         allChallenges.indexWhere((c) => c.id == widget.challenge.id);
-    Challenge? nextChallenge;
+    Stage?? nextStage?;
     if (currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
       // 次のステージがクイズ形式かつ無料のものを探す
       for (int i = currentIndex + 1; i < allChallenges.length; i++) {
         final c = allChallenges[i];
-        if (c.type == ChallengeType.quiz && c.isFree) {
-          nextChallenge = c;
+        if (c.type == Stage?Type.quiz && c.isFree) {
+          nextStage? = c;
           break;
         }
       }
@@ -545,7 +546,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
           previousStars: previousStars,
           didLevelUp: didLevelUp,
           newLevel: levelAfter,
-          nextChallenge: nextChallenge,
+          nextStage?: nextStage?,
           completedCount: newCompletedCount,
           sessionSeconds: DateTime.now().difference(_sessionStart).inSeconds,
           maxCombo: _maxCombo,
