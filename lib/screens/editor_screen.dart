@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math' as math;
-import '../config/constants.dart';
+import '../config/constants.dart' as constants;
 import '../config/theme.dart';
 import '../models/challenge.dart';
 import '../models/stage.dart';
@@ -300,12 +300,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final allChallenges = ref.read(allChallengesProvider);
     final currentIndex =
         allChallenges.indexWhere((c) => c.id == widget.challenge.id);
-    Stage?? nextStage?;
+    Stage? nextStage;
     if (isCorrect && currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
       for (int i = currentIndex + 1; i < allChallenges.length; i++) {
         final c = allChallenges[i];
-        if (c.type == Stage?Type.visual && c.isFree) {
-          nextStage? = c;
+        if (c.type == constants.ChallengeType.visual && c.isFree) {
+          nextStage = c;
           break;
         }
       }
@@ -327,7 +327,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         isCorrect: isCorrect,
         elapsedSeconds: elapsedSec,
         challengeTitle: widget.challenge.title,
-        nextStage?: nextStage?,
+        nextStage: nextStage,
         onRetry: () {
           Navigator.pop(ctx);
           ref.read(editorProvider.notifier).reset();
@@ -336,13 +336,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           Navigator.pop(ctx);
           Navigator.pop(context);
         },
-        onNext: nextStage? != null
+        onNext: nextStage != null
             ? () {
                 Navigator.pop(ctx);
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (_) =>
-                        EditorScreen(challenge: nextStage?!),
+                        EditorScreen(challenge: nextStage!),
                   ),
                 );
               }
