@@ -83,9 +83,9 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
           RankingMetric.compositeScore: 0,
         },
         scores: {
-          RankingMetric.totalCoins: 0,
-          RankingMetric.activityCompletions: 0,
-          RankingMetric.compositeScore: 0,
+          RankingMetric.totalCoins: 0.0,
+          RankingMetric.activityCompletions: 0.0,
+          RankingMetric.compositeScore: 0.0,
         },
         tiers: {
           RankingMetric.totalCoins: 'ビギナー',
@@ -94,7 +94,7 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
         },
         totalCoinsEarned: 0,
         totalActivitiesCompleted: 0,
-        compositeScore: 0,
+        compositeScore: 0.0,
         firstRankedAt: now,
         lastUpdatedAt: now,
       );
