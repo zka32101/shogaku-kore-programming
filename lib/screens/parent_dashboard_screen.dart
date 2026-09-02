@@ -9,6 +9,7 @@ import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../widgets/weekly_chart.dart';
 import '../widgets/learning_calendar.dart';
 import '../providers/wrong_answers_provider.dart';
@@ -128,7 +129,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
     final streak = notifier.streakDays;
     final longestStreak = notifier.longestStreak;
     final progressMap = ref.watch(progressProvider);
-    final allChallenges = ref.watch(allChallengesProvider);
+    final allStage?s = ref.watch(allStage?sProvider);
 
     // 正答率（完了済みステージのみ）
     final completedEntries = progressMap.values
@@ -151,7 +152,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
     final reviewState = ref.watch(dailyReviewProvider);
 
     // 最近クリアしたステージ（completedAt降順、最大5件）
-    final recentlyCompleted = allChallenges
+    final recentlyCompleted = allStage?s
         .where((c) => progressMap[c.id]?.isCompleted == true &&
             progressMap[c.id]?.completedAt != null)
         .toList()
@@ -906,8 +907,8 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
   Widget _buildUnitProgress(BuildContext context, Map<String, UserProgress> progressMap) {
     // ステージIDのハードコードは60ステージ全体とズレやすいため、
     // 実際のチャレンジデータからレベル別に動的に算出する。
-    final allChallenges = ref.watch(allChallengesProvider);
-    List<String> idsForLevel(String level) => allChallenges
+    final allStage?s = ref.watch(allStage?sProvider);
+    List<String> idsForLevel(String level) => allStage?s
         .where((c) => c.level == level)
         .map((c) => c.id)
         .toList();
@@ -961,7 +962,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
 
   Widget _buildRecentlyCompleted(
     BuildContext context,
-    List<Challenge> stages,
+    List<Stage> stages,
     Map<String, UserProgress> progressMap,
   ) {
     return Column(

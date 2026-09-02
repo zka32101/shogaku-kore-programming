@@ -10,6 +10,7 @@ import 'package:confetti/confetti.dart';
 import 'dart:math' as math;
 import '../config/theme.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../config/constants.dart';
 import '../services/sound_service.dart';
@@ -22,13 +23,13 @@ import 'flashcard_screen.dart' show FlashcardScreen, kFlashcards;
 import '../widgets/code_highlight.dart';
 
 class QuizResultScreen extends ConsumerStatefulWidget {
-  final Challenge challenge;
+  final Stage challenge;
   final List<QuizAnswer> answers;
   final int correctCount;
   final int totalCount;
   final int stars;
   final bool isFirstComplete;
-  final Challenge? nextChallenge;
+  final Stage?? nextStage?;
   final int completedCount;   // ステージ完了数（バッジ判定用）
   final int sessionSeconds;   // セッション所要時間（秒）
   final int previousStars;    // 前回の星数（改善表示用）
@@ -47,7 +48,7 @@ class QuizResultScreen extends ConsumerStatefulWidget {
     required this.totalCount,
     required this.stars,
     required this.isFirstComplete,
-    this.nextChallenge,
+    this.nextStage?,
     this.completedCount = 0,
     this.sessionSeconds = 0,
     this.previousStars = 0,
@@ -345,12 +346,12 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
   }
 
   void _checkUnitCompleteBadge(String level) {
-    final allChallenges = ref.read(allChallengesProvider);
+    final allStage?s = ref.read(allStage?sProvider);
     final progressMap = ref.read(progressProvider);
-    final unitChallenges = allChallenges.where((c) => c.level == level).toList();
-    if (unitChallenges.isEmpty) return;
-    final completedInUnit = unitChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    if (completedInUnit < unitChallenges.length) return;
+    final unitStage?s = allStage?s.where((c) => c.level == level).toList();
+    if (unitStage?s.isEmpty) return;
+    final completedInUnit = unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    if (completedInUnit < unitStage?s.length) return;
 
     final (icon, name, message, goal) = switch (level) {
       StageLevel.beginner     => ('🧩', '初級ユニット制覇！', 'ブロックプログラミング基礎を完全マスター！', '中級Pythonに挑戦しよう！'),
@@ -437,10 +438,10 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     final key = event.logicalKey;
     // Enter/Space → 次のステージ（あれば）、なければリトライ
     if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.space) {
-      if (widget.nextChallenge != null && widget.stars >= 1) {
+      if (widget.nextStage? != null && widget.stars >= 1) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => QuizScreen(challenge: widget.nextChallenge!),
+            builder: (_) => QuizScreen(challenge: widget.nextStage?!),
           ),
         );
       } else {
@@ -448,13 +449,13 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
       }
       return KeyEventResult.handled;
     }
-    // N → 次のステージ（正解かつ nextChallenge がある場合）
+    // N → 次のステージ（正解かつ nextStage? がある場合）
     if (key == LogicalKeyboardKey.keyN) {
-      if (widget.nextChallenge != null && widget.stars >= 1) {
+      if (widget.nextStage? != null && widget.stars >= 1) {
         HapticService.lightImpact();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => QuizScreen(challenge: widget.nextChallenge!),
+            builder: (_) => QuizScreen(challenge: widget.nextStage?!),
           ),
         );
         return KeyEventResult.handled;
@@ -1315,7 +1316,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           // 次のステージへ（優先表示）
-          if (widget.nextChallenge != null && widget.stars >= 1) ...[
+          if (widget.nextStage? != null && widget.stars >= 1) ...[
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -1323,13 +1324,13 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (_) =>
-                          QuizScreen(challenge: widget.nextChallenge!),
+                          QuizScreen(challenge: widget.nextStage?!),
                     ),
                   );
                 },
                 icon: const Text('🚀', style: TextStyle(fontSize: 16)),
                 label: Text(
-                  '次へ: ${widget.nextChallenge!.title}',
+                  '次へ: ${widget.nextStage?!.title}',
                   overflow: TextOverflow.ellipsis,
                 ),
                 style: ElevatedButton.styleFrom(

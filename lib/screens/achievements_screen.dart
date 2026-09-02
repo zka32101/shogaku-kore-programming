@@ -10,6 +10,7 @@ import '../config/constants.dart';
 import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
@@ -115,10 +116,10 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     final level = notifier.currentLevel;
     final longestStreak = notifier.longestStreak;
     final masteredCards = ref.read(flashcardProvider).masteredIds.length;
-    final allChallengesShare = ref.read(allChallengesProvider);
+    final allStage?sShare = ref.read(allStage?sProvider);
     final progressMapShare = ref.read(progressProvider);
     bool unitDoneShare(String level) {
-      final unit = allChallengesShare.where((c) => c.level == level).toList();
+      final unit = allStage?sShare.where((c) => c.level == level).toList();
       return unit.isNotEmpty && unit.every((c) => progressMapShare[c.id]?.isCompleted ?? false);
     }
     final badges = _getBadges(
@@ -167,7 +168,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
   Widget build(BuildContext context) {
     final progressMap = ref.watch(progressProvider);
     final notifier = ref.read(progressProvider.notifier);
-    final allChallenges = ref.watch(allChallengesProvider);
+    final allStage?s = ref.watch(allStage?sProvider);
     final profile = ref.watch(profileProvider);
 
     final completedCount = notifier.completedCount;
@@ -191,7 +192,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     final totalLearningSeconds = notifier.totalLearningSeconds;
 
     bool unitAllDone(String level) {
-      final unit = allChallenges.where((c) => c.level == level).toList();
+      final unit = allStage?s.where((c) => c.level == level).toList();
       return unit.isNotEmpty && unit.every((c) => progressMap[c.id]?.isCompleted ?? false);
     }
     final begUnitComplete = unitAllDone(StageLevel.beginner);
@@ -199,10 +200,10 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     final advUnitComplete = unitAllDone(StageLevel.advanced);
 
     // ユニット別完了数（次に解除できるバッジのハイライト用の進捗シグナル）
-    int unitDone(String level) => allChallenges
+    int unitDone(String level) => allStage?s
         .where((c) => c.level == level && (progressMap[c.id]?.isCompleted ?? false))
         .length;
-    int unitTotal(String level) => allChallenges.where((c) => c.level == level).length;
+    int unitTotal(String level) => allStage?s.where((c) => c.level == level).length;
     final begUnitDone = unitDone(StageLevel.beginner);
     final begUnitTotal = unitTotal(StageLevel.beginner);
     final intUnitDone = unitDone(StageLevel.intermediate);
@@ -264,18 +265,18 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                     badges: badges,
                     onRefresh: () async {
                       ref.invalidate(progressProvider);
-                      ref.invalidate(allChallengesProvider);
+                      ref.invalidate(allStage?sProvider);
                       await Future.delayed(const Duration(milliseconds: 400));
                     },
                   ),
                   _CompletedTab(
-                    allChallenges: allChallenges,
+                    allStage?s: allStage?s,
                     progressMap: progressMap,
                     completedCount: completedCount,
                   ),
                   _StatsTab(
                     weeklyData: weeklyData,
-                    allChallenges: allChallenges,
+                    allStage?s: allStage?s,
                     progressMap: progressMap,
                     streakDays: streak,
                     longestStreak: longestStreak,
@@ -1240,12 +1241,12 @@ class _FilterChip extends StatelessWidget {
 enum _CompletedSort { date, stars, level }
 
 class _CompletedTab extends StatefulWidget {
-  final List<Challenge> allChallenges;
+  final List<Stage> allStage?s;
   final Map<String, UserProgress> progressMap;
   final int completedCount;
 
   const _CompletedTab({
-    required this.allChallenges,
+    required this.allStage?s,
     required this.progressMap,
     required this.completedCount,
   });
@@ -1281,7 +1282,7 @@ class _CompletedTabState extends State<_CompletedTab> {
     }
 
     // 完了済みを取得
-    var completed = widget.allChallenges
+    var completed = widget.allStage?s
         .where((c) => widget.progressMap[c.id]?.isCompleted ?? false)
         .toList();
 
@@ -1430,7 +1431,7 @@ class _CompletedTabState extends State<_CompletedTab> {
 // ──────────── クリア統計サマリーバー ─────────────────────────────────────────────
 
 class _CompletedStatsBar extends StatelessWidget {
-  final List<Challenge> completed;
+  final List<Stage> completed;
   final Map<String, UserProgress> progressMap;
 
   const _CompletedStatsBar({
@@ -1824,7 +1825,7 @@ class _BadgeCard extends StatelessWidget {
 }
 
 class _CompletedStageCard extends StatelessWidget {
-  final Challenge challenge;
+  final Stage challenge;
   final int starsEarned;
   final DateTime? completedAt;
 
@@ -2133,7 +2134,7 @@ class _Badge {
 
 class _StatsTab extends ConsumerWidget {
   final List<int> weeklyData;
-  final List<Challenge> allChallenges;
+  final List<Stage> allStage?s;
   final Map<String, UserProgress> progressMap;
   final int streakDays;
   final int longestStreak;
@@ -2146,7 +2147,7 @@ class _StatsTab extends ConsumerWidget {
 
   const _StatsTab({
     required this.weeklyData,
-    required this.allChallenges,
+    required this.allStage?s,
     required this.progressMap,
     required this.streakDays,
     required this.completedCount,
@@ -2159,13 +2160,13 @@ class _StatsTab extends ConsumerWidget {
   });
 
   int _completedInLevel(String level) {
-    return allChallenges
+    return allStage?s
         .where((c) => c.level == level && (progressMap[c.id]?.isCompleted ?? false))
         .length;
   }
 
   int _totalInLevel(String level) {
-    return allChallenges.where((c) => c.level == level).length;
+    return allStage?s.where((c) => c.level == level).length;
   }
 
   @override
@@ -2800,7 +2801,7 @@ class _StatsTab extends ConsumerWidget {
     // レベル別の平均スター
     Map<String, double> avgByLevel = {};
     for (final lvl in [StageLevel.beginner, StageLevel.intermediate, StageLevel.advanced]) {
-      final lvlEntries = allChallenges
+      final lvlEntries = allStage?s
           .where((c) => c.level == lvl && (progressMap[c.id]?.isCompleted ?? false))
           .map((c) => progressMap[c.id]!.starsEarned)
           .toList();
@@ -3275,7 +3276,7 @@ class _StatsTab extends ConsumerWidget {
   }
 
   Widget _buildEstimationCard(BuildContext context) {
-    final total = allChallenges.length;
+    final total = allStage?s.length;
     final remaining = total - completedCount;
     if (remaining <= 0) {
       return _StatCard(

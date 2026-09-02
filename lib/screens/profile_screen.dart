@@ -14,6 +14,7 @@ import '../providers/favorites_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../config/constants.dart';
 import '../widgets/shortcut_help.dart';
@@ -154,7 +155,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final progressMap = ref.watch(progressProvider);
     final progressNotifier = ref.read(progressProvider.notifier);
     final timeAttack = ref.watch(timeAttackProvider);
-    final allChallenges = ref.watch(allChallengesProvider);
+    final allStage?s = ref.watch(allStage?sProvider);
     final reviewState = ref.watch(dailyReviewProvider);
 
     return Focus(
@@ -198,7 +199,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   if (reviewState.reviewStreak >= 1)
                     const SizedBox(height: 12),
                   // レベル別進捗
-                  _buildLevelProgressCard(allChallenges, progressMap)
+                  _buildLevelProgressCard(allStage?s, progressMap)
                       .animate(delay: 185.ms)
                       .fadeIn(duration: 350.ms)
                       .slideY(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
@@ -228,7 +229,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       .slideY(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
                   const SizedBox(height: 16),
                   // 📚 学習パス提案
-                  _buildAILearningPathCard(allChallenges, progressMap, progressNotifier.currentLevel)
+                  _buildAILearningPathCard(allStage?s, progressMap, progressNotifier.currentLevel)
                       .animate(delay: 400.ms)
                       .fadeIn(duration: 350.ms)
                       .slideY(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
@@ -246,7 +247,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       .slideY(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
                   const SizedBox(height: 16),
                   // 最近クリアしたステージ
-                  _buildRecentlyCompletedCard(allChallenges, progressMap)
+                  _buildRecentlyCompletedCard(allStage?s, progressMap)
                       .animate(delay: 450.ms)
                       .fadeIn(duration: 350.ms)
                       .slideY(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
@@ -542,7 +543,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildLevelProgressCard(
-    List<Challenge> allChallenges,
+    List<Stage> allStage?s,
     Map<String, UserProgress> progressMap,
   ) {
     final levels = [
@@ -583,11 +584,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           // 各レベルの進捗バー
           ...levels.map((entry) {
             final (levelKey, label, color) = entry;
-            final total = allChallenges.where((c) => c.level == levelKey).length;
-            final cleared = allChallenges
+            final total = allStage?s.where((c) => c.level == levelKey).length;
+            final cleared = allStage?s
                 .where((c) => c.level == levelKey && (progressMap[c.id]?.isCompleted ?? false))
                 .length;
-            final perfect = allChallenges
+            final perfect = allStage?s
                 .where((c) => c.level == levelKey && (progressMap[c.id]?.starsEarned ?? 0) >= 3)
                 .length;
             final pct = total > 0 ? cleared / total : 0.0;
@@ -1349,7 +1350,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildAILearningPathCard(
-      List<Challenge> allChallenges, Map<String, UserProgress> progressMap, int level) {
+      List<Stage> allStage?s, Map<String, UserProgress> progressMap, int level) {
     // 学習パスデータの集計
     final masterTopics = <String>[];
     final struggleTopics = <String>[];
@@ -1583,11 +1584,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildRecentlyCompletedCard(
-    List<Challenge> allChallenges,
+    List<Stage> allStage?s,
     Map<String, UserProgress> progressMap,
   ) {
     // 完了済みかつcompletedAtがあるものを新しい順に最大5件取得
-    final recent = allChallenges
+    final recent = allStage?s
         .where((c) =>
             (progressMap[c.id]?.isCompleted ?? false) &&
             progressMap[c.id]?.completedAt != null)

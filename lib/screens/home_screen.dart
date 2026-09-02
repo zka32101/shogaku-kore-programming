@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/profile_provider.dart';
@@ -157,9 +158,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     // Q → ランダム1問クイズ
     if (key == LogicalKeyboardKey.keyQ) {
-      final allChallenges = ref.read(allChallengesProvider);
+      final allStage?s = ref.read(allStage?sProvider);
       final progressMap = ref.read(progressProvider);
-      _showRandomQuickQuiz(context, allChallenges, progressMap);
+      _showRandomQuickQuiz(context, allStage?s, progressMap);
       return KeyEventResult.handled;
     }
     // A → 実績画面
@@ -235,7 +236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final progressMap = ref.watch(progressProvider);
     final progressNotifier = ref.read(progressProvider.notifier);
-    final allChallenges = ref.watch(allChallengesProvider);
+    final allStage?s = ref.watch(allStage?sProvider);
     final profile = ref.watch(profileProvider);
     // coinProvider は残高のみ select し、購入済みIDリスト変化では再ビルドしない
     final coinBalance = ref.watch(coinProvider.select((s) => s.balance));
@@ -406,10 +407,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     // ユニット別完了数（次のバッジカード用）
-    int unitDone(String level) => allChallenges
+    int unitDone(String level) => allStage?s
         .where((c) => c.level == level && (progressMap[c.id]?.isCompleted ?? false))
         .length;
-    int unitTotal(String level) => allChallenges.where((c) => c.level == level).length;
+    int unitTotal(String level) => allStage?s.where((c) => c.level == level).length;
     final unitCounts = (
       unitDone(StageLevel.beginner), unitTotal(StageLevel.beginner),
       unitDone(StageLevel.intermediate), unitTotal(StageLevel.intermediate),
@@ -417,16 +418,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     // 次の未完了ステージを探す
-    final nextChallenge = allChallenges.firstWhere(
+    final nextStage? = allStage?s.firstWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
-      orElse: () => allChallenges.first,
+      orElse: () => allStage?s.first,
     );
 
     // 現在のユニット（最初の未完了ステージのレベル）
-    final currentUnitLevel = allChallenges
+    final currentUnitLevel = allStage?s
         .firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
-          orElse: () => allChallenges.last,
+          orElse: () => allStage?s.last,
         )
         .level;
 
@@ -449,7 +450,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               final hasWrong = !wrongAnswersState.isEmpty;
               return FloatingActionButton.extended(
                 heroTag: 'quick_quiz_fab',
-                onPressed: () => _showRandomQuickQuiz(context, allChallenges, progressMap),
+                onPressed: () => _showRandomQuickQuiz(context, allStage?s, progressMap),
                 backgroundColor: hasWrong ? const Color(0xFFFF6B35) : kPrimaryColor,
                 tooltip: hasWrong ? '🔥 苦手問題優先でランダム1問チャレンジ' : 'ランダム1問チャレンジ',
                 icon: Text(hasWrong ? '🔥' : '🎲', style: const TextStyle(fontSize: 18)),
@@ -502,7 +503,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut)
                   else
-                    _buildDailyMission(context, nextChallenge)
+                    _buildDailyMission(context, nextStage?)
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut),
@@ -557,7 +558,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // お気に入りステージカード
                   if (favoritesState.count > 0) ...[
-                    _buildFavoritesCard(context, favoritesState.count, allChallenges, favoritesState.favoriteIds)
+                    _buildFavoritesCard(context, favoritesState.count, allStage?s, favoritesState.favoriteIds)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 95.ms)
                         .slideY(begin: 0.12, curve: Curves.easeOut),
@@ -740,7 +741,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // 弱点ステージ再挑戦カード（3つ星未取得のクリア済みステージ）
                   ...() {
-                    final weakStages = allChallenges
+                    final weakStages = allStage?s
                         .where((c) =>
                             (progressMap[c.id]?.isCompleted ?? false) &&
                             (progressMap[c.id]?.starsEarned ?? 3) < 3)
@@ -758,7 +759,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // 今週のチャレンジ
                   if (completedCount > 0) ...[
-                    _buildWeeklyChallenge(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
+                    _buildWeeklyStage?(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 97.ms)
                         .slideY(begin: 0.12, curve: Curves.easeOut),
@@ -807,7 +808,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ).animate().fadeIn(duration: 300.ms, delay: 200.ms),
                   const SizedBox(height: 8),
-                  _buildUnitCard(context, currentUnitLevel, progressMap, allChallenges)
+                  _buildUnitCard(context, currentUnitLevel, progressMap, allStage?s)
                       .animate()
                       .fadeIn(duration: 350.ms, delay: 220.ms)
                       .slideY(begin: 0.08, curve: Curves.easeOut),
@@ -824,7 +825,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ).animate().fadeIn(duration: 300.ms, delay: 260.ms),
                     const SizedBox(height: 8),
-                    _buildUnitCard(context, nextUnitLevel, progressMap, allChallenges)
+                    _buildUnitCard(context, nextUnitLevel, progressMap, allStage?s)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 280.ms)
                         .slideY(begin: 0.08, curve: Curves.easeOut),
@@ -1361,12 +1362,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }).toList();
 
-    final challenge = Challenge(
+    final challenge = Stage?(
       id: 'wrong_answers_quiz',
       stageNumber: 0,
       title: '苦手問題クイズ',
       description: '間違えた問題をもう一度解こう！',
-      type: ChallengeType.quiz,
+      type: Stage?Type.quiz,
       level: StageLevel.beginner,
       icon: '📝',
       isFree: true,
@@ -1381,10 +1382,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildFavoritesCard(
     BuildContext context,
     int count,
-    List<Challenge> allChallenges,
+    List<Stage> allStage?s,
     Set<String> favoriteIds,
   ) {
-    final favorites = allChallenges
+    final favorites = allStage?s
         .where((c) => favoriteIds.contains(c.id))
         .take(3)
         .toList();
@@ -1832,7 +1833,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildWeakStagesCard(
     BuildContext context,
-    List<Challenge> weakStages,
+    List<Stage> weakStages,
     Map<String, UserProgress> progressMap,
   ) {
     return Container(
@@ -1901,7 +1902,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     : const Color(0xFFE67E22);
             // 苦手問題があるか確認
             final wrongState = ref.read(wrongAnswersProvider);
-            final wrongCount = c.type == ChallengeType.quiz
+            final wrongCount = c.type == Stage?Type.quiz
                 ? c.questions.fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
                 : 0;
             return Padding(
@@ -1912,7 +1913,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   SoundService().playTap();
                   Navigator.of(context).push(
                     smoothPageRoute(
-                      c.type == ChallengeType.visual
+                      c.type == Stage?Type.visual
                           ? EditorScreen(challenge: c)
                           : QuizScreen(challenge: c),
                     ),
@@ -1985,7 +1986,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ///
   /// 「今日のチャレンジ」カード・連続記録危機バナー・おかえりバナーの
   /// 3箇所から呼び出され、プレミアムロックの回避（ペイウォールバイパス）を防ぐ。
-  void _openChallengeOrShowPaywall(BuildContext context, Challenge challenge) {
+  void _openStage?OrShowPaywall(BuildContext context, Stage challenge) {
     if (!challenge.isFree) {
       HapticService.lightImpact();
       SoundService().playTap();
@@ -2009,7 +2010,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     SoundService().playTap();
     Navigator.of(context).push(
       smoothPageRoute(
-        challenge.type == ChallengeType.visual
+        challenge.type == Stage?Type.visual
             ? EditorScreen(challenge: challenge)
             : QuizScreen(challenge: challenge),
       ),
@@ -2018,15 +2019,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildStreakDangerBanner(BuildContext context) {
     final streakDays = ref.read(progressProvider.notifier).streakDays;
-    final allChallenges = ref.read(allChallengesProvider);
+    final allStage?s = ref.read(allStage?sProvider);
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        final next = allChallenges.firstWhere(
+        final next = allStage?s.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
-          orElse: () => allChallenges.first,
+          orElse: () => allStage?s.first,
         );
-        _openChallengeOrShowPaywall(context, next);
+        _openStage?OrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2186,15 +2187,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     };
     final bonusPts = (days * 5).clamp(5, 30);
     final bonusAwarded = ref.read(progressProvider.notifier).comebackBonusAwardedToday;
-    final allChallenges = ref.read(allChallengesProvider);
+    final allStage?s = ref.read(allStage?sProvider);
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        final next = allChallenges.firstWhere(
+        final next = allStage?s.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
-          orElse: () => allChallenges.first,
+          orElse: () => allStage?s.first,
         );
-        _openChallengeOrShowPaywall(context, next);
+        _openStage?OrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2281,7 +2282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildWeeklyChallenge(
+  Widget _buildWeeklyStage?(
     BuildContext context,
     ProgressNotifier notifier,
     int completedCount,
@@ -2919,15 +2920,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _showRandomQuickQuiz(
     BuildContext context,
-    List<Challenge> allChallenges,
+    List<Stage> allStage?s,
     Map<String, UserProgress> progressMap,
   ) async {
     HapticService.mediumImpact();
     final rng = Random();
     // 完了済みのクイズ型チャレンジの問題を収集
     final pool = <(Question, String)>[];
-    for (final c in allChallenges) {
-      if (c.type == ChallengeType.quiz &&
+    for (final c in allStage?s) {
+      if (c.type == Stage?Type.quiz &&
           (progressMap[c.id]?.isCompleted ?? false) &&
           c.questions.isNotEmpty) {
         for (final q in c.questions) {
@@ -3024,13 +3025,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  Widget _buildDailyMission(BuildContext context, Challenge challenge) {
-    void openChallenge() {
-      _openChallengeOrShowPaywall(context, challenge);
+  Widget _buildDailyMission(BuildContext context, Stage challenge) {
+    void openStage?() {
+      _openStage?OrShowPaywall(context, challenge);
     }
 
     return TapScale(
-      onTap: openChallenge,
+      onTap: openStage?,
       child: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
@@ -3068,13 +3069,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
-                          challenge.type == ChallengeType.visual ? '🧩 ビジュアル' : '❓ クイズ',
+                          challenge.type == Stage?Type.visual ? '🧩 ビジュアル' : '❓ クイズ',
                           style: const TextStyle(fontSize: 9, color: Colors.white70),
                         ),
                       ),
                       // 苦手問題がある場合に🔥バッジを表示
                       Builder(builder: (ctx) {
-                        if (challenge.type != ChallengeType.quiz) return const SizedBox.shrink();
+                        if (challenge.type != Stage?Type.quiz) return const SizedBox.shrink();
                         final wrongState = ref.read(wrongAnswersProvider);
                         final hasWrong = challenge.questions.any(
                           (q) => wrongState.wrongCountFor(q.text) > 0,
@@ -3158,7 +3159,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             delay: 1200.ms,
                             color: Colors.white.withValues(alpha: 0.3),
                           ),
-                        if (challenge.type == ChallengeType.quiz &&
+                        if (challenge.type == Stage?Type.quiz &&
                             challenge.questions.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           Text(
@@ -3743,7 +3744,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     BuildContext context,
     String level,
     Map<String, UserProgress> progressMap,
-    List<Challenge> allChallenges,
+    List<Stage> allStage?s,
   ) {
     final String unitTitle;
     final String unitNumber;
@@ -3766,20 +3767,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         unitIcon = '🚀';
     }
 
-    final unitChallenges = allChallenges.where((c) => c.level == level).toList();
+    final unitStage?s = allStage?s.where((c) => c.level == level).toList();
     final completedInUnit =
-        unitChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    final totalInUnit = unitChallenges.length;
+        unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    final totalInUnit = unitStage?s.length;
     final progressText =
         completedInUnit == 0 ? '未開始' : '$completedInUnit/$totalInUnit完了';
     // このユニットの苦手問題数
     final wrongState = ref.read(wrongAnswersProvider);
-    final unitWrongCount = unitChallenges
-        .where((c) => c.type == ChallengeType.quiz)
+    final unitWrongCount = unitStage?s
+        .where((c) => c.type == Stage?Type.quiz)
         .fold<int>(0, (sum, c) => sum + c.questions.fold<int>(
           0, (s, q) => s + wrongState.wrongCountFor(q.text)));
-    final unitWrongStages = unitChallenges
-        .where((c) => c.type == ChallengeType.quiz &&
+    final unitWrongStages = unitStage?s
+        .where((c) => c.type == Stage?Type.quiz &&
             c.questions.any((q) => wrongState.wrongCountFor(q.text) > 0))
         .length;
 

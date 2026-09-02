@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:confetti/confetti.dart';
 import '../config/theme.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/daily_review_provider.dart';
@@ -262,13 +263,13 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
   }
 
   Future<void> _init() async {
-    final allChallenges = ref.read(allChallengesProvider);
+    final allStage?s = ref.read(allStage?sProvider);
     final progressMap = ref.read(progressProvider);
     final wrongAnswers = ref.read(wrongAnswersProvider).answers;
 
     // 完了済みかつクイズ問題を持つステージのみ収集
     final pool = <_ReviewQuestion>[];
-    for (final c in allChallenges) {
+    for (final c in allStage?s) {
       if (progressMap[c.id]?.isCompleted != true) continue;
       if (c.questions.isEmpty) continue;
       for (final q in c.questions) {
@@ -278,7 +279,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
 
     if (pool.isEmpty) {
       // 完了済みステージがない場合は全ステージから
-      for (final c in allChallenges) {
+      for (final c in allStage?s) {
         for (final q in c.questions) {
           pool.add(_ReviewQuestion(question: q, challengeTitle: c.title));
         }
