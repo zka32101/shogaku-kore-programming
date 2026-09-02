@@ -26,7 +26,7 @@ class LeaderboardState {
     return LeaderboardState(
       collection: collection ?? this.collection,
       isLoading: isLoading ?? this.isLoading,
-      error: error,
+      error: error ?? this.error,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     );
   }
