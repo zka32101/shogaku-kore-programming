@@ -13,22 +13,14 @@ enum SchoolGrade {
   const SchoolGrade(this.displayName, this.gradeLevel);
 
   /// Get next grade (returns same grade if already at 6年生)
-  SchoolGrade getNextGrade() {
-    switch (this) {
-      case SchoolGrade.firstGrade:
-        return SchoolGrade.secondGrade;
-      case SchoolGrade.secondGrade:
-        return SchoolGrade.thirdGrade;
-      case SchoolGrade.thirdGrade:
-        return SchoolGrade.fourthGrade;
-      case SchoolGrade.fourthGrade:
-        return SchoolGrade.fifthGrade;
-      case SchoolGrade.fifthGrade:
-        return SchoolGrade.sixthGrade;
-      case SchoolGrade.sixthGrade:
-        return SchoolGrade.sixthGrade;
-    }
-  }
+  SchoolGrade getNextGrade() => switch (this) {
+    SchoolGrade.firstGrade => SchoolGrade.secondGrade,
+    SchoolGrade.secondGrade => SchoolGrade.thirdGrade,
+    SchoolGrade.thirdGrade => SchoolGrade.fourthGrade,
+    SchoolGrade.fourthGrade => SchoolGrade.fifthGrade,
+    SchoolGrade.fifthGrade => SchoolGrade.sixthGrade,
+    SchoolGrade.sixthGrade => SchoolGrade.sixthGrade,
+  };
 
   /// Calculate grade from birth year (Japanese school year: April-March)
   static SchoolGrade fromBirthYear(int birthYear) {
