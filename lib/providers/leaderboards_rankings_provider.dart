@@ -22,14 +22,13 @@ class LeaderboardState {
     bool? isLoading,
     String? error,
     DateTime? lastUpdatedAt,
-  }) {
-    return LeaderboardState(
-      collection: collection ?? this.collection,
-      isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
-      lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
-    );
-  }
+  }) =>
+      LeaderboardState(
+        collection: collection ?? this.collection,
+        isLoading: isLoading ?? this.isLoading,
+        error: error ?? this.error,
+        lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
+      );
 }
 
 /// StateNotifier for leaderboard management
