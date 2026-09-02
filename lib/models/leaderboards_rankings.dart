@@ -421,9 +421,18 @@ class RankingStatistics {
       'userId': userId,
       'userName': userName,
       'currentGrade': currentGrade.name,
-      'rankPositions': rankPositions.map((k, v) => MapEntry(k.name, v)),
-      'scores': scores.map((k, v) => MapEntry(k.name, v)),
-      'tiers': tiers.map((k, v) => MapEntry(k.name, v)),
+      'rankPositions': {
+        for (final entry in rankPositions.entries)
+          entry.key.name: entry.value,
+      },
+      'scores': {
+        for (final entry in scores.entries)
+          entry.key.name: entry.value,
+      },
+      'tiers': {
+        for (final entry in tiers.entries)
+          entry.key.name: entry.value,
+      },
       'totalCoinsEarned': totalCoinsEarned,
       'totalActivitiesCompleted': totalActivitiesCompleted,
       'compositeScore': compositeScore,
