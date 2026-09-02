@@ -231,6 +231,7 @@ void main() {
       await notifier.initializeLeaderboards('test_user', 'テスト生徒', 2015);
 
       final tier = container.read(bestTierProvider);
+      expect(tier.isNotEmpty, true);
       expect(tier, 'ビギナー');
     });
 
