@@ -45,6 +45,42 @@ class MultiplayerUserProfile {
     return (matchesWon / matchesPlayed * 100).clamp(0.0, 100.0);
   }
 
+  /// Create a copy with modified fields
+  MultiplayerUserProfile copyWith({
+    String? userId,
+    String? username,
+    String? displayName,
+    String? profileImageUrl,
+    int? level,
+    int? totalXp,
+    double? averageAccuracy,
+    int? matchesWon,
+    int? matchesPlayed,
+    int? currentStreak,
+    int? longestStreak,
+    DateTime? createdAt,
+    DateTime? lastActiveAt,
+    bool? isOnline,
+    bool? isBlocked,
+  }) =>
+      MultiplayerUserProfile(
+        userId: userId ?? this.userId,
+        username: username ?? this.username,
+        displayName: displayName ?? this.displayName,
+        profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+        level: level ?? this.level,
+        totalXp: totalXp ?? this.totalXp,
+        averageAccuracy: averageAccuracy ?? this.averageAccuracy,
+        matchesWon: matchesWon ?? this.matchesWon,
+        matchesPlayed: matchesPlayed ?? this.matchesPlayed,
+        currentStreak: currentStreak ?? this.currentStreak,
+        longestStreak: longestStreak ?? this.longestStreak,
+        createdAt: createdAt ?? this.createdAt,
+        lastActiveAt: lastActiveAt ?? this.lastActiveAt,
+        isOnline: isOnline ?? this.isOnline,
+        isBlocked: isBlocked ?? this.isBlocked,
+      );
+
   Map<String, dynamic> toJson() => {
     'userId': userId,
     'username': username,
