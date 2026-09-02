@@ -245,7 +245,7 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
         leaderboards.add(
           Leaderboard(
             leaderboardId:
-                '${metric.name}_month_$month\_${DateTime.now().millisecondsSinceEpoch}',
+                '${metric.name}_month_${month}_${DateTime.now().millisecondsSinceEpoch}',
             metric: metric,
             grouping: RankingGrouping.byStartMonth,
             groupValue: monthName,
