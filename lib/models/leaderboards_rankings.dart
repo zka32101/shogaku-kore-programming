@@ -437,15 +437,18 @@ class RankingStatistics {
       userId: json['userId'] as String,
       userName: json['userName'] as String,
       currentGrade: SchoolGrade.values.byName(json['currentGrade'] as String),
-      rankPositions: (json['rankPositions'] as Map<String, dynamic>).map(
-        (k, v) => MapEntry(RankingMetric.values.byName(k), v as int),
-      ),
-      scores: (json['scores'] as Map<String, dynamic>).map(
-        (k, v) => MapEntry(RankingMetric.values.byName(k), (v as num).toDouble()),
-      ),
-      tiers: (json['tiers'] as Map<String, dynamic>).map(
-        (k, v) => MapEntry(RankingMetric.values.byName(k), v as String),
-      ),
+      rankPositions: {
+        for (final entry in (json['rankPositions'] as Map<String, dynamic>).entries)
+          RankingMetric.values.byName(entry.key): entry.value as int,
+      },
+      scores: {
+        for (final entry in (json['scores'] as Map<String, dynamic>).entries)
+          RankingMetric.values.byName(entry.key): (entry.value as num).toDouble(),
+      },
+      tiers: {
+        for (final entry in (json['tiers'] as Map<String, dynamic>).entries)
+          RankingMetric.values.byName(entry.key): entry.value as String,
+      },
       totalCoinsEarned: json['totalCoinsEarned'] as int,
       totalActivitiesCompleted: json['totalActivitiesCompleted'] as int,
       compositeScore: (json['compositeScore'] as num).toDouble(),
