@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /// School grades in Japan (1-6 elementary school)
 enum SchoolGrade {
   firstGrade('1年生', 1),
