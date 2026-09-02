@@ -529,6 +529,24 @@ class LeaderboardCollection {
     }
   }
 
+  /// Create a copy with modified fields
+  LeaderboardCollection copyWith({
+    String? userId,
+    UserGrade? userGrade,
+    RankingStatistics? statistics,
+    List<Leaderboard>? allLeaderboards,
+    List<RankingEntry>? userRankings,
+    DateTime? generatedAt,
+  }) =>
+      LeaderboardCollection(
+        userId: userId ?? this.userId,
+        userGrade: userGrade ?? this.userGrade,
+        statistics: statistics ?? this.statistics,
+        allLeaderboards: allLeaderboards ?? this.allLeaderboards,
+        userRankings: userRankings ?? this.userRankings,
+        generatedAt: generatedAt ?? this.generatedAt,
+      );
+
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,
