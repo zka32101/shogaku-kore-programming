@@ -207,7 +207,7 @@ void main() {
       await notifier.initializeLeaderboards('test_user', 'テスト生徒', 2015);
 
       final top10 = container.read(top10CoinUsersProvider);
-      expect(top10, isNotEmpty || isEmpty);
+      expect(top10, isEmpty);
     });
 
     test('top10ActivityUsersProvider returns empty initially', () async {
@@ -215,7 +215,7 @@ void main() {
       await notifier.initializeLeaderboards('test_user', 'テスト生徒', 2015);
 
       final top10 = container.read(top10ActivityUsersProvider);
-      expect(top10, isNotEmpty || isEmpty);
+      expect(top10, isEmpty);
     });
 
     test('top10CompositeScoreUsersProvider returns empty initially', () async {
@@ -223,7 +223,7 @@ void main() {
       await notifier.initializeLeaderboards('test_user', 'テスト生徒', 2015);
 
       final top10 = container.read(top10CompositeScoreUsersProvider);
-      expect(top10, isNotEmpty || isEmpty);
+      expect(top10, isEmpty);
     });
 
     test('bestTierProvider returns default tier initially', () async {
