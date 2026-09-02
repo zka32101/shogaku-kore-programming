@@ -346,9 +346,9 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
   }
 
   void _checkUnitCompleteBadge(String level) {
-    final allStage?s = ref.read(allStage?sProvider);
+    final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
-    final unitStage?s = allStage?s.where((c) => c.level == level).toList();
+    final unitStage?s = allChallenges.where((c) => c.level == level).toList();
     if (unitStage?s.isEmpty) return;
     final completedInUnit = unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
     if (completedInUnit < unitStage?s.length) return;

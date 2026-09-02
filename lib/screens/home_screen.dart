@@ -158,9 +158,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     // Q → ランダム1問クイズ
     if (key == LogicalKeyboardKey.keyQ) {
-      final allStage?s = ref.read(allStage?sProvider);
+      final allChallenges = ref.read(allChallengesProvider);
       final progressMap = ref.read(progressProvider);
-      _showRandomQuickQuiz(context, allStage?s, progressMap);
+      _showRandomQuickQuiz(context, allChallenges, progressMap);
       return KeyEventResult.handled;
     }
     // A → 実績画面
@@ -236,7 +236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final progressMap = ref.watch(progressProvider);
     final progressNotifier = ref.read(progressProvider.notifier);
-    final allStage?s = ref.watch(allStage?sProvider);
+    final allChallenges = ref.watch(allChallengesProvider);
     final profile = ref.watch(profileProvider);
     // coinProvider は残高のみ select し、購入済みIDリスト変化では再ビルドしない
     final coinBalance = ref.watch(coinProvider.select((s) => s.balance));
@@ -407,10 +407,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     // ユニット別完了数（次のバッジカード用）
-    int unitDone(String level) => allStage?s
+    int unitDone(String level) => allChallenges
         .where((c) => c.level == level && (progressMap[c.id]?.isCompleted ?? false))
         .length;
-    int unitTotal(String level) => allStage?s.where((c) => c.level == level).length;
+    int unitTotal(String level) => allChallenges.where((c) => c.level == level).length;
     final unitCounts = (
       unitDone(StageLevel.beginner), unitTotal(StageLevel.beginner),
       unitDone(StageLevel.intermediate), unitTotal(StageLevel.intermediate),
@@ -418,16 +418,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     // 次の未完了ステージを探す
-    final nextStage? = allStage?s.firstWhere(
+    final nextStage? = allChallenges.firstWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
-      orElse: () => allStage?s.first,
+      orElse: () => allChallenges.first,
     );
 
     // 現在のユニット（最初の未完了ステージのレベル）
-    final currentUnitLevel = allStage?s
+    final currentUnitLevel = allChallenges
         .firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
-          orElse: () => allStage?s.last,
+          orElse: () => allChallenges.last,
         )
         .level;
 
@@ -450,7 +450,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               final hasWrong = !wrongAnswersState.isEmpty;
               return FloatingActionButton.extended(
                 heroTag: 'quick_quiz_fab',
-                onPressed: () => _showRandomQuickQuiz(context, allStage?s, progressMap),
+                onPressed: () => _showRandomQuickQuiz(context, allChallenges, progressMap),
                 backgroundColor: hasWrong ? const Color(0xFFFF6B35) : kPrimaryColor,
                 tooltip: hasWrong ? '🔥 苦手問題優先でランダム1問チャレンジ' : 'ランダム1問チャレンジ',
                 icon: Text(hasWrong ? '🔥' : '🎲', style: const TextStyle(fontSize: 18)),
@@ -558,7 +558,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // お気に入りステージカード
                   if (favoritesState.count > 0) ...[
-                    _buildFavoritesCard(context, favoritesState.count, allStage?s, favoritesState.favoriteIds)
+                    _buildFavoritesCard(context, favoritesState.count, allChallenges, favoritesState.favoriteIds)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 95.ms)
                         .slideY(begin: 0.12, curve: Curves.easeOut),
@@ -741,7 +741,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // 弱点ステージ再挑戦カード（3つ星未取得のクリア済みステージ）
                   ...() {
-                    final weakStages = allStage?s
+                    final weakStages = allChallenges
                         .where((c) =>
                             (progressMap[c.id]?.isCompleted ?? false) &&
                             (progressMap[c.id]?.starsEarned ?? 3) < 3)
@@ -808,7 +808,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ).animate().fadeIn(duration: 300.ms, delay: 200.ms),
                   const SizedBox(height: 8),
-                  _buildUnitCard(context, currentUnitLevel, progressMap, allStage?s)
+                  _buildUnitCard(context, currentUnitLevel, progressMap, allChallenges)
                       .animate()
                       .fadeIn(duration: 350.ms, delay: 220.ms)
                       .slideY(begin: 0.08, curve: Curves.easeOut),
@@ -825,7 +825,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ).animate().fadeIn(duration: 300.ms, delay: 260.ms),
                     const SizedBox(height: 8),
-                    _buildUnitCard(context, nextUnitLevel, progressMap, allStage?s)
+                    _buildUnitCard(context, nextUnitLevel, progressMap, allChallenges)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 280.ms)
                         .slideY(begin: 0.08, curve: Curves.easeOut),
@@ -1382,10 +1382,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildFavoritesCard(
     BuildContext context,
     int count,
-    List<Stage> allStage?s,
+    List<Stage> allChallenges,
     Set<String> favoriteIds,
   ) {
-    final favorites = allStage?s
+    final favorites = allChallenges
         .where((c) => favoriteIds.contains(c.id))
         .take(3)
         .toList();
@@ -2019,13 +2019,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildStreakDangerBanner(BuildContext context) {
     final streakDays = ref.read(progressProvider.notifier).streakDays;
-    final allStage?s = ref.read(allStage?sProvider);
+    final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        final next = allStage?s.firstWhere(
+        final next = allChallenges.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
-          orElse: () => allStage?s.first,
+          orElse: () => allChallenges.first,
         );
         _openStage?OrShowPaywall(context, next);
       },
@@ -2187,13 +2187,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     };
     final bonusPts = (days * 5).clamp(5, 30);
     final bonusAwarded = ref.read(progressProvider.notifier).comebackBonusAwardedToday;
-    final allStage?s = ref.read(allStage?sProvider);
+    final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        final next = allStage?s.firstWhere(
+        final next = allChallenges.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
-          orElse: () => allStage?s.first,
+          orElse: () => allChallenges.first,
         );
         _openStage?OrShowPaywall(context, next);
       },
@@ -2920,14 +2920,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _showRandomQuickQuiz(
     BuildContext context,
-    List<Stage> allStage?s,
+    List<Stage> allChallenges,
     Map<String, UserProgress> progressMap,
   ) async {
     HapticService.mediumImpact();
     final rng = Random();
     // 完了済みのクイズ型チャレンジの問題を収集
     final pool = <(Question, String)>[];
-    for (final c in allStage?s) {
+    for (final c in allChallenges) {
       if (c.type == Stage?Type.quiz &&
           (progressMap[c.id]?.isCompleted ?? false) &&
           c.questions.isNotEmpty) {
@@ -3744,7 +3744,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     BuildContext context,
     String level,
     Map<String, UserProgress> progressMap,
-    List<Stage> allStage?s,
+    List<Stage> allChallenges,
   ) {
     final String unitTitle;
     final String unitNumber;
@@ -3767,7 +3767,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         unitIcon = '🚀';
     }
 
-    final unitStage?s = allStage?s.where((c) => c.level == level).toList();
+    final unitStage?s = allChallenges.where((c) => c.level == level).toList();
     final completedInUnit =
         unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
     final totalInUnit = unitStage?s.length;

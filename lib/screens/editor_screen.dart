@@ -297,13 +297,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
 
     // 次のビジュアル系ステージを探す
-    final allStage?s = ref.read(allStage?sProvider);
+    final allChallenges = ref.read(allChallengesProvider);
     final currentIndex =
-        allStage?s.indexWhere((c) => c.id == widget.challenge.id);
+        allChallenges.indexWhere((c) => c.id == widget.challenge.id);
     Stage?? nextStage?;
-    if (isCorrect && currentIndex >= 0 && currentIndex < allStage?s.length - 1) {
-      for (int i = currentIndex + 1; i < allStage?s.length; i++) {
-        final c = allStage?s[i];
+    if (isCorrect && currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
+      for (int i = currentIndex + 1; i < allChallenges.length; i++) {
+        final c = allChallenges[i];
         if (c.type == Stage?Type.visual && c.isFree) {
           nextStage? = c;
           break;
@@ -473,9 +473,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   void _checkUnitCompleteBadge(String level) {
-    final allStage?s = ref.read(allStage?sProvider);
+    final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
-    final unitStage?s = allStage?s.where((c) => c.level == level).toList();
+    final unitStage?s = allChallenges.where((c) => c.level == level).toList();
     if (unitStage?s.isEmpty) return;
     final completedInUnit = unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
     if (completedInUnit < unitStage?s.length) return;

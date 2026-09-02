@@ -462,10 +462,10 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     // 苦手問題モード: wrongAnswersProvider の問題のみを使用
     if (_selectedLevel == '__weak__') {
       final wrongState = ref.read(wrongAnswersProvider);
-      final allStage?s = ref.read(allStage?sProvider);
+      final allChallenges = ref.read(allChallengesProvider);
       final wrongTexts = wrongState.answers.map((a) => a.questionText).toSet();
       final allQs = <_TAQuestion>[];
-      for (final c in allStage?s) {
+      for (final c in allChallenges) {
         if (c.type == Stage?Type.quiz) {
           for (final q in c.questions) {
             if (wrongTexts.contains(q.text)) {
@@ -482,10 +482,10 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
       return;
     }
 
-    final allStage?s = ref.read(allStage?sProvider);
+    final allChallenges = ref.read(allChallengesProvider);
     // クイズ形式かつ質問が1問以上あるステージから全問を収集（レベルフィルター適用）
     final allQs = <_TAQuestion>[];
-    for (final c in allStage?s) {
+    for (final c in allChallenges) {
       if (c.type == Stage?Type.quiz &&
           (_selectedLevel == null || c.level == _selectedLevel)) {
         for (final q in c.questions) {

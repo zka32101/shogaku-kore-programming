@@ -515,14 +515,14 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     final newCompletedCount = ref.read(progressProvider.notifier).completedCount;
 
     // 次のクイズ系ステージを探す（クイズ形式のみ）
-    final allStage?s = ref.read(allStage?sProvider);
+    final allChallenges = ref.read(allChallengesProvider);
     final currentIndex =
-        allStage?s.indexWhere((c) => c.id == widget.challenge.id);
+        allChallenges.indexWhere((c) => c.id == widget.challenge.id);
     Stage?? nextStage?;
-    if (currentIndex >= 0 && currentIndex < allStage?s.length - 1) {
+    if (currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
       // 次のステージがクイズ形式かつ無料のものを探す
-      for (int i = currentIndex + 1; i < allStage?s.length; i++) {
-        final c = allStage?s[i];
+      for (int i = currentIndex + 1; i < allChallenges.length; i++) {
+        final c = allChallenges[i];
         if (c.type == Stage?Type.quiz && c.isFree) {
           nextStage? = c;
           break;
