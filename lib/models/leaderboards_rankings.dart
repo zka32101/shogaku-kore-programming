@@ -417,25 +417,28 @@ class RankingStatistics {
   }
 
   Map<String, dynamic> toJson() {
+    final rankPositionsMap = <String, int>{};
+    rankPositions.forEach((key, value) {
+      rankPositionsMap[key.name] = value;
+    });
+
+    final scoresMap = <String, double>{};
+    scores.forEach((key, value) {
+      scoresMap[key.name] = value;
+    });
+
+    final tiersMap = <String, String>{};
+    tiers.forEach((key, value) {
+      tiersMap[key.name] = value;
+    });
+
     return {
       'userId': userId,
       'userName': userName,
       'currentGrade': currentGrade.name,
-      'rankPositions': Map<String, int>.fromEntries(
-        rankPositions.entries.map(
-          (e) => MapEntry(e.key.name, e.value),
-        ),
-      ),
-      'scores': Map<String, double>.fromEntries(
-        scores.entries.map(
-          (e) => MapEntry(e.key.name, e.value),
-        ),
-      ),
-      'tiers': Map<String, String>.fromEntries(
-        tiers.entries.map(
-          (e) => MapEntry(e.key.name, e.value),
-        ),
-      ),
+      'rankPositions': rankPositionsMap,
+      'scores': scoresMap,
+      'tiers': tiersMap,
       'totalCoinsEarned': totalCoinsEarned,
       'totalActivitiesCompleted': totalActivitiesCompleted,
       'compositeScore': compositeScore,
@@ -449,25 +452,28 @@ class RankingStatistics {
     final scoresData = json['scores'] as Map<String, dynamic>? ?? {};
     final tiersData = json['tiers'] as Map<String, dynamic>? ?? {};
 
+    final rankPositions = <RankingMetric, int>{};
+    rankPositionsData.forEach((key, value) {
+      rankPositions[RankingMetric.values.byName(key)] = value as int;
+    });
+
+    final scores = <RankingMetric, double>{};
+    scoresData.forEach((key, value) {
+      scores[RankingMetric.values.byName(key)] = (value as num).toDouble();
+    });
+
+    final tiers = <RankingMetric, String>{};
+    tiersData.forEach((key, value) {
+      tiers[RankingMetric.values.byName(key)] = value as String;
+    });
+
     return RankingStatistics(
       userId: json['userId'] as String,
       userName: json['userName'] as String,
       currentGrade: SchoolGrade.values.byName(json['currentGrade'] as String),
-      rankPositions: Map<RankingMetric, int>.fromEntries(
-        rankPositionsData.entries.map(
-          (e) => MapEntry(RankingMetric.values.byName(e.key), e.value as int),
-        ),
-      ),
-      scores: Map<RankingMetric, double>.fromEntries(
-        scoresData.entries.map(
-          (e) => MapEntry(RankingMetric.values.byName(e.key), (e.value as num).toDouble()),
-        ),
-      ),
-      tiers: Map<RankingMetric, String>.fromEntries(
-        tiersData.entries.map(
-          (e) => MapEntry(RankingMetric.values.byName(e.key), e.value as String),
-        ),
-      ),
+      rankPositions: rankPositions,
+      scores: scores,
+      tiers: tiers,
       totalCoinsEarned: json['totalCoinsEarned'] as int? ?? 0,
       totalActivitiesCompleted: json['totalActivitiesCompleted'] as int? ?? 0,
       compositeScore: ((json['compositeScore'] as num?) ?? 0).toDouble(),
