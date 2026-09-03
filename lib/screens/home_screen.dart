@@ -418,7 +418,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     // 次の未完了ステージを探す
-    final nextStage? = allChallenges.firstWhere(
+    final Stage? nextStage = allChallenges.firstWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
       orElse: () => allChallenges.first,
     );
@@ -759,7 +759,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // 今週のチャレンジ
                   if (completedCount > 0) ...[
-                    _buildWeeklyStage?(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
+                    _buildWeeklyStage(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 97.ms)
                         .slideY(begin: 0.12, curve: Curves.easeOut),
@@ -2282,7 +2282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildWeeklyStage?(
+  Widget _buildWeeklyStage(
     BuildContext context,
     ProgressNotifier notifier,
     int completedCount,

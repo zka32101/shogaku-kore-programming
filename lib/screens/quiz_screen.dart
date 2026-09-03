@@ -252,7 +252,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     return KeyEventResult.ignored;
   }
 
-  String _getStagType(Stage challenge) {
+  String _getStageType(Stage challenge) {
     final title = challenge.title.toLowerCase();
     if (title.contains('if') || title.contains('分岐') || title.contains('条件')) return 'branch';
     if (title.contains('ループ') || title.contains('for') || title.contains('while')) return 'loop';
@@ -479,7 +479,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     final levelBefore = ref.read(progressProvider.notifier).currentLevel;
 
     // 進捗を保存
-    ref.read(progressProvider.notifier).completeStage?(
+    ref.read(progressProvider.notifier).completeChallenge(
           widget.challenge.id,
           stars,
         );
