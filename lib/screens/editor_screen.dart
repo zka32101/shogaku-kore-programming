@@ -1787,7 +1787,7 @@ class _EditorResultSheet extends StatefulWidget {
   final bool isCorrect;
   final VoidCallback onRetry;
   final VoidCallback onComplete;
-  final Stage?? nextStage?;
+  final Stage? nextStage;
   final VoidCallback? onNext;
   final int elapsedSeconds;
   final String challengeTitle;
@@ -1796,7 +1796,7 @@ class _EditorResultSheet extends StatefulWidget {
     required this.isCorrect,
     required this.onRetry,
     required this.onComplete,
-    this.nextStage?,
+    this.nextStage,
     this.onNext,
     this.elapsedSeconds = 0,
     this.challengeTitle = '',

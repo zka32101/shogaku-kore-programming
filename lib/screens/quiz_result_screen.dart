@@ -29,7 +29,7 @@ class QuizResultScreen extends ConsumerStatefulWidget {
   final int totalCount;
   final int stars;
   final bool isFirstComplete;
-  final Stage?? nextStage?;
+  final Stage? nextStage;
   final int completedCount;   // ステージ完了数（バッジ判定用）
   final int sessionSeconds;   // セッション所要時間（秒）
   final int previousStars;    // 前回の星数（改善表示用）
@@ -48,7 +48,7 @@ class QuizResultScreen extends ConsumerStatefulWidget {
     required this.totalCount,
     required this.stars,
     required this.isFirstComplete,
-    this.nextStage?,
+    this.nextStage,
     this.completedCount = 0,
     this.sessionSeconds = 0,
     this.previousStars = 0,

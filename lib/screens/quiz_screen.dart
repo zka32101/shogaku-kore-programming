@@ -518,13 +518,13 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     final allChallenges = ref.read(allChallengesProvider);
     final currentIndex =
         allChallenges.indexWhere((c) => c.id == widget.challenge.id);
-    Stage?? nextStage?;
+    Stage? nextStage;
     if (currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
       // 次のステージがクイズ形式かつ無料のものを探す
       for (int i = currentIndex + 1; i < allChallenges.length; i++) {
         final c = allChallenges[i];
         if (c.type == 'quiz' && c.isFree) {
-          nextStage? = c;
+          nextStage = c;
           break;
         }
       }
@@ -546,7 +546,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
           previousStars: previousStars,
           didLevelUp: didLevelUp,
           newLevel: levelAfter,
-          nextStage?: nextStage?,
+          nextStage: nextStage,
           completedCount: newCompletedCount,
           sessionSeconds: DateTime.now().difference(_sessionStart).inSeconds,
           maxCombo: _maxCombo,
