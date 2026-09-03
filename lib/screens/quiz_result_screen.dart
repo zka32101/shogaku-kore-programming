@@ -348,10 +348,10 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
   void _checkUnitCompleteBadge(String level) {
     final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
-    final unitStage?s = allChallenges.where((c) => c.level == level).toList();
-    if (unitStage?s.isEmpty) return;
-    final completedInUnit = unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    if (completedInUnit < unitStage?s.length) return;
+    final unitStages = allChallenges.where((c) => c.level == level).toList();
+    if (unitStages.isEmpty) return;
+    final completedInUnit = unitStages.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    if (completedInUnit < unitStages.length) return;
 
     final (icon, name, message, goal) = switch (level) {
       StageLevel.beginner     => ('🧩', '初級ユニット制覇！', 'ブロックプログラミング基礎を完全マスター！', '中級Pythonに挑戦しよう！'),
