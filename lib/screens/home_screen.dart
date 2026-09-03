@@ -1903,7 +1903,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             // 苦手問題があるか確認
             final wrongState = ref.read(wrongAnswersProvider);
             final wrongCount = c.type == 'quiz'
-                ? c.questions.fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
+                ? (c.questions ?? []).fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
                 : 0;
             return Padding(
               padding: const EdgeInsets.only(bottom: 6),
@@ -2930,8 +2930,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     for (final c in allChallenges) {
       if (c.type == 'quiz' &&
           (progressMap[c.id]?.isCompleted ?? false) &&
-          c.questions.isNotEmpty) {
-        for (final q in c.questions) {
+          (c.questions?.isNotEmpty ?? false)) {
+        for (final q in c.questions ?? []) {
           pool.add((q, c.title));
         }
       }
@@ -3077,7 +3077,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Builder(builder: (ctx) {
                         if (challenge.type != 'quiz') return const SizedBox.shrink();
                         final wrongState = ref.read(wrongAnswersProvider);
-                        final hasWrong = challenge.questions.any(
+                        final hasWrong = (challenge.questions ?? []).any(
                           (q) => wrongState.wrongCountFor(q.text) > 0,
                         );
                         if (!hasWrong) return const SizedBox.shrink();
@@ -3160,10 +3160,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             color: Colors.white.withValues(alpha: 0.3),
                           ),
                         if (challenge.type == 'quiz' &&
-                            challenge.questions.isNotEmpty) ...[
+                            (challenge.questions?.isNotEmpty ?? false)) ...[
                           const SizedBox(width: 8),
                           Text(
-                            '${challenge.questions.length}問',
+                            '${challenge.questions?.length ?? 0}問',
                             style: const TextStyle(fontSize: 11, color: Colors.white60),
                           ),
                         ],
@@ -3777,11 +3777,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final wrongState = ref.read(wrongAnswersProvider);
     final unitWrongCount = unitStages
         .where((c) => c.type == 'quiz')
-        .fold<int>(0, (sum, c) => sum + c.questions.fold<int>(
+        .fold<int>(0, (sum, c) => sum + (c.questions ?? []).fold<int>(
           0, (s, q) => s + wrongState.wrongCountFor(q.text)));
     final unitWrongStages = unitStages
         .where((c) => c.type == 'quiz' &&
-            c.questions.any((q) => wrongState.wrongCountFor(q.text) > 0))
+            (c.questions ?? []).any((q) => wrongState.wrongCountFor(q.text) > 0))
         .length;
 
     return GestureDetector(

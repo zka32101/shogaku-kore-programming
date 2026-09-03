@@ -7,7 +7,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
@@ -235,7 +234,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     final wrongTexts =
         ref.read(wrongAnswersProvider).answers.map((a) => a.questionText).toSet();
     return challenges
-        .where((c) => c.questions.any((q) => wrongTexts.contains(q.text)))
+        .where((c) => (c.questions ?? []).any((q) => wrongTexts.contains(q.text)))
         .map((c) => c.id)
         .toSet();
   }
@@ -488,7 +487,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     final wrongStageIds = wrongTexts.isEmpty
         ? const <String>{}
         : allStages
-            .where((c) => c.questions.any((q) => wrongTexts.contains(q.text)))
+            .where((c) => (c.questions ?? []).any((q) => wrongTexts.contains(q.text)))
             .map((c) => c.id)
             .toSet();
 
@@ -1555,7 +1554,7 @@ class _StageInfoSheet extends ConsumerWidget {
     final wrongTexts = ref.watch(wrongAnswersProvider).answers
         .map((a) => a.questionText)
         .toSet();
-    final wrongCount = challenge.questions
+    final wrongCount = (challenge.questions ?? [])
         .where((q) => wrongTexts.contains(q.text))
         .length;
 
@@ -1655,14 +1654,14 @@ class _StageInfoSheet extends ConsumerWidget {
             spacing: 14,
             runSpacing: 4,
             children: [
-              if (!isVisual && challenge.questions.isNotEmpty)
+              if (!isVisual && (challenge.questions?.isNotEmpty ?? false))
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.quiz_outlined, size: 14, color: kTextSecondary),
                     const SizedBox(width: 4),
                     Text(
-                      '${challenge.questions.length}問',
+                      '${challenge.questions?.length ?? 0}問',
                       style: const TextStyle(fontSize: 12, color: kTextSecondary),
                     ),
                   ],
@@ -1678,14 +1677,14 @@ class _StageInfoSheet extends ConsumerWidget {
                   ),
                 ],
               ),
-              if (challenge.hints.isNotEmpty)
+              if (challenge.hints?.isNotEmpty ?? false)
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.lightbulb_outline, size: 14, color: Color(0xFFF39C12)),
                     const SizedBox(width: 4),
                     Text(
-                      'ヒント ${challenge.hints.length}個',
+                      'ヒント ${challenge.hints?.length ?? 0}個',
                       style: const TextStyle(fontSize: 12, color: Color(0xFFF39C12)),
                     ),
                   ],

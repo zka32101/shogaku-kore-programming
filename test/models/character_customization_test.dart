@@ -232,7 +232,7 @@ void main() {
       );
       expect(beginner.getCustomizationTier(), '初期段階');
 
-      const stylist = CustomizationStatistics(
+      final stylist = CustomizationStatistics(
         userId: 'user2',
         totalCosmeticsOwned: 10,
         firstCustomizationAt: DateTime(2024),
@@ -241,7 +241,7 @@ void main() {
       );
       expect(stylist.getCustomizationTier(), 'スタイリスト');
 
-      const fashionista = CustomizationStatistics(
+      final fashionista = CustomizationStatistics(
         userId: 'user3',
         totalCosmeticsOwned: 25,
         firstCustomizationAt: DateTime(2024),
@@ -250,7 +250,7 @@ void main() {
       );
       expect(fashionista.getCustomizationTier(), 'ファッショニスタ');
 
-      const designer = CustomizationStatistics(
+      final designer = CustomizationStatistics(
         userId: 'user4',
         totalCosmeticsOwned: 40,
         firstCustomizationAt: DateTime(2024),
@@ -259,7 +259,7 @@ void main() {
       );
       expect(designer.getCustomizationTier(), 'ファッションデザイナー');
 
-      const master = CustomizationStatistics(
+      final master = CustomizationStatistics(
         userId: 'user5',
         totalCosmeticsOwned: 60,
         firstCustomizationAt: DateTime(2024),

@@ -7,7 +7,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/constants.dart';
 import '../config/theme.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
@@ -467,7 +466,8 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
       final allQs = <_TAQuestion>[];
       for (final c in allChallenges) {
         if (c.type == 'quiz') {
-          for (final q in c.questions) {
+          final questions = c.questions ?? [];
+          for (final q in questions) {
             if (wrongTexts.contains(q.text)) {
               allQs.add(_TAQuestion(question: q, challengeTitle: c.title));
             }
@@ -488,7 +488,8 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     for (final c in allChallenges) {
       if (c.type == 'quiz' &&
           (_selectedLevel == null || c.level == _selectedLevel)) {
-        for (final q in c.questions) {
+        final questions = c.questions ?? [];
+        for (final q in questions) {
           allQs.add(_TAQuestion(question: q, challengeTitle: c.title));
         }
       }
