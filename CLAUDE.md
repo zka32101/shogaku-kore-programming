@@ -198,7 +198,20 @@ class AuthNotifier extends AsyncNotifier<User?> {
 
 ## ⚠️ Critical Areas & Known Issues
 
-### Recent Fixes (Sept 2026)
+### Recent Fixes (Sept 2026 - Session 2)
+- **CRITICAL - Map Key Bug**: Fixed `challengeId:` → `(challengeId):` in progress_provider.dart:313
+  - Was storing all progress under literal key "challengeId", causing data loss
+  - Now properly uses variable as map key for per-stage progress tracking
+- **CRITICAL - Async Data Loss**: Made `awardHomeWeeklyBonus()` async and awaited `addBonusPoints()`
+  - Was calling async future without await in progress_provider.dart:145-155
+  - Could lose point awards if persistence failed mid-operation
+- **Callback Syntax Error**: Fixed `onTap: openStage?` → `onTap: openStage` in home_screen.dart:3034
+  - Invalid trailing `?` on non-optional callback reference
+- **Riverpod Reactivity**: Fixed `select()` with `ref.read()` in achievements_screen.dart:2178
+  - Was using wrong pattern that defeated reactive updates for totalLearningSeconds
+  - Now properly watches notifier for reactive UI updates
+
+### Earlier Fixes (Sept 2026 - Session 1)
 - **Dart Syntax Errors**: Resolved invalid nullable type syntax (`Stage??` → `Stage?`) and invalid null-coalescing operators across 6 screen files
 - **Method Name Corrections**: Fixed `completeStage()` → `completeChallenge()` in quiz/editor completion flows
 
