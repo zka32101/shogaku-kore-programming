@@ -254,7 +254,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
     if (isCorrect) {
       final levelBefore = ref.read(progressProvider.notifier).currentLevel;
-      ref.read(progressProvider.notifier).completeStage?(
+      ref.read(progressProvider.notifier).completeStage(
             widget.challenge.id,
             3,
           );
@@ -1786,7 +1786,7 @@ class _EditorResultSheet extends StatefulWidget {
   final bool isCorrect;
   final VoidCallback onRetry;
   final VoidCallback onComplete;
-  final Stage?? nextStage?;
+  final Stage? nextStage;
   final VoidCallback? onNext;
   final int elapsedSeconds;
   final String challengeTitle;
@@ -1795,7 +1795,7 @@ class _EditorResultSheet extends StatefulWidget {
     required this.isCorrect,
     required this.onRetry,
     required this.onComplete,
-    this.nextStage?,
+    this.nextStage,
     this.onNext,
     this.elapsedSeconds = 0,
     this.challengeTitle = '',
@@ -1849,7 +1849,7 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
     final key = event.logicalKey;
     // Enter/Space → 次のステージ（あれば）or 完了
     if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.space) {
-      if (widget.isCorrect && widget.nextStage? != null && widget.onNext != null) {
+      if (widget.isCorrect && widget.nextStage != null && widget.onNext != null) {
         widget.onNext!();
       } else if (widget.isCorrect) {
         widget.onComplete();
@@ -1959,14 +1959,14 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
           ],
           const SizedBox(height: 20),
           // 次のステージへ（正解かつ次のステージがある）
-          if (widget.isCorrect && widget.nextStage? != null && widget.onNext != null) ...[
+          if (widget.isCorrect && widget.nextStage != null && widget.onNext != null) ...[
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: widget.onNext,
                 icon: const Text('🚀', style: TextStyle(fontSize: 16)),
                 label: Text(
-                  '次へ: ${widget.nextStage?!.title}',
+                  '次へ: ${widget.nextStage!.title}',
                   overflow: TextOverflow.ellipsis,
                 ),
                 style: ElevatedButton.styleFrom(
