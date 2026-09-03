@@ -271,8 +271,8 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
     final pool = <_ReviewQuestion>[];
     for (final c in allChallenges) {
       if (progressMap[c.id]?.isCompleted != true) continue;
-      if (c.questions.isEmpty) continue;
-      for (final q in c.questions) {
+      if ((c.questions?.isEmpty ?? true)) continue;
+      for (final q in c.questions ?? []) {
         pool.add(_ReviewQuestion(question: q, challengeTitle: c.title));
       }
     }
@@ -280,7 +280,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
     if (pool.isEmpty) {
       // 完了済みステージがない場合は全ステージから
       for (final c in allChallenges) {
-        for (final q in c.questions) {
+        for (final q in c.questions ?? []) {
           pool.add(_ReviewQuestion(question: q, challengeTitle: c.title));
         }
       }

@@ -7,7 +7,6 @@ import 'package:confetti/confetti.dart';
 import 'dart:math' as math;
 import '../config/constants.dart' as constants;
 import '../config/theme.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/gallery_provider.dart';
 import '../models/block_model.dart';
@@ -104,7 +103,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final key = event.logicalKey;
     if (key == LogicalKeyboardKey.keyH) {
-      if (widget.challenge.hints.isNotEmpty) {
+      if (widget.challenge.hints?.isNotEmpty ?? false) {
         HapticService.selectionClick();
         setState(() => _showHint = !_showHint);
         return KeyEventResult.handled;
@@ -475,10 +474,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   void _checkUnitCompleteBadge(String level) {
     final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
-    final unitStage?s = allChallenges.where((c) => c.level == level).toList();
-    if (unitStage?s.isEmpty) return;
-    final completedInUnit = unitStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    if (completedInUnit < unitStage?s.length) return;
+    final unitStages = allChallenges.where((c) => c.level == level).toList();
+    if (unitStages.isEmpty) return;
+    final completedInUnit = unitStages.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    if (completedInUnit < unitStages.length) return;
 
     final (icon, name, message, goal) = switch (level) {
       StageLevel.beginner     => ('🧩', '初級ユニット制覇！', 'ブロックプログラミング基礎を完全マスター！', '中級Pythonに挑戦しよう！'),
@@ -573,7 +572,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               ),
             ),
             // ヒント
-            if (_showHint && widget.challenge.hints.isNotEmpty)
+            if (_showHint && widget.challenge.hints?.isNotEmpty ?? false)
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 width: double.infinity,
@@ -585,15 +584,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        widget.challenge.hints[_hintIndex % widget.challenge.hints.length],
+                        widget.challenge.hints![_hintIndex % widget.challenge.hints!.length],
                         style: TextStyle(fontSize: 13, color: context.textPrimary),
                       ),
                     ),
-                    if (widget.challenge.hints.length > 1)
+                    if ((widget.challenge.hints?.length ?? 0) > 1)
                       TextButton(
                         onPressed: () {
                           setState(() {
-                            _hintIndex = (_hintIndex + 1) % widget.challenge.hints.length;
+                            _hintIndex = (_hintIndex + 1) % widget.challenge.hints!.length;
                           });
                         },
                         child: const Text('次へ', style: TextStyle(fontSize: 12)),
@@ -719,7 +718,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   Widget _buildBlockPalette() {
     // ステージで許可されたブロックのみ表示（空の場合は全ブロック表示）
-    final allowedIds = widget.challenge.availableBlocks.map((b) => b.id).toSet();
+    final allowedIds = (widget.challenge.availableBlocks ?? []).map((b) => b.id).toSet();
     final paletteBlocks = allowedIds.isEmpty
         ? kAvailableBlocks
         : kAvailableBlocks.where((b) => allowedIds.contains(b.id)).toList();

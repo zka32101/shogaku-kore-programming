@@ -466,7 +466,8 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
       final allQs = <_TAQuestion>[];
       for (final c in allChallenges) {
         if (c.type == 'quiz') {
-          for (final q in c.questions) {
+          final questions = c.questions ?? [];
+          for (final q in questions) {
             if (wrongTexts.contains(q.text)) {
               allQs.add(_TAQuestion(question: q, challengeTitle: c.title));
             }
@@ -485,9 +486,10 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     // クイズ形式かつ質問が1問以上あるステージから全問を収集（レベルフィルター適用）
     final allQs = <_TAQuestion>[];
     for (final c in allChallenges) {
-      if (c.type == constants.ChallengeType.quiz &&
+      if (c.type == 'quiz' &&
           (_selectedLevel == null || c.level == _selectedLevel)) {
-        for (final q in c.questions) {
+        final questions = c.questions ?? [];
+        for (final q in questions) {
           allQs.add(_TAQuestion(question: q, challengeTitle: c.title));
         }
       }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../providers/progress_provider.dart';
@@ -13,7 +13,7 @@ import '../widgets/tap_scale.dart';
 /// チャレンジの詳細表示画面
 /// チャレンジ情報、難易度、解説などを表示し、チャレンジ開始ボタンを提供
 class ChallengeDetailScreen extends ConsumerWidget {
-  final Challenge challenge;
+  final Stage challenge;
 
   const ChallengeDetailScreen({
     super.key,
@@ -182,7 +182,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
             // ─────────────────────────────────────────────
             // ヒント（Visualの場合）
             // ─────────────────────────────────────────────
-            if (challenge.hints.isNotEmpty) ...[
+            if (challenge.hints?.isNotEmpty ?? false) ...[
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -202,7 +202,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    ...challenge.hints.map((hint) => Padding(
+                    ...(challenge.hints ?? []).map((hint) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +306,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
     // ─────────────────────────────────────────────────────────
     // チャレンジタイプに応じた画面遷移
     // ─────────────────────────────────────────────────────────
-    final destination = challenge.type == ChallengeType.quiz
+    final destination = challenge.type == 'quiz'
         ? QuizScreen(challenge: challenge)
         : EditorScreen(challenge: challenge);
 
@@ -317,17 +317,17 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
   /// チャレンジタイプのラベル取得
   String _getTypeLabel(String type) {
-    return type == ChallengeType.quiz ? 'クイズ 📝' : 'ビジュアルプログラミング 🖼️';
+    return type == 'quiz' ? 'クイズ 📝' : 'ビジュアルプログラミング 🖼️';
   }
 
   /// 難易度ラベル取得
   String _getLevelLabel(String level) {
     switch (level) {
-      case StageLevel.beginner:
+      case '初級':
         return '初級 🌱';
-      case StageLevel.intermediate:
+      case '中級':
         return '中級 🌿';
-      case StageLevel.advanced:
+      case '上級':
         return '上級 🌳';
       default:
         return level;

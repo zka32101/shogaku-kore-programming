@@ -345,7 +345,7 @@ void main() {
       );
       expect(beginnerStats.getActivityTier(), 'ビギナー');
 
-      const amateurStats = ActivityStatistics(
+      final amateurStats = ActivityStatistics(
         userId: 'user2',
         totalActivitiesCompleted: 30,
         firstActivityAt: DateTime(2024),
@@ -354,7 +354,7 @@ void main() {
       );
       expect(amateurStats.getActivityTier(), 'アマチュア');
 
-      const intermediateStats = ActivityStatistics(
+      final intermediateStats = ActivityStatistics(
         userId: 'user3',
         totalActivitiesCompleted: 75,
         firstActivityAt: DateTime(2024),
@@ -363,7 +363,7 @@ void main() {
       );
       expect(intermediateStats.getActivityTier(), 'インターミディエイト');
 
-      const advanceStats = ActivityStatistics(
+      final advanceStats = ActivityStatistics(
         userId: 'user4',
         totalActivitiesCompleted: 150,
         firstActivityAt: DateTime(2024),
@@ -372,7 +372,7 @@ void main() {
       );
       expect(advanceStats.getActivityTier(), 'アドバンス');
 
-      const expertStats = ActivityStatistics(
+      final expertStats = ActivityStatistics(
         userId: 'user5',
         totalActivitiesCompleted: 300,
         firstActivityAt: DateTime(2024),
@@ -381,7 +381,7 @@ void main() {
       );
       expect(expertStats.getActivityTier(), 'エキスパート');
 
-      const masterStats = ActivityStatistics(
+      final masterStats = ActivityStatistics(
         userId: 'user6',
         totalActivitiesCompleted: 600,
         firstActivityAt: DateTime(2024),

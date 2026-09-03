@@ -7,7 +7,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
@@ -101,7 +100,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     if (key == LogicalKeyboardKey.keyR) {
       HapticService.lightImpact();
       SoundService().playTap();
-      _openRandomStage?(context);
+      _openRandomStage(context);
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.keyF) {
@@ -117,7 +116,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     if (key == LogicalKeyboardKey.slash &&
         !HardwareKeyboard.instance.isShiftPressed) {
       HapticService.lightImpact();
-      final allStages = ref.read(allStagesProvider);
+      final allStages = ref.read(allChallengesProvider);
       final progressMap = ref.read(progressProvider);
       showSearch(
         context: context,
@@ -180,7 +179,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
           onPressed: () {
             HapticService.lightImpact();
             SoundService().playTap();
-            _openRandomStage?(context);
+            _openRandomStage(context);
           },
           backgroundColor: kPrimaryColor,
           icon: const Text('🎲', style: TextStyle(fontSize: 18)),
@@ -235,7 +234,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     final wrongTexts =
         ref.read(wrongAnswersProvider).answers.map((a) => a.questionText).toSet();
     return challenges
-        .where((c) => c.questions.any((q) => wrongTexts.contains(q.text)))
+        .where((c) => (c.questions ?? []).any((q) => wrongTexts.contains(q.text)))
         .map((c) => c.id)
         .toSet();
   }
@@ -288,7 +287,7 @@ class _PathHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final progressNotifier = ref.read(progressProvider.notifier);
     final progressMap = ref.watch(progressProvider);
-    final allStages = ref.watch(allStagesProvider);
+    final allStages = ref.watch(allChallengesProvider);
     final completedCount = progressNotifier.completedCount;
     final totalStars = progressNotifier.totalStarsEarned;
     final level = progressNotifier.currentLevel;
@@ -342,7 +341,7 @@ class _PathHeader extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.search, color: Colors.white),
                 onPressed: () {
-                  final allStages = ref.read(allStagesProvider);
+                  final allStages = ref.read(allChallengesProvider);
                   final progressMap = ref.read(progressProvider);
                   showSearch(
                     context: context,
@@ -466,13 +465,13 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     final List<Stage> allStages;
     switch (widget.level) {
       case StageLevel.beginner:
-        allStages = ref.watch(beginnerStagesProvider);
+        allStages = ref.watch(beginnerChallengesProvider);
         break;
       case StageLevel.intermediate:
-        allStages = ref.watch(intermediateStagesProvider);
+        allStages = ref.watch(intermediateChallengesProvider);
         break;
       default:
-        allStages = ref.watch(advancedStagesProvider);
+        allStages = ref.watch(advancedChallengesProvider);
     }
 
     final progressMap = ref.watch(progressProvider);
@@ -488,7 +487,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     final wrongStageIds = wrongTexts.isEmpty
         ? const <String>{}
         : allStages
-            .where((c) => c.questions.any((q) => wrongTexts.contains(q.text)))
+            .where((c) => (c.questions ?? []).any((q) => wrongTexts.contains(q.text)))
             .map((c) => c.id)
             .toSet();
 
@@ -669,7 +668,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
               color: kPrimaryColor,
               onRefresh: () async {
                 ref.invalidate(progressProvider);
-                ref.invalidate(allStagesProvider);
+                ref.invalidate(allChallengesProvider);
                 await Future.delayed(const Duration(milliseconds: 400));
               },
               child: _StagePathView(
@@ -688,7 +687,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
                   final stars = progressMap[challenge.id]?.starsEarned ?? 0;
                   final isCompleted = progressMap[challenge.id]?.isCompleted ?? false;
                   final completedAt = progressMap[challenge.id]?.completedAt;
-                  _openStage?(ctx, challenge, stars, isCompleted, completedAt);
+                  _openStage(ctx, challenge, stars, isCompleted, completedAt);
                 },
               ),
             ),
@@ -1273,7 +1272,7 @@ class _StageNodeState extends State<_StageNode>
       border = context.isDark ? Colors.white12 : Colors.grey[300]!;
     }
 
-    final typeEmoji = widget.challenge.type == Stage?Type.quiz ? '🐍' : '🧩';
+    final typeEmoji = widget.challenge.type == 'quiz' ? '🐍' : '🧩';
 
     Widget circle = TapScale(
       onTap: widget.onTap,
@@ -1350,7 +1349,7 @@ class _StageNodeState extends State<_StageNode>
                 height: 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.challenge.type == Stage?Type.quiz
+                  color: widget.challenge.type == 'quiz'
                       ? const Color(0xFF8E44AD)
                       : kPrimaryColor,
                   border: Border.all(color: context.cardBg, width: 1.5),
@@ -1528,7 +1527,7 @@ class _StageNodeState extends State<_StageNode>
   }
 }
 
-// ─── ステージ情報シート ──────────────────────────────────────────────────────
+// ─── チャレンジ情報シート ──────────────────────────────────────────────────────
 
 class _StageInfoSheet extends ConsumerWidget {
   final Stage challenge;
@@ -1555,7 +1554,7 @@ class _StageInfoSheet extends ConsumerWidget {
     final wrongTexts = ref.watch(wrongAnswersProvider).answers
         .map((a) => a.questionText)
         .toSet();
-    final wrongCount = challenge.questions
+    final wrongCount = (challenge.questions ?? [])
         .where((q) => wrongTexts.contains(q.text))
         .length;
 
@@ -1655,14 +1654,14 @@ class _StageInfoSheet extends ConsumerWidget {
             spacing: 14,
             runSpacing: 4,
             children: [
-              if (!isVisual && challenge.questions.isNotEmpty)
+              if (!isVisual && (challenge.questions?.isNotEmpty ?? false))
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.quiz_outlined, size: 14, color: kTextSecondary),
                     const SizedBox(width: 4),
                     Text(
-                      '${challenge.questions.length}問',
+                      '${challenge.questions?.length ?? 0}問',
                       style: const TextStyle(fontSize: 12, color: kTextSecondary),
                     ),
                   ],
@@ -1678,14 +1677,14 @@ class _StageInfoSheet extends ConsumerWidget {
                   ),
                 ],
               ),
-              if (challenge.hints.isNotEmpty)
+              if (challenge.hints?.isNotEmpty ?? false)
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.lightbulb_outline, size: 14, color: Color(0xFFF39C12)),
                     const SizedBox(width: 4),
                     Text(
-                      'ヒント ${challenge.hints.length}個',
+                      'ヒント ${challenge.hints?.length ?? 0}個',
                       style: const TextStyle(fontSize: 12, color: Color(0xFFF39C12)),
                     ),
                   ],
@@ -2309,14 +2308,14 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _StageSearchDelegate extends SearchDelegate<Stage??> {
-  final List<Stage> allStage?s;
+class _StageSearchDelegate extends SearchDelegate<Stage?> {
+  final List<Stage> allStages;
   final Map<String, UserProgress> progressMap;
   final Set<String> favoriteIds;
   final Set<String> wrongAnswerStageIds;
 
   _StageSearchDelegate({
-    required this.allStage?s,
+    required this.allStages,
     required this.progressMap,
     this.favoriteIds = const {},
     this.wrongAnswerStageIds = const {},
@@ -2356,11 +2355,11 @@ class _StageSearchDelegate extends SearchDelegate<Stage??> {
   );
 
   List<Stage> get _filtered {
-    if (query.isEmpty) return allStage?s;
+    if (query.isEmpty) return allStages;
     final q = query.toLowerCase().trim();
     // Allow searching by stage number (e.g. "1", "10")
     final stageNum = int.tryParse(q);
-    return allStage?s.where((c) =>
+    return allStages.where((c) =>
       c.title.toLowerCase().contains(q) ||
       c.description.toLowerCase().contains(q) ||
       (stageNum != null && c.stageNumber == stageNum)
@@ -2428,7 +2427,7 @@ class _StageSearchDelegate extends SearchDelegate<Stage??> {
                 );
                 return;
               }
-              if (c.type == Stage?Type.quiz) {
+              if (c.type == 'quiz') {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => QuizScreen(challenge: c)),
                 );
@@ -2471,18 +2470,18 @@ class _StageSearchDelegate extends SearchDelegate<Stage??> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: (c.type == Stage?Type.quiz
+                                color: (c.type == 'quiz'
                                         ? const Color(0xFF8E44AD)
                                         : kPrimaryColor)
                                     .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                c.type == Stage?Type.quiz ? '🐍 クイズ' : '🧩 ブロック',
+                                c.type == 'quiz' ? '🐍 クイズ' : '🧩 ブロック',
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: c.type == Stage?Type.quiz
+                                  color: c.type == 'quiz'
                                       ? const Color(0xFF8E44AD)
                                       : kPrimaryColor,
                                 ),

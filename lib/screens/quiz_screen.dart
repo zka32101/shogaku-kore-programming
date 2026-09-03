@@ -6,7 +6,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/constants.dart';
 import '../config/theme.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
@@ -39,7 +38,7 @@ class QuizScreen extends ConsumerStatefulWidget {
 class _QuizScreenState extends ConsumerState<QuizScreen>
     with SingleTickerProviderStateMixin {
   List<Question> get _questions =>
-      widget.overrideQuestions ?? widget.challenge.questions;
+      widget.overrideQuestions ?? widget.challenge.questions ?? [];
 
   int _currentQuestionIndex = 0;
   int? _selectedOptionIndex;
@@ -252,7 +251,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     return KeyEventResult.ignored;
   }
 
-  String _getStage?Type(Stage challenge) {
+  String _getStagType(Stage challenge) {
     final title = challenge.title.toLowerCase();
     if (title.contains('if') || title.contains('分岐') || title.contains('条件')) return 'branch';
     if (title.contains('ループ') || title.contains('for') || title.contains('while')) return 'loop';
@@ -346,7 +345,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       }
       // キャラクター成長トリガー
       ref.read(characterProvider.notifier).growFromCorrectAnswer(
-        challengeType: _getStage?Type(widget.challenge),
+        challengeType: _getStagType(widget.challenge),
         difficulty: widget.challenge.level,
       );
     }
@@ -523,7 +522,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       // 次のステージがクイズ形式かつ無料のものを探す
       for (int i = currentIndex + 1; i < allChallenges.length; i++) {
         final c = allChallenges[i];
-        if (c.type == Stage?Type.quiz && c.isFree) {
+        if (c.type == 'quiz' && c.isFree) {
           nextStage? = c;
           break;
         }
