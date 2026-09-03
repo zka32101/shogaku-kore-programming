@@ -29,14 +29,14 @@ void main() {
         conditionId: 'cond-1',
         description: 'Complete 10 quizzes',
         requiredAmount: 10,
-        category: LearningCategory.variables,
+        category: LearningCategory.programming,
       );
     });
 
     test('should create condition with correct values', () {
       expect(condition.conditionId, 'cond-1');
       expect(condition.requiredAmount, 10);
-      expect(condition.category, LearningCategory.variables);
+      expect(condition.category, LearningCategory.programming);
     });
 
     test('should serialize to JSON', () {
@@ -95,6 +95,7 @@ void main() {
         startedAt: DateTime(2026, 9, 1),
         expiresAt: DateTime(2026, 9, 2),
         isActive: true,
+        isFree: true,
       );
     });
 
@@ -118,6 +119,7 @@ void main() {
         startedAt: DateTime(2026, 8, 1),
         expiresAt: DateTime(2026, 8, 31),
         isActive: true,
+        isFree: false,
       );
       expect(expiredChallenge.isExpired, true);
     });
