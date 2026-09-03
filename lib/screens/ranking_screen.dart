@@ -96,7 +96,9 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.keyS) {
-      final rankings = _buildRankings();
+      final myPoints = ref.read(progressProvider.notifier).totalStarsEarned * 50;
+      final profile = ref.read(profileProvider);
+      final rankings = _buildRankings(myPoints, profile.nickname, profile.avatarEmoji);
       final myEntry = rankings.firstWhere((e) => e.isMe);
       _shareRanking(context, myEntry);
       return KeyEventResult.handled;
@@ -123,9 +125,7 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
   }
 
   // ダミーランキングデータ
-  List<RankEntry> _buildRankings() {
-    final myPoints = ref.read(progressProvider.notifier).totalStarsEarned * 50;
-    final profile = ref.read(profileProvider);
+  List<RankEntry> _buildRankings(int myPoints, String myName, String myIcon) {
     final base = _period == RankingPeriod.weekly
         ? [
             const RankEntry(rank: 1, name: 'コード探偵まさき', points: 4850, icon: '🏆'),
@@ -155,34 +155,39 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                 const RankEntry(rank: 8, name: 'バグハンターみお', points: 48300, icon: '🐛'),
               ];
 
-    // 自分のランクを挿入
-    final myRank = _calculateMyRank(myPoints, base);
-    return [
+    // 自分のエントリーを含めてポイント降順に並べ替え、順位を振り直す
+    // （挿入位置の既存ランク番号をそのまま使うと重複が発生するため、
+    //   ソート後のインデックスから連番で採番する）
+    final combined = [
       ...base,
       RankEntry(
-        rank: myRank,
-        name: profile.nickname,
+        rank: 0,
+        name: myName,
         points: myPoints,
-        icon: profile.avatarEmoji,
+        icon: myIcon,
         isMe: true,
       ),
-    ]..sort((a, b) => a.rank.compareTo(b.rank));
-  }
+    ]..sort((a, b) => b.points.compareTo(a.points));
 
-  int _calculateMyRank(int myPoints, List<RankEntry> entries) {
-    int rank = entries.length + 1;
-    for (final e in entries) {
-      if (myPoints > e.points) {
-        rank = e.rank;
-        break;
-      }
-    }
-    return rank;
+    return [
+      for (int i = 0; i < combined.length; i++)
+        RankEntry(
+          rank: i + 1,
+          name: combined[i].name,
+          points: combined[i].points,
+          icon: combined[i].icon,
+          isMe: combined[i].isMe,
+        ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final rankings = _buildRankings();
+    // ボーナス付与などで進捗/プロフィールが変化したら再描画されるよう watch する
+    ref.watch(progressProvider);
+    final profile = ref.watch(profileProvider);
+    final myPoints = ref.read(progressProvider.notifier).totalStarsEarned * 50;
+    final rankings = _buildRankings(myPoints, profile.nickname, profile.avatarEmoji);
     final myEntry = rankings.firstWhere((e) => e.isMe);
     final showChallenges = _period == RankingPeriod.weekly;
 
@@ -207,7 +212,15 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
             _buildHeader(context, myEntry, rankings),
             // ランキングリスト（＋週間チャレンジ）
             Expanded(
-              child: ListView.builder(
+              child: RefreshIndicator(
+                color: kPrimaryColor,
+                onRefresh: () async {
+                  ref.invalidate(progressProvider);
+                  ref.invalidate(profileProvider);
+                  await Future.delayed(const Duration(milliseconds: 400));
+                },
+                child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 itemCount: flatItems.length + (showChallenges ? 1 : 0),
                 itemBuilder: (context, index) {
@@ -244,6 +257,7 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                         ),
                       );
                 },
+                ),
               ),
             ),
           ],

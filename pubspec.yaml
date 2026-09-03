@@ -2,7 +2,7 @@ name: shogaku_kore_programming
 description: "小学コレ！プログラミング - コード探険でプログラミングを楽しく学ぼう！"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 0.1.0+1
 
 environment:
   sdk: ^3.11.5
@@ -11,7 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
   shared_core:
-    path: ../shared_core
+    git:
+      url: https://github.com/org-zka32101/shared_core.git
+      ref: main
 
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
@@ -33,6 +35,9 @@ dependencies:
   # 環境変数
   flutter_dotenv: ^5.2.1
 
+  # Google Mobile Ads（広告システム）
+  google_mobile_ads: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -51,3 +56,22 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/
+  fonts:
+    # 漢字が正しい字形(日本語字形)で表示されない不具合の修正。
+    # fontFamily: 'NotoSansJP' はテーマ(theme.dart)で指定されているが、
+    # 実際のフォントファイルが同梱されていなかったため、Flutterが
+    # フォントを解決できずOS標準フォントにフォールバックしていた。
+    # 端末によっては中国語(簡体字)向けの字形でCJK漢字が描画される等、
+    # 見た目が崩れる原因になっていた。可変フォント(Variable Font)を
+    # 同梱し、weightごとに参照することでRegular/Boldとも正しい
+    # 日本語字形で表示されるようにする。
+    - family: NotoSansJP
+      fonts:
+        - asset: assets/fonts/NotoSansJP-VariableWeight.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSansJP-VariableWeight.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSansJP-VariableWeight.ttf
+          weight: 700
+        - asset: assets/fonts/NotoSansJP-VariableWeight.ttf
+          weight: 900

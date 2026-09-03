@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/daily_puzzle_provider.dart';
+import '../services/ai_programming_coach_service.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 
@@ -15,6 +16,8 @@ class _DailyPuzzleScreenState extends ConsumerState<DailyPuzzleScreen> {
   String _userSolution = '';
   String? _feedback;
   bool _submitted = false;
+  bool _isEvaluating = false;
+  bool _isCorrect = false;
   TextEditingController? _textController;
 
   @override
@@ -38,18 +41,36 @@ class _DailyPuzzleScreenState extends ConsumerState<DailyPuzzleScreen> {
     }
 
     HapticService.lightImpact();
-    SoundService().playCorrect();
 
-    // 簡易評価（本来はAIサービスで評価）
+    final puzzle = ref.read(dailyPuzzleProvider).puzzle;
+
     setState(() {
-      _submitted = true;
-      _feedback = '''素晴らしい！あなたの解答を確認しました。
-このアプローチは効率的です。条件分岐とループの使い方が上手ですね。
-次のレベルに進む準備ができています！''';
+      _isEvaluating = true;
     });
 
-    // ストリーク更新
-    ref.read(dailyPuzzleProvider.notifier).markSolvedToday();
+    final aiService = AIProgrammingCoachService();
+    final result = await aiService.evaluatePuzzleSolution(
+      problemDescription: puzzle?['description'] as String? ?? '',
+      goalBehavior: puzzle?['goalBehavior'] as String? ?? '',
+      userCode: _userSolution,
+    );
+
+    if (!mounted) return;
+
+    final isCorrect = result['isCorrect'] == true;
+
+    setState(() {
+      _isEvaluating = false;
+      _submitted = true;
+      _isCorrect = isCorrect;
+      _feedback = result['feedback'] as String? ?? '';
+    });
+
+    if (isCorrect) {
+      SoundService().playCorrect();
+      // 正解の場合のみストリーク更新
+      ref.read(dailyPuzzleProvider.notifier).markSolvedToday();
+    }
   }
 
   @override
@@ -214,15 +235,24 @@ class _DailyPuzzleScreenState extends ConsumerState<DailyPuzzleScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _submitSolution,
+                  onPressed: _isEvaluating ? null : _submitSolution,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: const Text(
-                    '✓ 解答を送信',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  child: _isEvaluating
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          '✓ 解答を送信',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                 ),
               ),
             ],
@@ -233,16 +263,20 @@ class _DailyPuzzleScreenState extends ConsumerState<DailyPuzzleScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.15),
+                  color: (_isCorrect ? Colors.green : Colors.orange)
+                      .withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.withValues(alpha: 0.5)),
+                  border: Border.all(
+                    color: (_isCorrect ? Colors.green : Colors.orange)
+                        .withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '🎉 良い解答です！',
-                      style: TextStyle(
+                    Text(
+                      _isCorrect ? '🎉 良い解答です！' : '🤔 もう少し！',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -256,14 +290,22 @@ class _DailyPuzzleScreenState extends ConsumerState<DailyPuzzleScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: _isCorrect
+                      ? () => Navigator.of(context).pop()
+                      : () {
+                          setState(() {
+                            _submitted = false;
+                            _feedback = null;
+                          });
+                        },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor:
+                        _isCorrect ? Colors.green : Colors.orange,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: const Text(
-                    '✓ 完了',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  child: Text(
+                    _isCorrect ? '✓ 完了' : 'もう一度挑戦する',
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),

@@ -48,10 +48,15 @@ class CoinNotifier extends StateNotifier<CoinState> {
     final balance = prefs.getInt(_balanceKey) ?? 0;
     final totalEarned = prefs.getInt(_totalEarnedKey) ?? 0;
     final hintCount = prefs.getInt(_hintCountKey) ?? 0;
-    final purchasedJson = prefs.getString(_purchasedKey) ?? '[]';
-    final purchasedList = List<String>.from(
-      (jsonDecode(purchasedJson) as List).map((e) => e.toString()),
-    );
+    List<String> purchasedList = [];
+    try {
+      final purchasedJson = prefs.getString(_purchasedKey) ?? '[]';
+      purchasedList = List<String>.from(
+        (jsonDecode(purchasedJson) as List).map((e) => e.toString()),
+      );
+    } catch (_) {
+      purchasedList = [];
+    }
     state = CoinState(
       balance: balance,
       totalEarned: totalEarned,

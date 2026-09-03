@@ -66,9 +66,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-</dict>
-</plist>
-
 	<!-- App Transport Security -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -79,7 +76,6 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<false/>
 	</dict>
-
 	<!-- Firebase Configuration (from firebase_options.dart) -->
 	<key>GOOGLE_APP_ID</key>
 	<string>1:492221061005:ios:placeholder</string>
@@ -91,13 +87,11 @@
 	<string>petit-works-education</string>
 	<key>FIREBASE_STORAGE_BUCKET</key>
 	<string>petit-works-education.firebasestorage.app</string>
-
 	<!-- Notifications Support (Local & Remote) -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
 	</array>
-
 	<!-- Privacy & Permissions -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Your learning progress photos are stored securely in your device.</string>
@@ -110,9 +104,11 @@
 		<string>_http._tcp</string>
 		<string>_https._tcp</string>
 	</array>
-
 	<!-- Minimum Version -->
 	<key>MinimumOSVersion</key>
 	<string>14.0</string>
+	<!-- Google Mobile Ads App ID (required for ads SDK) -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy</string>
 </dict>
 </plist>

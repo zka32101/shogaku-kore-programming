@@ -1,41 +1,41 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/challenge.dart';
-import '../config/constants.dart';
+import '../models/stage.dart';
+import '../config/constants.dart' as constants;
 
 // 全ステージデータ
-final allChallengesProvider = Provider<List<Challenge>>((ref) {
+final allChallengesProvider = Provider<List<Stage>>((ref) {
   return _buildChallenges();
 });
 
 // レベル別フィルター
-final beginnerChallengesProvider = Provider<List<Challenge>>((ref) {
+final beginnerChallengesProvider = Provider<List<Stage>>((ref) {
   return ref.watch(allChallengesProvider)
-      .where((c) => c.level == StageLevel.beginner)
+      .where((c) => c.level == constants.StageLevel.beginner)
       .toList();
 });
 
-final intermediateChallengesProvider = Provider<List<Challenge>>((ref) {
+final intermediateChallengesProvider = Provider<List<Stage>>((ref) {
   return ref.watch(allChallengesProvider)
-      .where((c) => c.level == StageLevel.intermediate)
+      .where((c) => c.level == constants.StageLevel.intermediate)
       .toList();
 });
 
-final advancedChallengesProvider = Provider<List<Challenge>>((ref) {
+final advancedChallengesProvider = Provider<List<Stage>>((ref) {
   return ref.watch(allChallengesProvider)
-      .where((c) => c.level == StageLevel.advanced)
+      .where((c) => c.level == constants.StageLevel.advanced)
       .toList();
 });
 
-List<Challenge> _buildChallenges() {
+List<Stage> _buildChallenges() {
   final list = [
     // ===== 初級: ビジュアルプログラミング =====
-    Challenge(
+    Stage(
       id: 'stage_01',
       stageNumber: 1,
       title: '直線を描こう',
       description: '「前に進む」ブロックを使って、ロボットを右へ動かしてみよう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🤖',
       isFree: true,
       expectedOutput: 'move_forward(100)',
@@ -49,50 +49,71 @@ List<Challenge> _buildChallenges() {
           description: 'ロボットを前に進める',
         ),
       ],
+      goalCondition: {
+        'goalX': 3.5,
+        'goalY': 3.5,
+        'tolerance': 0.5,
+        'expectedAngle': 0,
+        'angleToleranceDeg': 45,
+      },
     ),
-    Challenge(
+    Stage(
       id: 'stage_02',
       stageNumber: 2,
       title: '右に曲がろう',
       description: '「前に進む」と「右に回転」を組み合わせてL字を描こう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '↪️',
       isFree: true,
       expectedOutput: 'move_forward(100)\nturn_right(90)',
       hints: ['2つのブロックを順番に並べよう', '先に進んでから回転しよう'],
+      goalCondition: {
+        'goalX': 3.5,
+        'goalY': 3.5,
+        'tolerance': 0.5,
+        'expectedAngle': 270,
+        'angleToleranceDeg': 45,
+      },
     ),
-    Challenge(
+    Stage(
       id: 'stage_03',
       stageNumber: 3,
       title: '四角を描こう',
       description: '繰り返しを使って、4回同じ動きをして四角を描こう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '⬜',
       isFree: true,
       expectedOutput: 'repeat(4):\n  move_forward(100)\n  turn_right(90)',
       hints: ['「繰り返す」ブロックを使おう', '中に「前に進む」と「右に回転」を入れよう'],
+      goalCondition: {
+        'goalX': 3.5,
+        'goalY': 3.5,
+        'tolerance': 0.5,
+        'expectedAngle': 0,
+        'angleToleranceDeg': 45,
+      },
     ),
-    Challenge(
+    Stage(
       id: 'stage_04',
       stageNumber: 4,
       title: '迷路を解こう①',
       description: 'ロボットを動かして迷路をゴールまで導こう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🧩',
       isFree: true,
       expectedOutput: 'move_forward(100)\nturn_right(90)\nmove_forward(200)\nturn_left(90)\nmove_forward(100)',
       hints: ['まず右に曲がる必要があるよ', 'ゴールまで4手順でたどり着けるよ'],
     ),
-    Challenge(
+    Stage(
       id: 'stage_05',
       stageNumber: 5,
       title: '条件を使おう',
       description: '「もし壁があれば」を使って、ロボットが賢く動けるようにしよう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🔀',
       isFree: true,
       expectedOutput: 'if wall:\n  turn_right(90)\nelse:\n  move_forward(100)',
@@ -100,13 +121,13 @@ List<Challenge> _buildChallenges() {
     ),
 
     // ===== 中級: Pythonクイズ =====
-    Challenge(
+    Stage(
       id: 'stage_06',
       stageNumber: 6,
       title: 'はじめてのprint',
       description: 'Pythonの基本！print文の使い方を学ぼう',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🐍',
       isFree: true,
       conceptExplanation: '''
@@ -169,13 +190,13 @@ Pythonは、世界中で大人気のプログラミングことば！
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_07',
       stageNumber: 7,
       title: 'くり返し入門',
       description: '同じ処理を何度もくり返す「くり返し」を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🔁',
       isFree: true,
       conceptExplanation: '''
@@ -242,13 +263,13 @@ for i in range(3):
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_08',
       stageNumber: 8,
       title: 'もし～なら',
       description: '条件によって処理を変える「もし～なら」を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🔀',
       isFree: true,
       conceptExplanation: '''
@@ -307,13 +328,13 @@ else: print("その他")
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_09',
       stageNumber: 9,
       title: 'まとめて入れよう',
       description: 'たくさんのデータをまとめて扱う「リスト（まとめ入れ物）」を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '📋',
       isFree: true,
       conceptExplanation: '''
@@ -376,13 +397,13 @@ fruits = ["りんご", "バナナ", "みかん"]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_10',
       stageNumber: 10,
       title: '動きを作ろう',
       description: 'よく使う処理をまとめた「動き（関数）」を作ってみよう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🔧',
       isFree: true,
       conceptExplanation: '''
@@ -447,13 +468,13 @@ print(square(5))  → 25
     ),
 
     // ===== 中級追加: Python応用入門 =====
-    Challenge(
+    Stage(
       id: 'stage_26',
       stageNumber: 26,
       title: '入れ物の種類を知ろう',
       description: '数・文字・真偽値など、Pythonの「入れ物の種類（型）」を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🧮',
       isFree: true,
       conceptExplanation: '''
@@ -506,13 +527,13 @@ int(x) で変換してから足そう！
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_27',
       stageNumber: 27,
       title: '辞書を使いこなそう',
       description: '名前と値をセットで管理できる「辞書（dict）」をさらに深く学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🗃️',
       isFree: true,
       conceptExplanation: '''
@@ -578,13 +599,13 @@ pokemon = {
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_28',
       stageNumber: 28,
       title: 'f文字列で整形しよう',
       description: '変数を文字列の中に埋め込む「f文字列」を使いこなそう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '✏️',
       isFree: true,
       conceptExplanation: '''
@@ -655,13 +676,13 @@ f"{pi:.2f}"  → "3.14"（小数点2桁）
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_29',
       stageNumber: 29,
       title: '続けてくり返そう',
       description: '条件が続く限り繰り返す「while（続けてくり返し）」のPythonコードを学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🔄',
       isFree: false,
       conceptExplanation: '''
@@ -727,13 +748,13 @@ break で止める条件を入れないと止まらなくなるよ！
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_30',
       stageNumber: 30,
       title: 'エラー処理を学ぼう',
       description: 'プログラムのエラーを上手に扱う「try/except」を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🛡️',
       isFree: false,
       conceptExplanation: '''
@@ -802,13 +823,13 @@ except FileNotFoundError:
     ),
 
     // ===== 上級: 応用 =====
-    Challenge(
+    Stage(
       id: 'stage_11',
       stageNumber: 11,
       title: '文字列を操作しよう',
       description: '文字列の便利な操作を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '📝',
       isFree: false,
       conceptExplanation: '''
@@ -872,13 +893,13 @@ print(text.split(","))
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_12',
       stageNumber: 12,
       title: 'ファイルを読もう',
       description: 'Pythonでファイルを読み書きする方法を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '📁',
       isFree: false,
       conceptExplanation: '''
@@ -945,37 +966,37 @@ with open("data.txt", "r") as f:
       ],
     ),
     // ===== 初級追加: ビジュアルプログラミング応用 =====
-    Challenge(
+    Stage(
       id: 'stage_13',
       stageNumber: 13,
       title: '三角を描こう',
       description: '3回同じ動きを繰り返して三角形を描こう！120°ずつ回転するよ。',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🔺',
       isFree: true,
       expectedOutput: 'repeat(3):\n  move_forward(100)\n  turn_right(120)',
       hints: ['繰り返しは3回だよ', '三角形は120°ずつ回るよ', '「前に進む」→「右に120°回転」を繰り返そう'],
     ),
-    Challenge(
+    Stage(
       id: 'stage_14',
       stageNumber: 14,
       title: 'ジグザグ道を進もう',
       description: '右に45°、左に45°を交互に使ってジグザグに進もう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '〰️',
       isFree: true,
       expectedOutput: 'move_forward(100)\nturn_right(45)\nmove_forward(100)\nturn_left(45)\nmove_forward(100)',
       hints: ['斜めに進んでから方向を変えよう', '右・左と交互に使うよ'],
     ),
-    Challenge(
+    Stage(
       id: 'stage_15',
       stageNumber: 15,
       title: '入れ物で数えよう',
       description: '入れ物「count」を使ってロボットが何歩進んだか数えてみよう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🔢',
       isFree: true,
       expectedOutput: 'set_variable(count=0)\nmove_forward(100)\nadd_variable',
@@ -983,13 +1004,13 @@ with open("data.txt", "r") as f:
     ),
 
     // ===== 中級追加: Pythonクイズ応用 =====
-    Challenge(
+    Stage(
       id: 'stage_16',
       stageNumber: 16,
       title: 'リストを使いこなそう',
       description: 'Pythonのリスト（まとめ入れ物）の操作をさらに深く学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🗒️',
       isFree: true,
       conceptExplanation: '''
@@ -1045,13 +1066,13 @@ fruits[1]  → "バナナ"
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_17',
       stageNumber: 17,
       title: '辞書の基本',
       description: 'Pythonの辞書（dict）でキーと値のペアを扱おう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '📖',
       isFree: true,
       conceptExplanation: '''
@@ -1116,13 +1137,13 @@ pikachu = {
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_18',
       stageNumber: 18,
       title: '動きを使いこなそう',
       description: 'Pythonで自分だけの「動き（関数・def）」を作れるようになろう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '⚙️',
       isFree: true,
       conceptExplanation: '''
@@ -1179,13 +1200,13 @@ result = たし算(3, 5)  → result = 8
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_19',
       stageNumber: 19,
       title: 'エラーを直そう',
       description: 'Pythonのエラーメッセージを読んでバグを直す方法を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🐛',
       isFree: true,
       conceptExplanation: '''
@@ -1258,74 +1279,74 @@ print(i)   → エラー！
       ],
     ),
     // ===== 初級追加: 新ブロック応用 =====
-    Challenge(
+    Stage(
       id: 'stage_21',
       stageNumber: 21,
       title: 'くり返しブロックを使おう',
       description: '「くり返し」ブロックで3回繰り返して進んでみよう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🔄',
       isFree: true,
       expectedOutput: 'while_loop(3):\n  move_forward(100)',
       hints: ['「whileループ」を選んで3回に設定しよう', 'ループの後に「前に進む」を置こう'],
     ),
-    Challenge(
+    Stage(
       id: 'stage_22',
       stageNumber: 22,
       title: 'もし〜ならばを使おう',
       description: '「もし〜ならば」ブロックで条件によって動きを変えてみよう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🔱',
       isFree: true,
       expectedOutput: 'if_condition:\n  move_forward(100)',
       hints: ['「もし〜ならば」ブロックを置こう', 'その後に「前に進む」を追加しよう'],
     ),
-    Challenge(
+    Stage(
       id: 'stage_23',
       stageNumber: 23,
       title: '表示ブロックを使おう',
       description: '「表示する」ブロックでメッセージを出してから進もう！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '📢',
       isFree: true,
       expectedOutput: 'print_block\nmove_forward(100)',
       hints: ['「表示する」ブロックを最初に置こう', '次に「前に進む」を追加しよう'],
     ),
-    Challenge(
+    Stage(
       id: 'stage_24',
       stageNumber: 24,
       title: 'くり返して三角を描こう',
       description: 'くり返しブロックを使って三角形を描こう！3回、前進・回転を繰り返すよ。',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🔻',
       isFree: true,
       expectedOutput: 'while_loop(3):\n  move_forward(100)\n  turn_right(120)',
       hints: ['whileループを3回に設定しよう', 'ループ内に「前に進む」→「右に120°回転」を入れよう'],
     ),
-    Challenge(
+    Stage(
       id: 'stage_25',
       stageNumber: 25,
       title: '組み合わせチャレンジ',
       description: '表示→条件→ループをすべて組み合わせた最終チャレンジ！',
-      type: ChallengeType.visual,
-      level: StageLevel.beginner,
+      type: constants.ChallengeType.visual,
+      level: constants.StageLevel.beginner,
       icon: '🏅',
       isFree: true,
       expectedOutput: 'print_block\nif_condition:\n  while_loop(3):\n    move_forward(100)',
       hints: ['最初に「表示する」を置こう', '次に「もし〜ならば」→「whileループ」→「前に進む」の順で'],
     ),
     // ===== 上級追加: Python発展ステージ 31〜40 =====
-    Challenge(
+    Stage(
       id: 'stage_31',
       stageNumber: 31,
       title: 'リストを1行で作ろう',
       description: '1行でリストを作れる便利な書き方をマスターしよう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '⚡',
       isFree: false,
       conceptExplanation: '''
@@ -1391,13 +1412,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_32',
       stageNumber: 32,
       title: '辞書内包表記',
       description: '辞書もワンライナーで作れる「辞書内包表記」を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '📚',
       isFree: false,
       questions: [
@@ -1442,13 +1463,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_33',
       stageNumber: 33,
       title: '設計図を引き継ごう',
       description: 'クラス（設計図）を受け継いで機能を追加する方法を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🧬',
       isFree: false,
       questions: [
@@ -1482,13 +1503,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_34',
       stageNumber: 34,
       title: '道具箱を使おう',
       description: '作ったコードを再利用できる「道具箱（モジュール）」の使い方を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '📦',
       isFree: false,
       questions: [
@@ -1530,13 +1551,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_35',
       stageNumber: 35,
       title: 'map/filterを使おう',
       description: 'リストをスマートに処理する「map」と「filter」を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🗂️',
       isFree: false,
       questions: [
@@ -1575,13 +1596,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_36',
       stageNumber: 36,
       title: 'ソートをマスター',
       description: 'リストや辞書を自在に並び替える「sort」の使い方を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🔢',
       isFree: false,
       questions: [
@@ -1620,13 +1641,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_37',
       stageNumber: 37,
       title: '文字列メソッド応用',
       description: '文字列を自在に操る高度なメソッドをマスターしよう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🔤',
       isFree: false,
       questions: [
@@ -1653,13 +1674,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_38',
       stageNumber: 38,
       title: 'mathモジュール',
       description: '数学計算に便利な「mathモジュール」の関数を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🔭',
       isFree: false,
       questions: [
@@ -1686,13 +1707,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_39',
       stageNumber: 39,
       title: 'ジェネレーター入門',
       description: 'メモリに優しい「ジェネレーター」とyieldを学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '⚙️',
       isFree: false,
       questions: [
@@ -1725,13 +1746,13 @@ alive = [e for e in enemies if e["hp"] > 50]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_40',
       stageNumber: 40,
       title: '総合チャレンジ',
       description: 'これまで学んだPythonの知識を総まとめ！最終ステージに挑もう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🏆',
       isFree: false,
       questions: [
@@ -1768,13 +1789,13 @@ alive = [e for e in enemies if e["hp"] > 50]
     ),
 
     // ===== 中級追加: 新概念ステージ (41-45) =====
-    Challenge(
+    Stage(
       id: 'stage_41',
       stageNumber: 41,
       title: 'キーボード入力を受け取ろう',
       description: 'ユーザーからの入力を受け取る「input()」の使い方を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '⌨️',
       isFree: false,
       conceptExplanation: '''
@@ -1852,13 +1873,13 @@ print(f"{name}、冒険の旅へようこそ！")
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_42',
       stageNumber: 42,
       title: 'タプル（変わらないリスト）',
       description: '変更できないデータをまとめる「タプル」を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🔒',
       isFree: false,
       conceptExplanation: '''
@@ -1929,13 +1950,13 @@ start_pos = (3, 5)   ← x=3、y=5の場所
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_43',
       stageNumber: 43,
       title: 'セット（重複なしリスト）',
       description: '同じ値が入らない「セット（集合）」を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🎯',
       isFree: false,
       conceptExplanation: '''
@@ -2009,13 +2030,13 @@ print(cleared)    → {1, 3, 5}  ← 変わらない！
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_44',
       stageNumber: 44,
       title: 'スライスで切り取ろう',
       description: 'リストや文字列の一部を切り取る「スライス」を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '✂️',
       isFree: false,
       conceptExplanation: '''
@@ -2084,13 +2105,13 @@ top3 = ranking[:3]    → [100, 80, 70]
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_45',
       stageNumber: 45,
       title: 'リストを検索・整理しよう',
       description: 'リストの中を探したり、並べ替えたりする便利な方法を学ぼう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🔍',
       isFree: false,
       questions: [
@@ -2140,13 +2161,13 @@ top3 = ranking[:3]    → [100, 80, 70]
     ),
 
     // ===== ミニプロジェクトステージ (46-50) =====
-    Challenge(
+    Stage(
       id: 'stage_46',
       stageNumber: 46,
       title: '✊ じゃんけんゲームを作ろう',
       description: 'じゃんけんゲームをステップで作りながらPythonを実感しよう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '✊',
       isFree: false,
       conceptExplanation: '''
@@ -2225,13 +2246,13 @@ for round in range(3):
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_47',
       stageNumber: 47,
       title: '🔢 数当てゲームを作ろう',
       description: '1〜100の数を当てるゲームを作りながらwhileループを実践しよう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.intermediate,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.intermediate,
       icon: '🔢',
       isFree: false,
       conceptExplanation: '''
@@ -2312,13 +2333,13 @@ while True:                        ← 当たるまで続ける
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_48',
       stageNumber: 48,
       title: '📊 成績表プログラムを作ろう',
       description: '辞書とリストを使って成績を計算するプログラムを作ろう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '📊',
       isFree: false,
       questions: [
@@ -2366,13 +2387,13 @@ while True:                        ← 当たるまで続ける
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_49',
       stageNumber: 49,
       title: '🎲 サイコロシミュレーター',
       description: 'サイコロを振ってデータを集計するプログラムを作ろう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🎲',
       isFree: false,
       questions: [
@@ -2420,13 +2441,13 @@ while True:                        ← 当たるまで続ける
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_50',
       stageNumber: 50,
       title: '🏆 総合ミニプロジェクト',
       description: 'Pythonの知識を全部使って「自分だけのクイズゲーム」を完成させよう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🏆',
       isFree: false,
       questions: [
@@ -2475,13 +2496,13 @@ while True:                        ← 当たるまで続ける
       ],
     ),
 
-    Challenge(
+    Stage(
       id: 'stage_20',
       stageNumber: 20,
       title: '設計図を作ろう',
       description: 'Pythonの「設計図（クラス）」でオリジナルの部品を作ろう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🏗️',
       isFree: false,
       conceptExplanation: '''
@@ -2555,13 +2576,13 @@ dragon = Monster("ドラゴン", 200)   ← ドラゴンも作れる！
       ],
     ),
     // ===== 上級追加: アルゴリズム入門ステージ (51-55) =====
-    Challenge(
+    Stage(
       id: 'stage_51',
       stageNumber: 51,
       title: '🔁 再帰で問題を解こう',
       description: '自分自身を呼び出す「再帰関数」でフィボナッチ数列を計算しよう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🔁',
       isFree: false,
       conceptExplanation: '''
@@ -2630,13 +2651,13 @@ factorial(3) の動き:
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_52',
       stageNumber: 52,
       title: '🔍 二分探索を学ぼう',
       description: 'ソート済みリストを半分ずつ絞り込む高速検索「二分探索」を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🔍',
       isFree: false,
       questions: [
@@ -2673,13 +2694,13 @@ factorial(3) の動き:
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_53',
       stageNumber: 53,
       title: '🫧 バブルソートの仕組み',
       description: '隣同士を比べて並び替える「バブルソート」アルゴリズムを理解しよう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🫧',
       isFree: false,
       questions: [
@@ -2719,13 +2740,13 @@ factorial(3) の動き:
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_54',
       stageNumber: 54,
       title: '📚 スタックとキュー',
       description: 'データの出し入れルールが違う「スタック」と「キュー」を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '📚',
       isFree: false,
       questions: [
@@ -2766,13 +2787,13 @@ factorial(3) の動き:
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_55',
       stageNumber: 55,
       title: '🔤 正規表現入門',
       description: '文字列のパターン検索が強力になる「正規表現」の基本を学ぼう！（プレミアム）',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🔤',
       isFree: false,
       questions: [
@@ -2821,13 +2842,13 @@ factorial(3) の動き:
     ),
 
     // ===== ゲーム制作特別ステージ =====
-    Challenge(
+    Stage(
       id: 'stage_56',
       stageNumber: 56,
       title: '🐍 Python（パイソン）ってなに？魔法のことば',
       description: '🎮 キミの好きなゲーム、ぜんぶプログラミングで作られているって知ってた？\n\nここからは、世界中のプロが使う「Python（パイソン）」という魔法のことばを学ぶよ！\n\n✨ このことばを覚えると…\n🎯 ゲームが作れる\n🤖 ロボットが動かせる\n🚀 キミのアイデアが現実になる！\n\nさあ、ゲームクリエイターへの第一歩をふみだそう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🐍',
       isFree: true,
       conceptExplanation: '''
@@ -2902,13 +2923,13 @@ factorial(3) の動き:
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_57',
       stageNumber: 57,
       title: '🎮 ポケモンずかんを作ろう！',
       description: '🐉 ポケモンには、なまえ・タイプ・HP（たいりょく）があるよね？\n\nゲームの中では、キャラクターのじょうほうを「データ」として整理しているんだ。\n\n✨ このステージでは…\n📒 自分だけの「モンスターずかん」をプログラミングで作る方法を学ぶよ！\n\nなまえやHPを、コンピューターにおぼえさせよう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🎮',
       isFree: true,
       conceptExplanation: '''
@@ -2987,13 +3008,13 @@ for pokemon in zukan:
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_58',
       stageNumber: 58,
       title: '⭐ マリオでコインを数えよう！',
       description: '🪙 マリオがコインをゲットすると、スコアがふえるよね？\n\nゲームの「とくてん（スコア）」は、ぜんぶ計算でできているんだ！\n\n✨ このステージでは…\n🎯 コインを集めたらスコアアップ\n⏰ はやくクリアするとボーナス！\n\nそんな「スコアのしくみ」を、自分でプログラミングしてみよう！',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '⭐',
       isFree: true,
       conceptExplanation: '''
@@ -3075,13 +3096,13 @@ boss_bonus = boss_level * 100
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_59',
       stageNumber: 59,
       title: '👾 モンスターをよびだそう！',
       description: '👻 ゲームをするたびに、ちがう敵が出てきたらドキドキするよね？\n\nそれは「ランダム（でたらめに選ぶ）」というしくみのおかげなんだ！\n\n✨ このステージでは…\n🎲 ランダムにモンスターをよびだす\n⚔️ たおした敵をきえさせる\n\nそんな「敵を出すしくみ」を作ってみよう！キミがゲームマスターだ！',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '👾',
       isFree: true,
       conceptExplanation: '''
@@ -3164,13 +3185,13 @@ if monster_hp <= 0:
         ),
       ],
     ),
-    Challenge(
+    Stage(
       id: 'stage_60',
       stageNumber: 60,
       title: '🎯 キミだけのゲームを作ろう！',
       description: '🎉 ついに最後のステージ！\n\nここまでで、キャラクター・スコア・敵……ゲームのパーツをぜんぶ学んだね。\n\n✨ 最後のひみつは「ゲームループ」！\nゲームは「ボタンをおす → うごく → 画面にうつす」を、ものすごいはやさでくりかえしているんだ。\n\n🏆 このステージをクリアすれば、キミはもう「ゲームクリエイター」！\nじぶんのアイデアを、ゲームにできる力を手に入れたよ！',
-      type: ChallengeType.quiz,
-      level: StageLevel.advanced,
+      type: constants.ChallengeType.quiz,
+      level: constants.StageLevel.advanced,
       icon: '🎯',
       isFree: false,
       conceptExplanation: '''

@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/profile_provider.dart';
@@ -16,6 +17,8 @@ import 'badge_unlock_screen.dart';
 import 'stage_list_screen.dart';
 import 'editor_screen.dart';
 import 'quiz_screen.dart';
+import 'paywall_screen.dart';
+import '../widgets/app_dialog.dart';
 import 'daily_review_screen.dart';
 import 'time_attack_screen.dart';
 import 'ranking_screen.dart';
@@ -32,6 +35,7 @@ import '../providers/flashcard_provider.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/daily_puzzle_card.dart';
+import '../widgets/tap_scale.dart';
 import 'why_programming_screen.dart';
 import 'programming_basics_screen.dart';
 import 'shop_screen.dart';
@@ -42,6 +46,7 @@ import 'character_screen.dart';
 import '../providers/coin_provider.dart';
 import '../providers/character_provider.dart';
 import '../models/character_model.dart';
+import '../utils/page_transitions.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -56,6 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int? _prevStreak;
   bool _goalCelebrated = false;
   bool _codeKingChecked = false; // セッション内でコード王チェック済みか
+  bool _showMoreStats = false; // 「もっと見る」で表示する補助カード群の開閉状態
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -83,28 +89,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyT) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TimeAttackScreen()));
+      Navigator.of(context).push(smoothPageRoute(const TimeAttackScreen()));
       return KeyEventResult.handled;
     }
     // R → ランキング
     if (key == LogicalKeyboardKey.keyR) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RankingScreen()));
+      Navigator.of(context).push(smoothPageRoute(const RankingScreen()));
       return KeyEventResult.handled;
     }
     // F → フラッシュカード
     if (key == LogicalKeyboardKey.keyF) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FlashcardScreen()));
+      Navigator.of(context).push(smoothPageRoute(const FlashcardScreen()));
       return KeyEventResult.handled;
     }
     // S → ステージ一覧
     if (key == LogicalKeyboardKey.keyS) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const StageListScreen()));
+      Navigator.of(context).push(smoothPageRoute(const StageListScreen()));
       return KeyEventResult.handled;
     }
     // D → 今日の復習
@@ -113,7 +119,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (!doneToday) {
         HapticService.lightImpact();
         SoundService().playTap();
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DailyReviewScreen()));
+        Navigator.of(context).push(smoothPageRoute(const DailyReviewScreen()));
         return KeyEventResult.handled;
       }
     }
@@ -121,28 +127,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyV) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReverseTeachingScreen()));
+      Navigator.of(context).push(smoothPageRoute(const ReverseTeachingScreen()));
       return KeyEventResult.handled;
     }
     // G → ギャラリー
     if (key == LogicalKeyboardKey.keyG) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GalleryScreen()));
+      Navigator.of(context).push(smoothPageRoute(const GalleryScreen()));
       return KeyEventResult.handled;
     }
     // E → 週次レポート
     if (key == LogicalKeyboardKey.keyE) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WeeklyReportScreen()));
+      Navigator.of(context).push(smoothPageRoute(const WeeklyReportScreen()));
       return KeyEventResult.handled;
     }
     // C → キャラクター育成
     if (key == LogicalKeyboardKey.keyC) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CharacterScreen()));
+      Navigator.of(context).push(smoothPageRoute(const CharacterScreen()));
       return KeyEventResult.handled;
     }
     // N → 次のTips
@@ -161,7 +167,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyA) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AchievementsScreen()));
+      Navigator.of(context).push(smoothPageRoute(const AchievementsScreen()));
       return KeyEventResult.handled;
     }
     // W → 苦手問題復習（苦手リストがある場合のみ）
@@ -171,7 +177,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => QuizReviewScreen(wrongAnswers: answers)),
+          smoothPageRoute(QuizReviewScreen(wrongAnswers: answers)),
         );
         return KeyEventResult.handled;
       }
@@ -180,7 +186,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyP) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
+      Navigator.of(context).push(smoothPageRoute(const ProfileScreen()));
       return KeyEventResult.handled;
     }
     // ? → キーボードショートカット一覧
@@ -412,7 +418,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     // 次の未完了ステージを探す
-    final nextChallenge = allChallenges.firstWhere(
+    final Stage? nextStage = allChallenges.firstWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
       orElse: () => allChallenges.first,
     );
@@ -442,12 +448,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: completedCount > 0
           ? Builder(builder: (ctx) {
               final hasWrong = !wrongAnswersState.isEmpty;
-              return FloatingActionButton.small(
+              return FloatingActionButton.extended(
                 heroTag: 'quick_quiz_fab',
                 onPressed: () => _showRandomQuickQuiz(context, allChallenges, progressMap),
                 backgroundColor: hasWrong ? const Color(0xFFFF6B35) : kPrimaryColor,
                 tooltip: hasWrong ? '🔥 苦手問題優先でランダム1問チャレンジ' : 'ランダム1問チャレンジ',
-                child: Text(hasWrong ? '🔥' : '🎲', style: const TextStyle(fontSize: 18)),
+                icon: Text(hasWrong ? '🔥' : '🎲', style: const TextStyle(fontSize: 18)),
+                label: Text(hasWrong ? '苦手' : '1問！', style: const TextStyle(fontSize: 11)),
               );
             })
           : null,
@@ -496,7 +503,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut)
                   else
-                    _buildDailyMission(context, nextChallenge)
+                    _buildDailyMission(context, nextStage?)
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut),
@@ -540,6 +547,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ];
                   }(),
 
+                  // 苦手問題復習カード（過去の間違い問題がある場合のみ）
+                  if (!wrongAnswersState.isEmpty) ...[
+                    _buildWrongAnswersCard(context, wrongAnswersState.count)
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 90.ms)
+                        .slideY(begin: 0.12, curve: Curves.easeOut),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // お気に入りステージカード
+                  if (favoritesState.count > 0) ...[
+                    _buildFavoritesCard(context, favoritesState.count, allChallenges, favoritesState.favoriteIds)
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 95.ms)
+                        .slideY(begin: 0.12, curve: Curves.easeOut),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // もっと見る（学習ストリーク・週間チャレンジなど詳細統計）
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        HapticService.lightImpact();
+                        setState(() => _showMoreStats = !_showMoreStats);
+                      },
+                      icon: Icon(
+                        _showMoreStats ? Icons.expand_less : Icons.expand_more,
+                        size: 18,
+                      ),
+                      label: Text(
+                        _showMoreStats ? 'とじる' : 'もっと見る',
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  if (_showMoreStats) ...[
                   // 学習ストリークカード（1日以上の連続記録がある場合のみ表示）
                   if (streakDays > 0) ...[
                     Container(
@@ -679,24 +724,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: 12),
                   ],
 
-                  // 苦手問題復習カード（過去の間違い問題がある場合のみ）
-                  if (!wrongAnswersState.isEmpty) ...[
-                    _buildWrongAnswersCard(context, wrongAnswersState.count)
-                        .animate()
-                        .fadeIn(duration: 350.ms, delay: 90.ms)
-                        .slideY(begin: 0.12, curve: Curves.easeOut),
-                    const SizedBox(height: 12),
-                  ],
-
-                  // お気に入りステージカード
-                  if (favoritesState.count > 0) ...[
-                    _buildFavoritesCard(context, favoritesState.count, allChallenges, favoritesState.favoriteIds)
-                        .animate()
-                        .fadeIn(duration: 350.ms, delay: 95.ms)
-                        .slideY(begin: 0.12, curve: Curves.easeOut),
-                    const SizedBox(height: 12),
-                  ],
-
                   // フラッシュカード復習スケジュール（7日以上前に習得したカテゴリーがある場合）
                   ...() {
                     if (masteredCards == 0) return <Widget>[];
@@ -732,7 +759,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // 今週のチャレンジ
                   if (completedCount > 0) ...[
-                    _buildWeeklyChallenge(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
+                    _buildWeeklyStage(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 97.ms)
                         .slideY(begin: 0.12, curve: Curves.easeOut),
@@ -754,6 +781,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       .fadeIn(duration: 350.ms, delay: 120.ms)
                       .slideY(begin: 0.12, curve: Curves.easeOut),
                   const SizedBox(height: 16),
+
+                  ],
 
                   // ミニゲーム（タイムアタック・ランキング）
                   _buildMiniGames(context)
@@ -821,9 +850,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             HapticService.lightImpact();
                             SoundService().playTap();
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const WhyProgrammingScreen(),
-                              ),
+                              smoothPageRoute(const WhyProgrammingScreen()),
                             );
                           },
                           icon: const Text('🎓', style: TextStyle(fontSize: 16)),
@@ -846,9 +873,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             HapticService.lightImpact();
                             SoundService().playTap();
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const ProgrammingBasicsScreen(),
-                              ),
+                              smoothPageRoute(const ProgrammingBasicsScreen()),
                             );
                           },
                           icon: const Text('📚', style: TextStyle(fontSize: 16)),
@@ -875,23 +900,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // CTA ボタン（全幅）
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        HapticService.lightImpact();
-                        SoundService().playTap();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const StageListScreen(),
+                    child: TapScale(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          HapticService.lightImpact();
+                          SoundService().playTap();
+                          Navigator.of(context).push(
+                            smoothPageRoute(const StageListScreen()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
+                        child: const Text('チャレンジを開始', style: TextStyle(fontSize: 15)),
                       ),
-                      child: const Text('チャレンジを開始', style: TextStyle(fontSize: 15)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -1034,7 +1059,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       HapticService.lightImpact();
                       SoundService().playTap();
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ShopScreen()),
+                        smoothPageRoute(const ShopScreen()),
                       );
                     },
                     child: Container(
@@ -1246,9 +1271,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     SoundService().playTap();
                     final answers = ref.read(wrongAnswersProvider).answers;
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => QuizReviewScreen(wrongAnswers: answers),
-                      ),
+                      smoothPageRoute(QuizReviewScreen(wrongAnswers: answers)),
                     );
                   },
                   style: OutlinedButton.styleFrom(
@@ -1288,9 +1311,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 HapticService.selectionClick();
                 SoundService().playTap();
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const WrongAnswersListScreen(),
-                  ),
+                  smoothPageRoute(const WrongAnswersListScreen()),
                 );
               },
               style: TextButton.styleFrom(
@@ -1341,12 +1362,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }).toList();
 
-    final challenge = Challenge(
+    final challenge = Stage?(
       id: 'wrong_answers_quiz',
       stageNumber: 0,
       title: '苦手問題クイズ',
       description: '間違えた問題をもう一度解こう！',
-      type: ChallengeType.quiz,
+      type: 'quiz',
       level: StageLevel.beginner,
       icon: '📝',
       isFree: true,
@@ -1354,14 +1375,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => QuizScreen(challenge: challenge)),
+      smoothPageRoute(QuizScreen(challenge: challenge)),
     );
   }
 
   Widget _buildFavoritesCard(
     BuildContext context,
     int count,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
     Set<String> favoriteIds,
   ) {
     final favorites = allChallenges
@@ -1374,7 +1395,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const StageListScreen(openFavorites: true)),
+          smoothPageRoute(const StageListScreen(openFavorites: true)),
         );
       },
       child: Container(
@@ -1729,7 +1750,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+                    smoothPageRoute(const FlashcardScreen()),
                   );
                 },
                 child: const Icon(Icons.chevron_right, color: Color(0xFF8E44AB)),
@@ -1751,7 +1772,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // TODO: Navigate to FlashcardScreen with category pre-selected
                   // For now, just open the flashcard screen
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+                    smoothPageRoute(const FlashcardScreen()),
                   );
                 },
                 child: Container(
@@ -1812,7 +1833,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildWeakStagesCard(
     BuildContext context,
-    List<Challenge> weakStages,
+    List<Stage> weakStages,
     Map<String, UserProgress> progressMap,
   ) {
     return Container(
@@ -1881,7 +1902,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     : const Color(0xFFE67E22);
             // 苦手問題があるか確認
             final wrongState = ref.read(wrongAnswersProvider);
-            final wrongCount = c.type == ChallengeType.quiz
+            final wrongCount = c.type == 'quiz'
                 ? c.questions.fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
                 : 0;
             return Padding(
@@ -1891,8 +1912,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => c.type == ChallengeType.visual
+                    smoothPageRoute(
+                      c.type == 'visual'
                           ? EditorScreen(challenge: c)
                           : QuizScreen(challenge: c),
                     ),
@@ -1960,25 +1981,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  /// プレミアム限定ステージなら課金モーダルを表示し、無料ステージなら
+  /// エディタ／クイズ画面へ遷移する共通ヘルパー。
+  ///
+  /// 「今日のチャレンジ」カード・連続記録危機バナー・おかえりバナーの
+  /// 3箇所から呼び出され、プレミアムロックの回避（ペイウォールバイパス）を防ぐ。
+  void _openStageOrShowPaywall(BuildContext context, Stage challenge) {
+    if (!challenge.isFree) {
+      HapticService.lightImpact();
+      SoundService().playTap();
+      AppDialog.confirm(
+        context,
+        emoji: '🔒',
+        title: 'プレミアム限定ステージ',
+        message: 'このステージはプレミアム会員限定です。\nアップグレードしてすべてのステージを解放しよう！',
+        okLabel: 'アップグレード',
+        cancelLabel: 'とじる',
+      ).then((upgrade) {
+        if (upgrade && context.mounted) {
+          Navigator.of(context).push(
+            smoothPageRoute(const PaywallScreen()),
+          );
+        }
+      });
+      return;
+    }
+    HapticService.lightImpact();
+    SoundService().playTap();
+    Navigator.of(context).push(
+      smoothPageRoute(
+        challenge.type == 'visual'
+            ? EditorScreen(challenge: challenge)
+            : QuizScreen(challenge: challenge),
+      ),
+    );
+  }
+
   Widget _buildStreakDangerBanner(BuildContext context) {
     final streakDays = ref.read(progressProvider.notifier).streakDays;
     final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        HapticService.mediumImpact();
-        SoundService().playTap();
         final next = allChallenges.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
           orElse: () => allChallenges.first,
         );
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => next.type == ChallengeType.visual
-                ? EditorScreen(challenge: next)
-                : QuizScreen(challenge: next),
-          ),
-        );
+        _openStageOrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2051,7 +2100,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const WhyProgrammingScreen()),
+          smoothPageRoute(const WhyProgrammingScreen()),
         );
       },
       child: Container(
@@ -2142,19 +2191,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        HapticService.lightImpact();
-        SoundService().playTap();
         final next = allChallenges.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
           orElse: () => allChallenges.first,
         );
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => next.type == ChallengeType.visual
-                ? EditorScreen(challenge: next)
-                : QuizScreen(challenge: next),
-          ),
-        );
+        _openStageOrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2241,7 +2282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildWeeklyChallenge(
+  Widget _buildWeeklyStage(
     BuildContext context,
     ProgressNotifier notifier,
     int completedCount,
@@ -2314,7 +2355,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         weeklyClearedCount.clamp(0, 7), 7,
       ),
       (
-        '💫', '3つ星コレクター', '累計 3つ星ステージを 3 つ取ろう',
+        '💫', '今週の3つ星チャレンジ', '累計 3つ星ステージを 3 つ取ろう',
         perfectCount.clamp(0, 3), 3,
       ),
       (
@@ -2687,7 +2728,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onTap: () {
               HapticService.selectionClick();
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AchievementsScreen()),
+                smoothPageRoute(const AchievementsScreen()),
               );
             },
             child: Row(
@@ -2879,7 +2920,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _showRandomQuickQuiz(
     BuildContext context,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
     Map<String, UserProgress> progressMap,
   ) async {
     HapticService.mediumImpact();
@@ -2887,7 +2928,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // 完了済みのクイズ型チャレンジの問題を収集
     final pool = <(Question, String)>[];
     for (final c in allChallenges) {
-      if (c.type == ChallengeType.quiz &&
+      if (c.type == 'quiz' &&
           (progressMap[c.id]?.isCompleted ?? false) &&
           c.questions.isNotEmpty) {
         for (final q in c.questions) {
@@ -2984,22 +3025,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  Widget _buildDailyMission(BuildContext context, Challenge challenge) {
-    void openChallenge() {
-      if (!challenge.isFree) return;
-      HapticService.lightImpact();
-      SoundService().playTap();
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => challenge.type == ChallengeType.visual
-              ? EditorScreen(challenge: challenge)
-              : QuizScreen(challenge: challenge),
-        ),
-      );
+  Widget _buildDailyMission(BuildContext context, Stage challenge) {
+    void openStage?() {
+      _openStageOrShowPaywall(context, challenge);
     }
 
-    return GestureDetector(
-      onTap: openChallenge,
+    return TapScale(
+      onTap: openStage?,
       child: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
@@ -3037,13 +3069,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
-                          challenge.type == ChallengeType.visual ? '🧩 ビジュアル' : '❓ クイズ',
+                          challenge.type == 'visual' ? '🧩 ビジュアル' : '❓ クイズ',
                           style: const TextStyle(fontSize: 9, color: Colors.white70),
                         ),
                       ),
                       // 苦手問題がある場合に🔥バッジを表示
                       Builder(builder: (ctx) {
-                        if (challenge.type != ChallengeType.quiz) return const SizedBox.shrink();
+                        if (challenge.type != 'quiz') return const SizedBox.shrink();
                         final wrongState = ref.read(wrongAnswersProvider);
                         final hasWrong = challenge.questions.any(
                           (q) => wrongState.wrongCountFor(q.text) > 0,
@@ -3127,7 +3159,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             delay: 1200.ms,
                             color: Colors.white.withValues(alpha: 0.3),
                           ),
-                        if (challenge.type == ChallengeType.quiz &&
+                        if (challenge.type == 'quiz' &&
                             challenge.questions.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           Text(
@@ -3374,7 +3406,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ShopScreen()),
+          smoothPageRoute(const ShopScreen()),
         );
       },
       child: Container(
@@ -3481,7 +3513,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const TimeAttackScreen()),
+                    smoothPageRoute(const TimeAttackScreen()),
                   );
                 },
               ),
@@ -3497,7 +3529,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const RankingScreen()),
+                    smoothPageRoute(const RankingScreen()),
                   );
                 },
               ),
@@ -3514,7 +3546,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             HapticService.lightImpact();
             SoundService().playTap();
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+              smoothPageRoute(const FlashcardScreen()),
             );
           },
         ),
@@ -3529,9 +3561,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               HapticService.mediumImpact();
               SoundService().playTap();
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const TimeAttackScreen(initialWeakMode: true),
-                ),
+                smoothPageRoute(const TimeAttackScreen(initialWeakMode: true)),
               );
             },
           ),
@@ -3557,7 +3587,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const CharacterScreen()),
+          smoothPageRoute(const CharacterScreen()),
         );
       },
       child: Container(
@@ -3606,7 +3636,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               HapticService.lightImpact();
               SoundService().playTap();
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const DailyReviewScreen()),
+                smoothPageRoute(const DailyReviewScreen()),
               );
             },
       child: Opacity(
@@ -3714,7 +3744,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     BuildContext context,
     String level,
     Map<String, UserProgress> progressMap,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
   ) {
     final String unitTitle;
     final String unitNumber;
@@ -3737,20 +3767,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         unitIcon = '🚀';
     }
 
-    final unitChallenges = allChallenges.where((c) => c.level == level).toList();
+    final unitStages = allChallenges.where((c) => c.level == level).toList();
     final completedInUnit =
-        unitChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    final totalInUnit = unitChallenges.length;
+        unitStages.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    final totalInUnit = unitStages.length;
     final progressText =
         completedInUnit == 0 ? '未開始' : '$completedInUnit/$totalInUnit完了';
     // このユニットの苦手問題数
     final wrongState = ref.read(wrongAnswersProvider);
-    final unitWrongCount = unitChallenges
-        .where((c) => c.type == ChallengeType.quiz)
+    final unitWrongCount = unitStages
+        .where((c) => c.type == 'quiz')
         .fold<int>(0, (sum, c) => sum + c.questions.fold<int>(
           0, (s, q) => s + wrongState.wrongCountFor(q.text)));
-    final unitWrongStages = unitChallenges
-        .where((c) => c.type == ChallengeType.quiz &&
+    final unitWrongStages = unitStages
+        .where((c) => c.type == 'quiz' &&
             c.questions.any((q) => wrongState.wrongCountFor(q.text) > 0))
         .length;
 
@@ -3759,9 +3789,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => StageListScreen(initialLevel: level),
-          ),
+          smoothPageRoute(StageListScreen(initialLevel: level)),
         );
       },
       child: Container(

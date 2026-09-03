@@ -12,6 +12,7 @@ class BadgeUnlockScreen extends StatefulWidget {
   final int pointsEarned;
   final String nextGoal;
   final VoidCallback onContinue;
+  final String continueLabel;
 
   const BadgeUnlockScreen({
     super.key,
@@ -21,6 +22,7 @@ class BadgeUnlockScreen extends StatefulWidget {
     required this.pointsEarned,
     required this.nextGoal,
     required this.onContinue,
+    this.continueLabel = '次のステージへ',
   });
 
   @override
@@ -116,7 +118,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('📋 クリップボードにコピーしました'),
+        content: const Text('📋 コピーしました！LINEやメモに貼り付けてね'),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -279,8 +281,8 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            icon: const Icon(Icons.share_outlined, size: 16),
-                            label: const Text('シェア (S)'),
+                            icon: const Icon(Icons.copy, size: 16),
+                            label: const Text('コピー'),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -294,7 +296,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            child: const Text('次のステージへ'),
+                            child: Text(widget.continueLabel),
                           ),
                         ),
                       ],
@@ -386,6 +388,7 @@ void showBadgeUnlock(
   required int points,
   required String nextGoal,
   required VoidCallback onContinue,
+  String continueLabel = '次のステージへ',
 }) {
   Navigator.of(context).push(
     PageRouteBuilder(
@@ -396,6 +399,7 @@ void showBadgeUnlock(
         pointsEarned: points,
         nextGoal: nextGoal,
         onContinue: onContinue,
+        continueLabel: continueLabel,
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(opacity: animation, child: child);
@@ -429,6 +433,7 @@ void checkFavoriteMilestoneBadge(
       points: newCount * 5,
       nextGoal: nextGoal,
       onContinue: () {},
+      continueLabel: 'とじる',
     );
   });
 }

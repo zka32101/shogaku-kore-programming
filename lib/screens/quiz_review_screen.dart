@@ -370,13 +370,15 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
           _index = _localAnswers.length - 1;
         }
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ 苦手リストから削除しました'),
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      if (_localAnswers.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ 苦手リストから削除しました'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
       return KeyEventResult.handled;
     }
 
@@ -400,6 +402,12 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 最後の1問を解決した直後、pop()遷移が完了するまでの間に再ビルドが
+    // 走ることがある。_localAnswersが空の状態でインデックス/除算を
+    // 行うとクラッシュするため、安全なプレースホルダーを返す。
+    if (_localAnswers.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return Focus(
       focusNode: _focusNode,
       onKeyEvent: _handleKeyEvent,
@@ -444,6 +452,9 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    if (_localAnswers.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -588,6 +599,9 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
   }
 
   Widget _buildCard() {
+    if (_localAnswers.isEmpty) {
+      return const SizedBox.shrink();
+    }
     final answer = _current;
     final wrongState = ref.read(wrongAnswersProvider);
     final ts = wrongState.timestampFor(answer.questionText);

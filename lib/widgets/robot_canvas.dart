@@ -171,6 +171,15 @@ class _RobotPainter extends CustomPainter {
 
     canvas.drawPath(drawPath, pathPaint);
 
+    // ─── 足あと（通過済みの頂点にうっすら残す） ───────────────
+    final footPaint = Paint();
+    for (int i = 1; i < fullSegments; i++) {
+      final p = _toPx(path[i], cell, offsetX, offsetY);
+      final recency = fullSegments <= 1 ? 1.0 : i / fullSegments;
+      footPaint.color = color.withValues(alpha: 0.10 + 0.18 * recency);
+      canvas.drawCircle(p, 2.6, footPaint);
+    }
+
     // ─── ロボット現在位置 ───────────────────────────────────
     final robotSegmentIdx =
         (totalSegments * progress).clamp(0, totalSegments.toDouble()).floor();
@@ -187,12 +196,19 @@ class _RobotPainter extends CustomPainter {
       );
     }
 
-    // ロボット本体（円 + 方向矢印）
+    // 移動中は一歩ごとにぴょんと跳ねるアニメーション
+    final hopPhase = drawnSegments - drawnSegments.floorToDouble();
+    final hop = (!hasSubmitted && progress < 1.0)
+        ? math.sin(hopPhase * math.pi) * 2.5
+        : 0.0;
+    final bodyPos = Offset(robotPos.dx, robotPos.dy - hop);
+
+    // ロボット本体（円 + 顔 + 方向矢印）
     final robotBg = Paint()
       ..color = hasSubmitted
           ? (isCorrect ? kPrimaryColor : Colors.red)
           : kPrimaryColor;
-    canvas.drawCircle(robotPos, 10, robotBg);
+    canvas.drawCircle(bodyPos, 10, robotBg);
 
     // 方向矢印
     final arrowAngleRad = finalAngle * math.pi / 180.0;
@@ -201,17 +217,90 @@ class _RobotPainter extends CustomPainter {
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
     final arrowEnd = Offset(
-      robotPos.dx + math.cos(arrowAngleRad) * 7,
-      robotPos.dy + math.sin(arrowAngleRad) * 7,
+      bodyPos.dx + math.cos(arrowAngleRad) * 7,
+      bodyPos.dy + math.sin(arrowAngleRad) * 7,
     );
-    canvas.drawLine(robotPos, arrowEnd, arrowPaint);
+    canvas.drawLine(bodyPos, arrowEnd, arrowPaint);
+
+    // かわいい顔（アンテナ＋目）
+    _drawRobotFace(canvas, bodyPos, hasSubmitted, isCorrect);
 
     // ─── ゴールマーカー（最終位置） ─────────────────────────
     if (progress >= 1.0) {
       final goalPx = _toPx(path.last, cell, offsetX, offsetY);
       if (hasSubmitted && isCorrect) {
         _drawStarAt(canvas, goalPx, 12, Colors.amber);
+        _drawSparkles(canvas, goalPx);
       }
+    }
+  }
+
+  // ─── ロボットの顔 ───────────────────────────────────────────
+  void _drawRobotFace(Canvas canvas, Offset pos, bool submitted, bool correct) {
+    // アンテナ
+    canvas.drawLine(
+      Offset(pos.dx, pos.dy - 10),
+      Offset(pos.dx, pos.dy - 14),
+      Paint()
+        ..color = Colors.white
+        ..strokeWidth = 1.5,
+    );
+    canvas.drawCircle(Offset(pos.dx, pos.dy - 14), 1.5, Paint()..color = Colors.white);
+
+    final leftEye = pos + const Offset(-3, -1);
+    final rightEye = pos + const Offset(3, -1);
+
+    if (submitted && !correct) {
+      // 残念そうな ×× の目
+      _drawX(canvas, leftEye, 2.0);
+      _drawX(canvas, rightEye, 2.0);
+      return;
+    }
+
+    if (submitted && correct) {
+      // うれしそうな ^ ^ の目
+      _drawHappyEye(canvas, leftEye);
+      _drawHappyEye(canvas, rightEye);
+      return;
+    }
+
+    // 通常時: まん丸の目
+    final eyePaint = Paint()..color = Colors.white;
+    canvas.drawCircle(leftEye, 1.6, eyePaint);
+    canvas.drawCircle(rightEye, 1.6, eyePaint);
+  }
+
+  void _drawX(Canvas canvas, Offset center, double r) {
+    final p = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(center + Offset(-r, -r), center + Offset(r, r), p);
+    canvas.drawLine(center + Offset(-r, r), center + Offset(r, -r), p);
+  }
+
+  void _drawHappyEye(Canvas canvas, Offset center) {
+    final p = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    final rect = Rect.fromCenter(center: center, width: 4, height: 4);
+    // 上向きの弧 (^) を描画
+    canvas.drawArc(rect, math.pi, math.pi, false, p);
+  }
+
+  // ─── 正解時のキラキラ演出 ────────────────────────────────────
+  void _drawSparkles(Canvas canvas, Offset center) {
+    const offsets = [
+      Offset(-18, -12),
+      Offset(18, -10),
+      Offset(-14, 14),
+      Offset(16, 14),
+      Offset(2, -20),
+    ];
+    for (final o in offsets) {
+      _drawStarAt(canvas, center + o, 3, Colors.amber.withValues(alpha: 0.85));
     }
   }
 

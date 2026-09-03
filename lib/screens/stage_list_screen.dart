@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/favorites_provider.dart';
@@ -18,6 +19,7 @@ import 'paywall_screen.dart';
 import 'flashcard_screen.dart';
 import 'badge_unlock_screen.dart';
 import '../widgets/shortcut_help.dart';
+import '../widgets/tap_scale.dart';
 
 class StageListScreen extends ConsumerStatefulWidget {
   final String? initialLevel;
@@ -99,7 +101,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     if (key == LogicalKeyboardKey.keyR) {
       HapticService.lightImpact();
       SoundService().playTap();
-      _openRandomChallenge(context);
+      _openRandomStage(context);
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.keyF) {
@@ -115,15 +117,15 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     if (key == LogicalKeyboardKey.slash &&
         !HardwareKeyboard.instance.isShiftPressed) {
       HapticService.lightImpact();
-      final allChallenges = ref.read(allChallengesProvider);
+      final allStages = ref.read(allChallengesProvider);
       final progressMap = ref.read(progressProvider);
       showSearch(
         context: context,
         delegate: _StageSearchDelegate(
-          allChallenges: allChallenges,
+          allStages: allStages,
           progressMap: progressMap,
           favoriteIds: ref.read(favoritesProvider).favoriteIds,
-          wrongAnswerStageIds: _computeWrongStageIds(allChallenges),
+          wrongAnswerStageIds: _computeWrongStageIds(allStages),
         ),
       );
       return KeyEventResult.handled;
@@ -178,7 +180,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
           onPressed: () {
             HapticService.lightImpact();
             SoundService().playTap();
-            _openRandomChallenge(context);
+            _openRandomStage(context);
           },
           backgroundColor: kPrimaryColor,
           icon: const Text('🎲', style: TextStyle(fontSize: 18)),
@@ -194,20 +196,30 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     );    // closes Focus return
   }
 
-  void _openRandomChallenge(BuildContext context) {
+  void _openRandomStage(BuildContext context) {
     HapticService.mediumImpact();
-    final allChallenges = ref.read(allChallengesProvider);
+    final allStages = ref.read(allStagesProvider);
     final progressMap = ref.read(progressProvider);
 
+    // 現在開いているタブ（初級/中級/上級）のレベルに絞り込む
+    const levels = [
+      StageLevel.beginner,
+      StageLevel.intermediate,
+      StageLevel.advanced,
+    ];
+    final currentLevel = levels[_tabController.index];
+    final levelStages =
+        allStages.where((c) => c.level == currentLevel).toList();
+
     // 未完了の無料チャレンジから選ぶ
-    final pool = allChallenges
+    final pool = levelStages
         .where((c) => c.isFree && !(progressMap[c.id]?.isCompleted ?? false))
         .toList();
 
-    // 未完了がなければ全無料から選ぶ
+    // 未完了がなければ現在レベルの全無料から選ぶ
     final source = pool.isNotEmpty
         ? pool
-        : allChallenges.where((c) => c.isFree).toList();
+        : levelStages.where((c) => c.isFree).toList();
 
     if (source.isEmpty) return;
     final pick = source[math.Random().nextInt(source.length)];
@@ -219,7 +231,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
   }
 
   /// 苦手問題を持つステージIDのセットを返す（検索デリゲートへの受け渡し用）
-  Set<String> _computeWrongStageIds(List<Challenge> challenges) {
+  Set<String> _computeWrongStageIds(List<Stage> challenges) {
     final wrongTexts =
         ref.read(wrongAnswersProvider).answers.map((a) => a.questionText).toSet();
     return challenges
@@ -230,7 +242,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
 
   void _showRandomSheet(
     BuildContext context,
-    Challenge challenge,
+    Stage challenge,
     int starsEarned,
     bool isCompleted,
     DateTime? completedAt,
@@ -241,14 +253,14 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (ctx) => _ChallengeInfoSheet(
+      builder: (ctx) => _StageInfoSheet(
         challenge: challenge,
         starsEarned: starsEarned,
         isCompleted: isCompleted,
         completedAt: completedAt,
         onStart: () {
           Navigator.pop(ctx);
-          if (challenge.type == ChallengeType.quiz) {
+          if (challenge.type == 'quiz') {
             Navigator.of(context).push(
               MaterialPageRoute(
                   builder: (_) => QuizScreen(challenge: challenge)),
@@ -276,16 +288,16 @@ class _PathHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final progressNotifier = ref.read(progressProvider.notifier);
     final progressMap = ref.watch(progressProvider);
-    final allChallenges = ref.watch(allChallengesProvider);
+    final allStages = ref.watch(allChallengesProvider);
     final completedCount = progressNotifier.completedCount;
     final totalStars = progressNotifier.totalStarsEarned;
     final level = progressNotifier.currentLevel;
 
-    int unitDone(String lvl) => allChallenges
+    int unitDone(String lvl) => allStages
         .where((c) => c.level == lvl && (progressMap[c.id]?.isCompleted ?? false))
         .length;
     int unitTotal(String lvl) =>
-        allChallenges.where((c) => c.level == lvl).length;
+        allStages.where((c) => c.level == lvl).length;
 
     return Container(
       decoration: const BoxDecoration(
@@ -330,12 +342,12 @@ class _PathHeader extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.search, color: Colors.white),
                 onPressed: () {
-                  final allChallenges = ref.read(allChallengesProvider);
+                  final allStages = ref.read(allChallengesProvider);
                   final progressMap = ref.read(progressProvider);
                   showSearch(
                     context: context,
                     delegate: _StageSearchDelegate(
-                      allChallenges: allChallenges,
+                      allStages: allStages,
                       progressMap: progressMap,
                       favoriteIds: ref.read(favoritesProvider).favoriteIds,
                     ),
@@ -451,16 +463,16 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Challenge> allChallenges;
+    final List<Stage> allStages;
     switch (widget.level) {
       case StageLevel.beginner:
-        allChallenges = ref.watch(beginnerChallengesProvider);
+        allStages = ref.watch(beginnerChallengesProvider);
         break;
       case StageLevel.intermediate:
-        allChallenges = ref.watch(intermediateChallengesProvider);
+        allStages = ref.watch(intermediateChallengesProvider);
         break;
       default:
-        allChallenges = ref.watch(advancedChallengesProvider);
+        allStages = ref.watch(advancedChallengesProvider);
     }
 
     final progressMap = ref.watch(progressProvider);
@@ -475,7 +487,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     final wrongTexts = wrongAnswers.map((a) => a.questionText).toSet();
     final wrongStageIds = wrongTexts.isEmpty
         ? const <String>{}
-        : allChallenges
+        : allStages
             .where((c) => c.questions.any((q) => wrongTexts.contains(q.text)))
             .map((c) => c.id)
             .toSet();
@@ -483,35 +495,35 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     // フィルター適用
     final challenges = switch (_filter) {
       _CompletionFilter.incomplete =>
-        allChallenges.where((c) => !(progressMap[c.id]?.isCompleted ?? false)).toList(),
+        allStages.where((c) => !(progressMap[c.id]?.isCompleted ?? false)).toList(),
       _CompletionFilter.completed =>
-        allChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).toList(),
+        allStages.where((c) => progressMap[c.id]?.isCompleted ?? false).toList(),
       _CompletionFilter.notPerfect =>
-        allChallenges.where((c) => (progressMap[c.id]?.starsEarned ?? 0) < 3).toList(),
+        allStages.where((c) => (progressMap[c.id]?.starsEarned ?? 0) < 3).toList(),
       _CompletionFilter.favorites =>
-        allChallenges.where((c) => favorites.isFavorite(c.id)).toList(),
+        allStages.where((c) => favorites.isFavorite(c.id)).toList(),
       _CompletionFilter.wrongAnswers =>
-        allChallenges.where((c) => wrongStageIds.contains(c.id)).toList(),
-      _CompletionFilter.all => allChallenges,
+        allStages.where((c) => wrongStageIds.contains(c.id)).toList(),
+      _CompletionFilter.all => allStages,
     };
 
     // 3つ星未取得のステージ数
-    final notPerfectCount = allChallenges
+    final notPerfectCount = allStages
         .where((c) => (progressMap[c.id]?.starsEarned ?? 0) < 3)
         .length;
 
     // お気に入りステージ数（このユニット内）
-    final favCount = allChallenges
+    final favCount = allStages
         .where((c) => favorites.isFavorite(c.id))
         .length;
 
-    // 現在のステージ（最初の未完了）
-    final currentIndex = allChallenges.indexWhere(
-      (c) => !(progressMap[c.id]?.isCompleted ?? false),
+    // 現在のステージ（最初の未完了かつ未ロックのステージ）
+    final currentIndex = allStages.indexWhere(
+      (c) => !(progressMap[c.id]?.isCompleted ?? false) && c.isFree,
     );
 
-    final completedInLevel = allChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    final totalInLevel = allChallenges.length;
+    final completedInLevel = allStages.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    final totalInLevel = allStages.length;
 
     return Column(
       children: [
@@ -519,74 +531,99 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
         Container(
           color: context.cardBg,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _FilterChip(
-                  label: '全て ($totalInLevel)',
-                  isSelected: _filter == _CompletionFilter.all,
-                  onTap: () {
-                    HapticService.selectionClick();
-                    setState(() => _filter = _CompletionFilter.all);
-                  },
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _FilterChip(
+                      label: '全て ($totalInLevel)',
+                      isSelected: _filter == _CompletionFilter.all,
+                      onTap: () {
+                        HapticService.selectionClick();
+                        setState(() => _filter = _CompletionFilter.all);
+                      },
+                    ),
+                    const SizedBox(width: 6),
+                    _FilterChip(
+                      label: '未完了 (${totalInLevel - completedInLevel})',
+                      isSelected: _filter == _CompletionFilter.incomplete,
+                      color: const Color(0xFFE67E22),
+                      onTap: () {
+                        HapticService.selectionClick();
+                        setState(() => _filter = _CompletionFilter.incomplete);
+                      },
+                    ),
+                    const SizedBox(width: 6),
+                    _FilterChip(
+                      label: 'クリア ($completedInLevel)',
+                      isSelected: _filter == _CompletionFilter.completed,
+                      color: const Color(0xFF27AE60),
+                      onTap: () {
+                        HapticService.selectionClick();
+                        setState(() => _filter = _CompletionFilter.completed);
+                      },
+                    ),
+                    const SizedBox(width: 6),
+                    _FilterChip(
+                      label: '★3未満 ($notPerfectCount)',
+                      isSelected: _filter == _CompletionFilter.notPerfect,
+                      color: const Color(0xFFF39C12),
+                      onTap: () {
+                        HapticService.selectionClick();
+                        setState(() => _filter = _CompletionFilter.notPerfect);
+                      },
+                    ),
+                    if (favCount > 0) ...[
+                      const SizedBox(width: 6),
+                      _FilterChip(
+                        label: '⭐ お気に入り ($favCount)',
+                        isSelected: _filter == _CompletionFilter.favorites,
+                        color: Colors.pink.shade400,
+                        onTap: () {
+                          HapticService.selectionClick();
+                          setState(() => _filter = _CompletionFilter.favorites);
+                        },
+                      ),
+                    ],
+                    if (wrongStageIds.isNotEmpty) ...[
+                      const SizedBox(width: 6),
+                      _FilterChip(
+                        label: '🔥 苦手 (${wrongStageIds.length})',
+                        isSelected: _filter == _CompletionFilter.wrongAnswers,
+                        color: const Color(0xFFFF6B35),
+                        onTap: () {
+                          HapticService.selectionClick();
+                          setState(() => _filter = _CompletionFilter.wrongAnswers);
+                        },
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(width: 6),
-                _FilterChip(
-                  label: '未完了 (${totalInLevel - completedInLevel})',
-                  isSelected: _filter == _CompletionFilter.incomplete,
-                  color: const Color(0xFFE67E22),
-                  onTap: () {
-                    HapticService.selectionClick();
-                    setState(() => _filter = _CompletionFilter.incomplete);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _FilterChip(
-                  label: 'クリア ($completedInLevel)',
-                  isSelected: _filter == _CompletionFilter.completed,
-                  color: const Color(0xFF27AE60),
-                  onTap: () {
-                    HapticService.selectionClick();
-                    setState(() => _filter = _CompletionFilter.completed);
-                  },
-                ),
-                const SizedBox(width: 6),
-                _FilterChip(
-                  label: '⭐未満 ($notPerfectCount)',
-                  isSelected: _filter == _CompletionFilter.notPerfect,
-                  color: const Color(0xFFF39C12),
-                  onTap: () {
-                    HapticService.selectionClick();
-                    setState(() => _filter = _CompletionFilter.notPerfect);
-                  },
-                ),
-                if (favCount > 0) ...[
-                  const SizedBox(width: 6),
-                  _FilterChip(
-                    label: '⭐ お気に入り ($favCount)',
-                    isSelected: _filter == _CompletionFilter.favorites,
-                    color: const Color(0xFFE67E22),
-                    onTap: () {
-                      HapticService.selectionClick();
-                      setState(() => _filter = _CompletionFilter.favorites);
-                    },
+              ),
+              // 右端フェード：横スクロールできることを示すヒント
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 20,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          context.cardBg.withValues(alpha: 0),
+                          context.cardBg,
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-                if (wrongStageIds.isNotEmpty) ...[
-                  const SizedBox(width: 6),
-                  _FilterChip(
-                    label: '🔥 苦手 (${wrongStageIds.length})',
-                    isSelected: _filter == _CompletionFilter.wrongAnswers,
-                    color: const Color(0xFFFF6B35),
-                    onTap: () {
-                      HapticService.selectionClick();
-                      setState(() => _filter = _CompletionFilter.wrongAnswers);
-                    },
-                  ),
-                ],
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
         ),
         _LevelProgressBanner(
@@ -628,33 +665,41 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
           )
         else
           Expanded(
-            child: _StagePathView(
-              challenges: challenges,
-              progressMap: progressMap,
-              currentIndex: _filter == _CompletionFilter.all ? currentIndex : -1,
-              level: widget.level,
-              favoriteIds: favorites.favoriteIds,
-              wrongAnswerStageIds: wrongStageIds,
-              onFavoriteToggle: (id) async {
-                final (wasAdded, newCount) = await ref.read(favoritesProvider.notifier).toggle(id);
-                if (!mounted) return;
-                checkFavoriteMilestoneBadge(context, wasAdded: wasAdded, newCount: newCount); // ignore: use_build_context_synchronously
+            child: RefreshIndicator(
+              color: kPrimaryColor,
+              onRefresh: () async {
+                ref.invalidate(progressProvider);
+                ref.invalidate(allChallengesProvider);
+                await Future.delayed(const Duration(milliseconds: 400));
               },
-              onStageTap: (ctx, challenge) {
-                final stars = progressMap[challenge.id]?.starsEarned ?? 0;
-                final isCompleted = progressMap[challenge.id]?.isCompleted ?? false;
-                final completedAt = progressMap[challenge.id]?.completedAt;
-                _openChallenge(ctx, challenge, stars, isCompleted, completedAt);
-              },
+              child: _StagePathView(
+                challenges: challenges,
+                progressMap: progressMap,
+                currentIndex: _filter == _CompletionFilter.all ? currentIndex : -1,
+                level: widget.level,
+                favoriteIds: favorites.favoriteIds,
+                wrongAnswerStageIds: wrongStageIds,
+                onFavoriteToggle: (id) async {
+                  final (wasAdded, newCount) = await ref.read(favoritesProvider.notifier).toggle(id);
+                  if (!mounted) return;
+                  checkFavoriteMilestoneBadge(context, wasAdded: wasAdded, newCount: newCount); // ignore: use_build_context_synchronously
+                },
+                onStageTap: (ctx, challenge) {
+                  final stars = progressMap[challenge.id]?.starsEarned ?? 0;
+                  final isCompleted = progressMap[challenge.id]?.isCompleted ?? false;
+                  final completedAt = progressMap[challenge.id]?.completedAt;
+                  _openStage(ctx, challenge, stars, isCompleted, completedAt);
+                },
+              ),
             ),
           ),
       ],
     );
   }
 
-  void _openChallenge(
+  void _openStage(
     BuildContext context,
-    Challenge challenge,
+    Stage challenge,
     int starsEarned,
     bool isCompleted,
     DateTime? completedAt,
@@ -665,12 +710,12 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
       _showPremiumModal(context, challenge);
       return;
     }
-    _showChallengeInfoSheet(context, challenge, starsEarned, isCompleted, completedAt);
+    _showStageInfoSheet(context, challenge, starsEarned, isCompleted, completedAt);
   }
 
-  void _showChallengeInfoSheet(
+  void _showStageInfoSheet(
     BuildContext context,
-    Challenge challenge,
+    Stage challenge,
     int starsEarned,
     bool isCompleted,
     DateTime? completedAt,
@@ -681,14 +726,14 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (ctx) => _ChallengeInfoSheet(
+      builder: (ctx) => _StageInfoSheet(
         challenge: challenge,
         starsEarned: starsEarned,
         isCompleted: isCompleted,
         completedAt: completedAt,
         onStart: () {
           Navigator.pop(ctx);
-          if (challenge.type == ChallengeType.quiz) {
+          if (challenge.type == 'quiz') {
             Navigator.of(context).push(
               MaterialPageRoute(
                   builder: (_) => QuizScreen(challenge: challenge)),
@@ -704,7 +749,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     );
   }
 
-  void _showPremiumModal(BuildContext context, Challenge challenge) {
+  void _showPremiumModal(BuildContext context, Stage challenge) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -727,14 +772,14 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
 // ─── パスビュー（メイン実装） ──────────────────────────────────────────────────
 
 class _StagePathView extends StatelessWidget {
-  final List<Challenge> challenges;
+  final List<Stage> challenges;
   final Map<String, UserProgress> progressMap;
   final int currentIndex;
   final String level;
   final Set<String> favoriteIds;
   final Set<String> wrongAnswerStageIds;
   final void Function(String id) onFavoriteToggle;
-  final void Function(BuildContext, Challenge) onStageTap;
+  final void Function(BuildContext, Stage?) onStageTap;
 
   const _StagePathView({
     required this.challenges,
@@ -776,7 +821,9 @@ class _StagePathView extends StatelessWidget {
       final totalHeight = challenges.length * _rowHeight + _topPadding * 2 + 60;
 
       return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         padding: const EdgeInsets.only(top: 8, bottom: 32),
         child: SizedBox(
           width: w,
@@ -851,7 +898,7 @@ class _StagePathView extends StatelessWidget {
 // ─── CustomPainter: パス線 ─────────────────────────────────────────────────
 
 class _PathPainter extends CustomPainter {
-  final List<Challenge> challenges;
+  final List<Stage> challenges;
   final Map<String, UserProgress> progressMap;
   final double leftX;
   final double rightX;
@@ -961,7 +1008,7 @@ class _PathPainter extends CustomPainter {
 // ─── ステージノード ────────────────────────────────────────────────────────────
 
 class _StageNode extends StatefulWidget {
-  final Challenge challenge;
+  final Stage challenge;
   final bool isCompleted;
   final bool isCurrent;
   final bool isLocked;
@@ -1226,15 +1273,16 @@ class _StageNodeState extends State<_StageNode>
       border = context.isDark ? Colors.white12 : Colors.grey[300]!;
     }
 
-    final typeEmoji = widget.challenge.type == ChallengeType.quiz ? '🐍' : '🧩';
+    final typeEmoji = widget.challenge.type == 'quiz' ? '🐍' : '🧩';
 
-    Widget circle = GestureDetector(
+    Widget circle = TapScale(
       onTap: widget.onTap,
-      onLongPress: !widget.isLocked ? () {
-        HapticService.mediumImpact();
-        _showContextMenu(context);
-      } : null,
-      child: Stack(
+      child: GestureDetector(
+        onLongPress: !widget.isLocked ? () {
+          HapticService.mediumImpact();
+          _showContextMenu(context);
+        } : null,
+        child: Stack(
         clipBehavior: Clip.none,
         children: [
           Container(
@@ -1302,7 +1350,7 @@ class _StageNodeState extends State<_StageNode>
                 height: 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.challenge.type == ChallengeType.quiz
+                  color: widget.challenge.type == 'quiz'
                       ? const Color(0xFF8E44AD)
                       : kPrimaryColor,
                   border: Border.all(color: context.cardBg, width: 1.5),
@@ -1349,6 +1397,7 @@ class _StageNodeState extends State<_StageNode>
               ),
             ),
         ],
+        ),
       ),
     );
 
@@ -1481,14 +1530,14 @@ class _StageNodeState extends State<_StageNode>
 
 // ─── チャレンジ情報シート ──────────────────────────────────────────────────────
 
-class _ChallengeInfoSheet extends ConsumerWidget {
-  final Challenge challenge;
+class _StageInfoSheet extends ConsumerWidget {
+  final Stage challenge;
   final int starsEarned;
   final bool isCompleted;
   final DateTime? completedAt;
   final VoidCallback onStart;
 
-  const _ChallengeInfoSheet({
+  const _StageInfoSheet({
     required this.challenge,
     required this.starsEarned,
     required this.isCompleted,
@@ -1498,7 +1547,7 @@ class _ChallengeInfoSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isVisual = challenge.type == ChallengeType.visual;
+    final isVisual = challenge.type == 'visual';
     final typeColor = isVisual ? kPrimaryColor : const Color(0xFF8E44AD);
     final typeLabel = isVisual ? '🧩 ブロックプログラミング' : '🐍 Pythonクイズ';
     final isFavorite = ref.watch(favoritesProvider).isFavorite(challenge.id);
@@ -1802,7 +1851,7 @@ class _ChallengeInfoSheet extends ConsumerWidget {
 // ─── プレミアムゲートシート ────────────────────────────────────────────────────
 
 class _PremiumGateSheet extends StatelessWidget {
-  final Challenge challenge;
+  final Stage challenge;
   final VoidCallback onUpgrade;
 
   const _PremiumGateSheet({
@@ -2260,14 +2309,14 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _StageSearchDelegate extends SearchDelegate<Challenge?> {
-  final List<Challenge> allChallenges;
+class _StageSearchDelegate extends SearchDelegate<Stage?> {
+  final List<Stage> allStages;
   final Map<String, UserProgress> progressMap;
   final Set<String> favoriteIds;
   final Set<String> wrongAnswerStageIds;
 
   _StageSearchDelegate({
-    required this.allChallenges,
+    required this.allStages,
     required this.progressMap,
     this.favoriteIds = const {},
     this.wrongAnswerStageIds = const {},
@@ -2306,12 +2355,12 @@ class _StageSearchDelegate extends SearchDelegate<Challenge?> {
     onPressed: () => close(context, null),
   );
 
-  List<Challenge> get _filtered {
-    if (query.isEmpty) return allChallenges;
+  List<Stage> get _filtered {
+    if (query.isEmpty) return allStages;
     final q = query.toLowerCase().trim();
     // Allow searching by stage number (e.g. "1", "10")
     final stageNum = int.tryParse(q);
-    return allChallenges.where((c) =>
+    return allStages.where((c) =>
       c.title.toLowerCase().contains(q) ||
       c.description.toLowerCase().contains(q) ||
       (stageNum != null && c.stageNumber == stageNum)
@@ -2379,7 +2428,7 @@ class _StageSearchDelegate extends SearchDelegate<Challenge?> {
                 );
                 return;
               }
-              if (c.type == ChallengeType.quiz) {
+              if (c.type == 'quiz') {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => QuizScreen(challenge: c)),
                 );
@@ -2422,18 +2471,18 @@ class _StageSearchDelegate extends SearchDelegate<Challenge?> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: (c.type == ChallengeType.quiz
+                                color: (c.type == 'quiz'
                                         ? const Color(0xFF8E44AD)
                                         : kPrimaryColor)
                                     .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                c.type == ChallengeType.quiz ? '🐍 クイズ' : '🧩 ブロック',
+                                c.type == 'quiz' ? '🐍 クイズ' : '🧩 ブロック',
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: c.type == ChallengeType.quiz
+                                  color: c.type == 'quiz'
                                       ? const Color(0xFF8E44AD)
                                       : kPrimaryColor,
                                 ),

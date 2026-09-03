@@ -33,7 +33,30 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
           ),
         ],
       ),
-      body: filteredWorks.isEmpty
+      body: galleryState.error != null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    '😥 作品を読み込めませんでした',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'もう一度試してみてね',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () => ref.invalidate(galleryProvider),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('もう一度読み込む'),
+                  ),
+                ],
+              ),
+            )
+          : filteredWorks.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -97,8 +120,12 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.memory(
-                              Uri.dataFromString(work.resultImage).data!.contentAsBytes(),
+                              Uri.parse(work.resultImage).data!.contentAsBytes(),
                               fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => const Icon(
+                                Icons.broken_image,
+                                color: Colors.grey,
+                              ),
                             ),
                           )
                         : const Center(
@@ -152,10 +179,14 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                           topRight: Radius.circular(12),
                         ),
                         child: Image.memory(
-                          Uri.dataFromString(work.resultImage)
+                          Uri.parse(work.resultImage)
                               .data!
                               .contentAsBytes(),
                           fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => const Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                          ),
                         ),
                       )
                     : const Center(
