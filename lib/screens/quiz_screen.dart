@@ -6,7 +6,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/constants.dart';
 import '../config/theme.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
@@ -39,7 +38,7 @@ class QuizScreen extends ConsumerStatefulWidget {
 class _QuizScreenState extends ConsumerState<QuizScreen>
     with SingleTickerProviderStateMixin {
   List<Question> get _questions =>
-      widget.overrideQuestions ?? widget.challenge.questions;
+      widget.overrideQuestions ?? widget.challenge.questions ?? [];
 
   int _currentQuestionIndex = 0;
   int? _selectedOptionIndex;

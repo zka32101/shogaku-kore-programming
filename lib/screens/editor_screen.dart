@@ -7,7 +7,6 @@ import 'package:confetti/confetti.dart';
 import 'dart:math' as math;
 import '../config/constants.dart' as constants;
 import '../config/theme.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/gallery_provider.dart';
 import '../models/block_model.dart';
