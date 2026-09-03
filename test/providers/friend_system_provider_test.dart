@@ -41,7 +41,7 @@ void main() {
       expect(state.collection!.statistics.totalFriends, 0);
 
       // Reinitialize with new notifier to test persistence
-      final notifier2 = FriendSystemNotifier();
+      final _notifier2 = FriendSystemNotifier();
       final container2 = ProviderContainer();
       await container2.read(friendSystemProvider.notifier).initializeFriendSystem('test_user');
 
@@ -79,7 +79,7 @@ void main() {
 
       await notifier.sendFriendRequest('test_user', 'friend1', 'testuser');
       var state = container.read(friendSystemProvider);
-      final initialCount = state.collection!.outgoingRequests.length;
+      final _initialCount = state.collection!.outgoingRequests.length;
 
       await notifier.sendFriendRequest('test_user', 'friend1', 'testuser');
       state = container.read(friendSystemProvider);
@@ -101,7 +101,7 @@ void main() {
       );
 
       // Manually add request to collection
-      final updatedRequests = [...state.collection!.incomingRequests, request];
+      final _updatedRequests = [...state.collection!.incomingRequests, request];
       // Simulate having an incoming request by creating it manually
       // This is a simplified test - in reality we'd need to test the full flow
 
@@ -185,7 +185,7 @@ void main() {
 
       var state = container.read(friendSystemProvider);
       final now = DateTime.now();
-      final friendship = Friendship(
+      final _friendship = Friendship(
         friendshipId: 'fs1',
         userId: 'test_user',
         friendId: 'friend1',

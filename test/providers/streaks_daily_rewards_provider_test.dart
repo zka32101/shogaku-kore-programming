@@ -27,7 +27,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      final state = container.read(streakProvider);
+      final _state = container.read(streakProvider);
       expect(state.collection, isNotNull);
       expect(state.collection!.userId, 'test_user');
       expect(state.collection!.rewardSchedule.isNotEmpty, true);
@@ -37,7 +37,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      final state = container.read(streakProvider);
+      final _state = container.read(streakProvider);
       expect(state.collection!.rewardSchedule.length, 30);
     });
 
@@ -45,11 +45,11 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       expect(state.collection!.currentStreak.currentStreak, 0);
 
       // Reinitialize should load from storage
-      final notifier2 = StreakNotifier();
+      final _notifier2 = StreakNotifier();
       final container2 = ProviderContainer();
       await container2.read(streakProvider.notifier).initializeStreaks('test_user');
 
@@ -61,7 +61,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       expect(state.collection!.currentStreak.currentStreak, 0);
 
       await notifier.loginUser('test_user');
@@ -74,7 +74,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       expect(state.collection!.loginHistory.isEmpty, true);
 
       await notifier.loginUser('test_user');
@@ -89,7 +89,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       final firstCount = state.collection!.loginHistory.length;
 
       await notifier.loginUser('test_user');
@@ -102,7 +102,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       final login = state.collection!.loginHistory[0];
       expect(login.logoutDate, isNull);
 
@@ -117,7 +117,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       final dayOfMonth = DateTime.now().day;
 
       await notifier.claimDailyReward('test_user', dayOfMonth);
@@ -132,7 +132,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       expect(state.collection!.statistics.totalCoinsFromStreaks, 0);
 
       final dayOfMonth = DateTime.now().day;
@@ -147,7 +147,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       expect(state.collection!.currentStreak.currentStreak, 1);
 
       await notifier.breakStreak('test_user');
@@ -160,7 +160,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       expect(state.collection!.currentStreak.timesStreakBroken, 0);
 
       await notifier.breakStreak('test_user');
@@ -174,12 +174,12 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       // Simulate being at risk by setting last login to yesterday
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       final currentStreak = state.collection!.currentStreak;
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
 
       // We can't directly modify, so we'll check that protectStreak only works when at risk
-      final atRiskStreak = UserStreak(
+      final _atRiskStreak = UserStreak(
         streakId: currentStreak.streakId,
         userId: 'test_user',
         currentStreak: 5,
@@ -199,7 +199,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('persist_test');
 
-      var state = container.read(streakProvider);
+      var _state = container.read(streakProvider);
       await notifier.loginUser('persist_test');
 
       final prefs = await SharedPreferences.getInstance();

@@ -229,7 +229,7 @@ void main() {
       final notifier = container.read(multiplayerProvider.notifier);
       await notifier.initializeUserProfile('player1');
 
-      final friendProfile = MultiplayerUserProfile(
+      final _friendProfile = MultiplayerUserProfile(
         userId: 'friend1',
         username: 'friend1',
         displayName: 'Friend 1',
@@ -246,7 +246,7 @@ void main() {
       await notifier.sendFriendRequest(friendProfile);
 
       // Simulate receiving the friend request
-      final stateAfterRequest = container.read(multiplayerProvider);
+      final _stateAfterRequest = container.read(multiplayerProvider);
       // In a real app, friend requests would be received from server
       // For testing, we manually add to friendRequests
     });
@@ -260,7 +260,7 @@ void main() {
       await notifier.initializeUserProfile('player1');
 
       // Setup: add a friend first
-      final friendProfile = MultiplayerUserProfile(
+      final _friendProfile = MultiplayerUserProfile(
         userId: 'friend1',
         username: 'friend1',
         displayName: 'Friend 1',
@@ -352,7 +352,7 @@ void main() {
 
       await newNotifier.loadLocalData('testUser123');
 
-      final newState = newContainer.read(multiplayerProvider);
+      final _newState = newContainer.read(multiplayerProvider);
       // Data should be loaded if it was saved
     });
 
