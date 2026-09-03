@@ -1362,7 +1362,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }).toList();
 
-    final challenge = Stage?(
+    final challenge = Stage(
       id: 'wrong_answers_quiz',
       stageNumber: 0,
       title: '苦手問題クイズ',

@@ -437,10 +437,10 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     final key = event.logicalKey;
     // Enter/Space → 次のステージ（あれば）、なければリトライ
     if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.space) {
-      if (widget.nextStage? != null && widget.stars >= 1) {
+      if (widget.nextStage != null && widget.stars >= 1) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => QuizScreen(challenge: widget.nextStage?!),
+            builder: (_) => QuizScreen(challenge: widget.nextStage!),
           ),
         );
       } else {
@@ -448,13 +448,13 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
       }
       return KeyEventResult.handled;
     }
-    // N → 次のステージ（正解かつ nextStage? がある場合）
+    // N → 次のステージ（正解かつ nextStage がある場合）
     if (key == LogicalKeyboardKey.keyN) {
-      if (widget.nextStage? != null && widget.stars >= 1) {
+      if (widget.nextStage != null && widget.stars >= 1) {
         HapticService.lightImpact();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => QuizScreen(challenge: widget.nextStage?!),
+            builder: (_) => QuizScreen(challenge: widget.nextStage!),
           ),
         );
         return KeyEventResult.handled;
