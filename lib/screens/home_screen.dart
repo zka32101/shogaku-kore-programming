@@ -2384,8 +2384,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (isDone && !notifier.isHomeWeeklyBonusAwardedThisWeek) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        final awarded = notifier.awardHomeWeeklyBonus();
-        if (awarded) {
+        notifier.awardHomeWeeklyBonus().then((awarded) {
+          if (!mounted || !awarded) return;
           HapticService.mediumImpact();
           SoundService().playComplete();
           Future.delayed(const Duration(milliseconds: 600), () {
@@ -2400,7 +2400,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onContinue: () {},
             );
           });
-        }
+        });
       });
     }
 

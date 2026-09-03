@@ -2174,9 +2174,7 @@ class _StatsTab extends ConsumerWidget {
     final masteredCount = ref.watch(flashcardProvider).masteredIds.length;
     final totalFlashcards = kFlashcards.length;
     final wrongState = ref.watch(wrongAnswersProvider);
-    final totalSeconds = ref.watch(
-      progressProvider.select((_) => ref.read(progressProvider.notifier).totalLearningSeconds),
-    );
+    final totalSeconds = ref.watch(progressProvider.notifier).totalLearningSeconds;
     final totalMinutes = totalSeconds ~/ 60;
     final maxBar = weeklyData.isEmpty
         ? 1

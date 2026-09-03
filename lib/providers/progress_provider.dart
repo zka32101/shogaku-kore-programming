@@ -141,16 +141,15 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     return _homeWeeklyBonusWeek == _currentWeekIso();
   }
 
-  /// ホーム週次チャレンジボーナス（20pt）を今週1回だけ付与する（同期的にフラグ設定）
-  bool awardHomeWeeklyBonus() {
+  /// ホーム週次チャレンジボーナス（20pt）を今週1回だけ付与する（非同期で完全に保持される）
+  Future<bool> awardHomeWeeklyBonus() async {
     final currentWeek = _currentWeekIso();
     if (_homeWeeklyBonusWeek == currentWeek) return false;
     _homeWeeklyBonusWeek = currentWeek;
     // 非同期で永続化＋ポイント付与
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setString(_homeWeeklyBonusKey, currentWeek);
-    });
-    addBonusPoints(20);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_homeWeeklyBonusKey, currentWeek);
+    await addBonusPoints(20);
     return true;
   }
 
@@ -311,7 +310,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     final bestStars = (state[challengeId]?.starsEarned ?? 0);
     state = {
       ...state,
-      challengeId: UserProgress(
+      (challengeId): UserProgress(
         challengeId: challengeId,
         isCompleted: true,
         starsEarned: stars > bestStars ? stars : bestStars,
