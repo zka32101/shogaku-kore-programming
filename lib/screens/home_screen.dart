@@ -503,7 +503,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut)
                   else
-                    _buildDailyMission(context, nextStage?)
+                    _buildDailyMission(context, nextStage)
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut),
@@ -759,7 +759,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // 今週のチャレンジ
                   if (completedCount > 0) ...[
-                    _buildWeeklyStage?(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
+                    _buildWeeklyStage(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 97.ms)
                         .slideY(begin: 0.12, curve: Curves.easeOut),
