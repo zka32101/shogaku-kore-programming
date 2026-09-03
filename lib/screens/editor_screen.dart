@@ -254,7 +254,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
     if (isCorrect) {
       final levelBefore = ref.read(progressProvider.notifier).currentLevel;
-      ref.read(progressProvider.notifier).completeStage(
+      ref.read(progressProvider.notifier).completeChallenge(
             widget.challenge.id,
             3,
           );

@@ -478,7 +478,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     final levelBefore = ref.read(progressProvider.notifier).currentLevel;
 
     // 進捗を保存
-    ref.read(progressProvider.notifier).completeStage(
+    ref.read(progressProvider.notifier).completeChallenge(
           widget.challenge.id,
           stars,
         );
