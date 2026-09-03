@@ -3031,7 +3031,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     return TapScale(
-      onTap: openStage?,
+      onTap: openStage,
       child: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
