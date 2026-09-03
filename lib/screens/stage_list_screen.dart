@@ -101,7 +101,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     if (key == LogicalKeyboardKey.keyR) {
       HapticService.lightImpact();
       SoundService().playTap();
-      _openRandomStage?(context);
+      _openRandomStage(context);
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.keyF) {
@@ -117,15 +117,15 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     if (key == LogicalKeyboardKey.slash &&
         !HardwareKeyboard.instance.isShiftPressed) {
       HapticService.lightImpact();
-      final allStage?s = ref.read(allStage?sProvider);
+      final allStages = ref.read(allChallengesProvider);
       final progressMap = ref.read(progressProvider);
       showSearch(
         context: context,
         delegate: _StageSearchDelegate(
-          allStage?s: allStage?s,
+          allStages: allStages,
           progressMap: progressMap,
           favoriteIds: ref.read(favoritesProvider).favoriteIds,
-          wrongAnswerStageIds: _computeWrongStageIds(allStage?s),
+          wrongAnswerStageIds: _computeWrongStageIds(allStages),
         ),
       );
       return KeyEventResult.handled;
@@ -180,7 +180,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
           onPressed: () {
             HapticService.lightImpact();
             SoundService().playTap();
-            _openRandomStage?(context);
+            _openRandomStage(context);
           },
           backgroundColor: kPrimaryColor,
           icon: const Text('🎲', style: TextStyle(fontSize: 18)),
@@ -196,9 +196,9 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     );    // closes Focus return
   }
 
-  void _openRandomStage?(BuildContext context) {
+  void _openRandomStage(BuildContext context) {
     HapticService.mediumImpact();
-    final allStage?s = ref.read(allStage?sProvider);
+    final allStages = ref.read(allStagesProvider);
     final progressMap = ref.read(progressProvider);
 
     // 現在開いているタブ（初級/中級/上級）のレベルに絞り込む
@@ -208,18 +208,18 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
       StageLevel.advanced,
     ];
     final currentLevel = levels[_tabController.index];
-    final levelStage?s =
-        allStage?s.where((c) => c.level == currentLevel).toList();
+    final levelStages =
+        allStages.where((c) => c.level == currentLevel).toList();
 
     // 未完了の無料チャレンジから選ぶ
-    final pool = levelStage?s
+    final pool = levelStages
         .where((c) => c.isFree && !(progressMap[c.id]?.isCompleted ?? false))
         .toList();
 
     // 未完了がなければ現在レベルの全無料から選ぶ
     final source = pool.isNotEmpty
         ? pool
-        : levelStage?s.where((c) => c.isFree).toList();
+        : levelStages.where((c) => c.isFree).toList();
 
     if (source.isEmpty) return;
     final pick = source[math.Random().nextInt(source.length)];
@@ -253,14 +253,14 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (ctx) => _Stage?InfoSheet(
+      builder: (ctx) => _StageInfoSheet(
         challenge: challenge,
         starsEarned: starsEarned,
         isCompleted: isCompleted,
         completedAt: completedAt,
         onStart: () {
           Navigator.pop(ctx);
-          if (challenge.type == Stage?Type.quiz) {
+          if (challenge.type == 'quiz') {
             Navigator.of(context).push(
               MaterialPageRoute(
                   builder: (_) => QuizScreen(challenge: challenge)),
@@ -288,16 +288,16 @@ class _PathHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final progressNotifier = ref.read(progressProvider.notifier);
     final progressMap = ref.watch(progressProvider);
-    final allStage?s = ref.watch(allStage?sProvider);
+    final allStages = ref.watch(allChallengesProvider);
     final completedCount = progressNotifier.completedCount;
     final totalStars = progressNotifier.totalStarsEarned;
     final level = progressNotifier.currentLevel;
 
-    int unitDone(String lvl) => allStage?s
+    int unitDone(String lvl) => allStages
         .where((c) => c.level == lvl && (progressMap[c.id]?.isCompleted ?? false))
         .length;
     int unitTotal(String lvl) =>
-        allStage?s.where((c) => c.level == lvl).length;
+        allStages.where((c) => c.level == lvl).length;
 
     return Container(
       decoration: const BoxDecoration(
@@ -342,12 +342,12 @@ class _PathHeader extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.search, color: Colors.white),
                 onPressed: () {
-                  final allStage?s = ref.read(allStage?sProvider);
+                  final allStages = ref.read(allChallengesProvider);
                   final progressMap = ref.read(progressProvider);
                   showSearch(
                     context: context,
                     delegate: _StageSearchDelegate(
-                      allStage?s: allStage?s,
+                      allStages: allStages,
                       progressMap: progressMap,
                       favoriteIds: ref.read(favoritesProvider).favoriteIds,
                     ),
@@ -463,16 +463,16 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Stage> allStage?s;
+    final List<Stage> allStages;
     switch (widget.level) {
       case StageLevel.beginner:
-        allStage?s = ref.watch(beginnerStage?sProvider);
+        allStages = ref.watch(beginnerChallengesProvider);
         break;
       case StageLevel.intermediate:
-        allStage?s = ref.watch(intermediateStage?sProvider);
+        allStages = ref.watch(intermediateChallengesProvider);
         break;
       default:
-        allStage?s = ref.watch(advancedStage?sProvider);
+        allStages = ref.watch(advancedChallengesProvider);
     }
 
     final progressMap = ref.watch(progressProvider);
@@ -487,7 +487,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     final wrongTexts = wrongAnswers.map((a) => a.questionText).toSet();
     final wrongStageIds = wrongTexts.isEmpty
         ? const <String>{}
-        : allStage?s
+        : allStages
             .where((c) => c.questions.any((q) => wrongTexts.contains(q.text)))
             .map((c) => c.id)
             .toSet();
@@ -495,35 +495,35 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     // フィルター適用
     final challenges = switch (_filter) {
       _CompletionFilter.incomplete =>
-        allStage?s.where((c) => !(progressMap[c.id]?.isCompleted ?? false)).toList(),
+        allStages.where((c) => !(progressMap[c.id]?.isCompleted ?? false)).toList(),
       _CompletionFilter.completed =>
-        allStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).toList(),
+        allStages.where((c) => progressMap[c.id]?.isCompleted ?? false).toList(),
       _CompletionFilter.notPerfect =>
-        allStage?s.where((c) => (progressMap[c.id]?.starsEarned ?? 0) < 3).toList(),
+        allStages.where((c) => (progressMap[c.id]?.starsEarned ?? 0) < 3).toList(),
       _CompletionFilter.favorites =>
-        allStage?s.where((c) => favorites.isFavorite(c.id)).toList(),
+        allStages.where((c) => favorites.isFavorite(c.id)).toList(),
       _CompletionFilter.wrongAnswers =>
-        allStage?s.where((c) => wrongStageIds.contains(c.id)).toList(),
-      _CompletionFilter.all => allStage?s,
+        allStages.where((c) => wrongStageIds.contains(c.id)).toList(),
+      _CompletionFilter.all => allStages,
     };
 
     // 3つ星未取得のステージ数
-    final notPerfectCount = allStage?s
+    final notPerfectCount = allStages
         .where((c) => (progressMap[c.id]?.starsEarned ?? 0) < 3)
         .length;
 
     // お気に入りステージ数（このユニット内）
-    final favCount = allStage?s
+    final favCount = allStages
         .where((c) => favorites.isFavorite(c.id))
         .length;
 
     // 現在のステージ（最初の未完了かつ未ロックのステージ）
-    final currentIndex = allStage?s.indexWhere(
+    final currentIndex = allStages.indexWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false) && c.isFree,
     );
 
-    final completedInLevel = allStage?s.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    final totalInLevel = allStage?s.length;
+    final completedInLevel = allStages.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    final totalInLevel = allStages.length;
 
     return Column(
       children: [
@@ -669,7 +669,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
               color: kPrimaryColor,
               onRefresh: () async {
                 ref.invalidate(progressProvider);
-                ref.invalidate(allStage?sProvider);
+                ref.invalidate(allChallengesProvider);
                 await Future.delayed(const Duration(milliseconds: 400));
               },
               child: _StagePathView(
@@ -688,7 +688,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
                   final stars = progressMap[challenge.id]?.starsEarned ?? 0;
                   final isCompleted = progressMap[challenge.id]?.isCompleted ?? false;
                   final completedAt = progressMap[challenge.id]?.completedAt;
-                  _openStage?(ctx, challenge, stars, isCompleted, completedAt);
+                  _openStage(ctx, challenge, stars, isCompleted, completedAt);
                 },
               ),
             ),
@@ -697,7 +697,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     );
   }
 
-  void _openStage?(
+  void _openStage(
     BuildContext context,
     Stage challenge,
     int starsEarned,
@@ -710,10 +710,10 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
       _showPremiumModal(context, challenge);
       return;
     }
-    _showStage?InfoSheet(context, challenge, starsEarned, isCompleted, completedAt);
+    _showStageInfoSheet(context, challenge, starsEarned, isCompleted, completedAt);
   }
 
-  void _showStage?InfoSheet(
+  void _showStageInfoSheet(
     BuildContext context,
     Stage challenge,
     int starsEarned,
@@ -726,14 +726,14 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (ctx) => _Stage?InfoSheet(
+      builder: (ctx) => _StageInfoSheet(
         challenge: challenge,
         starsEarned: starsEarned,
         isCompleted: isCompleted,
         completedAt: completedAt,
         onStart: () {
           Navigator.pop(ctx);
-          if (challenge.type == Stage?Type.quiz) {
+          if (challenge.type == 'quiz') {
             Navigator.of(context).push(
               MaterialPageRoute(
                   builder: (_) => QuizScreen(challenge: challenge)),
@@ -1273,7 +1273,7 @@ class _StageNodeState extends State<_StageNode>
       border = context.isDark ? Colors.white12 : Colors.grey[300]!;
     }
 
-    final typeEmoji = widget.challenge.type == Stage?Type.quiz ? '🐍' : '🧩';
+    final typeEmoji = widget.challenge.type == 'quiz' ? '🐍' : '🧩';
 
     Widget circle = TapScale(
       onTap: widget.onTap,
@@ -1350,7 +1350,7 @@ class _StageNodeState extends State<_StageNode>
                 height: 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.challenge.type == Stage?Type.quiz
+                  color: widget.challenge.type == 'quiz'
                       ? const Color(0xFF8E44AD)
                       : kPrimaryColor,
                   border: Border.all(color: context.cardBg, width: 1.5),
@@ -1530,14 +1530,14 @@ class _StageNodeState extends State<_StageNode>
 
 // ─── チャレンジ情報シート ──────────────────────────────────────────────────────
 
-class _Stage?InfoSheet extends ConsumerWidget {
+class _StageInfoSheet extends ConsumerWidget {
   final Stage challenge;
   final int starsEarned;
   final bool isCompleted;
   final DateTime? completedAt;
   final VoidCallback onStart;
 
-  const _Stage?InfoSheet({
+  const _StageInfoSheet({
     required this.challenge,
     required this.starsEarned,
     required this.isCompleted,
@@ -1547,7 +1547,7 @@ class _Stage?InfoSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isVisual = challenge.type == Stage?Type.visual;
+    final isVisual = challenge.type == 'visual';
     final typeColor = isVisual ? kPrimaryColor : const Color(0xFF8E44AD);
     final typeLabel = isVisual ? '🧩 ブロックプログラミング' : '🐍 Pythonクイズ';
     final isFavorite = ref.watch(favoritesProvider).isFavorite(challenge.id);
@@ -2309,14 +2309,14 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _StageSearchDelegate extends SearchDelegate<Stage??> {
-  final List<Stage> allStage?s;
+class _StageSearchDelegate extends SearchDelegate<Stage?> {
+  final List<Stage> allStages;
   final Map<String, UserProgress> progressMap;
   final Set<String> favoriteIds;
   final Set<String> wrongAnswerStageIds;
 
   _StageSearchDelegate({
-    required this.allStage?s,
+    required this.allStages,
     required this.progressMap,
     this.favoriteIds = const {},
     this.wrongAnswerStageIds = const {},
@@ -2356,11 +2356,11 @@ class _StageSearchDelegate extends SearchDelegate<Stage??> {
   );
 
   List<Stage> get _filtered {
-    if (query.isEmpty) return allStage?s;
+    if (query.isEmpty) return allStages;
     final q = query.toLowerCase().trim();
     // Allow searching by stage number (e.g. "1", "10")
     final stageNum = int.tryParse(q);
-    return allStage?s.where((c) =>
+    return allStages.where((c) =>
       c.title.toLowerCase().contains(q) ||
       c.description.toLowerCase().contains(q) ||
       (stageNum != null && c.stageNumber == stageNum)
@@ -2428,7 +2428,7 @@ class _StageSearchDelegate extends SearchDelegate<Stage??> {
                 );
                 return;
               }
-              if (c.type == Stage?Type.quiz) {
+              if (c.type == 'quiz') {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => QuizScreen(challenge: c)),
                 );
@@ -2471,18 +2471,18 @@ class _StageSearchDelegate extends SearchDelegate<Stage??> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: (c.type == Stage?Type.quiz
+                                color: (c.type == 'quiz'
                                         ? const Color(0xFF8E44AD)
                                         : kPrimaryColor)
                                     .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                c.type == Stage?Type.quiz ? '🐍 クイズ' : '🧩 ブロック',
+                                c.type == 'quiz' ? '🐍 クイズ' : '🧩 ブロック',
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
-                                  color: c.type == Stage?Type.quiz
+                                  color: c.type == 'quiz'
                                       ? const Color(0xFF8E44AD)
                                       : kPrimaryColor,
                                 ),
