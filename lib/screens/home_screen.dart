@@ -418,7 +418,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     // 次の未完了ステージを探す
-    final nextStage? = allChallenges.firstWhere(
+    final nextStage = allChallenges.firstWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
       orElse: () => allChallenges.first,
     );
@@ -2282,7 +2282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildWeeklyStage?(
+  Widget _buildWeeklyStage(
     BuildContext context,
     ProgressNotifier notifier,
     int completedCount,
@@ -3026,7 +3026,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDailyMission(BuildContext context, Stage challenge) {
-    void openStage?() {
+    void openStage() {
       _openStageOrShowPaywall(context, challenge);
     }
 

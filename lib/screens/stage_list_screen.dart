@@ -197,7 +197,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
 
   void _openRandomStage(BuildContext context) {
     HapticService.mediumImpact();
-    final allStages = ref.read(allStagesProvider);
+    final allStages = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
 
     // 現在開いているタブ（初級/中級/上級）のレベルに絞り込む
