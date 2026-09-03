@@ -104,7 +104,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final key = event.logicalKey;
     if (key == LogicalKeyboardKey.keyH) {
-      if (widget.challenge.hints.isNotEmpty) {
+      if (widget.challenge.hints?.isNotEmpty ?? false) {
         HapticService.selectionClick();
         setState(() => _showHint = !_showHint);
         return KeyEventResult.handled;
@@ -719,7 +719,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   Widget _buildBlockPalette() {
     // ステージで許可されたブロックのみ表示（空の場合は全ブロック表示）
-    final allowedIds = widget.challenge.availableBlocks.map((b) => b.id).toSet();
+    final allowedIds = (widget.challenge.availableBlocks ?? []).map((b) => b.id).toSet();
     final paletteBlocks = allowedIds.isEmpty
         ? kAvailableBlocks
         : kAvailableBlocks.where((b) => allowedIds.contains(b.id)).toList();

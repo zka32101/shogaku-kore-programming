@@ -234,7 +234,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
     final wrongTexts =
         ref.read(wrongAnswersProvider).answers.map((a) => a.questionText).toSet();
     return challenges
-        .where((c) => c.questions.any((q) => wrongTexts.contains(q.text)))
+        .where((c) => (c.questions ?? []).any((q) => wrongTexts.contains(q.text)))
         .map((c) => c.id)
         .toSet();
   }
@@ -487,7 +487,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
     final wrongStageIds = wrongTexts.isEmpty
         ? const <String>{}
         : allStages
-            .where((c) => c.questions.any((q) => wrongTexts.contains(q.text)))
+            .where((c) => (c.questions ?? []).any((q) => wrongTexts.contains(q.text)))
             .map((c) => c.id)
             .toSet();
 

@@ -1378,12 +1378,14 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
               child: ElevatedButton.icon(
                 onPressed: () {
                   HapticService.lightImpact();
+                  final questions = widget.challenge.questions ?? [];
                   final wrongQuestions = widget.answers
                       .where((a) => !a.isCorrect)
-                      .map((a) => widget.challenge.questions.firstWhere(
+                      .map((a) => questions.firstWhere(
                             (q) => q.text == a.questionText,
-                            orElse: () => widget.challenge.questions.first,
+                            orElse: () => questions.isNotEmpty ? questions.first : null,
                           ))
+                      .whereType<Question>()
                       .toList();
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
