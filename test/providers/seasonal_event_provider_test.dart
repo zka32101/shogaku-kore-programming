@@ -59,7 +59,7 @@ void main() {
       final firstEventId = state.collection!.allEvents[0].eventId;
 
       // Create new notifier and reinitialize
-      final notifier2 = SeasonalEventNotifier();
+      final _notifier2 = SeasonalEventNotifier();
       final container2 = ProviderContainer();
       container2.read(seasonalEventProvider.notifier).initializeEvents('test_user');
 
@@ -72,7 +72,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
 
@@ -86,7 +86,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
       final initialCount = state.collection!.allEvents[0].currentParticipantCount;
 
       await notifier.joinEvent('test_user', eventId);
@@ -103,7 +103,7 @@ void main() {
       var state = container.read(seasonalEventProvider);
       expect(state.collection!.statistics.totalEventsParticipated, 0);
 
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
       await notifier.joinEvent('test_user', eventId);
 
       state = container.read(seasonalEventProvider);
@@ -115,7 +115,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       state = container.read(seasonalEventProvider);
@@ -131,7 +131,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       await notifier.updateEventScore('test_user', eventId, 100);
@@ -146,7 +146,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       await notifier.updateEventScore('test_user', eventId, 100);
@@ -162,7 +162,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       expect(
@@ -184,7 +184,7 @@ void main() {
       var state = container.read(seasonalEventProvider);
       expect(state.collection!.statistics.totalEventsCompleted, 0);
 
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
       await notifier.joinEvent('test_user', eventId);
       await notifier.completeEvent('test_user', eventId);
 
@@ -197,7 +197,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       await notifier.completeEvent('test_user', eventId);
@@ -211,7 +211,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       expect(state.collection!.participations.participations.isNotEmpty, true);
@@ -227,7 +227,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
       final initialCount = state.collection!.allEvents[0].currentParticipantCount;
 
       await notifier.joinEvent('test_user', eventId);
@@ -243,7 +243,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       await notifier.completeEvent('test_user', eventId);
@@ -258,7 +258,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       await notifier.claimEventReward('test_user', eventId);
@@ -272,7 +272,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       await notifier.completeEvent('test_user', eventId);
@@ -346,7 +346,7 @@ void main() {
       expect(participations.isEmpty, true);
 
       final state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
       await notifier.joinEvent('test_user', eventId);
 
       participations = container.read(userParticipationsProvider);
@@ -358,7 +358,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       var activeParticipations = container.read(activeParticipationsProvider);
@@ -374,7 +374,7 @@ void main() {
       await notifier.initializeEvents('test_user');
 
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
       var completed = container.read(completedParticipationsProvider);
@@ -403,7 +403,7 @@ void main() {
 
       // Update stats to increase level
       var state = container.read(seasonalEventProvider);
-      final eventId = state.collection!.allEvents[0].eventId;
+      final _eventId = state.collection!.allEvents[0].eventId;
 
       for (int i = 0; i < 5; i++) {
         await notifier.joinEvent('test_user', 'evt$i');

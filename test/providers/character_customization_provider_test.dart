@@ -47,7 +47,7 @@ void main() {
       var state = container.read(customizationProvider);
       expect(state.collection!.userId, 'test_user');
 
-      final notifier2 = CharacterCustomizationNotifier();
+      final _notifier2 = CharacterCustomizationNotifier();
       final container2 = ProviderContainer();
       await container2.read(customizationProvider.notifier).initializeCustomization('test_user');
 

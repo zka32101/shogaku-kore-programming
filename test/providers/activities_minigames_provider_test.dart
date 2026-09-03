@@ -49,7 +49,7 @@ void main() {
       expect(state.collection!.userId, 'test_user');
 
       // Reinitialize should load from storage
-      final notifier2 = ActivityNotifier();
+      final _notifier2 = ActivityNotifier();
       final container2 = ProviderContainer();
       await container2.read(activityProvider.notifier).initializeActivities('test_user');
 

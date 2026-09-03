@@ -49,7 +49,7 @@ void main() {
       expect(state.collection!.ownedItems.isEmpty, true);
 
       // Reinitialize with new notifier
-      final notifier2 = ShopNotifier();
+      final _notifier2 = ShopNotifier();
       final container2 = ProviderContainer();
       await container2.read(shopProvider.notifier).initializeShop('test_user');
 

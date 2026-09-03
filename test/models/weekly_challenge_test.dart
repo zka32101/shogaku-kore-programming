@@ -430,9 +430,9 @@ void main() {
         generatedAt: now,
       );
 
-      final learning_list = collection.getByCategory(ChallengeCategory.learning);
-      expect(learning_list.length, 1);
-      expect(learning_list.first.challengeId, 'ch_learn');
+      final learningList = collection.getByCategory(ChallengeCategory.learning);
+      expect(learningList.length, 1);
+      expect(learningList.first.challengeId, 'ch_learn');
     });
 
     test('JSON round-trip preserves structure', () {
