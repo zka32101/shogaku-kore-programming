@@ -110,6 +110,15 @@ class Stage {
     this.goalCondition,
   });
 
+  /// Get the maximum number of stars achievable for this stage
+  int get maxStars {
+    if (type == 'quiz') {
+      return questions?.length ?? 0;
+    }
+    // Visual programming stages typically have 3 stars
+    return 3;
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'stageNumber': stageNumber,
