@@ -34,6 +34,26 @@ flutter test -v
 flutter test -d <device_id>
 ```
 
+### Run Widget Tests Only
+```bash
+flutter test test/widgets/
+```
+
+### Run Specific Widget Test
+```bash
+flutter test test/widgets/quiz_screen_test.dart
+flutter test test/widgets/home_screen_test.dart
+flutter test test/widgets/editor_screen_test.dart
+```
+
+### Run Tests for Critical Screens (Priority 1)
+```bash
+flutter test test/widgets/quiz_screen_test.dart \
+  test/widgets/editor_screen_test.dart \
+  test/widgets/home_screen_test.dart \
+  test/widgets/quiz_result_screen_test.dart
+```
+
 ## 🏗️ Test Structure
 
 Tests are organized by layer:
@@ -46,8 +66,16 @@ test/
 │   ├── badge_provider_test.dart
 │   └── ...
 └── widgets/               # UI component tests
-    ├── quiz_screen_test.dart
-    ├── editor_screen_test.dart
+    ├── test_helpers.dart   # Shared test utilities and fixtures
+    ├── quiz_screen_test.dart          # Multiple choice quiz UI
+    ├── editor_screen_test.dart        # Visual block programming editor
+    ├── home_screen_test.dart          # Main hub navigation
+    ├── quiz_result_screen_test.dart   # Result display and scoring
+    ├── login_screen_test.dart         # Authentication UI
+    ├── splash_screen_test.dart        # App initialization
+    ├── achievements_screen_test.dart  # Badges and statistics
+    ├── settings_screen_test.dart      # User preferences
+    ├── flashcard_screen_test.dart     # Spaced repetition review
     └── ...
 ```
 
@@ -123,16 +151,45 @@ void main() {
 }
 ```
 
+## 🎯 Widget Tests (New - Sept 2026)
+
+Comprehensive widget tests have been implemented for critical screens:
+
+| Screen | Tests | Coverage | Status |
+|--------|-------|----------|--------|
+| QuizScreen | 15+ | Question display, answer selection, submission | ✅ Complete |
+| EditorScreen | 16+ | Block library, workspace, execution, parameters | ✅ Complete |
+| HomeScreen | 24+ | Progress stats, daily missions, navigation | ✅ Complete |
+| QuizResultScreen | 23+ | Results display, scoring, animations | ✅ Complete |
+| LoginScreen | 24+ | Form validation, password entry, auth | ✅ Complete |
+| SplashScreen | 17+ | Logo animation, routing, app initialization | ✅ Complete |
+| AchievementsScreen | 27+ | Badges, tabs, statistics, leaderboard | ✅ Complete |
+| SettingsScreen | 26+ | Toggles, preferences, navigation | ✅ Complete |
+| FlashcardScreen | 24+ | Card flipping, difficulty rating, progress | ✅ Complete |
+
+**Total Widget Tests Created:** 195+ test cases
+
+### Test Helpers
+- **test_helpers.dart** - Reusable utilities for screen testing
+  - `TestApp` widget for Riverpod provider setup
+  - `pumpTestWidget()` for pumping widgets with dependencies
+  - Finder helpers: `findText()`, `findByType()`, `findByKey()`
+  - Assertion helpers: `expectExists()`, `expectNotExists()`, `expectText()`
+  - User interaction helpers: `tap()`, `enterText()`
+
 ## 🐛 Known Test Issues
 
 ### Fixed Issues (Sept 2026)
 - ✅ **Variable naming inconsistency** - Changed `final _notifier =` to `final notifier =` across all test files
 - ✅ **Unused variable warnings** - Removed unnecessary underscore prefixes
 - ✅ **Test structure compliance** - All tests now follow consistent patterns
+- ✅ **Widget test infrastructure** - Created test_helpers.dart with reusable test utilities
+- ✅ **Critical screen coverage** - Implemented 9 comprehensive screen test suites
 
 ### Remaining Issues
 - 356+ analyzer errors (pre-existing, mostly in unused test helper files)
 - Some tests may have incorrect assertions that need review
+- Integration tests still needed for full user flows
 
 ## 📊 Test Coverage Goals
 
