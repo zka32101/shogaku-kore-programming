@@ -465,7 +465,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
       final wrongTexts = wrongState.answers.map((a) => a.questionText).toSet();
       final allQs = <_TAQuestion>[];
       for (final c in allChallenges) {
-        if (c.type == constants.ChallengeType.quiz) {
+        if (c.type == 'quiz') {
           for (final q in c.questions) {
             if (wrongTexts.contains(q.text)) {
               allQs.add(_TAQuestion(question: q, challengeTitle: c.title));

@@ -260,7 +260,7 @@ class _StageListScreenState extends ConsumerState<StageListScreen>
         completedAt: completedAt,
         onStart: () {
           Navigator.pop(ctx);
-          if (challenge.type == constants.ChallengeType.quiz) {
+          if (challenge.type == 'quiz') {
             Navigator.of(context).push(
               MaterialPageRoute(
                   builder: (_) => QuizScreen(challenge: challenge)),
@@ -733,7 +733,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
         completedAt: completedAt,
         onStart: () {
           Navigator.pop(ctx);
-          if (challenge.type == constants.ChallengeType.quiz) {
+          if (challenge.type == 'quiz') {
             Navigator.of(context).push(
               MaterialPageRoute(
                   builder: (_) => QuizScreen(challenge: challenge)),
@@ -1547,7 +1547,7 @@ class _StageInfoSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isVisual = challenge.type == constants.ChallengeType.visual;
+    final isVisual = challenge.type == 'visual';
     final typeColor = isVisual ? kPrimaryColor : const Color(0xFF8E44AD);
     final typeLabel = isVisual ? '🧩 ブロックプログラミング' : '🐍 Pythonクイズ';
     final isFavorite = ref.watch(favoritesProvider).isFavorite(challenge.id);
