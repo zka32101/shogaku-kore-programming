@@ -145,6 +145,7 @@ class Challenge {
   final DateTime startedAt;
   final DateTime expiresAt;
   final bool isActive;
+  final bool isFree;
 
   Challenge({
     required this.challengeId,
@@ -157,6 +158,7 @@ class Challenge {
     required this.startedAt,
     required this.expiresAt,
     required this.isActive,
+    required this.isFree,
   });
 
   /// チャレンジが期限切れか判定
@@ -176,6 +178,7 @@ class Challenge {
         'startedAt': startedAt.toIso8601String(),
         'expiresAt': expiresAt.toIso8601String(),
         'isActive': isActive,
+        'isFree': isFree,
       };
 
   factory Challenge.fromJson(Map<String, dynamic> json) => Challenge(
@@ -192,6 +195,7 @@ class Challenge {
         startedAt: DateTime.parse(json['startedAt'] as String),
         expiresAt: DateTime.parse(json['expiresAt'] as String),
         isActive: json['isActive'] as bool,
+        isFree: json['isFree'] as bool? ?? false,
       );
 }
 
