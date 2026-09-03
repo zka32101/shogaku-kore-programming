@@ -27,7 +27,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      final _state = container.read(streakProvider);
+      final state = container.read(streakProvider);
       expect(state.collection, isNotNull);
       expect(state.collection!.userId, 'test_user');
       expect(state.collection!.rewardSchedule.isNotEmpty, true);
@@ -37,7 +37,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      final _state = container.read(streakProvider);
+      final state = container.read(streakProvider);
       expect(state.collection!.rewardSchedule.length, 30);
     });
 
