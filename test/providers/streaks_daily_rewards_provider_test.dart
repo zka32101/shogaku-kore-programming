@@ -117,7 +117,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       final dayOfMonth = DateTime.now().day;
 
       await notifier.claimDailyReward('test_user', dayOfMonth);
@@ -132,7 +132,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       expect(state.collection!.statistics.totalCoinsFromStreaks, 0);
 
       final dayOfMonth = DateTime.now().day;
@@ -147,7 +147,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       expect(state.collection!.currentStreak.currentStreak, 1);
 
       await notifier.breakStreak('test_user');
@@ -160,7 +160,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       expect(state.collection!.currentStreak.timesStreakBroken, 0);
 
       await notifier.breakStreak('test_user');
@@ -174,7 +174,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       // Simulate being at risk by setting last login to yesterday
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       final currentStreak = state.collection!.currentStreak;
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
 
@@ -199,7 +199,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('persist_test');
 
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       await notifier.loginUser('persist_test');
 
       final prefs = await SharedPreferences.getInstance();
