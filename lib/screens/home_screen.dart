@@ -1152,62 +1152,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildWrongAnswersCard(BuildContext context, int count) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFE74C3C).withValues(alpha: 0.3),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('📝', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFE74C3C).withValues(alpha: 0.1),
+      title: const Text(
+        '苦手問題を復習しよう',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE74C3C),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      subtitle: Text(
+        '間違えた問題が $count 件あるよ',
+        style: const TextStyle(fontSize: 11, color: kTextSecondary),
+      ),
+      borderColor: const Color(0xFFE74C3C),
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE74C3C).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('📝', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '苦手問題を復習しよう',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE74C3C),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '間違えた問題が $count 件あるよ',
-                      style: const TextStyle(fontSize: 11, color: kTextSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
           // 最も間違えた問題プレビュー（2回以上ある場合のみ）
           Builder(builder: (ctx) {
             final ws = ref.read(wrongAnswersProvider);
@@ -1221,7 +1183,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ? '${worst.questionText.substring(0, 30)}…'
                 : worst.questionText;
             return Container(
-              margin: const EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: const Color(0xFFE74C3C).withValues(alpha: 0.06),
@@ -1260,7 +1222,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             );
           }),
-          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
