@@ -1573,76 +1573,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return a.key.compareTo(b.key);
       });
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF8E44AD).withValues(alpha: 0.3),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('📚', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFF8E44AD).withValues(alpha: 0.1),
+      title: const Text(
+        'フラッシュカード復習スケジュール',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF8E44AB),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      subtitle: Text(
+        '習得後の復習が効果的です',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
+        ),
+      ),
+      trailing: GestureDetector(
+        onTap: () {
+          HapticService.lightImpact();
+          SoundService().playTap();
+          Navigator.of(context).push(
+            smoothPageRoute(const FlashcardScreen()),
+          );
+        },
+        child: const Icon(Icons.chevron_right, color: Color(0xFF8E44AB)),
+      ),
+      borderColor: const Color(0xFF8E44AD),
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF8E44AD).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('📚', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'フラッシュカード復習スケジュール',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8E44AB),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '習得後の復習が効果的です',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  HapticService.lightImpact();
-                  SoundService().playTap();
-                  Navigator.of(context).push(
-                    smoothPageRoute(const FlashcardScreen()),
-                  );
-                },
-                child: const Icon(Icons.chevron_right, color: Color(0xFF8E44AB)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
           Wrap(
             spacing: 6,
             runSpacing: 6,
@@ -1721,147 +1682,107 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     List<Stage> weakStages,
     Map<String, UserProgress> progressMap,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFF39C12).withValues(alpha: 0.35),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('⬆️', style: TextStyle(fontSize: 20)),
+      iconBackgroundColor: const Color(0xFFF39C12).withValues(alpha: 0.12),
+      iconSize: 40,
+      title: const Text(
+        '3つ星を狙え！',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE67E22),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF39C12).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Center(
-                  child: Text('⬆️', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '3つ星を狙え！',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE67E22),
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    const Text(
-                      '満点でさらにポイントアップ！',
-                      style: TextStyle(fontSize: 10, color: kTextSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          ...weakStages.map((c) {
-            final stars = progressMap[c.id]?.starsEarned ?? 0;
-            final levelColor = c.level == StageLevel.beginner
-                ? kPrimaryColor
-                : c.level == StageLevel.intermediate
-                    ? const Color(0xFF9B59B6)
-                    : const Color(0xFFE67E22);
-            // 苦手問題があるか確認
-            final wrongState = ref.read(wrongAnswersProvider);
-            final wrongCount = c.type == 'quiz'
-                ? (c.questions ?? []).fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
-                : 0;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: GestureDetector(
-                onTap: () {
-                  HapticService.lightImpact();
-                  SoundService().playTap();
-                  Navigator.of(context).push(
-                    smoothPageRoute(
-                      c.type == 'visual'
-                          ? EditorScreen(challenge: c)
-                          : QuizScreen(challenge: c),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: levelColor.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: levelColor.withValues(alpha: 0.2),
-                    ),
+      subtitle: const Text(
+        '満点でさらにポイントアップ！',
+        style: TextStyle(fontSize: 10, color: kTextSecondary),
+      ),
+      borderColor: const Color(0xFFF39C12),
+      content: Column(
+        children: weakStages.map((c) {
+          final stars = progressMap[c.id]?.starsEarned ?? 0;
+          final levelColor = c.level == StageLevel.beginner
+              ? kPrimaryColor
+              : c.level == StageLevel.intermediate
+                  ? const Color(0xFF9B59B6)
+                  : const Color(0xFFE67E22);
+          // 苦手問題があるか確認
+          final wrongState = ref.read(wrongAnswersProvider);
+          final wrongCount = c.type == 'quiz'
+              ? (c.questions ?? []).fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
+              : 0;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: GestureDetector(
+              onTap: () {
+                HapticService.lightImpact();
+                SoundService().playTap();
+                Navigator.of(context).push(
+                  smoothPageRoute(
+                    c.type == 'visual'
+                        ? EditorScreen(challenge: c)
+                        : QuizScreen(challenge: c),
                   ),
-                  child: Row(
-                    children: [
-                      Text(c.icon, style: const TextStyle(fontSize: 18)),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          c.title,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: context.textPrimary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: levelColor.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: levelColor.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Text(c.icon, style: const TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        c.title,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: context.textPrimary,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (wrongCount > 0) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Text(
-                            '🔥×$wrongCount',
-                            style: const TextStyle(fontSize: 9, color: Color(0xFFE64A00)),
-                          ),
+                    ),
+                    if (wrongCount > 0) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        const SizedBox(width: 4),
-                      ],
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(
-                          3,
-                          (i) => Icon(
-                            i < stars ? Icons.star : Icons.star_border,
-                            size: 14,
-                            color: i < stars ? kStarColor : context.borderColor,
-                          ),
+                        child: Text(
+                          '🔥×$wrongCount',
+                          style: const TextStyle(fontSize: 9, color: Color(0xFFE64A00)),
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.chevron_right, size: 14, color: kTextSecondary),
                     ],
-                  ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(
+                        3,
+                        (i) => Icon(
+                          i < stars ? Icons.star : Icons.star_border,
+                          size: 14,
+                          color: i < stars ? kStarColor : context.borderColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.chevron_right, size: 14, color: kTextSecondary),
+                  ],
                 ),
               ),
-            );
-          }),
-        ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
