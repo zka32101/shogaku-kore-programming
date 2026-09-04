@@ -33,6 +33,7 @@ import '../providers/favorites_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
 import '../widgets/shortcut_help.dart';
+import '../widgets/standard_card.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/daily_puzzle_card.dart';
 import '../widgets/tap_scale.dart';
