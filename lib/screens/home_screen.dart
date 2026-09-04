@@ -4326,72 +4326,34 @@ class _LevelUpOverlay extends StatelessWidget {
             ? '🔥 あと${bestStreak - currentStreak}日でベスト記録！'
             : '💪 連続学習を継続中！';
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFFF6B35).withValues(alpha: 0.08),
-            const Color(0xFFFF8C42).withValues(alpha: 0.05),
-          ],
+    return IconCard(
+      iconWidget: const Text('🔥', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFFF6B35).withValues(alpha: 0.12),
+      title: const Text(
+        '学習ストリーク',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFFF6B35).withValues(alpha: 0.3),
-          width: 1,
+      ),
+      subtitle: Text(
+        motivationMessage,
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+      ),
+      borderColor: const Color(0xFFFF6B35),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFFF6B35).withValues(alpha: 0.08),
+          const Color(0xFFFF8C42).withValues(alpha: 0.05),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('🔥', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '学習ストリーク',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      motivationMessage,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
