@@ -4,6 +4,50 @@ import 'dart:convert';
 import '../models/challenge.dart';
 import '../services/notification_service.dart';
 
+/// User progress for a challenge/stage
+class UserProgress {
+  final String challengeId;
+  final bool isCompleted;
+  final int starsEarned;
+  final DateTime? completedAt;
+
+  const UserProgress({
+    required this.challengeId,
+    this.isCompleted = false,
+    this.starsEarned = 0,
+    this.completedAt,
+  });
+
+  UserProgress copyWith({
+    String? challengeId,
+    bool? isCompleted,
+    int? starsEarned,
+    DateTime? completedAt,
+  }) =>
+      UserProgress(
+        challengeId: challengeId ?? this.challengeId,
+        isCompleted: isCompleted ?? this.isCompleted,
+        starsEarned: starsEarned ?? this.starsEarned,
+        completedAt: completedAt ?? this.completedAt,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'challengeId': challengeId,
+        'isCompleted': isCompleted,
+        'starsEarned': starsEarned,
+        'completedAt': completedAt?.toIso8601String(),
+      };
+
+  factory UserProgress.fromJson(Map<String, dynamic> json) => UserProgress(
+        challengeId: json['challengeId'] as String,
+        isCompleted: json['isCompleted'] as bool? ?? false,
+        starsEarned: json['starsEarned'] as int? ?? 0,
+        completedAt: json['completedAt'] != null
+            ? DateTime.parse(json['completedAt'] as String)
+            : null,
+      );
+}
+
 class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   ProgressNotifier() : super({}) {
     _loadProgress();
@@ -97,16 +141,15 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     return _homeWeeklyBonusWeek == _currentWeekIso();
   }
 
-  /// ホーム週次チャレンジボーナス（20pt）を今週1回だけ付与する（同期的にフラグ設定）
-  bool awardHomeWeeklyBonus() {
+  /// ホーム週次チャレンジボーナス（20pt）を今週1回だけ付与する（非同期で完全に保持される）
+  Future<bool> awardHomeWeeklyBonus() async {
     final currentWeek = _currentWeekIso();
     if (_homeWeeklyBonusWeek == currentWeek) return false;
     _homeWeeklyBonusWeek = currentWeek;
     // 非同期で永続化＋ポイント付与
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setString(_homeWeeklyBonusKey, currentWeek);
-    });
-    addBonusPoints(20);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_homeWeeklyBonusKey, currentWeek);
+    await addBonusPoints(20);
     return true;
   }
 
@@ -267,7 +310,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     final bestStars = (state[challengeId]?.starsEarned ?? 0);
     state = {
       ...state,
-      challengeId: UserProgress(
+      (challengeId): UserProgress(
         challengeId: challengeId,
         isCompleted: true,
         starsEarned: stars > bestStars ? stars : bestStars,

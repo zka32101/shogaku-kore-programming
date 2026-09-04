@@ -7,7 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
-import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/profile_provider.dart';
@@ -16,6 +16,8 @@ import 'badge_unlock_screen.dart';
 import 'stage_list_screen.dart';
 import 'editor_screen.dart';
 import 'quiz_screen.dart';
+import 'paywall_screen.dart';
+import '../widgets/app_dialog.dart';
 import 'daily_review_screen.dart';
 import 'time_attack_screen.dart';
 import 'ranking_screen.dart';
@@ -30,8 +32,10 @@ import '../providers/favorites_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
 import '../widgets/shortcut_help.dart';
+import '../widgets/standard_card.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/daily_puzzle_card.dart';
+import '../widgets/tap_scale.dart';
 import 'why_programming_screen.dart';
 import 'programming_basics_screen.dart';
 import 'shop_screen.dart';
@@ -42,6 +46,7 @@ import 'character_screen.dart';
 import '../providers/coin_provider.dart';
 import '../providers/character_provider.dart';
 import '../models/character_model.dart';
+import '../utils/page_transitions.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -56,6 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int? _prevStreak;
   bool _goalCelebrated = false;
   bool _codeKingChecked = false; // セッション内でコード王チェック済みか
+  bool _showMoreStats = false; // 「もっと見る」で表示する補助カード群の開閉状態
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -83,28 +89,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyT) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TimeAttackScreen()));
+      Navigator.of(context).push(smoothPageRoute(const TimeAttackScreen()));
       return KeyEventResult.handled;
     }
     // R → ランキング
     if (key == LogicalKeyboardKey.keyR) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const RankingScreen()));
+      Navigator.of(context).push(smoothPageRoute(const RankingScreen()));
       return KeyEventResult.handled;
     }
     // F → フラッシュカード
     if (key == LogicalKeyboardKey.keyF) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FlashcardScreen()));
+      Navigator.of(context).push(smoothPageRoute(const FlashcardScreen()));
       return KeyEventResult.handled;
     }
     // S → ステージ一覧
     if (key == LogicalKeyboardKey.keyS) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const StageListScreen()));
+      Navigator.of(context).push(smoothPageRoute(const StageListScreen()));
       return KeyEventResult.handled;
     }
     // D → 今日の復習
@@ -113,7 +119,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (!doneToday) {
         HapticService.lightImpact();
         SoundService().playTap();
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const DailyReviewScreen()));
+        Navigator.of(context).push(smoothPageRoute(const DailyReviewScreen()));
         return KeyEventResult.handled;
       }
     }
@@ -121,28 +127,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyV) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReverseTeachingScreen()));
+      Navigator.of(context).push(smoothPageRoute(const ReverseTeachingScreen()));
       return KeyEventResult.handled;
     }
     // G → ギャラリー
     if (key == LogicalKeyboardKey.keyG) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GalleryScreen()));
+      Navigator.of(context).push(smoothPageRoute(const GalleryScreen()));
       return KeyEventResult.handled;
     }
     // E → 週次レポート
     if (key == LogicalKeyboardKey.keyE) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WeeklyReportScreen()));
+      Navigator.of(context).push(smoothPageRoute(const WeeklyReportScreen()));
       return KeyEventResult.handled;
     }
     // C → キャラクター育成
     if (key == LogicalKeyboardKey.keyC) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CharacterScreen()));
+      Navigator.of(context).push(smoothPageRoute(const CharacterScreen()));
       return KeyEventResult.handled;
     }
     // N → 次のTips
@@ -161,7 +167,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyA) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AchievementsScreen()));
+      Navigator.of(context).push(smoothPageRoute(const AchievementsScreen()));
       return KeyEventResult.handled;
     }
     // W → 苦手問題復習（苦手リストがある場合のみ）
@@ -171,7 +177,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => QuizReviewScreen(wrongAnswers: answers)),
+          smoothPageRoute(QuizReviewScreen(wrongAnswers: answers)),
         );
         return KeyEventResult.handled;
       }
@@ -180,7 +186,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyP) {
       HapticService.lightImpact();
       SoundService().playTap();
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
+      Navigator.of(context).push(smoothPageRoute(const ProfileScreen()));
       return KeyEventResult.handled;
     }
     // ? → キーボードショートカット一覧
@@ -412,7 +418,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     // 次の未完了ステージを探す
-    final nextChallenge = allChallenges.firstWhere(
+    final nextStage = allChallenges.firstWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
       orElse: () => allChallenges.first,
     );
@@ -442,12 +448,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: completedCount > 0
           ? Builder(builder: (ctx) {
               final hasWrong = !wrongAnswersState.isEmpty;
-              return FloatingActionButton.small(
+              return FloatingActionButton.extended(
                 heroTag: 'quick_quiz_fab',
                 onPressed: () => _showRandomQuickQuiz(context, allChallenges, progressMap),
                 backgroundColor: hasWrong ? const Color(0xFFFF6B35) : kPrimaryColor,
                 tooltip: hasWrong ? '🔥 苦手問題優先でランダム1問チャレンジ' : 'ランダム1問チャレンジ',
-                child: Text(hasWrong ? '🔥' : '🎲', style: const TextStyle(fontSize: 18)),
+                icon: Text(hasWrong ? '🔥' : '🎲', style: const TextStyle(fontSize: 18)),
+                label: Text(hasWrong ? '苦手' : '1問！', style: const TextStyle(fontSize: 11)),
               );
             })
           : null,
@@ -496,7 +503,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut)
                   else
-                    _buildDailyMission(context, nextChallenge)
+                    _buildDailyMission(context, nextStage)
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut),
@@ -540,6 +547,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ];
                   }(),
 
+                  // 苦手問題復習カード（過去の間違い問題がある場合のみ）
+                  if (!wrongAnswersState.isEmpty) ...[
+                    _buildWrongAnswersCard(context, wrongAnswersState.count)
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 90.ms)
+                        .slideY(begin: 0.12, curve: Curves.easeOut),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // お気に入りステージカード
+                  if (favoritesState.count > 0) ...[
+                    _buildFavoritesCard(context, favoritesState.count, allChallenges, favoritesState.favoriteIds)
+                        .animate()
+                        .fadeIn(duration: 350.ms, delay: 95.ms)
+                        .slideY(begin: 0.12, curve: Curves.easeOut),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // もっと見る（学習ストリーク・週間チャレンジなど詳細統計）
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        HapticService.lightImpact();
+                        setState(() => _showMoreStats = !_showMoreStats);
+                      },
+                      icon: Icon(
+                        _showMoreStats ? Icons.expand_less : Icons.expand_more,
+                        size: 18,
+                      ),
+                      label: Text(
+                        _showMoreStats ? 'とじる' : 'もっと見る',
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  if (_showMoreStats) ...[
                   // 学習ストリークカード（1日以上の連続記録がある場合のみ表示）
                   if (streakDays > 0) ...[
                     Container(
@@ -679,24 +724,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: 12),
                   ],
 
-                  // 苦手問題復習カード（過去の間違い問題がある場合のみ）
-                  if (!wrongAnswersState.isEmpty) ...[
-                    _buildWrongAnswersCard(context, wrongAnswersState.count)
-                        .animate()
-                        .fadeIn(duration: 350.ms, delay: 90.ms)
-                        .slideY(begin: 0.12, curve: Curves.easeOut),
-                    const SizedBox(height: 12),
-                  ],
-
-                  // お気に入りステージカード
-                  if (favoritesState.count > 0) ...[
-                    _buildFavoritesCard(context, favoritesState.count, allChallenges, favoritesState.favoriteIds)
-                        .animate()
-                        .fadeIn(duration: 350.ms, delay: 95.ms)
-                        .slideY(begin: 0.12, curve: Curves.easeOut),
-                    const SizedBox(height: 12),
-                  ],
-
                   // フラッシュカード復習スケジュール（7日以上前に習得したカテゴリーがある場合）
                   ...() {
                     if (masteredCards == 0) return <Widget>[];
@@ -732,7 +759,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // 今週のチャレンジ
                   if (completedCount > 0) ...[
-                    _buildWeeklyChallenge(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
+                    _buildWeeklyStage(context, progressNotifier, completedCount, streakDays, favoritesState.count, masteredCards, reviewStreak, reviewState.totalReviewsCompleted, weeklyMasteredCards, wrongAnswersState.totalResolvedCount, wrongAnswersState.count)
                         .animate()
                         .fadeIn(duration: 350.ms, delay: 97.ms)
                         .slideY(begin: 0.12, curve: Curves.easeOut),
@@ -754,6 +781,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       .fadeIn(duration: 350.ms, delay: 120.ms)
                       .slideY(begin: 0.12, curve: Curves.easeOut),
                   const SizedBox(height: 16),
+
+                  ],
 
                   // ミニゲーム（タイムアタック・ランキング）
                   _buildMiniGames(context)
@@ -821,9 +850,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             HapticService.lightImpact();
                             SoundService().playTap();
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const WhyProgrammingScreen(),
-                              ),
+                              smoothPageRoute(const WhyProgrammingScreen()),
                             );
                           },
                           icon: const Text('🎓', style: TextStyle(fontSize: 16)),
@@ -846,9 +873,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             HapticService.lightImpact();
                             SoundService().playTap();
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const ProgrammingBasicsScreen(),
-                              ),
+                              smoothPageRoute(const ProgrammingBasicsScreen()),
                             );
                           },
                           icon: const Text('📚', style: TextStyle(fontSize: 16)),
@@ -875,23 +900,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // CTA ボタン（全幅）
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        HapticService.lightImpact();
-                        SoundService().playTap();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const StageListScreen(),
+                    child: TapScale(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          HapticService.lightImpact();
+                          SoundService().playTap();
+                          Navigator.of(context).push(
+                            smoothPageRoute(const StageListScreen()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
+                        child: const Text('チャレンジを開始', style: TextStyle(fontSize: 15)),
                       ),
-                      child: const Text('チャレンジを開始', style: TextStyle(fontSize: 15)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -1034,7 +1059,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       HapticService.lightImpact();
                       SoundService().playTap();
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ShopScreen()),
+                        smoothPageRoute(const ShopScreen()),
                       );
                     },
                     child: Container(
@@ -1126,62 +1151,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildWrongAnswersCard(BuildContext context, int count) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFE74C3C).withValues(alpha: 0.3),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('📝', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFE74C3C).withValues(alpha: 0.1),
+      title: const Text(
+        '苦手問題を復習しよう',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE74C3C),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      subtitle: Text(
+        '間違えた問題が $count 件あるよ',
+        style: const TextStyle(fontSize: 11, color: kTextSecondary),
+      ),
+      borderColor: const Color(0xFFE74C3C),
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE74C3C).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('📝', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '苦手問題を復習しよう',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE74C3C),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '間違えた問題が $count 件あるよ',
-                      style: const TextStyle(fontSize: 11, color: kTextSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
           // 最も間違えた問題プレビュー（2回以上ある場合のみ）
           Builder(builder: (ctx) {
             final ws = ref.read(wrongAnswersProvider);
@@ -1195,7 +1182,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ? '${worst.questionText.substring(0, 30)}…'
                 : worst.questionText;
             return Container(
-              margin: const EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: const Color(0xFFE74C3C).withValues(alpha: 0.06),
@@ -1234,7 +1221,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             );
           }),
-          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -1246,9 +1232,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     SoundService().playTap();
                     final answers = ref.read(wrongAnswersProvider).answers;
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => QuizReviewScreen(wrongAnswers: answers),
-                      ),
+                      smoothPageRoute(QuizReviewScreen(wrongAnswers: answers)),
                     );
                   },
                   style: OutlinedButton.styleFrom(
@@ -1288,9 +1272,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 HapticService.selectionClick();
                 SoundService().playTap();
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const WrongAnswersListScreen(),
-                  ),
+                  smoothPageRoute(const WrongAnswersListScreen()),
                 );
               },
               style: TextButton.styleFrom(
@@ -1341,12 +1323,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }).toList();
 
-    final challenge = Challenge(
+    final challenge = Stage(
       id: 'wrong_answers_quiz',
       stageNumber: 0,
       title: '苦手問題クイズ',
       description: '間違えた問題をもう一度解こう！',
-      type: ChallengeType.quiz,
+      type: 'quiz',
       level: StageLevel.beginner,
       icon: '📝',
       isFree: true,
@@ -1354,14 +1336,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => QuizScreen(challenge: challenge)),
+      smoothPageRoute(QuizScreen(challenge: challenge)),
     );
   }
 
   Widget _buildFavoritesCard(
     BuildContext context,
     int count,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
     Set<String> favoriteIds,
   ) {
     final favorites = allChallenges
@@ -1369,71 +1351,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         .take(3)
         .toList();
 
-    return GestureDetector(
+    return IconCard(
+      iconWidget: const Text('⭐', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFE67E22).withValues(alpha: 0.1),
+      title: Text(
+        'お気に入り ($count)',
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE67E22),
+        ),
+      ),
+      subtitle: Row(
+        children: favorites.map((c) => Padding(
+          padding: const EdgeInsets.only(right: 4),
+          child: Text(c.icon, style: const TextStyle(fontSize: 18)),
+        )).toList(),
+      ),
+      trailing: const Icon(Icons.chevron_right, color: Color(0xFFE67E22)),
+      borderColor: const Color(0xFFE67E22),
       onTap: () {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const StageListScreen(openFavorites: true)),
+          smoothPageRoute(const StageListScreen(openFavorites: true)),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: context.cardBg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFE67E22).withValues(alpha: 0.3),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: context.shadowColor,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE67E22).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text('⭐', style: TextStyle(fontSize: 22)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'お気に入り ($count)',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFE67E22),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: favorites.map((c) => Padding(
-                      padding: const EdgeInsets.only(right: 4),
-                      child: Text(c.icon, style: const TextStyle(fontSize: 18)),
-                    )).toList(),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: Color(0xFFE67E22)),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1515,74 +1458,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ? '😊'
             : '✨';
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF27AE60).withValues(alpha: 0.08),
-            const Color(0xFF2ECC71).withValues(alpha: 0.05),
-          ],
+    return IconCard(
+      iconWidget: Text(emoji, style: const TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFF27AE60).withValues(alpha: 0.12),
+      title: const Text(
+        '本日の学習成果',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF27AE60),
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF27AE60).withValues(alpha: 0.3),
-          width: 1,
+      ),
+      subtitle: Text(
+        'ポイント: $achievementPoints',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
+          fontWeight: FontWeight.w600,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+      ),
+      borderColor: const Color(0xFF27AE60),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFF27AE60).withValues(alpha: 0.08),
+          const Color(0xFF2ECC71).withValues(alpha: 0.05),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF27AE60).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '本日の学習成果',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF27AE60),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'ポイント: $achievementPoints',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 6,
@@ -1667,76 +1572,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return a.key.compareTo(b.key);
       });
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF8E44AD).withValues(alpha: 0.3),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('📚', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFF8E44AD).withValues(alpha: 0.1),
+      title: const Text(
+        'フラッシュカード復習スケジュール',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF8E44AB),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      subtitle: Text(
+        '習得後の復習が効果的です',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
+        ),
+      ),
+      trailing: GestureDetector(
+        onTap: () {
+          HapticService.lightImpact();
+          SoundService().playTap();
+          Navigator.of(context).push(
+            smoothPageRoute(const FlashcardScreen()),
+          );
+        },
+        child: const Icon(Icons.chevron_right, color: Color(0xFF8E44AB)),
+      ),
+      borderColor: const Color(0xFF8E44AD),
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF8E44AD).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('📚', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'フラッシュカード復習スケジュール',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8E44AB),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '習得後の復習が効果的です',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  HapticService.lightImpact();
-                  SoundService().playTap();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const FlashcardScreen()),
-                  );
-                },
-                child: const Icon(Icons.chevron_right, color: Color(0xFF8E44AB)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
           Wrap(
             spacing: 6,
             runSpacing: 6,
@@ -1748,10 +1614,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 onTap: () {
                   HapticService.lightImpact();
                   SoundService().playTap();
-                  // TODO: Navigate to FlashcardScreen with category pre-selected
-                  // For now, just open the flashcard screen
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+                    smoothPageRoute(FlashcardScreen(
+                      initialCategory: category,
+                    )),
                   );
                 },
                 child: Container(
@@ -1812,150 +1678,146 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildWeakStagesCard(
     BuildContext context,
-    List<Challenge> weakStages,
+    List<Stage> weakStages,
     Map<String, UserProgress> progressMap,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFF39C12).withValues(alpha: 0.35),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('⬆️', style: TextStyle(fontSize: 20)),
+      iconBackgroundColor: const Color(0xFFF39C12).withValues(alpha: 0.12),
+      iconSize: 40,
+      title: const Text(
+        '3つ星を狙え！',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE67E22),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF39C12).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Center(
-                  child: Text('⬆️', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '3つ星を狙え！',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE67E22),
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    const Text(
-                      '満点でさらにポイントアップ！',
-                      style: TextStyle(fontSize: 10, color: kTextSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          ...weakStages.map((c) {
-            final stars = progressMap[c.id]?.starsEarned ?? 0;
-            final levelColor = c.level == StageLevel.beginner
-                ? kPrimaryColor
-                : c.level == StageLevel.intermediate
-                    ? const Color(0xFF9B59B6)
-                    : const Color(0xFFE67E22);
-            // 苦手問題があるか確認
-            final wrongState = ref.read(wrongAnswersProvider);
-            final wrongCount = c.type == ChallengeType.quiz
-                ? c.questions.fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
-                : 0;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: GestureDetector(
-                onTap: () {
-                  HapticService.lightImpact();
-                  SoundService().playTap();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => c.type == ChallengeType.visual
-                          ? EditorScreen(challenge: c)
-                          : QuizScreen(challenge: c),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: levelColor.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: levelColor.withValues(alpha: 0.2),
-                    ),
+      subtitle: const Text(
+        '満点でさらにポイントアップ！',
+        style: TextStyle(fontSize: 10, color: kTextSecondary),
+      ),
+      borderColor: const Color(0xFFF39C12),
+      content: Column(
+        children: weakStages.map((c) {
+          final stars = progressMap[c.id]?.starsEarned ?? 0;
+          final levelColor = c.level == StageLevel.beginner
+              ? kPrimaryColor
+              : c.level == StageLevel.intermediate
+                  ? const Color(0xFF9B59B6)
+                  : const Color(0xFFE67E22);
+          // 苦手問題があるか確認
+          final wrongState = ref.read(wrongAnswersProvider);
+          final wrongCount = c.type == 'quiz'
+              ? (c.questions ?? []).fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
+              : 0;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: GestureDetector(
+              onTap: () {
+                HapticService.lightImpact();
+                SoundService().playTap();
+                Navigator.of(context).push(
+                  smoothPageRoute(
+                    c.type == 'visual'
+                        ? EditorScreen(challenge: c)
+                        : QuizScreen(challenge: c),
                   ),
-                  child: Row(
-                    children: [
-                      Text(c.icon, style: const TextStyle(fontSize: 18)),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          c.title,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: context.textPrimary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: levelColor.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: levelColor.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Text(c.icon, style: const TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        c.title,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: context.textPrimary,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (wrongCount > 0) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Text(
-                            '🔥×$wrongCount',
-                            style: const TextStyle(fontSize: 9, color: Color(0xFFE64A00)),
-                          ),
+                    ),
+                    if (wrongCount > 0) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        const SizedBox(width: 4),
-                      ],
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(
-                          3,
-                          (i) => Icon(
-                            i < stars ? Icons.star : Icons.star_border,
-                            size: 14,
-                            color: i < stars ? kStarColor : context.borderColor,
-                          ),
+                        child: Text(
+                          '🔥×$wrongCount',
+                          style: const TextStyle(fontSize: 9, color: Color(0xFFE64A00)),
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.chevron_right, size: 14, color: kTextSecondary),
                     ],
-                  ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(
+                        3,
+                        (i) => Icon(
+                          i < stars ? Icons.star : Icons.star_border,
+                          size: 14,
+                          color: i < stars ? kStarColor : context.borderColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.chevron_right, size: 14, color: kTextSecondary),
+                  ],
                 ),
               ),
-            );
-          }),
-        ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  /// プレミアム限定ステージなら課金モーダルを表示し、無料ステージなら
+  /// エディタ／クイズ画面へ遷移する共通ヘルパー。
+  ///
+  /// 「今日のチャレンジ」カード・連続記録危機バナー・おかえりバナーの
+  /// 3箇所から呼び出され、プレミアムロックの回避（ペイウォールバイパス）を防ぐ。
+  void _openStageOrShowPaywall(BuildContext context, Stage challenge) {
+    if (!challenge.isFree) {
+      HapticService.lightImpact();
+      SoundService().playTap();
+      AppDialog.confirm(
+        context,
+        emoji: '🔒',
+        title: 'プレミアム限定ステージ',
+        message: 'このステージはプレミアム会員限定です。\nアップグレードしてすべてのステージを解放しよう！',
+        okLabel: 'アップグレード',
+        cancelLabel: 'とじる',
+      ).then((upgrade) {
+        if (upgrade && context.mounted) {
+          Navigator.of(context).push(
+            smoothPageRoute(const PaywallScreen()),
+          );
+        }
+      });
+      return;
+    }
+    HapticService.lightImpact();
+    SoundService().playTap();
+    Navigator.of(context).push(
+      smoothPageRoute(
+        challenge.type == 'visual'
+            ? EditorScreen(challenge: challenge)
+            : QuizScreen(challenge: challenge),
       ),
     );
   }
@@ -1966,19 +1828,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        HapticService.mediumImpact();
-        SoundService().playTap();
         final next = allChallenges.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
           orElse: () => allChallenges.first,
         );
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => next.type == ChallengeType.visual
-                ? EditorScreen(challenge: next)
-                : QuizScreen(challenge: next),
-          ),
-        );
+        _openStageOrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2051,7 +1905,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const WhyProgrammingScreen()),
+          smoothPageRoute(const WhyProgrammingScreen()),
         );
       },
       child: Container(
@@ -2142,19 +1996,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final progressMap = ref.read(progressProvider);
     return GestureDetector(
       onTap: () {
-        HapticService.lightImpact();
-        SoundService().playTap();
         final next = allChallenges.firstWhere(
           (c) => !(progressMap[c.id]?.isCompleted ?? false),
           orElse: () => allChallenges.first,
         );
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => next.type == ChallengeType.visual
-                ? EditorScreen(challenge: next)
-                : QuizScreen(challenge: next),
-          ),
-        );
+        _openStageOrShowPaywall(context, next);
       },
       child: Container(
       width: double.infinity,
@@ -2241,7 +2087,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildWeeklyChallenge(
+  Widget _buildWeeklyStage(
     BuildContext context,
     ProgressNotifier notifier,
     int completedCount,
@@ -2314,7 +2160,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         weeklyClearedCount.clamp(0, 7), 7,
       ),
       (
-        '💫', '3つ星コレクター', '累計 3つ星ステージを 3 つ取ろう',
+        '💫', '今週の3つ星チャレンジ', '累計 3つ星ステージを 3 つ取ろう',
         perfectCount.clamp(0, 3), 3,
       ),
       (
@@ -2343,8 +2189,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (isDone && !notifier.isHomeWeeklyBonusAwardedThisWeek) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        final awarded = notifier.awardHomeWeeklyBonus();
-        if (awarded) {
+        notifier.awardHomeWeeklyBonus().then((awarded) {
+          if (!mounted || !awarded) return;
           HapticService.mediumImpact();
           SoundService().playComplete();
           Future.delayed(const Duration(milliseconds: 600), () {
@@ -2359,7 +2205,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onContinue: () {},
             );
           });
-        }
+        });
       });
     }
 
@@ -2687,7 +2533,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onTap: () {
               HapticService.selectionClick();
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AchievementsScreen()),
+                smoothPageRoute(const AchievementsScreen()),
               );
             },
             child: Row(
@@ -2879,7 +2725,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _showRandomQuickQuiz(
     BuildContext context,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
     Map<String, UserProgress> progressMap,
   ) async {
     HapticService.mediumImpact();
@@ -2887,10 +2733,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // 完了済みのクイズ型チャレンジの問題を収集
     final pool = <(Question, String)>[];
     for (final c in allChallenges) {
-      if (c.type == ChallengeType.quiz &&
+      if (c.type == 'quiz' &&
           (progressMap[c.id]?.isCompleted ?? false) &&
-          c.questions.isNotEmpty) {
-        for (final q in c.questions) {
+          (c.questions?.isNotEmpty ?? false)) {
+        for (final q in c.questions ?? []) {
           pool.add((q, c.title));
         }
       }
@@ -2984,22 +2830,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  Widget _buildDailyMission(BuildContext context, Challenge challenge) {
-    void openChallenge() {
-      if (!challenge.isFree) return;
-      HapticService.lightImpact();
-      SoundService().playTap();
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => challenge.type == ChallengeType.visual
-              ? EditorScreen(challenge: challenge)
-              : QuizScreen(challenge: challenge),
-        ),
-      );
+  Widget _buildDailyMission(BuildContext context, Stage challenge) {
+    void openStage() {
+      _openStageOrShowPaywall(context, challenge);
     }
 
-    return GestureDetector(
-      onTap: openChallenge,
+    return TapScale(
+      onTap: openStage,
       child: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
@@ -3037,15 +2874,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
-                          challenge.type == ChallengeType.visual ? '🧩 ビジュアル' : '❓ クイズ',
+                          challenge.type == 'visual' ? '🧩 ビジュアル' : '❓ クイズ',
                           style: const TextStyle(fontSize: 9, color: Colors.white70),
                         ),
                       ),
                       // 苦手問題がある場合に🔥バッジを表示
                       Builder(builder: (ctx) {
-                        if (challenge.type != ChallengeType.quiz) return const SizedBox.shrink();
+                        if (challenge.type != 'quiz') return const SizedBox.shrink();
                         final wrongState = ref.read(wrongAnswersProvider);
-                        final hasWrong = challenge.questions.any(
+                        final hasWrong = (challenge.questions ?? []).any(
                           (q) => wrongState.wrongCountFor(q.text) > 0,
                         );
                         if (!hasWrong) return const SizedBox.shrink();
@@ -3127,11 +2964,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             delay: 1200.ms,
                             color: Colors.white.withValues(alpha: 0.3),
                           ),
-                        if (challenge.type == ChallengeType.quiz &&
-                            challenge.questions.isNotEmpty) ...[
+                        if (challenge.type == 'quiz' &&
+                            (challenge.questions?.isNotEmpty ?? false)) ...[
                           const SizedBox(width: 8),
                           Text(
-                            '${challenge.questions.length}問',
+                            '${challenge.questions?.length ?? 0}問',
                             style: const TextStyle(fontSize: 11, color: Colors.white60),
                           ),
                         ],
@@ -3369,91 +3206,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   /// コインショップカード
   Widget _buildShopCard(BuildContext context, int coinBalance) {
-    return GestureDetector(
-      onTap: () {
-        HapticService.lightImpact();
-        SoundService().playTap();
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ShopScreen()),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFFFFD700).withValues(alpha: 0.12),
-              const Color(0xFFFFA500).withValues(alpha: 0.06),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFFFD700).withValues(alpha: 0.4),
-          ),
+    return IconCard(
+      iconWidget: const Text('🏪', style: TextStyle(fontSize: 24)),
+      iconBackgroundColor: const Color(0xFFFFD700).withValues(alpha: 0.15),
+      iconSize: 46,
+      title: const Text(
+        'コインショップ',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
         ),
-        child: Row(
+      ),
+      subtitle: Text(
+        'コインでスキンや背景をゲットしよう！',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textPrimary.withValues(alpha: 0.6),
+        ),
+      ),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.5)),
+        ),
+        child: Column(
           children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD700).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text('🏪', style: TextStyle(fontSize: 24)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'コインショップ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'コインでスキンや背景をゲットしよう！',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: context.textPrimary.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // コイン残高
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD700).withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.5)),
-              ),
-              child: Column(
-                children: [
-                  const Text('🪙', style: TextStyle(fontSize: 16)),
-                  Text(
-                    '$coinBalance',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B6914),
-                    ),
-                  ),
-                ],
+            const Text('🪙', style: TextStyle(fontSize: 16)),
+            Text(
+              '$coinBalance',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8B6914),
               ),
             ),
           ],
         ),
       ),
+      borderColor: const Color(0xFFFFD700),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFFFD700).withValues(alpha: 0.12),
+          const Color(0xFFFFA500).withValues(alpha: 0.06),
+        ],
+      ),
+      onTap: () {
+        HapticService.lightImpact();
+        SoundService().playTap();
+        Navigator.of(context).push(
+          smoothPageRoute(const ShopScreen()),
+        );
+      },
     );
   }
 
@@ -3481,7 +3288,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const TimeAttackScreen()),
+                    smoothPageRoute(const TimeAttackScreen()),
                   );
                 },
               ),
@@ -3497,7 +3304,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   HapticService.lightImpact();
                   SoundService().playTap();
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const RankingScreen()),
+                    smoothPageRoute(const RankingScreen()),
                   );
                 },
               ),
@@ -3514,7 +3321,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             HapticService.lightImpact();
             SoundService().playTap();
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+              smoothPageRoute(const FlashcardScreen()),
             );
           },
         ),
@@ -3529,9 +3336,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               HapticService.mediumImpact();
               SoundService().playTap();
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const TimeAttackScreen(initialWeakMode: true),
-                ),
+                smoothPageRoute(const TimeAttackScreen(initialWeakMode: true)),
               );
             },
           ),
@@ -3557,7 +3362,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const CharacterScreen()),
+          smoothPageRoute(const CharacterScreen()),
         );
       },
       child: Container(
@@ -3599,113 +3404,73 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDailyReviewCard(BuildContext context, bool doneToday, int reviewStreak) {
-    return GestureDetector(
-      onTap: doneToday
-          ? null
-          : () {
-              HapticService.lightImpact();
-              SoundService().playTap();
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const DailyReviewScreen()),
-              );
-            },
-      child: Opacity(
-        opacity: doneToday ? 0.65 : 1.0,
-        child: Container(
-          decoration: BoxDecoration(
-            color: context.cardBg,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: const Color(0xFF1ABC9C).withValues(alpha: 0.5),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+    return Opacity(
+      opacity: doneToday ? 0.65 : 1.0,
+      child: IconCard(
+        iconWidget: Text(
+          doneToday ? '✅' : '📖',
+          style: const TextStyle(fontSize: 22),
+        ),
+        iconBackgroundColor: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
+        iconSize: 44,
+        title: Row(
+          children: [
+            const Text(
+              '今日の復習',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF16A085),
               ),
-            ],
-          ),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
+            ),
+            if (reviewStreak >= 2) ...[
+              const SizedBox(width: 8),
               Container(
-                width: 44,
-                height: 44,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Center(
-                  child: Text(
-                    doneToday ? '✅' : '📖',
-                    style: const TextStyle(fontSize: 22),
+                child: Text(
+                  '📖 $reviewStreak日連続',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF16A085),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Text(
-                          '今日の復習',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF16A085),
-                          ),
-                        ),
-                        if (reviewStreak >= 2) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '📖 $reviewStreak日連続',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF16A085),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Builder(builder: (ctx) {
-                      final wrongCount = ref.read(wrongAnswersProvider).count;
-                      final subtitle = doneToday
-                          ? '今日の復習は済んでいます！また明日'
-                          : wrongCount > 0
-                              ? '🔥 苦手問題$wrongCount件含む・ボーナスポイントあり'
-                              : 'クリア済みステージから5問・ボーナスポイントあり';
-                      return Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: !doneToday && wrongCount > 0
-                              ? const Color(0xFFE64A00)
-                              : kTextSecondary,
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-              if (!doneToday)
-                const Icon(Icons.chevron_right, color: Color(0xFF1ABC9C)),
             ],
-          ),
+          ],
         ),
+        subtitle: Builder(builder: (ctx) {
+          final wrongCount = ref.read(wrongAnswersProvider).count;
+          final subtitle = doneToday
+              ? '今日の復習は済んでいます！また明日'
+              : wrongCount > 0
+                  ? '🔥 苦手問題$wrongCount件含む・ボーナスポイントあり'
+                  : 'クリア済みステージから5問・ボーナスポイントあり';
+          return Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 11,
+              color: !doneToday && wrongCount > 0
+                  ? const Color(0xFFE64A00)
+                  : kTextSecondary,
+            ),
+          );
+        }),
+        trailing: !doneToday ? const Icon(Icons.chevron_right, color: Color(0xFF1ABC9C)) : null,
+        borderColor: const Color(0xFF1ABC9C),
+        onTap: doneToday
+            ? null
+            : () {
+                HapticService.lightImpact();
+                SoundService().playTap();
+                Navigator.of(context).push(
+                  smoothPageRoute(const DailyReviewScreen()),
+                );
+              },
       ),
     );
   }
@@ -3714,7 +3479,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     BuildContext context,
     String level,
     Map<String, UserProgress> progressMap,
-    List<Challenge> allChallenges,
+    List<Stage> allChallenges,
   ) {
     final String unitTitle;
     final String unitNumber;
@@ -3737,21 +3502,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         unitIcon = '🚀';
     }
 
-    final unitChallenges = allChallenges.where((c) => c.level == level).toList();
+    final unitStages = allChallenges.where((c) => c.level == level).toList();
     final completedInUnit =
-        unitChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    final totalInUnit = unitChallenges.length;
+        unitStages.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    final totalInUnit = unitStages.length;
     final progressText =
         completedInUnit == 0 ? '未開始' : '$completedInUnit/$totalInUnit完了';
     // このユニットの苦手問題数
     final wrongState = ref.read(wrongAnswersProvider);
-    final unitWrongCount = unitChallenges
-        .where((c) => c.type == ChallengeType.quiz)
-        .fold<int>(0, (sum, c) => sum + c.questions.fold<int>(
+    final unitWrongCount = unitStages
+        .where((c) => c.type == 'quiz')
+        .fold<int>(0, (sum, c) => sum + (c.questions ?? []).fold<int>(
           0, (s, q) => s + wrongState.wrongCountFor(q.text)));
-    final unitWrongStages = unitChallenges
-        .where((c) => c.type == ChallengeType.quiz &&
-            c.questions.any((q) => wrongState.wrongCountFor(q.text) > 0))
+    final unitWrongStages = unitStages
+        .where((c) => c.type == 'quiz' &&
+            (c.questions ?? []).any((q) => wrongState.wrongCountFor(q.text) > 0))
         .length;
 
     return GestureDetector(
@@ -3759,9 +3524,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HapticService.lightImpact();
         SoundService().playTap();
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => StageListScreen(initialLevel: level),
-          ),
+          smoothPageRoute(StageListScreen(initialLevel: level)),
         );
       },
       child: Container(
@@ -4307,7 +4070,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
                           ),
                           child: Center(
                             child: Text(
-                              String.fromCharCode(0x41 + i), // A, B, C, D
+                              String.fromCharCode(0x41 + (i as int)), // A, B, C, D
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -4562,72 +4325,34 @@ class _LevelUpOverlay extends StatelessWidget {
             ? '🔥 あと${bestStreak - currentStreak}日でベスト記録！'
             : '💪 連続学習を継続中！';
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFFF6B35).withValues(alpha: 0.08),
-            const Color(0xFFFF8C42).withValues(alpha: 0.05),
-          ],
+    return IconCard(
+      iconWidget: const Text('🔥', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFFF6B35).withValues(alpha: 0.12),
+      title: const Text(
+        '学習ストリーク',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFFF6B35).withValues(alpha: 0.3),
-          width: 1,
+      ),
+      subtitle: Text(
+        motivationMessage,
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+      ),
+      borderColor: const Color(0xFFFF6B35),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFFF6B35).withValues(alpha: 0.08),
+          const Color(0xFFFF8C42).withValues(alpha: 0.05),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('🔥', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '学習ストリーク',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      motivationMessage,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(

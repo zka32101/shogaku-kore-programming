@@ -320,7 +320,12 @@ const List<Flashcard> kFlashcards = [
 // ─── フラッシュカードセッション画面 ──────────────────────────────────────────
 
 class FlashcardScreen extends ConsumerStatefulWidget {
-  const FlashcardScreen({super.key});
+  final String? initialCategory;
+
+  const FlashcardScreen({
+    super.key,
+    this.initialCategory,
+  });
 
   @override
   ConsumerState<FlashcardScreen> createState() => _FlashcardScreenState();
@@ -390,6 +395,8 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
   @override
   void initState() {
     super.initState();
+    // Initialize with provided category if available
+    _selectedCategory = widget.initialCategory;
     _flipController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -1026,7 +1033,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                           ref.watch(flashcardProvider).masteredCount;
                       final total = kFlashcards.length;
                       return Text(
-                        '習得済み $mastered / $total',
+                        'おぼえた $mastered / $total',
                         style: const TextStyle(
                           fontSize: 11,
                           color: Colors.white70,
@@ -1039,12 +1046,27 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
               // 自動めくりトグル
               if (!_listViewMode)
                 IconButton(
-                  icon: Icon(
-                    Icons.auto_mode,
-                    color: _autoFlipEnabled
-                        ? Colors.yellow.shade300
-                        : Colors.white54,
-                    size: 20,
+                  icon: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.auto_mode,
+                        color: _autoFlipEnabled
+                            ? Colors.yellow.shade300
+                            : Colors.white54,
+                        size: 20,
+                      ),
+                      Text(
+                        '自動',
+                        style: TextStyle(
+                          fontSize: 8,
+                          height: 1,
+                          color: _autoFlipEnabled
+                              ? Colors.yellow.shade300
+                              : Colors.white54,
+                        ),
+                      ),
+                    ],
                   ),
                   tooltip: _autoFlipEnabled
                       ? '自動めくり: オン ($_autoFlipSeconds秒)'
@@ -1071,10 +1093,23 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
               // クイズモードトグル
               if (!_listViewMode)
                 IconButton(
-                  icon: Icon(
-                    Icons.quiz_outlined,
-                    color: _quizMode ? Colors.yellow.shade300 : Colors.white54,
-                    size: 20,
+                  icon: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.quiz_outlined,
+                        color: _quizMode ? Colors.yellow.shade300 : Colors.white54,
+                        size: 20,
+                      ),
+                      Text(
+                        'クイズ',
+                        style: TextStyle(
+                          fontSize: 8,
+                          height: 1,
+                          color: _quizMode ? Colors.yellow.shade300 : Colors.white54,
+                        ),
+                      ),
+                    ],
                   ),
                   tooltip: _quizMode ? 'クイズモード: オン' : 'クイズモード: オフ',
                   onPressed: () {
@@ -1106,10 +1141,23 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                 ),
               // 一覧/カードモード切り替え
               IconButton(
-                icon: Icon(
-                  _listViewMode ? Icons.style : Icons.list,
-                  color: Colors.white,
-                  size: 22,
+                icon: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _listViewMode ? Icons.style : Icons.list,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                    Text(
+                      _listViewMode ? 'カード' : '一覧',
+                      style: const TextStyle(
+                        fontSize: 8,
+                        height: 1,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
                 tooltip: _listViewMode ? 'カードモード' : '一覧モード',
                 onPressed: () {
@@ -1196,7 +1244,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
             final label = switch (f) {
               _MasteryFilter.all => '全て',
               _MasteryFilter.unmastered => '未習得',
-              _MasteryFilter.mastered => '習得済み',
+              _MasteryFilter.mastered => 'おぼえた',
             };
             final isSelected = f == _masteryFilter;
             return Padding(
@@ -1405,7 +1453,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                           Icon(Icons.check_circle, size: 11, color: Color(0xFF27AE60)),
                           SizedBox(width: 3),
                           Text(
-                            '習得済み',
+                            'おぼえた',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -1583,7 +1631,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                     children: [
                       Icon(Icons.check_circle, size: 11, color: Color(0xFF27AE60)),
                       SizedBox(width: 3),
-                      Text('習得済み', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF27AE60))),
+                      Text('おぼえた', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF27AE60))),
                     ],
                   ),
                 ),
@@ -1942,9 +1990,9 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
 
   Widget _buildSortBar() {
     const sortModes = [
-      (_SortMode.defaultOrder,   '🗂️ デフォルト'),
-      (_SortMode.masteredDateNew, '🆕 習得：新'),
-      (_SortMode.masteredDateOld, '📅 習得：古'),
+      (_SortMode.defaultOrder,   '🗂️ ふつう'),
+      (_SortMode.masteredDateNew, '🆕 さいきん覚えた順'),
+      (_SortMode.masteredDateOld, '📅 むかし覚えた順'),
       (_SortMode.alphabetical,    '🔤 あいうえお順'),
     ];
     return Container(
@@ -2489,7 +2537,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                       color: isMastered ? const Color(0xFF27AE60) : kTextSecondary,
                     ),
                     label: Text(
-                      isMastered ? '習得済み' : '習得済みにする',
+                      isMastered ? 'おぼえた' : 'おぼえたにする',
                       style: TextStyle(
                         fontSize: 11,
                         color: isMastered ? const Color(0xFF27AE60) : kTextSecondary,

@@ -9,6 +9,7 @@ import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../widgets/weekly_chart.dart';
 import '../widgets/learning_calendar.dart';
 import '../providers/wrong_answers_provider.dart';
@@ -904,39 +905,35 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
   }
 
   Widget _buildUnitProgress(BuildContext context, Map<String, UserProgress> progressMap) {
+    // ステージIDのハードコードは60ステージ全体とズレやすいため、
+    // 実際のチャレンジデータからレベル別に動的に算出する。
+    final allChallenges = ref.watch(allChallengesProvider);
+    List<String> idsForLevel(String level) => allChallenges
+        .where((c) => c.level == level)
+        .map((c) => c.id)
+        .toList();
+
     final units = [
       _UnitProgress(
         name: 'Unit 1 · 初級',
         subtitle: 'ブロックプログラミング基礎',
         emoji: '🧩',
         color: kPrimaryColor,
-        stageIds: [
-          'stage_01', 'stage_02', 'stage_03', 'stage_04', 'stage_05',
-          'stage_13', 'stage_14', 'stage_15',
-          'stage_21', 'stage_22', 'stage_23', 'stage_24', 'stage_25',
-        ],
+        stageIds: idsForLevel(StageLevel.beginner),
       ),
       _UnitProgress(
         name: 'Unit 2 · 中級',
         subtitle: 'Pythonプログラミング入門',
         emoji: '🐍',
         color: const Color(0xFF9B59B6),
-        stageIds: [
-          'stage_06', 'stage_07', 'stage_08', 'stage_09', 'stage_10',
-          'stage_16', 'stage_17', 'stage_18', 'stage_19',
-          'stage_26', 'stage_27', 'stage_28', 'stage_29', 'stage_30',
-        ],
+        stageIds: idsForLevel(StageLevel.intermediate),
       ),
       _UnitProgress(
         name: 'Unit 3 · 上級',
         subtitle: 'Python応用・自動化',
         emoji: '🚀',
         color: const Color(0xFFE67E22),
-        stageIds: [
-          'stage_11', 'stage_12', 'stage_20',
-          'stage_31', 'stage_32', 'stage_33', 'stage_34', 'stage_35',
-          'stage_36', 'stage_37', 'stage_38', 'stage_39', 'stage_40',
-        ],
+        stageIds: idsForLevel(StageLevel.advanced),
       ),
     ];
 
@@ -965,7 +962,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
 
   Widget _buildRecentlyCompleted(
     BuildContext context,
-    List<Challenge> stages,
+    List<Stage> stages,
     Map<String, UserProgress> progressMap,
   ) {
     return Column(

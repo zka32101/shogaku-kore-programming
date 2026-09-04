@@ -1,0 +1,41 @@
+version: 2
+updates:
+  # Dart/Flutter dependencies
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "02:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "zka32101"
+    labels:
+      - "dependencies"
+      - "dart"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # 自動マージの設定（テスト済みの小さな更新）
+    auto-commit-frequency: "weekly"
+    # セキュリティアップデートは優先度を上げる
+    security-and-updates-schedule:
+      interval: "daily"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "zka32101"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(deps)"
+      include: "scope"

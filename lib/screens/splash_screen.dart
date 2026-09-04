@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math' as math;
 import '../config/theme.dart';
 import '../providers/profile_provider.dart';
+import '../providers/auth_provider.dart';
 import '../main.dart';
 import 'onboarding_screen.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -51,10 +53,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   void _navigate() {
-    final profile = ref.read(profileProvider);
-    final destination = profile.isOnboardingComplete
-        ? const MainNavigator()
-        : const OnboardingScreen();
+    final currentUser = ref.read(currentUserProvider);
+
+    // ─────────────────────────────────────────────────────────
+    // 認証状態に基づいてナビゲーション先を決定
+    // ─────────────────────────────────────────────────────────
+    final destination = _getNextScreen(currentUser);
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -64,6 +68,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         transitionDuration: const Duration(milliseconds: 500),
       ),
     );
+  }
+
+  /// 現在の認証状態と設定に基づいて、次のスクリーンを決定
+  Widget _getNextScreen(dynamic currentUser) {
+    // ログインしていない → LoginScreen
+    if (currentUser == null) {
+      return const LoginScreen();
+    }
+
+    // ログイン済み
+    final profile = ref.read(profileProvider);
+
+    // オンボーディング完了 → MainNavigator
+    if (profile.isOnboardingComplete) {
+      return const MainNavigator();
+    }
+
+    // オンボーディング未完了 → OnboardingScreen
+    return const OnboardingScreen();
   }
 
   @override

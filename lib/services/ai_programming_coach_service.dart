@@ -228,6 +228,70 @@ $codeSnippet
     }
   }
 
+  /// 日替わり詰め問の解答コードを評価
+  Future<Map<String, dynamic>> evaluatePuzzleSolution({
+    required String problemDescription,
+    required String goalBehavior,
+    required String userCode,
+  }) async {
+    if (!isConfigured) {
+      return {'isCorrect': false, 'feedback': 'API キーが設定されていません。'};
+    }
+
+    try {
+      final prompt = '''プログラミング詰め将棋の採点者です。小学生が書いたコードを評価します。
+
+**問題**: $problemDescription
+**目標の動き**: $goalBehavior
+**子どもが書いたコード**:
+$userCode
+
+このコードが目標を達成できているか判定してください。
+必ず1行目に判定結果だけを "CORRECT" または "INCORRECT" と書き、
+2行目以降に2-3文で日本語のフィードバックを書いてください（褒めるところがあれば褒め、
+間違いがあれば優しく、答えを直接教えずヒントで指摘してください）。最後に絵文字を付けてください。''';
+
+      final response = await http.post(
+        Uri.parse(_apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': _apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: jsonEncode({
+          'model': 'claude-3-5-haiku-20241022',
+          'max_tokens': 300,
+          'messages': [
+            {'role': 'user', 'content': prompt}
+          ],
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        final content = jsonResponse['content'] as List?;
+        if (content != null && content.isNotEmpty) {
+          final text = (content[0]['text'] as String? ?? '').trim();
+          final lines = text.split('\n');
+          final firstLine = lines.isNotEmpty ? lines.first.trim().toUpperCase() : '';
+          final isCorrect =
+              firstLine.contains('CORRECT') && !firstLine.contains('INCORRECT');
+          final feedback = lines.length > 1
+              ? lines.sublist(1).join('\n').trim()
+              : text;
+          return {
+            'isCorrect': isCorrect,
+            'feedback': feedback.isNotEmpty ? feedback : text,
+          };
+        }
+      }
+
+      return {'isCorrect': false, 'feedback': '評価の生成に失敗しました。'};
+    } catch (e) {
+      return {'isCorrect': false, 'feedback': 'エラー: $e'};
+    }
+  }
+
   /// 日替わり詰め問生成
   Future<Map<String, dynamic>> generateDailyPuzzle({
     required String difficulty, // '初級', '中級', '上級'

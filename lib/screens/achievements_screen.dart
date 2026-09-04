@@ -10,6 +10,7 @@ import '../config/constants.dart';
 import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
 import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
@@ -33,6 +34,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final FocusNode _focusNode = FocusNode();
+  bool _showDetailedStats = false;
 
   @override
   void initState() {
@@ -197,7 +199,26 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     final intUnitComplete = unitAllDone(StageLevel.intermediate);
     final advUnitComplete = unitAllDone(StageLevel.advanced);
 
-    final badges = _getBadges(completedCount, totalStars, longestStreak, taState.playCount, perfectCount, taState.bestCorrect, masteredCards, wrongCount, totalResolvedWrong, totalAnswered, reviewStreak, totalReviewsCompleted, favoritesCount, totalLearningSeconds, taState.bestMaxCombo, begUnitComplete, intUnitComplete, advUnitComplete, totalPerfectRuns: notifier.totalPerfectRuns);
+    // ユニット別完了数（次に解除できるバッジのハイライト用の進捗シグナル）
+    int unitDone(String level) => allChallenges
+        .where((c) => c.level == level && (progressMap[c.id]?.isCompleted ?? false))
+        .length;
+    int unitTotal(String level) => allChallenges.where((c) => c.level == level).length;
+    final begUnitDone = unitDone(StageLevel.beginner);
+    final begUnitTotal = unitTotal(StageLevel.beginner);
+    final intUnitDone = unitDone(StageLevel.intermediate);
+    final intUnitTotal = unitTotal(StageLevel.intermediate);
+    final advUnitDone = unitDone(StageLevel.advanced);
+    final advUnitTotal = unitTotal(StageLevel.advanced);
+
+    final badges = _getBadges(completedCount, totalStars, longestStreak, taState.playCount, perfectCount, taState.bestCorrect, masteredCards, wrongCount, totalResolvedWrong, totalAnswered, reviewStreak, totalReviewsCompleted, favoritesCount, totalLearningSeconds, taState.bestMaxCombo, begUnitComplete, intUnitComplete, advUnitComplete,
+        totalPerfectRuns: notifier.totalPerfectRuns,
+        begUnitDone: begUnitDone,
+        begUnitTotal: begUnitTotal,
+        intUnitDone: intUnitDone,
+        intUnitTotal: intUnitTotal,
+        advUnitDone: advUnitDone,
+        advUnitTotal: advUnitTotal);
     final unlockedCount = badges.where((b) => b.isUnlocked).length;
     final weeklyData = notifier.weeklyActivity(weeks: 4);
 
@@ -240,7 +261,14 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _BadgesTab(badges: badges),
+                  _BadgesTab(
+                    badges: badges,
+                    onRefresh: () async {
+                      ref.invalidate(progressProvider);
+                      ref.invalidate(allChallengesProvider);
+                      await Future.delayed(const Duration(milliseconds: 400));
+                    },
+                  ),
                   _CompletedTab(
                     allChallenges: allChallenges,
                     progressMap: progressMap,
@@ -256,6 +284,8 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                     totalStars: totalStars,
                     totalQuestionsAnswered: notifier.totalQuestionsAnswered,
                     totalPerfectRuns: notifier.totalPerfectRuns,
+                    showDetailedStats: _showDetailedStats,
+                    onToggleDetails: () => setState(() => _showDetailedStats = !_showDetailedStats),
                   ),
                 ],
               ),
@@ -365,7 +395,13 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       int totalAnswered, int reviewStreak, int totalReviewsCompleted,
       int favoritesCount, int totalLearningSeconds, int taBestMaxCombo,
       bool begUnitComplete, bool intUnitComplete, bool advUnitComplete,
-      {int totalPerfectRuns = 0}) {
+      {int totalPerfectRuns = 0,
+      int begUnitDone = 0,
+      int begUnitTotal = 0,
+      int intUnitDone = 0,
+      int intUnitTotal = 0,
+      int advUnitDone = 0,
+      int advUnitTotal = 0}) {
     // ストリークバッジは最長記録で判定（一度達成したら保持）
     final streak = longestStreak;
     final totalLearningMinutes = totalLearningSeconds ~/ 60;
@@ -473,24 +509,30 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // ユニット制覇バッジ
       _Badge(
         icon: '🧩',
-        name: '初級ユニット制覇',
+        name: '初級クリア！',
         description: '初級の全ステージをクリア！',
         category: 'progress',
         isUnlocked: begUnitComplete,
+        progressCurrent: begUnitDone,
+        progressTarget: begUnitTotal,
       ),
       _Badge(
         icon: '🐍',
-        name: '中級ユニット制覇',
+        name: '中級クリア！',
         description: '中級の全ステージをクリア！',
         category: 'progress',
         isUnlocked: intUnitComplete,
+        progressCurrent: intUnitDone,
+        progressTarget: intUnitTotal,
       ),
       _Badge(
         icon: '🚀',
-        name: '全ユニット制覇',
+        name: '全部クリア！',
         description: '全ユニット（初・中・上級）をクリア！',
         category: 'progress',
         isUnlocked: advUnitComplete,
+        progressCurrent: advUnitDone,
+        progressTarget: advUnitTotal,
       ),
       // スターバッジ
       _Badge(
@@ -534,9 +576,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         name: 'パーフェクトクリア',
         description: '全${AppConstants.totalStages}ステージ3つ星（${AppConstants.totalStages * 3}ポイント満点）',
         category: 'stars',
-        isUnlocked: totalStars >= 120,
-        progressCurrent: totalStars.clamp(0, 120),
-        progressTarget: 120,
+        isUnlocked: totalStars >= AppConstants.totalStages * 3,
+        progressCurrent: totalStars.clamp(0, AppConstants.totalStages * 3),
+        progressTarget: AppConstants.totalStages * 3,
       ),
       // 3つ星バッジ
       _Badge(
@@ -992,7 +1034,8 @@ enum _BadgeFilter { all, unlocked, locked }
 
 class _BadgesTab extends StatefulWidget {
   final List<_Badge> badges;
-  const _BadgesTab({required this.badges});
+  final Future<void> Function() onRefresh;
+  const _BadgesTab({required this.badges, required this.onRefresh});
 
   @override
   State<_BadgesTab> createState() => _BadgesTabState();
@@ -1020,7 +1063,11 @@ class _BadgesTabState extends State<_BadgesTab> {
       _BadgeFilter.all      => widget.badges,
     };
 
-    return ListView(
+    return RefreshIndicator(
+      color: kPrimaryColor,
+      onRefresh: widget.onRefresh,
+      child: ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: [
         // フィルターチップ
@@ -1140,6 +1187,7 @@ class _BadgesTabState extends State<_BadgesTab> {
             ),
         ],
       ],
+      ),
     );
   }
 }
@@ -1193,7 +1241,7 @@ class _FilterChip extends StatelessWidget {
 enum _CompletedSort { date, stars, level }
 
 class _CompletedTab extends StatefulWidget {
-  final List<Challenge> allChallenges;
+  final List<Stage> allChallenges;
   final Map<String, UserProgress> progressMap;
   final int completedCount;
 
@@ -1383,7 +1431,7 @@ class _CompletedTabState extends State<_CompletedTab> {
 // ──────────── クリア統計サマリーバー ─────────────────────────────────────────────
 
 class _CompletedStatsBar extends StatelessWidget {
-  final List<Challenge> completed;
+  final List<Stage> completed;
   final Map<String, UserProgress> progressMap;
 
   const _CompletedStatsBar({
@@ -1695,7 +1743,7 @@ class _BadgeCard extends StatelessWidget {
             : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1706,7 +1754,7 @@ class _BadgeCard extends StatelessWidget {
                 color: badge.isUnlocked ? null : Colors.grey,
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 4),
             Text(
               badge.name,
               textAlign: TextAlign.center,
@@ -1719,7 +1767,7 @@ class _BadgeCard extends StatelessWidget {
               ),
             ),
             if (showProgress) ...[
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Column(
@@ -1740,11 +1788,11 @@ class _BadgeCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 1),
                     Text(
                       '${badge.progressCurrent}/${badge.progressTarget}',
                       style: TextStyle(
-                        fontSize: 8,
+                        fontSize: 10,
                         color: kPrimaryColor.withValues(alpha: 0.8),
                         fontWeight: FontWeight.bold,
                       ),
@@ -1753,7 +1801,7 @@ class _BadgeCard extends StatelessWidget {
                 ),
               ),
             ] else ...[
-              const SizedBox(height: 2),
+              const SizedBox(height: 1),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
@@ -1762,7 +1810,7 @@ class _BadgeCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 8,
+                    fontSize: 10,
                     color: kTextSecondary,
                   ),
                 ),
@@ -1777,7 +1825,7 @@ class _BadgeCard extends StatelessWidget {
 }
 
 class _CompletedStageCard extends StatelessWidget {
-  final Challenge challenge;
+  final Stage challenge;
   final int starsEarned;
   final DateTime? completedAt;
 
@@ -2086,7 +2134,7 @@ class _Badge {
 
 class _StatsTab extends ConsumerWidget {
   final List<int> weeklyData;
-  final List<Challenge> allChallenges;
+  final List<Stage> allChallenges;
   final Map<String, UserProgress> progressMap;
   final int streakDays;
   final int longestStreak;
@@ -2094,6 +2142,8 @@ class _StatsTab extends ConsumerWidget {
   final int totalStars;
   final int totalQuestionsAnswered;
   final int totalPerfectRuns;
+  final bool showDetailedStats;
+  final VoidCallback onToggleDetails;
 
   const _StatsTab({
     required this.weeklyData,
@@ -2102,6 +2152,8 @@ class _StatsTab extends ConsumerWidget {
     required this.streakDays,
     required this.completedCount,
     required this.totalStars,
+    required this.showDetailedStats,
+    required this.onToggleDetails,
     this.longestStreak = 0,
     this.totalQuestionsAnswered = 0,
     this.totalPerfectRuns = 0,
@@ -2122,9 +2174,7 @@ class _StatsTab extends ConsumerWidget {
     final masteredCount = ref.watch(flashcardProvider).masteredIds.length;
     final totalFlashcards = kFlashcards.length;
     final wrongState = ref.watch(wrongAnswersProvider);
-    final totalSeconds = ref.watch(
-      progressProvider.select((_) => ref.read(progressProvider.notifier).totalLearningSeconds),
-    );
+    final totalSeconds = ref.watch(progressProvider.notifier).totalLearningSeconds;
     final totalMinutes = totalSeconds ~/ 60;
     final maxBar = weeklyData.isEmpty
         ? 1
@@ -2139,115 +2189,6 @@ class _StatsTab extends ConsumerWidget {
           // 28日間アクティビティヒートマップ
           _build28DayHeatmap(context, activityByDate)
               .animate().fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 12),
-          // 週ごとの学習バーチャート
-          _StatCard(
-            title: '📅 週ごとの学習（過去4週）',
-            child: SizedBox(
-              height: 160,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: (maxBar + 2).toDouble(),
-                  barGroups: weeklyData.asMap().entries.map((e) {
-                    return BarChartGroupData(
-                      x: e.key,
-                      barRods: [
-                        BarChartRodData(
-                          toY: e.value.toDouble(),
-                          gradient: const LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [kPrimaryDark, kPrimaryColor],
-                          ),
-                          width: 32,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(6),
-                            topRight: Radius.circular(6),
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                  titlesData: FlTitlesData(
-                    leftTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          final v = weeklyData[value.toInt()];
-                          if (v == 0) return const SizedBox.shrink();
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Text(
-                              '$v',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: kPrimaryColor,
-                              ),
-                            ),
-                          );
-                        },
-                        reservedSize: 20,
-                      ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          const labels = ['3週前', '2週前', '先週', '今週'];
-                          final idx = value.toInt();
-                          if (idx < 0 || idx >= labels.length) {
-                            return const SizedBox.shrink();
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              labels[idx],
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: kTextSecondary,
-                              ),
-                            ),
-                          );
-                        },
-                        reservedSize: 26,
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (value) => FlLine(
-                      color: context.borderColor,
-                      strokeWidth: 1,
-                    ),
-                  ),
-                  barTouchData: BarTouchData(
-                    touchTooltipData: BarTouchTooltipData(
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        return BarTooltipItem(
-                          '${rod.toY.toInt()}クリア',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
           const SizedBox(height: 12),
           // ユニット別進捗
           _StatCard(
@@ -2332,101 +2273,228 @@ class _StatsTab extends ConsumerWidget {
               ],
             ),
           ).animate(delay: 200.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 12),
-          // 累計回答数
-          if (totalQuestionsAnswered > 0)
+          const SizedBox(height: 8),
+          // くわしく見る トグル
+          Center(
+            child: TextButton.icon(
+              onPressed: () {
+                HapticService.selectionClick();
+                onToggleDetails();
+              },
+              icon: Icon(
+                showDetailedStats ? Icons.expand_less : Icons.expand_more,
+                size: 18,
+              ),
+              label: Text(showDetailedStats ? 'とじる' : 'くわしく見る'),
+              style: TextButton.styleFrom(foregroundColor: kPrimaryColor),
+            ),
+          ),
+          if (showDetailedStats) ...[
+            const SizedBox(height: 4),
+            // 週ごとの学習バーチャート
             _StatCard(
-              title: '❓ 累計回答数',
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TweenAnimationBuilder<int>(
-                          tween: IntTween(begin: 0, end: totalQuestionsAnswered),
-                          duration: const Duration(milliseconds: 900),
-                          curve: Curves.easeOut,
-                          builder: (context, value, _) => Text(
-                            '$value 問',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: kPrimaryColor,
+              title: '📅 週ごとの学習（過去4週）',
+              child: SizedBox(
+                height: 160,
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: (maxBar + 2).toDouble(),
+                    barGroups: weeklyData.asMap().entries.map((e) {
+                      return BarChartGroupData(
+                        x: e.key,
+                        barRods: [
+                          BarChartRodData(
+                            toY: e.value.toDouble(),
+                            gradient: const LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [kPrimaryDark, kPrimaryColor],
+                            ),
+                            width: 32,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(6),
+                              topRight: Radius.circular(6),
                             ),
                           ),
+                        ],
+                      );
+                    }).toList(),
+                    titlesData: FlTitlesData(
+                      leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            final v = weeklyData[value.toInt()];
+                            if (v == 0) return const SizedBox.shrink();
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                '$v',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: kPrimaryColor,
+                                ),
+                              ),
+                            );
+                          },
+                          reservedSize: 20,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          completedCount > 0
-                              ? '平均 ${(totalQuestionsAnswered / completedCount).toStringAsFixed(1)} 問/ステージ'
-                              : 'クイズの回答が記録されます',
-                          style: const TextStyle(fontSize: 11, color: kTextSecondary),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            const labels = ['3週前', '2週前', '先週', '今週'];
+                            final idx = value.toInt();
+                            if (idx < 0 || idx >= labels.length) {
+                              return const SizedBox.shrink();
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                labels[idx],
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: kTextSecondary,
+                                ),
+                              ),
+                            );
+                          },
+                          reservedSize: 26,
                         ),
-                      ],
+                      ),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine: (value) => FlLine(
+                        color: context.borderColor,
+                        strokeWidth: 1,
+                      ),
+                    ),
+                    barTouchData: BarTouchData(
+                      touchTooltipData: BarTouchTooltipData(
+                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                          return BarTooltipItem(
+                            '${rod.toY.toInt()}クリア',
+                            const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                  const Text('🧠', style: TextStyle(fontSize: 40)),
-                ],
+                ),
               ),
-            ).animate(delay: 250.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
-          if (totalSeconds > 0) ...[
+            ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
             const SizedBox(height: 12),
-            // 累計学習時間
-            _StatCard(
-              title: '⏱ 累計学習時間',
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TweenAnimationBuilder<int>(
-                          tween: IntTween(begin: 0, end: totalMinutes),
-                          duration: const Duration(milliseconds: 900),
-                          curve: Curves.easeOut,
-                          builder: (context, value, _) => Text(
-                            value >= 60
-                                ? '${value ~/ 60} 時間 ${value % 60} 分'
-                                : '$value 分',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF8E44AD),
+            // 累計回答数
+            if (totalQuestionsAnswered > 0)
+              _StatCard(
+                title: '❓ 累計回答数',
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TweenAnimationBuilder<int>(
+                            tween: IntTween(begin: 0, end: totalQuestionsAnswered),
+                            duration: const Duration(milliseconds: 900),
+                            curve: Curves.easeOut,
+                            builder: (context, value, _) => Text(
+                              '$value 問',
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: kPrimaryColor,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'クイズ・復習・タイムアタックの合計',
-                          style: TextStyle(fontSize: 11, color: kTextSecondary),
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Text(
+                            completedCount > 0
+                                ? '平均 ${(totalQuestionsAnswered / completedCount).toStringAsFixed(1)} 問/ステージ'
+                                : 'クイズの回答が記録されます',
+                            style: const TextStyle(fontSize: 11, color: kTextSecondary),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Text('⏱', style: TextStyle(fontSize: 40)),
-                ],
-              ),
-            ).animate(delay: 260.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+                    const Text('🧠', style: TextStyle(fontSize: 40)),
+                  ],
+                ),
+              ).animate(delay: 250.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+            if (totalSeconds > 0) ...[
+              const SizedBox(height: 12),
+              // 累計学習時間
+              _StatCard(
+                title: '⏱ 累計学習時間',
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TweenAnimationBuilder<int>(
+                            tween: IntTween(begin: 0, end: totalMinutes),
+                            duration: const Duration(milliseconds: 900),
+                            curve: Curves.easeOut,
+                            builder: (context, value, _) => Text(
+                              value >= 60
+                                  ? '${value ~/ 60} 時間 ${value % 60} 分'
+                                  : '$value 分',
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF8E44AD),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'クイズ・復習・タイムアタックの合計',
+                            style: TextStyle(fontSize: 11, color: kTextSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Text('⏱', style: TextStyle(fontSize: 40)),
+                  ],
+                ),
+              ).animate(delay: 260.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+            ],
+            const SizedBox(height: 12),
+            // フラッシュカード習得 & 苦手問題
+            _buildLearningToolsCard(context, masteredCount, totalFlashcards, wrongState, ref)
+                .animate(delay: 280.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+            const SizedBox(height: 12),
+            // タイムアタック成績
+            _buildTimeAttackCard(context, ref)
+                .animate(delay: 310.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+            const SizedBox(height: 12),
+            // 今日の復習成績
+            _buildDailyReviewCard(context, ref)
+                .animate(delay: 330.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+            const SizedBox(height: 12),
+            // 完了予測
+            _buildEstimationCard(context),
+            const SizedBox(height: 12),
+            // 学習品質
+            _buildLearningQualityCard(context),
           ],
-          const SizedBox(height: 12),
-          // フラッシュカード習得 & 苦手問題
-          _buildLearningToolsCard(context, masteredCount, totalFlashcards, wrongState, ref)
-              .animate(delay: 280.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 12),
-          // タイムアタック成績
-          _buildTimeAttackCard(context, ref)
-              .animate(delay: 310.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 12),
-          // 今日の復習成績
-          _buildDailyReviewCard(context, ref)
-              .animate(delay: 330.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 12),
-          // 完了予測
-          _buildEstimationCard(context),
-          const SizedBox(height: 12),
-          // 学習品質
-          _buildLearningQualityCard(context),
           const SizedBox(height: 8),
         ],
       ),

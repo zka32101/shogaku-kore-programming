@@ -5,9 +5,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math' as math;
-import '../config/constants.dart';
+import '../config/constants.dart' as constants;
 import '../config/theme.dart';
-import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/gallery_provider.dart';
 import '../models/block_model.dart';
 import '../providers/editor_provider.dart';
@@ -21,9 +21,16 @@ import 'badge_unlock_screen.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/app_dialog.dart';
 import '../providers/coin_provider.dart';
+import '../providers/character_provider.dart';
+import '../widgets/character_reaction_widget.dart';
+import '../providers/step_executor_provider.dart';
+import '../widgets/step_execution_controls.dart';
+import '../widgets/variable_viewer.dart';
+import '../widgets/scoring_result_widget.dart';
+import '../widgets/execution_timeline.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
-  final Challenge challenge;
+  final Stage challenge;
 
   const EditorScreen({super.key, required this.challenge});
 
@@ -39,6 +46,32 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   DateTime? _sessionStart;
   bool _timeRecorded = false;
   Block? _lastAddedBlock;
+  CharacterMood _characterMood = CharacterMood.idle;
+  String? _characterMessage;
+  int _reactionToken = 0;
+  final math.Random _rng = math.Random();
+  bool _stepExecutionMode = false;
+  ScoringResult? _lastScoringResult;
+
+  /// キャラクターのリアクションを一時的に切り替え、しばらくしたらアイドルに戻す
+  void _reactCharacter(
+    CharacterMood mood, {
+    String? message,
+    Duration hold = const Duration(milliseconds: 2200),
+  }) {
+    final token = ++_reactionToken;
+    setState(() {
+      _characterMood = mood;
+      _characterMessage = message;
+    });
+    Future.delayed(hold, () {
+      if (!mounted || token != _reactionToken) return;
+      setState(() {
+        _characterMood = CharacterMood.idle;
+        _characterMessage = null;
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -70,7 +103,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final key = event.logicalKey;
     if (key == LogicalKeyboardKey.keyH) {
-      if (widget.challenge.hints.isNotEmpty) {
+      if (widget.challenge.hints?.isNotEmpty ?? false) {
         HapticService.selectionClick();
         setState(() => _showHint = !_showHint);
         return KeyEventResult.handled;
@@ -101,9 +134,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
     if (key == LogicalKeyboardKey.enter) {
       final editorState = ref.read(editorProvider);
-      if (editorState.scriptBlocks.isNotEmpty) {
+      if (editorState.scriptBlocks.isNotEmpty && !editorState.hasSubmitted) {
         HapticService.lightImpact();
-        ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput);
+        ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput ?? "");
         Future.delayed(const Duration(milliseconds: 100), () {
           final s = ref.read(editorProvider);
           if (s.hasSubmitted) _showResult(s.isCorrect);
@@ -184,9 +217,40 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     );
   }
 
-  void _showResult(bool isCorrect) {
+  Future<void> _showResult(bool isCorrect) async {
     final isFirstComplete =
         !(ref.read(progressProvider)[widget.challenge.id]?.isCompleted ?? false);
+
+    if (isCorrect) {
+      // キャラクターが喜んでくれる & 育成が進む
+      _reactCharacter(
+        CharacterMood.celebrating,
+        message: kCelebrationMessages[_rng.nextInt(kCelebrationMessages.length)],
+        hold: const Duration(seconds: 4),
+      );
+      await ref.read(characterProvider.notifier).growFromCorrectAnswer(
+            challengeType: 'visual',
+            difficulty: widget.challenge.level,
+          );
+      if (!mounted) return;
+      final charState = ref.read(characterProvider);
+      if (charState.didStageUp && charState.lastGrowthMessage != null) {
+        // ステージアップ！ 特別なリアクションで進化の瞬間を演出
+        _reactCharacter(
+          CharacterMood.celebrating,
+          message: charState.lastGrowthMessage!,
+          hold: const Duration(seconds: 4),
+        );
+        ref.read(characterProvider.notifier).clearGrowthMessage();
+      }
+    } else {
+      // 不正解でも責めず、応援する
+      _reactCharacter(
+        CharacterMood.encouraging,
+        message: kEncouragementMessages[_rng.nextInt(kEncouragementMessages.length)],
+        hold: const Duration(seconds: 4),
+      );
+    }
 
     if (isCorrect) {
       final levelBefore = ref.read(progressProvider.notifier).currentLevel;
@@ -235,12 +299,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final allChallenges = ref.read(allChallengesProvider);
     final currentIndex =
         allChallenges.indexWhere((c) => c.id == widget.challenge.id);
-    Challenge? nextChallenge;
+    Stage? nextStage;
     if (isCorrect && currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
       for (int i = currentIndex + 1; i < allChallenges.length; i++) {
         final c = allChallenges[i];
-        if (c.type == ChallengeType.visual && c.isFree) {
-          nextChallenge = c;
+        if (c.type == constants.ChallengeType.visual && c.isFree) {
+          nextStage = c;
           break;
         }
       }
@@ -262,7 +326,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         isCorrect: isCorrect,
         elapsedSeconds: elapsedSec,
         challengeTitle: widget.challenge.title,
-        nextChallenge: nextChallenge,
+        nextStage: nextStage,
         onRetry: () {
           Navigator.pop(ctx);
           ref.read(editorProvider.notifier).reset();
@@ -271,13 +335,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           Navigator.pop(ctx);
           Navigator.pop(context);
         },
-        onNext: nextChallenge != null
+        onNext: nextStage != null
             ? () {
                 Navigator.pop(ctx);
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (_) =>
-                        EditorScreen(challenge: nextChallenge!),
+                        EditorScreen(challenge: nextStage!),
                   ),
                 );
               }
@@ -348,7 +412,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         25 => ('🏅', '半分制覇！', '25ステージクリア！折り返し地点！', 'あと15ステージで全制覇！'),
         30 => ('🔥', '上級者突入！', '30ステージクリア！上位プレイヤー！', 'あと5ステージでゴールが見えてくる！'),
         35 => ('⚡', 'ゴールが見えた！', '35ステージクリア！あと5ステージ！', 'ラストスパート！全ステージ制覇を目指せ！'),
-        AppConstants.totalStages => ('👑', '全ステージ制覇！', '${AppConstants.totalStages}ステージ完全クリア！伝説のコード探険家！', '全実績を確認しよう！'),
+        60 => ('👑', '全ステージ制覇！', '60ステージ完全クリア！伝説のコード探険家！', '全実績を確認しよう！'),
         _  => ('', '', '', ''),
       };
 
@@ -410,15 +474,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   void _checkUnitCompleteBadge(String level) {
     final allChallenges = ref.read(allChallengesProvider);
     final progressMap = ref.read(progressProvider);
-    final unitChallenges = allChallenges.where((c) => c.level == level).toList();
-    if (unitChallenges.isEmpty) return;
-    final completedInUnit = unitChallenges.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
-    if (completedInUnit < unitChallenges.length) return;
+    final unitStages = allChallenges.where((c) => c.level == level).toList();
+    if (unitStages.isEmpty) return;
+    final completedInUnit = unitStages.where((c) => progressMap[c.id]?.isCompleted ?? false).length;
+    if (completedInUnit < unitStages.length) return;
 
     final (icon, name, message, goal) = switch (level) {
-      StageLevel.beginner     => ('🧩', '初級ユニット制覇！', 'ブロックプログラミング基礎を完全マスター！', '中級Pythonに挑戦しよう！'),
-      StageLevel.intermediate => ('🐍', '中級ユニット制覇！', 'Pythonプログラミング入門を完全マスター！', '上級Python応用に挑戦しよう！'),
-      StageLevel.advanced     => ('🚀', '全ユニット制覇！', 'Python応用・自動化まで完全マスター！', '全実績を確認しよう！'),
+      '初級'  => ('🧩', '初級ユニット制覇！', 'ブロックプログラミング基礎を完全マスター！', '中級Pythonに挑戦しよう！'),
+      '中級' => ('🐍', '中級ユニット制覇！', 'Pythonプログラミング入門を完全マスター！', '上級Python応用に挑戦しよう！'),
+      '上級'     => ('🚀', '全ユニット制覇！', 'Python応用・自動化まで完全マスター！', '全実績を確認しよう！'),
       _                       => ('', '', '', ''),
     };
     if (icon.isEmpty) return;
@@ -435,8 +499,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       (3,  '✨', '完璧主義者！',      '3ステージを3つ星でクリア！',               '5ステージ完璧を目指そう！'),
       (5,  '⭐', '5ステージ完璧！',  '5ステージを3つ星でクリア！',              '10ステージ完璧を目指そう！'),
       (10, '🌠', '3つ星コレクター！', '10ステージを3つ星でクリア！すごい！',       '20ステージ完璧を目指そう！'),
-      (20, '🎖️', 'パーフェクトマスター！', '20ステージを3つ星でクリア！折り返し地点！', '全${AppConstants.totalStages}ステージ完璧制覇を目指そう！'),
-      (AppConstants.totalStages, '👑', '全ステージ完璧！', '全${AppConstants.totalStages}ステージ3つ星クリア！パーフェクトコーダー！', '実績画面で確認しよう！'),
+      (20, '🎖️', 'パーフェクトマスター！', '20ステージを3つ星でクリア！折り返し地点！', '全60ステージ完璧制覇を目指そう！'),
+      (60, '👑', '全ステージ完璧！', '全60ステージ3つ星クリア！パーフェクトコーダー！', '実績画面で確認しよう！'),
     ];
     for (final (target, icon, name, message, goal) in milestones) {
       if (perfectCount == target) {
@@ -482,6 +546,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               children: [
                 // ヘッダー
                 _buildHeader(context),
+            // キャラクターのひとこと（見守り役）
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+                child: CharacterReactionWidget(
+                  mood: _characterMood,
+                  message: _characterMessage,
+                ),
+              ),
+            ),
             // 課題説明
             Container(
               width: double.infinity,
@@ -497,7 +572,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               ),
             ),
             // ヒント
-            if (_showHint && widget.challenge.hints.isNotEmpty)
+            if (_showHint && (widget.challenge.hints?.isNotEmpty ?? false))
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 width: double.infinity,
@@ -509,15 +584,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        widget.challenge.hints[_hintIndex % widget.challenge.hints.length],
+                        widget.challenge.hints![_hintIndex % widget.challenge.hints!.length],
                         style: TextStyle(fontSize: 13, color: context.textPrimary),
                       ),
                     ),
-                    if (widget.challenge.hints.length > 1)
+                    if ((widget.challenge.hints?.length ?? 0) > 1)
                       TextButton(
                         onPressed: () {
                           setState(() {
-                            _hintIndex = (_hintIndex + 1) % widget.challenge.hints.length;
+                            _hintIndex = (_hintIndex + 1) % widget.challenge.hints!.length;
                           });
                         },
                         child: const Text('次へ', style: TextStyle(fontSize: 12)),
@@ -643,7 +718,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   Widget _buildBlockPalette() {
     // ステージで許可されたブロックのみ表示（空の場合は全ブロック表示）
-    final allowedIds = widget.challenge.availableBlocks.map((b) => b.id).toSet();
+    final allowedIds = (widget.challenge.availableBlocks ?? []).map((b) => b.id).toSet();
     final paletteBlocks = allowedIds.isEmpty
         ? kAvailableBlocks
         : kAvailableBlocks.where((b) => allowedIds.contains(b.id)).toList();
@@ -692,6 +767,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     Future.delayed(const Duration(seconds: 2), () {
                       if (mounted) setState(() => _lastAddedBlock = null);
                     });
+                    // 最初のブロックを置いたときだけ、そっと応援する
+                    if (ref.read(editorProvider).scriptBlocks.length == 1) {
+                      _reactCharacter(
+                        CharacterMood.thinking,
+                        message: kThinkingMessages[_rng.nextInt(kThinkingMessages.length)],
+                      );
+                    }
                   },
                 );
               },
@@ -821,12 +903,22 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               : ReorderableListView.builder(
                   padding: const EdgeInsets.all(8),
                   itemCount: editorState.scriptBlocks.length,
+                  // onReorderItem migration tracked as follow-up (signature
+                  // differs; current onReorder behavior is correct as-is).
+                  // ignore: deprecated_member_use
                   onReorder: (oldIndex, newIndex) {
                     if (newIndex > oldIndex) newIndex--;
                     ref.read(editorProvider.notifier).moveBlock(oldIndex, newIndex);
                   },
                   itemBuilder: (context, index) {
                     final block = editorState.scriptBlocks[index];
+                    // NOTE: ReorderableListView.builder は itemBuilder が返す
+                    // 一番外側のウィジェットに一意なキーを持つことを要求する。
+                    // 以前は .animate() が一番外側になっており、そのラッパーに
+                    // キーが付いていなかったため、ブロックの同一性を正しく
+                    // 追跡できず、追加したブロックが一瞬表示されてすぐ消える
+                    // 不具合が発生していた。.animate(key: ...) で明示的に
+                    // 一番外側のウィジェットにもキーを渡すことで修正する。
                     return Dismissible(
                       key: ValueKey('dismiss_${block.id}'),
                       direction: DismissDirection.endToStart,
@@ -854,17 +946,34 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                       onDismissed: (_) {
                         ref.read(editorProvider.notifier).removeBlock(index);
                       },
-                      child: _ScriptBlockItem(
-                        key: ValueKey(block.id),
-                        block: block,
-                        index: index,
-                        onDelete: () {
-                          HapticService.lightImpact();
-                          ref.read(editorProvider.notifier).removeBlock(index);
+                      child: Consumer(
+                        builder: (ctx, consumerRef, _) {
+                          final execState = consumerRef.watch(stepExecutorProvider);
+                          final isCurrentBlock =
+                              _stepExecutionMode && execState.currentBlockId == block.id;
+                          final hasBreakpoint = execState.breakpoints.contains(index);
+
+                          return _ScriptBlockItem(
+                            key: ValueKey(block.id),
+                            block: block,
+                            index: index,
+                            onDelete: () {
+                              HapticService.lightImpact();
+                              ref.read(editorProvider.notifier).removeBlock(index);
+                            },
+                            onTap: () => _showParamEditor(context, block),
+                            isCurrentExecutingBlock: isCurrentBlock,
+                            hasBreakpoint: hasBreakpoint,
+                            onToggleBreakpoint: () {
+                              HapticService.lightImpact();
+                              consumerRef
+                                  .read(stepExecutorProvider.notifier)
+                                  .toggleBreakpoint(index);
+                            },
+                          );
                         },
-                        onTap: () => _showParamEditor(context, block),
                       ),
-                    ).animate().fadeIn(duration: 250.ms).slideX(
+                    ).animate(key: ValueKey(block.id)).fadeIn(duration: 250.ms).slideX(
                           begin: -0.1,
                           curve: Curves.easeOut,
                           duration: 250.ms,
@@ -878,39 +987,53 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   // ロボットキャンバス: ブロック追加時に即時表示（実行不要）
   Widget _buildRobotPreview(EditorState editorState) {
-    final isCorrect = editorState.isCorrect && editorState.hasSubmitted;
-    final isWrong = !editorState.isCorrect && editorState.hasSubmitted;
+    return Consumer(
+      builder: (ctx, consumerRef, _) {
+        // ステップ実行モードの場合は step executor の状態を使用
+        final execState = _stepExecutionMode
+            ? consumerRef.watch(stepExecutorProvider)
+            : null;
 
-    return Container(
-      height: 130,
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: context.isDark ? const Color(0xFF1A2A2A) : const Color(0xFFF8FFFE),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isCorrect
-              ? kPrimaryColor.withValues(alpha: 0.4)
-              : isWrong
-                  ? Colors.red.withValues(alpha: 0.3)
-                  : context.borderColor,
-          width: 1.5,
-        ),
-      ),
-      // RepaintBoundary: ロボットアニメーション(毎フレーム再描画)を
-      // 親ウィジェットツリーから分離し、不要な再描画を防ぐ
-      child: RepaintBoundary(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(11),
-          child: RobotCanvasWidget(
-            path: editorState.robotPath,
-            finalAngle: editorState.robotAngle,
-            hasSubmitted: editorState.hasSubmitted,
-            isCorrect: editorState.isCorrect,
+        final robotPath =
+            _stepExecutionMode && execState != null ? execState.robotPath : editorState.robotPath;
+        final robotAngle =
+            _stepExecutionMode && execState != null ? execState.robotAngle : editorState.robotAngle;
+
+        final isCorrect = editorState.isCorrect && editorState.hasSubmitted;
+        final isWrong = !editorState.isCorrect && editorState.hasSubmitted;
+
+        return Container(
+          height: 130,
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: context.isDark ? const Color(0xFF1A2A2A) : const Color(0xFFF8FFFE),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isCorrect
+                  ? kPrimaryColor.withValues(alpha: 0.4)
+                  : isWrong
+                      ? Colors.red.withValues(alpha: 0.3)
+                      : context.borderColor,
+              width: 1.5,
+            ),
           ),
-        ),
-      ),
-    ).animate().fadeIn(duration: 250.ms);
+          // RepaintBoundary: ロボットアニメーション(毎フレーム再描画)を
+          // 親ウィジェットツリーから分離し、不要な再描画を防ぐ
+          child: RepaintBoundary(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(11),
+              child: RobotCanvasWidget(
+                path: robotPath,
+                finalAngle: robotAngle,
+                hasSubmitted: editorState.hasSubmitted,
+                isCorrect: editorState.isCorrect,
+              ),
+            ),
+          ),
+        ).animate().fadeIn(duration: 250.ms);
+      },
+    );
   }
 
   // テキスト出力: 実行・回答後のみ表示
@@ -946,7 +1069,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           ),
         ),
         // 期待される出力（不正解かつ期待出力がある場合）
-        if (isWrong && widget.challenge.expectedOutput.isNotEmpty)
+        if (isWrong && (widget.challenge.expectedOutput?.isNotEmpty ?? false))
           Container(
             width: double.infinity,
             color: kPrimaryColor.withValues(alpha: 0.06),
@@ -964,7 +1087,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.challenge.expectedOutput.replaceAll('\n', ' ／ '),
+                    (widget.challenge.expectedOutput ?? '').replaceAll('\n', ' ／ '),
                     style: TextStyle(
                       fontSize: 10,
                       color: kPrimaryColor.withValues(alpha: 0.8),
@@ -997,47 +1120,150 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           BoxShadow(color: context.shadowColor, blurRadius: 8, offset: const Offset(0, -2)),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: editorState.scriptBlocks.isEmpty
-                  ? null
-                  : () => ref.read(editorProvider.notifier).executeScript(),
-              icon: const Text('▶', style: TextStyle(fontSize: 12)),
-              label: const Text('実行'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          // ─── ステップ実行モード表示 ────────────────────────────────────
+          if (_stepExecutionMode)
+            Consumer(
+              builder: (context, ref, child) {
+                final execState = ref.watch(stepExecutorProvider);
+                final isExecutionComplete =
+                    execState.currentStepIndex >= editorState.scriptBlocks.length;
+
+                // 実行完了時に採点結果を計算
+                if (isExecutionComplete && _lastScoringResult == null) {
+                  _lastScoringResult = ref
+                      .read(stepExecutorProvider.notifier)
+                      .checkGoal(widget.challenge.goalCondition);
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    children: [
+                      if (!isExecutionComplete)
+                        StepExecutionControls(
+                          totalBlocks: editorState.scriptBlocks.length,
+                          onStepForward: () {
+                            setState(() {});
+                          },
+                        )
+                      else if (_lastScoringResult != null)
+                        ScoringResultWidget(result: _lastScoringResult!),
+                      if (execState.executionHistory.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        ExecutionTimeline(
+                          history: execState.executionHistory,
+                          currentHistoryIndex: (execState.currentStepIndex - 1)
+                              .clamp(0, execState.executionHistory.length - 1),
+                          onTimelineChanged: (index) {
+                            ref
+                                .read(stepExecutorProvider.notifier)
+                                .goToHistoryPoint(index);
+                            setState(() {});
+                          },
+                          totalBlocks: editorState.scriptBlocks.length,
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                      VariableViewer(variables: execState.variables),
+                    ],
+                  ),
+                );
+              },
+            ),
+
+          // ─── 実行・回答ボタン ──────────────────────────────────────────
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: editorState.scriptBlocks.isEmpty
+                      ? null
+                      : () {
+                          if (_stepExecutionMode) {
+                            // ステップ実行モード開始
+                            ref.read(stepExecutorProvider.notifier)
+                                .initializeExecution(editorState.scriptBlocks);
+                            setState(() {});
+                          } else {
+                            // 通常実行
+                            ref.read(editorProvider.notifier).executeScript();
+                            _reactCharacter(CharacterMood.excited, message: 'どうなるかな…！');
+                          }
+                        },
+                  icon: const Text('▶', style: TextStyle(fontSize: 12)),
+                  label: Text(_stepExecutionMode ? 'ステップ準備' : '実行'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            flex: 2,
-            child: ElevatedButton.icon(
-              onPressed: editorState.scriptBlocks.isEmpty
-                  ? null
-                  : () {
-                      ref
-                          .read(editorProvider.notifier)
-                          .submitScript(widget.challenge.expectedOutput);
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        final s = ref.read(editorProvider);
-                        if (s.hasSubmitted) _showResult(s.isCorrect);
-                      });
-                    },
-              icon: const Icon(Icons.check, size: 16),
-              label: const Text('回答する'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              const SizedBox(width: 8),
+              // ステップ実行モード切り替え
+              SizedBox(
+                height: 48,
+                width: 48,
+                child: OutlinedButton(
+                  onPressed: editorState.scriptBlocks.isEmpty
+                      ? null
+                      : () {
+                          HapticService.selectionClick();
+                          setState(() {
+                            _stepExecutionMode = !_stepExecutionMode;
+                            _lastScoringResult = null;
+                            if (!_stepExecutionMode) {
+                              ref.read(stepExecutorProvider.notifier).reset();
+                            }
+                          });
+                        },
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: BorderSide(
+                      color: _stepExecutionMode ? kPrimaryColor : Colors.grey.withValues(alpha: 0.3),
+                      width: _stepExecutionMode ? 2 : 1,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.slow_motion_video,
+                    size: 20,
+                    color: _stepExecutionMode ? kPrimaryColor : context.textSecondary,
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton.icon(
+                  onPressed: (editorState.scriptBlocks.isEmpty || editorState.hasSubmitted || _stepExecutionMode)
+                      ? null
+                      : () {
+                          ref
+                              .read(editorProvider.notifier)
+                              .submitScript(widget.challenge.expectedOutput ?? "");
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            final s = ref.read(editorProvider);
+                            if (s.hasSubmitted) _showResult(s.isCorrect);
+                          });
+                        },
+                  icon: const Icon(Icons.check, size: 16),
+                  label: const Text('回答する'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1159,6 +1385,9 @@ class _ScriptBlockItem extends StatelessWidget {
   final int index;
   final VoidCallback onDelete;
   final VoidCallback onTap;
+  final bool isCurrentExecutingBlock;
+  final bool hasBreakpoint;
+  final VoidCallback onToggleBreakpoint;
 
   const _ScriptBlockItem({
     super.key,
@@ -1166,6 +1395,9 @@ class _ScriptBlockItem extends StatelessWidget {
     required this.index,
     required this.onDelete,
     required this.onTap,
+    this.isCurrentExecutingBlock = false,
+    this.hasBreakpoint = false,
+    required this.onToggleBreakpoint,
   });
 
   Color get _color => _categoryColor(block.category);
@@ -1179,9 +1411,25 @@ class _ScriptBlockItem extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),
         decoration: BoxDecoration(
-          color: _color.withValues(alpha: 0.12),
+          color: isCurrentExecutingBlock
+              ? kPrimaryColor.withValues(alpha: 0.2)
+              : _color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _color.withValues(alpha: 0.45)),
+          border: Border.all(
+            color: isCurrentExecutingBlock
+                ? kPrimaryColor.withValues(alpha: 0.8)
+                : _color.withValues(alpha: 0.45),
+            width: isCurrentExecutingBlock ? 2 : 1,
+          ),
+          boxShadow: isCurrentExecutingBlock
+              ? [
+                  BoxShadow(
+                    color: kPrimaryColor.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  )
+                ]
+              : null,
         ),
         child: Row(
           children: [
@@ -1234,7 +1482,23 @@ class _ScriptBlockItem extends StatelessWidget {
               ),
             ),
             const Icon(Icons.drag_handle, color: Colors.grey, size: 20),
-            // 44x44 タッチエリアの削除ボタン
+            // ブレークポイントボタン
+            SizedBox(
+              width: 44,
+              height: 44,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  hasBreakpoint ? Icons.stop_circle : Icons.stop_circle_outlined,
+                  color: hasBreakpoint ? Colors.orange : Colors.grey,
+                  size: 20,
+                ),
+                onPressed: onToggleBreakpoint,
+                splashRadius: 20,
+                tooltip: hasBreakpoint ? 'ブレークポイント削除' : 'ブレークポイント設定',
+              ),
+            ),
+            // 削除ボタン
             SizedBox(
               width: 44,
               height: 44,
@@ -1522,7 +1786,7 @@ class _EditorResultSheet extends StatefulWidget {
   final bool isCorrect;
   final VoidCallback onRetry;
   final VoidCallback onComplete;
-  final Challenge? nextChallenge;
+  final Stage? nextStage;
   final VoidCallback? onNext;
   final int elapsedSeconds;
   final String challengeTitle;
@@ -1531,7 +1795,7 @@ class _EditorResultSheet extends StatefulWidget {
     required this.isCorrect,
     required this.onRetry,
     required this.onComplete,
-    this.nextChallenge,
+    this.nextStage,
     this.onNext,
     this.elapsedSeconds = 0,
     this.challengeTitle = '',
@@ -1585,7 +1849,7 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
     final key = event.logicalKey;
     // Enter/Space → 次のステージ（あれば）or 完了
     if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.space) {
-      if (widget.isCorrect && widget.nextChallenge != null && widget.onNext != null) {
+      if (widget.isCorrect && widget.nextStage != null && widget.onNext != null) {
         widget.onNext!();
       } else if (widget.isCorrect) {
         widget.onComplete();
@@ -1695,14 +1959,14 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
           ],
           const SizedBox(height: 20),
           // 次のステージへ（正解かつ次のステージがある）
-          if (widget.isCorrect && widget.nextChallenge != null && widget.onNext != null) ...[
+          if (widget.isCorrect && widget.nextStage != null && widget.onNext != null) ...[
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: widget.onNext,
                 icon: const Text('🚀', style: TextStyle(fontSize: 16)),
                 label: Text(
-                  '次へ: ${widget.nextChallenge!.title}',
+                  '次へ: ${widget.nextStage!.title}',
                   overflow: TextOverflow.ellipsis,
                 ),
                 style: ElevatedButton.styleFrom(

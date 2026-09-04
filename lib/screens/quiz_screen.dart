@@ -6,7 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/constants.dart';
 import '../config/theme.dart';
-import '../models/challenge.dart';
+import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/wrong_answers_provider.dart';
@@ -25,7 +25,7 @@ import '../providers/bgm_provider.dart';
 import '../providers/character_provider.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
-  final Challenge challenge;
+  final Stage challenge;
   /// 指定した場合、challenge.questions の代わりにこのリストを使用する（再挑戦用）
   final List<Question>? overrideQuestions;
 
@@ -38,7 +38,7 @@ class QuizScreen extends ConsumerStatefulWidget {
 class _QuizScreenState extends ConsumerState<QuizScreen>
     with SingleTickerProviderStateMixin {
   List<Question> get _questions =>
-      widget.overrideQuestions ?? widget.challenge.questions;
+      widget.overrideQuestions ?? widget.challenge.questions ?? [];
 
   int _currentQuestionIndex = 0;
   int? _selectedOptionIndex;
@@ -251,7 +251,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     return KeyEventResult.ignored;
   }
 
-  String _getChallengeType(Challenge challenge) {
+  String _getStagType(Stage challenge) {
     final title = challenge.title.toLowerCase();
     if (title.contains('if') || title.contains('分岐') || title.contains('条件')) return 'branch';
     if (title.contains('ループ') || title.contains('for') || title.contains('while')) return 'loop';
@@ -317,6 +317,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
 
   Future<void> _submitAnswer() async {
     if (_selectedOptionIndex == null || _hasAnswered) return;
+    // 二重送信（連打・Enter+タップの同時発火）を防ぐため、await前に即座にロックする
+    setState(() => _hasAnswered = true);
     _timer.cancel();
 
     final question = _questions[_currentQuestionIndex];
@@ -343,7 +345,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       }
       // キャラクター成長トリガー
       ref.read(characterProvider.notifier).growFromCorrectAnswer(
-        challengeType: _getChallengeType(widget.challenge),
+        challengeType: _getStagType(widget.challenge),
         difficulty: widget.challenge.level,
       );
     }
@@ -383,7 +385,6 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     }
 
     setState(() {
-      _hasAnswered = true;
       _isCorrect = correct;
       if (correct) _correctCount++;
       _comboMessage = comboMsg;
@@ -516,13 +517,13 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     final allChallenges = ref.read(allChallengesProvider);
     final currentIndex =
         allChallenges.indexWhere((c) => c.id == widget.challenge.id);
-    Challenge? nextChallenge;
+    Stage? nextStage;
     if (currentIndex >= 0 && currentIndex < allChallenges.length - 1) {
       // 次のステージがクイズ形式かつ無料のものを探す
       for (int i = currentIndex + 1; i < allChallenges.length; i++) {
         final c = allChallenges[i];
-        if (c.type == ChallengeType.quiz && c.isFree) {
-          nextChallenge = c;
+        if (c.type == 'quiz' && c.isFree) {
+          nextStage = c;
           break;
         }
       }
@@ -544,20 +545,13 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
           previousStars: previousStars,
           didLevelUp: didLevelUp,
           newLevel: levelAfter,
-          nextChallenge: nextChallenge,
+          nextStage: nextStage,
           completedCount: newCompletedCount,
           sessionSeconds: DateTime.now().difference(_sessionStart).inSeconds,
           maxCombo: _maxCombo,
           resolvedWrongCount: _resolvedWrongCount,
           speedBonusCount: _speedBonusCount,
           coinsEarned: coinTotal,
-          onRetry: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => QuizScreen(challenge: widget.challenge),
-              ),
-            );
-          },
         ),
       ),
     );
@@ -565,8 +559,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
 
   int _calculateStars(int correct, int total) {
     if (correct == total) return 3;
-    if (correct >= total * 0.7) return 2;
-    if (correct >= total * 0.5) return 1;
+    if (correct >= (total * 0.7).round()) return 2;
+    if (correct >= (total * 0.5).round()) return 1;
     return 0;
   }
 
@@ -1309,6 +1303,17 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     );
   }
 
+  /// 行の先頭が絵文字かどうかを判定する（日本語の通常文と区別するため）。
+  bool _startsWithEmoji(String line) {
+    if (line.isEmpty) return false;
+    final cp = line.runes.first;
+    // 主要な絵文字ブロック（記号・絵文字・ダイングバット・乗り物・補助記号 等）
+    return (cp >= 0x2600 && cp <= 0x27BF) || // Misc symbols & dingbats (✅ ⭐ 等)
+        (cp >= 0x1F300 && cp <= 0x1FAFF) || // Misc symbols/pictographs, emoticons, transport, supplemental
+        (cp >= 0x2190 && cp <= 0x21FF) || // Arrows (→ 等)
+        cp == 0x2B50; // ⭐ star
+  }
+
   Widget _buildConceptCard(BuildContext context) {
     final explanation = widget.challenge.conceptExplanation!;
     final lines = explanation.split('\n');
@@ -1366,7 +1371,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
 
             // 絵文字で始まる行は見出し風に
             final isHeading = line.length > 1 &&
-                line.codeUnitAt(0) > 127 &&
+                _startsWithEmoji(line) &&
                 !line.startsWith('•') &&
                 !line.startsWith('→') &&
                 !line.startsWith('-');
