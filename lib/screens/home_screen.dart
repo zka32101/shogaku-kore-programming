@@ -1352,7 +1352,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         .take(3)
         .toList();
 
-    return GestureDetector(
+    return IconCard(
+      iconWidget: const Text('⭐', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFE67E22).withValues(alpha: 0.1),
+      title: Text(
+        'お気に入り ($count)',
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE67E22),
+        ),
+      ),
+      subtitle: Row(
+        children: favorites.map((c) => Padding(
+          padding: const EdgeInsets.only(right: 4),
+          child: Text(c.icon, style: const TextStyle(fontSize: 18)),
+        )).toList(),
+      ),
+      trailing: const Icon(Icons.chevron_right, color: Color(0xFFE67E22)),
+      borderColor: const Color(0xFFE67E22),
       onTap: () {
         HapticService.lightImpact();
         SoundService().playTap();
@@ -1360,63 +1378,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           smoothPageRoute(const StageListScreen(openFavorites: true)),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: context.cardBg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFE67E22).withValues(alpha: 0.3),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: context.shadowColor,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE67E22).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text('⭐', style: TextStyle(fontSize: 22)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'お気に入り ($count)',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFE67E22),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: favorites.map((c) => Padding(
-                      padding: const EdgeInsets.only(right: 4),
-                      child: Text(c.icon, style: const TextStyle(fontSize: 18)),
-                    )).toList(),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: Color(0xFFE67E22)),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1498,74 +1459,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ? '😊'
             : '✨';
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF27AE60).withValues(alpha: 0.08),
-            const Color(0xFF2ECC71).withValues(alpha: 0.05),
-          ],
+    return IconCard(
+      iconWidget: Text(emoji, style: const TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFF27AE60).withValues(alpha: 0.12),
+      title: const Text(
+        '本日の学習成果',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF27AE60),
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF27AE60).withValues(alpha: 0.3),
-          width: 1,
+      ),
+      subtitle: Text(
+        'ポイント: $achievementPoints',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
+          fontWeight: FontWeight.w600,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+      ),
+      borderColor: const Color(0xFF27AE60),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFF27AE60).withValues(alpha: 0.08),
+          const Color(0xFF2ECC71).withValues(alpha: 0.05),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF27AE60).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '本日の学習成果',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF27AE60),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'ポイント: $achievementPoints',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 6,
