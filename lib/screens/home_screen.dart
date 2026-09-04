@@ -1614,10 +1614,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 onTap: () {
                   HapticService.lightImpact();
                   SoundService().playTap();
-                  // TODO: Navigate to FlashcardScreen with category pre-selected
-                  // For now, just open the flashcard screen
                   Navigator.of(context).push(
-                    smoothPageRoute(const FlashcardScreen()),
+                    smoothPageRoute(FlashcardScreen(
+                      initialCategory: category,
+                    )),
                   );
                 },
                 child: Container(

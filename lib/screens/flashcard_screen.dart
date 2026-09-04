@@ -320,7 +320,12 @@ const List<Flashcard> kFlashcards = [
 // ─── フラッシュカードセッション画面 ──────────────────────────────────────────
 
 class FlashcardScreen extends ConsumerStatefulWidget {
-  const FlashcardScreen({super.key});
+  final String? initialCategory;
+
+  const FlashcardScreen({
+    super.key,
+    this.initialCategory,
+  });
 
   @override
   ConsumerState<FlashcardScreen> createState() => _FlashcardScreenState();
@@ -390,6 +395,8 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
   @override
   void initState() {
     super.initState();
+    // Initialize with provided category if available
+    _selectedCategory = widget.initialCategory;
     _flipController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
