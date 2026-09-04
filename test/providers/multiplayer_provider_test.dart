@@ -229,7 +229,7 @@ void main() {
       final notifier = container.read(multiplayerProvider.notifier);
       await notifier.initializeUserProfile('player1');
 
-      final _friendProfile = MultiplayerUserProfile(
+      final friendProfile = MultiplayerUserProfile(
         userId: 'friend1',
         username: 'friend1',
         displayName: 'Friend 1',
@@ -246,7 +246,7 @@ void main() {
       await notifier.sendFriendRequest(friendProfile);
 
       // Simulate receiving the friend request
-      final _stateAfterRequest = container.read(multiplayerProvider);
+      final stateAfterRequest = container.read(multiplayerProvider);
       // In a real app, friend requests would be received from server
       // For testing, we manually add to friendRequests
     });

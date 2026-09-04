@@ -84,7 +84,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.coinCost > 0);
       final success = await notifier.purchaseItem(
         'test_user',
@@ -102,7 +102,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.premiumCost > 0);
       final success = await notifier.purchaseItem(
         'test_user',
@@ -121,7 +121,7 @@ void main() {
       await notifier.initializeShop('test_user');
 
       // Item has xpCost=0 for this currency
-      final _item = ShopItem(
+      final item = ShopItem(
         itemId: 'test_item',
         name: 'Test',
         description: 'Test',
@@ -145,7 +145,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.purchaseLimit == 1);
 
       // First purchase should succeed
@@ -170,7 +170,7 @@ void main() {
       await notifier.initializeShop('test_user');
 
       // Item with stock 0
-      final _item = ShopItem(
+      final item = ShopItem(
         itemId: 'sold_out',
         name: 'Sold Out',
         description: 'Test',
@@ -213,7 +213,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.xpCost > 0);
 
       await notifier.purchaseItem(
@@ -305,7 +305,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.coinCost > 0);
 
       await notifier.purchaseItem('test_user', item.itemId, CurrencyType.coins);
@@ -367,7 +367,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.xpCost > 0);
 
       await notifier.purchaseItem('test_user', item.itemId, CurrencyType.xp);
@@ -392,7 +392,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.purchaseLimit == -1);
 
       await notifier.purchaseItem('test_user', item.itemId, CurrencyType.xp);
@@ -407,7 +407,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.xpCost > 0 && i.coinCost > 0);
 
       await notifier.purchaseItem('test_user', item.itemId, CurrencyType.xp);
@@ -518,7 +518,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final _item = container.read(shopProvider).catalog!.allItems
+      final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.purchaseLimit == -1);
 
       // Simulate multiple purchases
