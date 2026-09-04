@@ -7,7 +7,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
@@ -4071,7 +4070,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
                           ),
                           child: Center(
                             child: Text(
-                              String.fromCharCode(0x41 + i), // A, B, C, D
+                              String.fromCharCode(0x41 + (i as int)), // A, B, C, D
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
