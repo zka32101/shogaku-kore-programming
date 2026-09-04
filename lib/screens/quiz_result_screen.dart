@@ -1380,10 +1380,13 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                   final questions = widget.challenge.questions ?? [];
                   final wrongQuestions = widget.answers
                       .where((a) => !a.isCorrect)
-                      .map((a) => questions.firstWhere(
-                            (q) => q.text == a.questionText,
-                            orElse: () => questions.isNotEmpty ? questions.first : null,
-                          ))
+                      .map((a) {
+                        try {
+                          return questions.firstWhere((q) => q.text == a.questionText);
+                        } catch (_) {
+                          return questions.isNotEmpty ? questions.first : null;
+                        }
+                      })
                       .whereType<Question>()
                       .toList();
                   Navigator.of(context).pushReplacement(

@@ -684,6 +684,7 @@ class _StagePathTabState extends ConsumerState<_StagePathTab> {
                   checkFavoriteMilestoneBadge(context, wasAdded: wasAdded, newCount: newCount); // ignore: use_build_context_synchronously
                 },
                 onStageTap: (ctx, challenge) {
+                  if (challenge == null) return;
                   final stars = progressMap[challenge.id]?.starsEarned ?? 0;
                   final isCompleted = progressMap[challenge.id]?.isCompleted ?? false;
                   final completedAt = progressMap[challenge.id]?.completedAt;

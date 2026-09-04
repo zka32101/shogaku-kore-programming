@@ -136,7 +136,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       final editorState = ref.read(editorProvider);
       if (editorState.scriptBlocks.isNotEmpty && !editorState.hasSubmitted) {
         HapticService.lightImpact();
-        ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput);
+        ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput ?? "");
         Future.delayed(const Duration(milliseconds: 100), () {
           final s = ref.read(editorProvider);
           if (s.hasSubmitted) _showResult(s.isCorrect);
@@ -412,7 +412,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         25 => ('🏅', '半分制覇！', '25ステージクリア！折り返し地点！', 'あと15ステージで全制覇！'),
         30 => ('🔥', '上級者突入！', '30ステージクリア！上位プレイヤー！', 'あと5ステージでゴールが見えてくる！'),
         35 => ('⚡', 'ゴールが見えた！', '35ステージクリア！あと5ステージ！', 'ラストスパート！全ステージ制覇を目指せ！'),
-        AppConstants.totalStages => ('👑', '全ステージ制覇！', '${AppConstants.totalStages}ステージ完全クリア！伝説のコード探険家！', '全実績を確認しよう！'),
+        60 => ('👑', '全ステージ制覇！', '60ステージ完全クリア！伝説のコード探険家！', '全実績を確認しよう！'),
         _  => ('', '', '', ''),
       };
 
@@ -480,9 +480,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (completedInUnit < unitStages.length) return;
 
     final (icon, name, message, goal) = switch (level) {
-      StageLevel.beginner     => ('🧩', '初級ユニット制覇！', 'ブロックプログラミング基礎を完全マスター！', '中級Pythonに挑戦しよう！'),
-      StageLevel.intermediate => ('🐍', '中級ユニット制覇！', 'Pythonプログラミング入門を完全マスター！', '上級Python応用に挑戦しよう！'),
-      StageLevel.advanced     => ('🚀', '全ユニット制覇！', 'Python応用・自動化まで完全マスター！', '全実績を確認しよう！'),
+      '初級'  => ('🧩', '初級ユニット制覇！', 'ブロックプログラミング基礎を完全マスター！', '中級Pythonに挑戦しよう！'),
+      '中級' => ('🐍', '中級ユニット制覇！', 'Pythonプログラミング入門を完全マスター！', '上級Python応用に挑戦しよう！'),
+      '上級'     => ('🚀', '全ユニット制覇！', 'Python応用・自動化まで完全マスター！', '全実績を確認しよう！'),
       _                       => ('', '', '', ''),
     };
     if (icon.isEmpty) return;
@@ -499,8 +499,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       (3,  '✨', '完璧主義者！',      '3ステージを3つ星でクリア！',               '5ステージ完璧を目指そう！'),
       (5,  '⭐', '5ステージ完璧！',  '5ステージを3つ星でクリア！',              '10ステージ完璧を目指そう！'),
       (10, '🌠', '3つ星コレクター！', '10ステージを3つ星でクリア！すごい！',       '20ステージ完璧を目指そう！'),
-      (20, '🎖️', 'パーフェクトマスター！', '20ステージを3つ星でクリア！折り返し地点！', '全${AppConstants.totalStages}ステージ完璧制覇を目指そう！'),
-      (AppConstants.totalStages, '👑', '全ステージ完璧！', '全${AppConstants.totalStages}ステージ3つ星クリア！パーフェクトコーダー！', '実績画面で確認しよう！'),
+      (20, '🎖️', 'パーフェクトマスター！', '20ステージを3つ星でクリア！折り返し地点！', '全60ステージ完璧制覇を目指そう！'),
+      (60, '👑', '全ステージ完璧！', '全60ステージ3つ星クリア！パーフェクトコーダー！', '実績画面で確認しよう！'),
     ];
     for (final (target, icon, name, message, goal) in milestones) {
       if (perfectCount == target) {
@@ -572,7 +572,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               ),
             ),
             // ヒント
-            if (_showHint && widget.challenge.hints?.isNotEmpty ?? false)
+            if (_showHint && (widget.challenge.hints?.isNotEmpty ?? false))
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 width: double.infinity,
@@ -1069,7 +1069,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           ),
         ),
         // 期待される出力（不正解かつ期待出力がある場合）
-        if (isWrong && widget.challenge.expectedOutput.isNotEmpty)
+        if (isWrong && (widget.challenge.expectedOutput?.isNotEmpty ?? false))
           Container(
             width: double.infinity,
             color: kPrimaryColor.withValues(alpha: 0.06),
@@ -1087,7 +1087,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.challenge.expectedOutput.replaceAll('\n', ' ／ '),
+                    (widget.challenge.expectedOutput ?? '').replaceAll('\n', ' ／ '),
                     style: TextStyle(
                       fontSize: 10,
                       color: kPrimaryColor.withValues(alpha: 0.8),
@@ -1247,7 +1247,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                       : () {
                           ref
                               .read(editorProvider.notifier)
-                              .submitScript(widget.challenge.expectedOutput);
+                              .submitScript(widget.challenge.expectedOutput ?? "");
                           Future.delayed(const Duration(milliseconds: 100), () {
                             final s = ref.read(editorProvider);
                             if (s.hasSubmitted) _showResult(s.isCorrect);
