@@ -37,7 +37,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      final state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       expect(state.collection!.rewardSchedule.length, 30);
     });
 
@@ -45,7 +45,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      var _state = container.read(streakProvider);
+      final state = container.read(streakProvider);
       expect(state.collection!.currentStreak.currentStreak, 0);
 
       // Reinitialize should load from storage
@@ -61,7 +61,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       expect(state.collection!.currentStreak.currentStreak, 0);
 
       await notifier.loginUser('test_user');
@@ -74,7 +74,7 @@ void main() {
       final notifier = container.read(streakProvider.notifier);
       await notifier.initializeStreaks('test_user');
 
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       expect(state.collection!.loginHistory.isEmpty, true);
 
       await notifier.loginUser('test_user');
@@ -89,7 +89,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       final firstCount = state.collection!.loginHistory.length;
 
       await notifier.loginUser('test_user');
@@ -102,7 +102,7 @@ void main() {
       await notifier.initializeStreaks('test_user');
 
       await notifier.loginUser('test_user');
-      var _state = container.read(streakProvider);
+      var state = container.read(streakProvider);
       final login = state.collection!.loginHistory[0];
       expect(login.logoutDate, isNull);
 

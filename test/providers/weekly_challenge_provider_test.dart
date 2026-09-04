@@ -125,19 +125,19 @@ void main() {
       final notifier = WeeklyChallengeNotifier();
 
       expect(
-// notifier._calculateRewardTier(100, 100),
+        notifier._calculateRewardTier(100, 100),
         ChallengeRewardTier.platinum,
       );
       expect(
-// notifier._calculateRewardTier(95, 100),
+        notifier._calculateRewardTier(95, 100),
         ChallengeRewardTier.gold,
       );
       expect(
-// notifier._calculateRewardTier(75, 100),
+        notifier._calculateRewardTier(75, 100),
         ChallengeRewardTier.silver,
       );
       expect(
-// notifier._calculateRewardTier(50, 100),
+        notifier._calculateRewardTier(50, 100),
         ChallengeRewardTier.bronze,
       );
     });
@@ -162,7 +162,7 @@ void main() {
         weekEndDate: weekEnd,
       );
 
-// final reward = notifier._calculateReward(
+      final reward = notifier._calculateReward(
         challenge,
         ChallengeRewardTier.platinum,  // 2.0x bonus
       );
