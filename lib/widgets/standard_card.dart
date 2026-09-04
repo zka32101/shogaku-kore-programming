@@ -6,6 +6,7 @@ import '../config/theme.dart';
 class StandardCard extends StatelessWidget {
   final Widget child;
   final Color? backgroundColor;
+  final Gradient? gradient;
   final Color? borderColor;
   final EdgeInsets padding;
   final double borderRadius;
@@ -16,6 +17,7 @@ class StandardCard extends StatelessWidget {
     super.key,
     required this.child,
     this.backgroundColor,
+    this.gradient,
     this.borderColor,
     this.padding = const EdgeInsets.all(14),
     this.borderRadius = 14,
@@ -26,7 +28,8 @@ class StandardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final decoration = BoxDecoration(
-      color: backgroundColor ?? context.cardBg,
+      color: gradient == null ? (backgroundColor ?? context.cardBg) : null,
+      gradient: gradient,
       borderRadius: BorderRadius.circular(borderRadius),
       border: borderColor != null
           ? Border.all(color: borderColor!.withValues(alpha: 0.3), width: 1)
@@ -59,32 +62,45 @@ class StandardCard extends StatelessWidget {
   }
 }
 
-/// アイコン付き Card
+/// アイコン付き Card (IconData またはカスタムアイコンウィジェット対応)
 class IconCard extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final Color iconBackgroundColor;
+  final IconData? icon;
+  final Widget? iconWidget;
+  final Color? iconColor;
+  final Color? iconBackgroundColor;
   final Widget title;
   final Widget? subtitle;
+  final Widget? content;
   final Widget? trailing;
   final void Function()? onTap;
   final double iconSize;
+  final Color? borderColor;
+  final Gradient? gradient;
 
   const IconCard({
     super.key,
-    required this.icon,
-    required this.iconColor,
-    required this.iconBackgroundColor,
+    this.icon,
+    this.iconWidget,
+    this.iconColor,
+    this.iconBackgroundColor,
     required this.title,
     this.subtitle,
+    this.content,
     this.trailing,
     this.onTap,
     this.iconSize = 44,
-  });
+    this.borderColor,
+    this.gradient,
+  }) : assert(
+    icon != null || iconWidget != null,
+    'Either icon or iconWidget must be provided',
+  );
 
   @override
   Widget build(BuildContext context) {
     return StandardCard(
+      borderColor: borderColor,
+      gradient: gradient,
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,10 +111,14 @@ class IconCard extends StatelessWidget {
                 width: iconSize,
                 height: iconSize,
                 decoration: BoxDecoration(
-                  color: iconBackgroundColor,
+                  color: iconBackgroundColor ?? Colors.grey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(iconSize / 4),
                 ),
-                child: Icon(icon, color: iconColor, size: iconSize * 0.5),
+                child: Center(
+                  child: icon != null
+                      ? Icon(icon, color: iconColor ?? Colors.grey, size: iconSize * 0.5)
+                      : iconWidget,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -125,6 +145,10 @@ class IconCard extends StatelessWidget {
               ],
             ],
           ),
+          if (content != null) ...[
+            const SizedBox(height: 10),
+            content!,
+          ],
         ],
       ),
     );

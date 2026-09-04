@@ -7,7 +7,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
@@ -1152,62 +1151,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildWrongAnswersCard(BuildContext context, int count) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFE74C3C).withValues(alpha: 0.3),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('📝', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFE74C3C).withValues(alpha: 0.1),
+      title: const Text(
+        '苦手問題を復習しよう',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE74C3C),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      subtitle: Text(
+        '間違えた問題が $count 件あるよ',
+        style: const TextStyle(fontSize: 11, color: kTextSecondary),
+      ),
+      borderColor: const Color(0xFFE74C3C),
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE74C3C).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('📝', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '苦手問題を復習しよう',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE74C3C),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '間違えた問題が $count 件あるよ',
-                      style: const TextStyle(fontSize: 11, color: kTextSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
           // 最も間違えた問題プレビュー（2回以上ある場合のみ）
           Builder(builder: (ctx) {
             final ws = ref.read(wrongAnswersProvider);
@@ -1221,7 +1182,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ? '${worst.questionText.substring(0, 30)}…'
                 : worst.questionText;
             return Container(
-              margin: const EdgeInsets.only(top: 8),
+              margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: const Color(0xFFE74C3C).withValues(alpha: 0.06),
@@ -1260,7 +1221,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             );
           }),
-          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -1391,7 +1351,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         .take(3)
         .toList();
 
-    return GestureDetector(
+    return IconCard(
+      iconWidget: const Text('⭐', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFE67E22).withValues(alpha: 0.1),
+      title: Text(
+        'お気に入り ($count)',
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE67E22),
+        ),
+      ),
+      subtitle: Row(
+        children: favorites.map((c) => Padding(
+          padding: const EdgeInsets.only(right: 4),
+          child: Text(c.icon, style: const TextStyle(fontSize: 18)),
+        )).toList(),
+      ),
+      trailing: const Icon(Icons.chevron_right, color: Color(0xFFE67E22)),
+      borderColor: const Color(0xFFE67E22),
       onTap: () {
         HapticService.lightImpact();
         SoundService().playTap();
@@ -1399,63 +1377,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           smoothPageRoute(const StageListScreen(openFavorites: true)),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: context.cardBg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFE67E22).withValues(alpha: 0.3),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: context.shadowColor,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE67E22).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text('⭐', style: TextStyle(fontSize: 22)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'お気に入り ($count)',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFE67E22),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: favorites.map((c) => Padding(
-                      padding: const EdgeInsets.only(right: 4),
-                      child: Text(c.icon, style: const TextStyle(fontSize: 18)),
-                    )).toList(),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: Color(0xFFE67E22)),
-          ],
-        ),
-      ),
     );
   }
 
@@ -1537,74 +1458,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ? '😊'
             : '✨';
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF27AE60).withValues(alpha: 0.08),
-            const Color(0xFF2ECC71).withValues(alpha: 0.05),
-          ],
+    return IconCard(
+      iconWidget: Text(emoji, style: const TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFF27AE60).withValues(alpha: 0.12),
+      title: const Text(
+        '本日の学習成果',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF27AE60),
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF27AE60).withValues(alpha: 0.3),
-          width: 1,
+      ),
+      subtitle: Text(
+        'ポイント: $achievementPoints',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
+          fontWeight: FontWeight.w600,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+      ),
+      borderColor: const Color(0xFF27AE60),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFF27AE60).withValues(alpha: 0.08),
+          const Color(0xFF2ECC71).withValues(alpha: 0.05),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF27AE60).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '本日の学習成果',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF27AE60),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'ポイント: $achievementPoints',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 6,
@@ -1689,76 +1572,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return a.key.compareTo(b.key);
       });
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF8E44AD).withValues(alpha: 0.3),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('📚', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFF8E44AD).withValues(alpha: 0.1),
+      title: const Text(
+        'フラッシュカード復習スケジュール',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF8E44AB),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      subtitle: Text(
+        '習得後の復習が効果的です',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
+        ),
+      ),
+      trailing: GestureDetector(
+        onTap: () {
+          HapticService.lightImpact();
+          SoundService().playTap();
+          Navigator.of(context).push(
+            smoothPageRoute(const FlashcardScreen()),
+          );
+        },
+        child: const Icon(Icons.chevron_right, color: Color(0xFF8E44AB)),
+      ),
+      borderColor: const Color(0xFF8E44AD),
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF8E44AD).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('📚', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'フラッシュカード復習スケジュール',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8E44AB),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '習得後の復習が効果的です',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  HapticService.lightImpact();
-                  SoundService().playTap();
-                  Navigator.of(context).push(
-                    smoothPageRoute(const FlashcardScreen()),
-                  );
-                },
-                child: const Icon(Icons.chevron_right, color: Color(0xFF8E44AB)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
           Wrap(
             spacing: 6,
             runSpacing: 6,
@@ -1837,147 +1681,107 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     List<Stage> weakStages,
     Map<String, UserProgress> progressMap,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFF39C12).withValues(alpha: 0.35),
-          width: 1,
+    return IconCard(
+      iconWidget: const Text('⬆️', style: TextStyle(fontSize: 20)),
+      iconBackgroundColor: const Color(0xFFF39C12).withValues(alpha: 0.12),
+      iconSize: 40,
+      title: const Text(
+        '3つ星を狙え！',
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFFE67E22),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF39C12).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Center(
-                  child: Text('⬆️', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '3つ星を狙え！',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE67E22),
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    const Text(
-                      '満点でさらにポイントアップ！',
-                      style: TextStyle(fontSize: 10, color: kTextSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          ...weakStages.map((c) {
-            final stars = progressMap[c.id]?.starsEarned ?? 0;
-            final levelColor = c.level == StageLevel.beginner
-                ? kPrimaryColor
-                : c.level == StageLevel.intermediate
-                    ? const Color(0xFF9B59B6)
-                    : const Color(0xFFE67E22);
-            // 苦手問題があるか確認
-            final wrongState = ref.read(wrongAnswersProvider);
-            final wrongCount = c.type == 'quiz'
-                ? (c.questions ?? []).fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
-                : 0;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: GestureDetector(
-                onTap: () {
-                  HapticService.lightImpact();
-                  SoundService().playTap();
-                  Navigator.of(context).push(
-                    smoothPageRoute(
-                      c.type == 'visual'
-                          ? EditorScreen(challenge: c)
-                          : QuizScreen(challenge: c),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: levelColor.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: levelColor.withValues(alpha: 0.2),
-                    ),
+      subtitle: const Text(
+        '満点でさらにポイントアップ！',
+        style: TextStyle(fontSize: 10, color: kTextSecondary),
+      ),
+      borderColor: const Color(0xFFF39C12),
+      content: Column(
+        children: weakStages.map((c) {
+          final stars = progressMap[c.id]?.starsEarned ?? 0;
+          final levelColor = c.level == StageLevel.beginner
+              ? kPrimaryColor
+              : c.level == StageLevel.intermediate
+                  ? const Color(0xFF9B59B6)
+                  : const Color(0xFFE67E22);
+          // 苦手問題があるか確認
+          final wrongState = ref.read(wrongAnswersProvider);
+          final wrongCount = c.type == 'quiz'
+              ? (c.questions ?? []).fold<int>(0, (sum, q) => sum + wrongState.wrongCountFor(q.text))
+              : 0;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: GestureDetector(
+              onTap: () {
+                HapticService.lightImpact();
+                SoundService().playTap();
+                Navigator.of(context).push(
+                  smoothPageRoute(
+                    c.type == 'visual'
+                        ? EditorScreen(challenge: c)
+                        : QuizScreen(challenge: c),
                   ),
-                  child: Row(
-                    children: [
-                      Text(c.icon, style: const TextStyle(fontSize: 18)),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          c.title,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: context.textPrimary,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: levelColor.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: levelColor.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Text(c.icon, style: const TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        c.title,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: context.textPrimary,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (wrongCount > 0) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Text(
-                            '🔥×$wrongCount',
-                            style: const TextStyle(fontSize: 9, color: Color(0xFFE64A00)),
-                          ),
+                    ),
+                    if (wrongCount > 0) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        const SizedBox(width: 4),
-                      ],
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(
-                          3,
-                          (i) => Icon(
-                            i < stars ? Icons.star : Icons.star_border,
-                            size: 14,
-                            color: i < stars ? kStarColor : context.borderColor,
-                          ),
+                        child: Text(
+                          '🔥×$wrongCount',
+                          style: const TextStyle(fontSize: 9, color: Color(0xFFE64A00)),
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.chevron_right, size: 14, color: kTextSecondary),
                     ],
-                  ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(
+                        3,
+                        (i) => Icon(
+                          i < stars ? Icons.star : Icons.star_border,
+                          size: 14,
+                          color: i < stars ? kStarColor : context.borderColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.chevron_right, size: 14, color: kTextSecondary),
+                  ],
                 ),
               ),
-            );
-          }),
-        ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -3402,7 +3206,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   /// コインショップカード
   Widget _buildShopCard(BuildContext context, int coinBalance) {
-    return GestureDetector(
+    return IconCard(
+      iconWidget: const Text('🏪', style: TextStyle(fontSize: 24)),
+      iconBackgroundColor: const Color(0xFFFFD700).withValues(alpha: 0.15),
+      iconSize: 46,
+      title: const Text(
+        'コインショップ',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      subtitle: Text(
+        'コインでスキンや背景をゲットしよう！',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textPrimary.withValues(alpha: 0.6),
+        ),
+      ),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.5)),
+        ),
+        child: Column(
+          children: [
+            const Text('🪙', style: TextStyle(fontSize: 16)),
+            Text(
+              '$coinBalance',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8B6914),
+              ),
+            ),
+          ],
+        ),
+      ),
+      borderColor: const Color(0xFFFFD700),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFFFD700).withValues(alpha: 0.12),
+          const Color(0xFFFFA500).withValues(alpha: 0.06),
+        ],
+      ),
       onTap: () {
         HapticService.lightImpact();
         SoundService().playTap();
@@ -3410,83 +3261,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           smoothPageRoute(const ShopScreen()),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFFFFD700).withValues(alpha: 0.12),
-              const Color(0xFFFFA500).withValues(alpha: 0.06),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFFFD700).withValues(alpha: 0.4),
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD700).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text('🏪', style: TextStyle(fontSize: 24)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'コインショップ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'コインでスキンや背景をゲットしよう！',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: context.textPrimary.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // コイン残高
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD700).withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.5)),
-              ),
-              child: Column(
-                children: [
-                  const Text('🪙', style: TextStyle(fontSize: 16)),
-                  Text(
-                    '$coinBalance',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B6914),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -3630,113 +3404,73 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDailyReviewCard(BuildContext context, bool doneToday, int reviewStreak) {
-    return GestureDetector(
-      onTap: doneToday
-          ? null
-          : () {
-              HapticService.lightImpact();
-              SoundService().playTap();
-              Navigator.of(context).push(
-                smoothPageRoute(const DailyReviewScreen()),
-              );
-            },
-      child: Opacity(
-        opacity: doneToday ? 0.65 : 1.0,
-        child: Container(
-          decoration: BoxDecoration(
-            color: context.cardBg,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: const Color(0xFF1ABC9C).withValues(alpha: 0.5),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+    return Opacity(
+      opacity: doneToday ? 0.65 : 1.0,
+      child: IconCard(
+        iconWidget: Text(
+          doneToday ? '✅' : '📖',
+          style: const TextStyle(fontSize: 22),
+        ),
+        iconBackgroundColor: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
+        iconSize: 44,
+        title: Row(
+          children: [
+            const Text(
+              '今日の復習',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF16A085),
               ),
-            ],
-          ),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
+            ),
+            if (reviewStreak >= 2) ...[
+              const SizedBox(width: 8),
               Container(
-                width: 44,
-                height: 44,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Center(
-                  child: Text(
-                    doneToday ? '✅' : '📖',
-                    style: const TextStyle(fontSize: 22),
+                child: Text(
+                  '📖 $reviewStreak日連続',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF16A085),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Text(
-                          '今日の復習',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF16A085),
-                          ),
-                        ),
-                        if (reviewStreak >= 2) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '📖 $reviewStreak日連続',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF16A085),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Builder(builder: (ctx) {
-                      final wrongCount = ref.read(wrongAnswersProvider).count;
-                      final subtitle = doneToday
-                          ? '今日の復習は済んでいます！また明日'
-                          : wrongCount > 0
-                              ? '🔥 苦手問題$wrongCount件含む・ボーナスポイントあり'
-                              : 'クリア済みステージから5問・ボーナスポイントあり';
-                      return Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: !doneToday && wrongCount > 0
-                              ? const Color(0xFFE64A00)
-                              : kTextSecondary,
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-              if (!doneToday)
-                const Icon(Icons.chevron_right, color: Color(0xFF1ABC9C)),
             ],
-          ),
+          ],
         ),
+        subtitle: Builder(builder: (ctx) {
+          final wrongCount = ref.read(wrongAnswersProvider).count;
+          final subtitle = doneToday
+              ? '今日の復習は済んでいます！また明日'
+              : wrongCount > 0
+                  ? '🔥 苦手問題$wrongCount件含む・ボーナスポイントあり'
+                  : 'クリア済みステージから5問・ボーナスポイントあり';
+          return Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 11,
+              color: !doneToday && wrongCount > 0
+                  ? const Color(0xFFE64A00)
+                  : kTextSecondary,
+            ),
+          );
+        }),
+        trailing: !doneToday ? const Icon(Icons.chevron_right, color: Color(0xFF1ABC9C)) : null,
+        borderColor: const Color(0xFF1ABC9C),
+        onTap: doneToday
+            ? null
+            : () {
+                HapticService.lightImpact();
+                SoundService().playTap();
+                Navigator.of(context).push(
+                  smoothPageRoute(const DailyReviewScreen()),
+                );
+              },
       ),
     );
   }
@@ -4336,7 +4070,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
                           ),
                           child: Center(
                             child: Text(
-                              String.fromCharCode(0x41 + i), // A, B, C, D
+                              String.fromCharCode(0x41 + (i as int)), // A, B, C, D
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -4591,72 +4325,34 @@ class _LevelUpOverlay extends StatelessWidget {
             ? '🔥 あと${bestStreak - currentStreak}日でベスト記録！'
             : '💪 連続学習を継続中！';
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFFF6B35).withValues(alpha: 0.08),
-            const Color(0xFFFF8C42).withValues(alpha: 0.05),
-          ],
+    return IconCard(
+      iconWidget: const Text('🔥', style: TextStyle(fontSize: 22)),
+      iconBackgroundColor: const Color(0xFFFF6B35).withValues(alpha: 0.12),
+      title: const Text(
+        '学習ストリーク',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFFF6B35).withValues(alpha: 0.3),
-          width: 1,
+      ),
+      subtitle: Text(
+        motivationMessage,
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textSecondary,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+      ),
+      borderColor: const Color(0xFFFF6B35),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFFF6B35).withValues(alpha: 0.08),
+          const Color(0xFFFF8C42).withValues(alpha: 0.05),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      content: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B35).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('🔥', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '学習ストリーク',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      motivationMessage,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: context.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
