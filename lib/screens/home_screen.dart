@@ -3207,7 +3207,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   /// コインショップカード
   Widget _buildShopCard(BuildContext context, int coinBalance) {
-    return GestureDetector(
+    return IconCard(
+      iconWidget: const Text('🏪', style: TextStyle(fontSize: 24)),
+      iconBackgroundColor: const Color(0xFFFFD700).withValues(alpha: 0.15),
+      iconSize: 46,
+      title: const Text(
+        'コインショップ',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      subtitle: Text(
+        'コインでスキンや背景をゲットしよう！',
+        style: TextStyle(
+          fontSize: 11,
+          color: context.textPrimary.withValues(alpha: 0.6),
+        ),
+      ),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.5)),
+        ),
+        child: Column(
+          children: [
+            const Text('🪙', style: TextStyle(fontSize: 16)),
+            Text(
+              '$coinBalance',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8B6914),
+              ),
+            ),
+          ],
+        ),
+      ),
+      borderColor: const Color(0xFFFFD700),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFFFD700).withValues(alpha: 0.12),
+          const Color(0xFFFFA500).withValues(alpha: 0.06),
+        ],
+      ),
       onTap: () {
         HapticService.lightImpact();
         SoundService().playTap();
@@ -3215,83 +3262,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           smoothPageRoute(const ShopScreen()),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFFFFD700).withValues(alpha: 0.12),
-              const Color(0xFFFFA500).withValues(alpha: 0.06),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFFFD700).withValues(alpha: 0.4),
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD700).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text('🏪', style: TextStyle(fontSize: 24)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'コインショップ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'コインでスキンや背景をゲットしよう！',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: context.textPrimary.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // コイン残高
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD700).withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.5)),
-              ),
-              child: Column(
-                children: [
-                  const Text('🪙', style: TextStyle(fontSize: 16)),
-                  Text(
-                    '$coinBalance',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B6914),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -3435,113 +3405,73 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDailyReviewCard(BuildContext context, bool doneToday, int reviewStreak) {
-    return GestureDetector(
-      onTap: doneToday
-          ? null
-          : () {
-              HapticService.lightImpact();
-              SoundService().playTap();
-              Navigator.of(context).push(
-                smoothPageRoute(const DailyReviewScreen()),
-              );
-            },
-      child: Opacity(
-        opacity: doneToday ? 0.65 : 1.0,
-        child: Container(
-          decoration: BoxDecoration(
-            color: context.cardBg,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: const Color(0xFF1ABC9C).withValues(alpha: 0.5),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+    return Opacity(
+      opacity: doneToday ? 0.65 : 1.0,
+      child: IconCard(
+        iconWidget: Text(
+          doneToday ? '✅' : '📖',
+          style: const TextStyle(fontSize: 22),
+        ),
+        iconBackgroundColor: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
+        iconSize: 44,
+        title: Row(
+          children: [
+            const Text(
+              '今日の復習',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF16A085),
               ),
-            ],
-          ),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
+            ),
+            if (reviewStreak >= 2) ...[
+              const SizedBox(width: 8),
               Container(
-                width: 44,
-                height: 44,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Center(
-                  child: Text(
-                    doneToday ? '✅' : '📖',
-                    style: const TextStyle(fontSize: 22),
+                child: Text(
+                  '📖 $reviewStreak日連続',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF16A085),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Text(
-                          '今日の復習',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF16A085),
-                          ),
-                        ),
-                        if (reviewStreak >= 2) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1ABC9C).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '📖 $reviewStreak日連続',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF16A085),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Builder(builder: (ctx) {
-                      final wrongCount = ref.read(wrongAnswersProvider).count;
-                      final subtitle = doneToday
-                          ? '今日の復習は済んでいます！また明日'
-                          : wrongCount > 0
-                              ? '🔥 苦手問題$wrongCount件含む・ボーナスポイントあり'
-                              : 'クリア済みステージから5問・ボーナスポイントあり';
-                      return Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: !doneToday && wrongCount > 0
-                              ? const Color(0xFFE64A00)
-                              : kTextSecondary,
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-              if (!doneToday)
-                const Icon(Icons.chevron_right, color: Color(0xFF1ABC9C)),
             ],
-          ),
+          ],
         ),
+        subtitle: Builder(builder: (ctx) {
+          final wrongCount = ref.read(wrongAnswersProvider).count;
+          final subtitle = doneToday
+              ? '今日の復習は済んでいます！また明日'
+              : wrongCount > 0
+                  ? '🔥 苦手問題$wrongCount件含む・ボーナスポイントあり'
+                  : 'クリア済みステージから5問・ボーナスポイントあり';
+          return Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 11,
+              color: !doneToday && wrongCount > 0
+                  ? const Color(0xFFE64A00)
+                  : kTextSecondary,
+            ),
+          );
+        }),
+        trailing: !doneToday ? const Icon(Icons.chevron_right, color: Color(0xFF1ABC9C)) : null,
+        borderColor: const Color(0xFF1ABC9C),
+        onTap: doneToday
+            ? null
+            : () {
+                HapticService.lightImpact();
+                SoundService().playTap();
+                Navigator.of(context).push(
+                  smoothPageRoute(const DailyReviewScreen()),
+                );
+              },
       ),
     );
   }
