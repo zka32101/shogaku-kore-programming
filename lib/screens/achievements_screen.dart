@@ -11,6 +11,7 @@ import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
 import '../models/challenge.dart';
 import '../models/stage.dart';
+import '../models/badge.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
@@ -21,6 +22,19 @@ import 'flashcard_screen.dart' show kFlashcards;
 import 'quiz_review_screen.dart';
 import 'wrong_answers_list_screen.dart';
 import '../widgets/shortcut_help.dart';
+import '../widgets/next_badge_card.dart';
+import '../widgets/badge_card.dart';
+import '../widgets/completed_stage_card.dart';
+import '../widgets/quality_stat_tile.dart';
+import '../widgets/stat_card.dart';
+import '../widgets/heatmap_legend.dart';
+import '../widgets/unit_progress_row.dart';
+import '../widgets/summary_tile.dart';
+import '../widgets/completed_stats_bar.dart';
+import '../widgets/stat_mini_cell.dart';
+import '../widgets/sort_button.dart';
+import '../widgets/filter_chip.dart';
+import '../widgets/header_stat.dart';
 
 class AchievementsScreen extends ConsumerStatefulWidget {
   const AchievementsScreen({super.key});
