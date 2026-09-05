@@ -18,6 +18,9 @@ import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../config/constants.dart';
 import '../widgets/shortcut_help.dart';
+import '../widgets/stat_item.dart';
+import '../widgets/mini_stat_card.dart';
+import '../widgets/quality_mini_card.dart';
 import 'flashcard_screen.dart' show kFlashcards;
 import '../providers/ai_programming_coach_provider.dart';
 
@@ -782,22 +785,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _StatItem(
+              StatItem(
                 icon: '🏆',
                 value: '${notifier.completedCount}',
                 label: 'クリア',
               ),
-              _StatItem(
+              StatItem(
                 icon: '⭐',
                 value: '${notifier.totalStarsEarned}',
                 label: 'ポイント',
               ),
-              _StatItem(
+              StatItem(
                 icon: '🎯',
                 value: 'Lv.${notifier.currentLevel}',
                 label: 'レベル',
               ),
-              _StatItem(
+              StatItem(
                 icon: '💎',
                 value: '$perfect',
                 label: '3つ星',
@@ -813,7 +816,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Row(
           children: [
             Expanded(
-              child: _MiniStatCard(
+              child: MiniStatCard(
                 emoji: '📝',
                 value: totalAnswered > 0 ? '$totalAnswered問' : '—',
                 label: '累計回答数',
@@ -822,7 +825,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _MiniStatCard(
+              child: MiniStatCard(
                 emoji: '📅',
                 value: activeDays > 0 ? '$activeDays日' : '—',
                 label: '学習した日',
@@ -831,7 +834,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _MiniStatCard(
+              child: MiniStatCard(
                 emoji: '⏱',
                 value: learningTimeLabel,
                 label: '累計学習時間',
@@ -977,7 +980,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Row(
       children: [
         Expanded(
-          child: _MiniStatCard(
+          child: MiniStatCard(
             emoji: '📖',
             value: '${reviewState.reviewStreak}日',
             label: '復習連続',
@@ -986,7 +989,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: _MiniStatCard(
+          child: MiniStatCard(
             emoji: '🏅',
             value: reviewState.longestReviewStreak > 0
                 ? '${reviewState.longestReviewStreak}日'
@@ -997,7 +1000,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: _MiniStatCard(
+          child: MiniStatCard(
             emoji: '✅',
             value: reviewState.totalReviewsCompleted > 0
                 ? '${reviewState.totalReviewsCompleted}回'
@@ -1021,7 +1024,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Row(
       children: [
         Expanded(
-          child: _QualityMiniCard(
+          child: QualityMiniCard(
             emoji: '🃏',
             value: '$masteredCount / $kTotal',
             label: 'カード習得',
@@ -1031,7 +1034,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _QualityMiniCard(
+          child: QualityMiniCard(
             emoji: wrongCount == 0
                 ? (resolvedCount > 0 ? '🏆' : '✅')
                 : '🔥',
@@ -1049,7 +1052,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _QualityMiniCard(
+          child: QualityMiniCard(
             emoji: '❤️',
             value: '$favCount 件',
             label: 'お気に入り',
@@ -1872,163 +1875,3 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 }
 
-class _StatItem extends StatelessWidget {
-  final String icon;
-  final String value;
-  final String label;
-
-  const _StatItem({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(icon, style: const TextStyle(fontSize: 22)),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 10, color: Colors.white70),
-        ),
-      ],
-    );
-  }
-}
-
-class _MiniStatCard extends StatelessWidget {
-  final String emoji;
-  final String value;
-  final String label;
-  final Color color;
-
-  const _MiniStatCard({
-    required this.emoji,
-    required this.value,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  label,
-                  style: const TextStyle(fontSize: 10, color: kTextSecondary),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _QualityMiniCard extends StatelessWidget {
-  final String emoji;
-  final String value;
-  final String label;
-  final Color color;
-  final double progress;
-
-  const _QualityMiniCard({
-    required this.emoji,
-    required this.value,
-    required this.label,
-    required this.color,
-    required this.progress,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 18)),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.0, end: progress),
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.easeOut,
-              builder: (context, val, _) => LinearProgressIndicator(
-                value: val,
-                backgroundColor:
-                    context.isDark ? kDarkSurface2 : Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation<Color>(color),
-                minHeight: 5,
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 11, color: kTextSecondary),
-          ),
-        ],
-      ),
-    );
-  }
-}
