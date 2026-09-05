@@ -345,7 +345,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       }
       // キャラクター成長トリガー
       ref.read(characterProvider.notifier).growFromCorrectAnswer(
-        challengeType: _getStagType(widget.challenge),
+        challengeType: _getStageType(widget.challenge),
         difficulty: widget.challenge.level,
       );
     }
