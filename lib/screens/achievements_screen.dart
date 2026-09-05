@@ -383,15 +383,15 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _HeaderStat(
+              HeaderStat(
                   icon: '✅',
                   value: '$completedCount/${AppConstants.totalStages}',
                   label: 'クリア'),
-              _HeaderStat(
+              HeaderStat(
                   icon: '⭐', value: '$totalStars', label: 'ポイント'),
-              _HeaderStat(
+              HeaderStat(
                   icon: '🔥', value: '$longestStreak日', label: '最長連続'),
-              _HeaderStat(
+              HeaderStat(
                   icon: '🏅',
                   value: '$unlockedBadges/$totalBadges',
                   label: 'バッジ'),
@@ -402,7 +402,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     );
   }
 
-  List<_Badge> _getBadges(
+  List<Badge> _getBadges(
       int completedCount, int totalStars, int longestStreak, int taPlayCount,
       int perfectCount, int taBestCorrect, int masteredCards, int wrongCount,
       int totalResolvedWrong,
@@ -421,7 +421,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     final totalLearningMinutes = totalLearningSeconds ~/ 60;
     return [
       // 進捗バッジ
-      _Badge(
+      Badge(
         icon: '🚀',
         name: 'はじめの一歩',
         description: '最初のステージをクリア',
@@ -430,7 +430,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 1),
         progressTarget: 1,
       ),
-      _Badge(
+      Badge(
         icon: '🌿',
         name: 'コードビギナー',
         description: '3ステージクリア',
@@ -439,7 +439,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 3),
         progressTarget: 3,
       ),
-      _Badge(
+      Badge(
         icon: '🌱',
         name: '成長中',
         description: '5ステージクリア',
@@ -448,7 +448,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 5),
         progressTarget: 5,
       ),
-      _Badge(
+      Badge(
         icon: '🧩',
         name: 'ブロック名人',
         description: '8ステージクリア（初級の折り返し）',
@@ -457,7 +457,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 8),
         progressTarget: 8,
       ),
-      _Badge(
+      Badge(
         icon: '🎯',
         name: '1/4制覇',
         description: '10ステージクリア',
@@ -466,7 +466,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 10),
         progressTarget: 10,
       ),
-      _Badge(
+      Badge(
         icon: '⭐',
         name: '15ステージ通過',
         description: '15ステージクリア',
@@ -475,7 +475,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 15),
         progressTarget: 15,
       ),
-      _Badge(
+      Badge(
         icon: '🐍',
         name: 'Python入門者',
         description: '20ステージクリア',
@@ -484,7 +484,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 20),
         progressTarget: 20,
       ),
-      _Badge(
+      Badge(
         icon: '🏅',
         name: '半分制覇',
         description: '25ステージクリア（折り返し地点！）',
@@ -493,7 +493,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 25),
         progressTarget: 25,
       ),
-      _Badge(
+      Badge(
         icon: '🔥',
         name: '上級者突入',
         description: '30ステージクリア',
@@ -502,7 +502,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 30),
         progressTarget: 30,
       ),
-      _Badge(
+      Badge(
         icon: '⚡',
         name: 'ゴールが見えた！',
         description: '35ステージクリア（あと5ステージ！）',
@@ -511,7 +511,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: completedCount.clamp(0, 35),
         progressTarget: 35,
       ),
-      _Badge(
+      Badge(
         icon: '👑',
         name: '全ステージ制覇',
         description: '${AppConstants.totalStages}ステージ全てクリア！',
@@ -521,7 +521,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: AppConstants.totalStages,
       ),
       // ユニット制覇バッジ
-      _Badge(
+      Badge(
         icon: '🧩',
         name: '初級クリア！',
         description: '初級の全ステージをクリア！',
@@ -530,7 +530,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: begUnitDone,
         progressTarget: begUnitTotal,
       ),
-      _Badge(
+      Badge(
         icon: '🐍',
         name: '中級クリア！',
         description: '中級の全ステージをクリア！',
@@ -539,7 +539,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: intUnitDone,
         progressTarget: intUnitTotal,
       ),
-      _Badge(
+      Badge(
         icon: '🚀',
         name: '全部クリア！',
         description: '全ユニット（初・中・上級）をクリア！',
@@ -549,7 +549,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: advUnitTotal,
       ),
       // スターバッジ
-      _Badge(
+      Badge(
         icon: '⭐',
         name: '星コレクター',
         description: 'ポイント50以上',
@@ -558,7 +558,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalStars.clamp(0, 50),
         progressTarget: 50,
       ),
-      _Badge(
+      Badge(
         icon: '💎',
         name: 'スター収集家',
         description: 'ポイント60以上',
@@ -567,7 +567,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalStars.clamp(0, 60),
         progressTarget: 60,
       ),
-      _Badge(
+      Badge(
         icon: '🌟',
         name: '輝く星',
         description: 'ポイント150以上',
@@ -576,7 +576,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalStars.clamp(0, 150),
         progressTarget: 150,
       ),
-      _Badge(
+      Badge(
         icon: '💰',
         name: 'ポイント長者',
         description: 'ポイント300以上',
@@ -585,7 +585,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalStars.clamp(0, 300),
         progressTarget: 300,
       ),
-      _Badge(
+      Badge(
         icon: '🌠',
         name: 'パーフェクトクリア',
         description: '全${AppConstants.totalStages}ステージ3つ星（${AppConstants.totalStages * 3}ポイント満点）',
@@ -595,7 +595,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: AppConstants.totalStages * 3,
       ),
       // 3つ星バッジ
-      _Badge(
+      Badge(
         icon: '✨',
         name: '完璧主義者',
         description: '3ステージで3つ星',
@@ -604,7 +604,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: perfectCount.clamp(0, 3),
         progressTarget: 3,
       ),
-      _Badge(
+      Badge(
         icon: '⭐',
         name: '5ステージ完璧',
         description: '5ステージで3つ星',
@@ -613,7 +613,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: perfectCount.clamp(0, 5),
         progressTarget: 5,
       ),
-      _Badge(
+      Badge(
         icon: '🌠',
         name: '3つ星コレクター',
         description: '10ステージで3つ星',
@@ -622,7 +622,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: perfectCount.clamp(0, 10),
         progressTarget: 10,
       ),
-      _Badge(
+      Badge(
         icon: '🎖️',
         name: 'パーフェクトマスター',
         description: '20ステージで3つ星満点',
@@ -632,7 +632,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 20,
       ),
       // ストリークバッジ
-      _Badge(
+      Badge(
         icon: '💫',
         name: '2日連続',
         description: '2日連続でチャレンジ',
@@ -641,7 +641,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: streak.clamp(0, 2),
         progressTarget: 2,
       ),
-      _Badge(
+      Badge(
         icon: '🔥',
         name: '3日連続',
         description: '3日連続でチャレンジ',
@@ -650,7 +650,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: streak.clamp(0, 3),
         progressTarget: 3,
       ),
-      _Badge(
+      Badge(
         icon: '🔥🔥',
         name: '1週間連続',
         description: '7日連続でチャレンジ',
@@ -659,7 +659,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: streak.clamp(0, 7),
         progressTarget: 7,
       ),
-      _Badge(
+      Badge(
         icon: '⚡⚡',
         name: '2週間連続',
         description: '14日連続でチャレンジ',
@@ -668,7 +668,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: streak.clamp(0, 14),
         progressTarget: 14,
       ),
-      _Badge(
+      Badge(
         icon: '🏆',
         name: 'チャンピオン',
         description: '30日連続でチャレンジ',
@@ -677,7 +677,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: streak.clamp(0, 30),
         progressTarget: 30,
       ),
-      _Badge(
+      Badge(
         icon: '🔥🔥🔥',
         name: '1ヶ月連続',
         description: '60日連続でチャレンジ',
@@ -686,7 +686,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: streak.clamp(0, 60),
         progressTarget: 60,
       ),
-      _Badge(
+      Badge(
         icon: '🌟',
         name: '100日連続！',
         description: '100日連続でチャレンジ！伝説！',
@@ -696,7 +696,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 100,
       ),
       // タイムアタック
-      _Badge(
+      Badge(
         icon: '⚡',
         name: 'タイムアタック参戦',
         description: 'タイムアタックに1回挑戦',
@@ -705,7 +705,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: taPlayCount.clamp(0, 1),
         progressTarget: 1,
       ),
-      _Badge(
+      Badge(
         icon: '🏎️',
         name: 'スピードランナー',
         description: 'タイムアタックに10回挑戦',
@@ -714,7 +714,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: taPlayCount.clamp(0, 10),
         progressTarget: 10,
       ),
-      _Badge(
+      Badge(
         icon: '🔥',
         name: 'タイムアタック達人',
         description: 'タイムアタックで8問以上正解',
@@ -723,7 +723,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: taBestCorrect.clamp(0, 8),
         progressTarget: 8,
       ),
-      _Badge(
+      Badge(
         icon: '⚡',
         name: 'ライトニングクイズ',
         description: 'タイムアタックで全問正解',
@@ -732,7 +732,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: taBestCorrect.clamp(0, 10),
         progressTarget: 10,
       ),
-      _Badge(
+      Badge(
         icon: '🔥',
         name: 'コンボ5連続',
         description: 'タイムアタックで5問連続正解',
@@ -741,7 +741,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: taBestMaxCombo.clamp(0, 5),
         progressTarget: 5,
       ),
-      _Badge(
+      Badge(
         icon: '🌟',
         name: 'コンボ神業',
         description: 'タイムアタックで10問連続正解（全問コンボ！）',
@@ -751,7 +751,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 10,
       ),
       // パーフェクトラン
-      _Badge(
+      Badge(
         icon: '💯',
         name: 'パーフェクトチャレンジャー',
         description: 'クイズを全問正解でクリア',
@@ -760,7 +760,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalPerfectRuns.clamp(0, 1),
         progressTarget: 1,
       ),
-      _Badge(
+      Badge(
         icon: '✨',
         name: 'パーフェクトマスター',
         description: 'クイズを全問正解で5回クリア',
@@ -769,7 +769,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalPerfectRuns.clamp(0, 5),
         progressTarget: 5,
       ),
-      _Badge(
+      Badge(
         icon: '👑',
         name: 'パーフェクトレジェンド',
         description: 'クイズを全問正解で20回クリア',
@@ -779,7 +779,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 20,
       ),
       // フラッシュカード
-      _Badge(
+      Badge(
         icon: '📚',
         name: '単語マスター',
         description: 'フラッシュカード5枚習得',
@@ -788,7 +788,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: masteredCards.clamp(0, 5),
         progressTarget: 5,
       ),
-      _Badge(
+      Badge(
         icon: '🃏',
         name: 'カードビギナー',
         description: 'フラッシュカード10枚習得',
@@ -797,7 +797,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: masteredCards.clamp(0, 10),
         progressTarget: 10,
       ),
-      _Badge(
+      Badge(
         icon: '🧠',
         name: 'Python知識人',
         description: 'フラッシュカード20枚習得',
@@ -806,7 +806,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: masteredCards.clamp(0, 20),
         progressTarget: 20,
       ),
-      _Badge(
+      Badge(
         icon: '💡',
         name: '上級知識人',
         description: 'フラッシュカード30枚習得',
@@ -815,7 +815,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: masteredCards.clamp(0, 30),
         progressTarget: 30,
       ),
-      _Badge(
+      Badge(
         icon: '🎴',
         name: 'カードマスター',
         description: 'フラッシュカード全${kFlashcards.length}枚習得！',
@@ -825,7 +825,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: kFlashcards.length,
       ),
       // 苦手問題克服
-      _Badge(
+      Badge(
         icon: '💪',
         name: '苦手克服',
         description: '苦手リストをゼロにした！',
@@ -833,7 +833,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         isUnlocked: wrongCount == 0 && completedCount >= 1,
       ),
       // 苦手問題累計克服マイルストーン
-      _Badge(
+      Badge(
         icon: '🎯',
         name: '苦手10問克服',
         description: '累計10問の苦手問題を克服した！',
@@ -842,7 +842,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalResolvedWrong.clamp(0, 10),
         progressTarget: 10,
       ),
-      _Badge(
+      Badge(
         icon: '🌟',
         name: '苦手30問克服',
         description: '累計30問の苦手問題を克服した！',
@@ -852,7 +852,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 30,
       ),
       // スペシャル
-      _Badge(
+      Badge(
         icon: '👑',
         name: 'コード王',
         description: '全${AppConstants.totalStages}ステージクリア＋30日連続',
@@ -862,7 +862,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
             streak >= 30,
       ),
       // 累計回答数バッジ
-      _Badge(
+      Badge(
         icon: '📝',
         name: '100問挑戦',
         description: '累計100問に回答',
@@ -871,7 +871,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalAnswered.clamp(0, 100),
         progressTarget: 100,
       ),
-      _Badge(
+      Badge(
         icon: '📚',
         name: '500問達成',
         description: '累計500問に回答',
@@ -880,7 +880,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalAnswered.clamp(0, 500),
         progressTarget: 500,
       ),
-      _Badge(
+      Badge(
         icon: '🧠',
         name: '1000問マスター',
         description: '累計1000問に回答',
@@ -890,7 +890,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 1000,
       ),
       // 今日の復習連続バッジ
-      _Badge(
+      Badge(
         icon: '📖',
         name: '復習3日連続',
         description: '今日の復習を3日連続で完了',
@@ -899,7 +899,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: reviewStreak.clamp(0, 3),
         progressTarget: 3,
       ),
-      _Badge(
+      Badge(
         icon: '📖📖',
         name: '復習1週間連続',
         description: '今日の復習を7日連続で完了',
@@ -908,7 +908,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: reviewStreak.clamp(0, 7),
         progressTarget: 7,
       ),
-      _Badge(
+      Badge(
         icon: '📖📖📖',
         name: '復習2週間連続',
         description: '今日の復習を14日連続で完了',
@@ -917,7 +917,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: reviewStreak.clamp(0, 14),
         progressTarget: 14,
       ),
-      _Badge(
+      Badge(
         icon: '🔖',
         name: '復習1ヶ月連続',
         description: '今日の復習を30日連続で完了！すごい！',
@@ -927,7 +927,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 30,
       ),
       // 累計復習回数バッジ
-      _Badge(
+      Badge(
         icon: '📋',
         name: '復習5回達成',
         description: '今日の復習を累計5回完了',
@@ -936,7 +936,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalReviewsCompleted.clamp(0, 5),
         progressTarget: 5,
       ),
-      _Badge(
+      Badge(
         icon: '📒',
         name: '復習10回達成',
         description: '今日の復習を累計10回完了',
@@ -945,7 +945,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalReviewsCompleted.clamp(0, 10),
         progressTarget: 10,
       ),
-      _Badge(
+      Badge(
         icon: '📕',
         name: '復習30回達成！',
         description: '今日の復習を累計30回完了！復習の達人！',
@@ -955,7 +955,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 30,
       ),
       // お気に入りバッジ
-      _Badge(
+      Badge(
         icon: '❤️',
         name: 'お気に入り登録',
         description: 'ステージを1つお気に入りに追加',
@@ -964,7 +964,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: favoritesCount.clamp(0, 1),
         progressTarget: 1,
       ),
-      _Badge(
+      Badge(
         icon: '💝',
         name: 'お気に入りコレクター',
         description: 'ステージを5つお気に入りに追加',
@@ -973,7 +973,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: favoritesCount.clamp(0, 5),
         progressTarget: 5,
       ),
-      _Badge(
+      Badge(
         icon: '💖',
         name: 'お気に入りマスター',
         description: 'ステージを10つお気に入りに追加',
@@ -983,7 +983,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressTarget: 10,
       ),
       // 累計学習時間バッジ
-      _Badge(
+      Badge(
         icon: '⏱',
         name: '10分学習',
         description: '累計10分学習した',
@@ -992,7 +992,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalLearningMinutes.clamp(0, 10),
         progressTarget: 10,
       ),
-      _Badge(
+      Badge(
         icon: '⏰',
         name: '30分学習',
         description: '累計30分学習した',
@@ -1001,7 +1001,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalLearningMinutes.clamp(0, 30),
         progressTarget: 30,
       ),
-      _Badge(
+      Badge(
         icon: '🕐',
         name: '1時間学習',
         description: '累計1時間学習した',
@@ -1010,7 +1010,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalLearningMinutes.clamp(0, 60),
         progressTarget: 60,
       ),
-      _Badge(
+      Badge(
         icon: '🕑',
         name: '2時間学習',
         description: '累計2時間学習した',
@@ -1019,7 +1019,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalLearningMinutes.clamp(0, 120),
         progressTarget: 120,
       ),
-      _Badge(
+      Badge(
         icon: '🕒',
         name: '3時間学習',
         description: '累計3時間学習した',
@@ -1028,7 +1028,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         progressCurrent: totalLearningMinutes.clamp(0, 180),
         progressTarget: 180,
       ),
-      _Badge(
+      Badge(
         icon: '🏆',
         name: '10時間学習',
         description: '累計10時間学習！本気の学習者！',
@@ -1047,7 +1047,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
 enum _BadgeFilter { all, unlocked, locked }
 
 class _BadgesTab extends StatefulWidget {
-  final List<_Badge> badges;
+  final List<Badge> badges;
   final Future<void> Function() onRefresh;
   const _BadgesTab({required this.badges, required this.onRefresh});
 
@@ -1087,20 +1087,20 @@ class _BadgesTabState extends State<_BadgesTab> {
         // フィルターチップ
         Row(
           children: [
-            _FilterChip(
+            FilterChip(
               label: '全て (${widget.badges.length})',
               selected: _filter == _BadgeFilter.all,
               onTap: () => setState(() => _filter = _BadgeFilter.all),
             ),
             const SizedBox(width: 8),
-            _FilterChip(
+            FilterChip(
               label: '✅ 解除済み ($unlockedCount)',
               selected: _filter == _BadgeFilter.unlocked,
               onTap: () => setState(() => _filter = _BadgeFilter.unlocked),
               selectedColor: const Color(0xFF27AE60),
             ),
             const SizedBox(width: 8),
-            _FilterChip(
+            FilterChip(
               label: '🔒 未解除 ($lockedCount)',
               selected: _filter == _BadgeFilter.locked,
               onTap: () => setState(() => _filter = _BadgeFilter.locked),
@@ -1120,7 +1120,7 @@ class _BadgesTabState extends State<_BadgesTab> {
             if (nextBadge == null) return const SizedBox.shrink();
             return Padding(
               padding: const EdgeInsets.only(bottom: 14),
-              child: _NextBadgeCard(badge: nextBadge),
+              child: NextBadgeCard(badge: nextBadge),
             );
           }),
         ],
@@ -1154,7 +1154,7 @@ class _BadgesTabState extends State<_BadgesTab> {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                   children: catBadges.asMap().entries.map((e) =>
-                    _BadgeCard(badge: e.value)
+                    AchievementBadgeCard(badge: e.value)
                         .animate()
                         .fadeIn(
                           duration: 300.ms,
@@ -1190,7 +1190,7 @@ class _BadgesTabState extends State<_BadgesTab> {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               children: filteredBadges.asMap().entries.map((e) =>
-                _BadgeCard(badge: e.value)
+                AchievementBadgeCard(badge: e.value)
                     .animate()
                     .fadeIn(
                       duration: 250.ms,
@@ -1206,50 +1206,6 @@ class _BadgesTabState extends State<_BadgesTab> {
   }
 }
 
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  final Color? selectedColor;
-
-  const _FilterChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    this.selectedColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = selectedColor ?? kPrimaryColor;
-    return GestureDetector(
-      onTap: () {
-        HapticService.selectionClick();
-        onTap();
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.12) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: selected ? color : context.borderColor,
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-            color: selected ? color : kTextSecondary,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ソート種別
 enum _CompletedSort { date, stars, level }
@@ -1341,13 +1297,13 @@ class _CompletedTabState extends State<_CompletedTab> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _FilterChip(
+                    FilterChip(
                       label: '全て (${widget.completedCount})',
                       selected: _levelFilter == null,
                       onTap: () => setState(() => _levelFilter = null),
                     ),
                     const SizedBox(width: 6),
-                    _FilterChip(
+                    FilterChip(
                       label: '🧩 初級',
                       selected: _levelFilter == StageLevel.beginner,
                       onTap: () => setState(() => _levelFilter =
@@ -1355,7 +1311,7 @@ class _CompletedTabState extends State<_CompletedTab> {
                       selectedColor: kPrimaryColor,
                     ),
                     const SizedBox(width: 6),
-                    _FilterChip(
+                    FilterChip(
                       label: '🐍 中級',
                       selected: _levelFilter == StageLevel.intermediate,
                       onTap: () => setState(() => _levelFilter =
@@ -1363,7 +1319,7 @@ class _CompletedTabState extends State<_CompletedTab> {
                       selectedColor: const Color(0xFF9B59B6),
                     ),
                     const SizedBox(width: 6),
-                    _FilterChip(
+                    FilterChip(
                       label: '🚀 上級',
                       selected: _levelFilter == StageLevel.advanced,
                       onTap: () => setState(() => _levelFilter =
@@ -1382,19 +1338,19 @@ class _CompletedTabState extends State<_CompletedTab> {
                     style: const TextStyle(fontSize: 11, color: kTextSecondary),
                   ),
                   const SizedBox(width: 8),
-                  _SortButton(
+                  SortButton(
                     label: '🕒 日付',
                     selected: _sort == _CompletedSort.date,
                     onTap: () => setState(() => _sort = _CompletedSort.date),
                   ),
                   const SizedBox(width: 6),
-                  _SortButton(
+                  SortButton(
                     label: '⭐ スター',
                     selected: _sort == _CompletedSort.stars,
                     onTap: () => setState(() => _sort = _CompletedSort.stars),
                   ),
                   const SizedBox(width: 6),
-                  _SortButton(
+                  SortButton(
                     label: '📚 レベル',
                     selected: _sort == _CompletedSort.level,
                     onTap: () => setState(() => _sort = _CompletedSort.level),
@@ -1407,7 +1363,7 @@ class _CompletedTabState extends State<_CompletedTab> {
         const Divider(height: 1),
         // クリア統計サマリー
         if (completed.isNotEmpty)
-          _CompletedStatsBar(
+          CompletedStatsBar(
             completed: completed,
             progressMap: widget.progressMap,
           ).animate().fadeIn(duration: 200.ms),
@@ -1427,7 +1383,7 @@ class _CompletedTabState extends State<_CompletedTab> {
                   itemBuilder: (context, index) {
                     final c = completed[index];
                     final progress = widget.progressMap[c.id]!;
-                    return _CompletedStageCard(
+                    return CompletedStageCard(
                       challenge: c,
                       starsEarned: progress.starsEarned,
                       completedAt: progress.completedAt,
@@ -1444,705 +1400,23 @@ class _CompletedTabState extends State<_CompletedTab> {
 
 // ──────────── クリア統計サマリーバー ─────────────────────────────────────────────
 
-class _CompletedStatsBar extends StatelessWidget {
-  final List<Stage> completed;
-  final Map<String, UserProgress> progressMap;
 
-  const _CompletedStatsBar({
-    required this.completed,
-    required this.progressMap,
-  });
 
-  @override
-  Widget build(BuildContext context) {
-    final total = completed.length;
-    final perfectCount = completed
-        .where((c) => (progressMap[c.id]?.starsEarned ?? 0) >= 3)
-        .length;
-    final totalStars = completed.fold<int>(
-      0,
-      (sum, c) => sum + (progressMap[c.id]?.starsEarned ?? 0),
-    );
-    final avgStars = total > 0 ? totalStars / total : 0.0;
-    final improveable = total - perfectCount;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: context.subCardBg,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _StatMiniCell(label: 'クリア', value: '$total', color: kPrimaryColor),
-          Container(width: 1, height: 28, color: context.borderColor),
-          _StatMiniCell(
-            label: '平均⭐',
-            value: avgStars.toStringAsFixed(1),
-            color: kStarColor,
-          ),
-          Container(width: 1, height: 28, color: context.borderColor),
-          _StatMiniCell(
-            label: '満点',
-            value: '$perfectCount',
-            color: const Color(0xFF27AE60),
-          ),
-          Container(width: 1, height: 28, color: context.borderColor),
-          _StatMiniCell(
-            label: '改善可',
-            value: '$improveable',
-            color: improveable > 0
-                ? const Color(0xFFE67E22)
-                : kPrimaryColor,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatMiniCell extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatMiniCell({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        const SizedBox(height: 1),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 10, color: kTextSecondary),
-        ),
-      ],
-    );
-  }
-}
-
-class _SortButton extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _SortButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        HapticService.selectionClick();
-        onTap();
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: selected ? kPrimaryColor.withValues(alpha: 0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? kPrimaryColor : context.borderColor,
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-            color: selected ? kPrimaryColor : kTextSecondary,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 // ──────────── カード ──────────────────────────────────────────────────────────
 
-class _BadgeCard extends StatelessWidget {
-  final _Badge badge;
-  const _BadgeCard({required this.badge});
 
-  void _showDetails(BuildContext context) {
-    HapticService.selectionClick();
-    showModalBottomSheet<void>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              badge.isUnlocked ? badge.icon : '🔒',
-              style: TextStyle(
-                fontSize: 56,
-                color: badge.isUnlocked ? null : Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              badge.name,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: badge.isUnlocked ? context.textPrimary : kTextSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              badge.description,
-              style: const TextStyle(
-                fontSize: 14,
-                color: kTextSecondary,
-                height: 1.4,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: badge.isUnlocked
-                    ? kPrimaryColor.withValues(alpha: 0.1)
-                    : Colors.grey.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                badge.isUnlocked ? '✅ 達成済み！' : '🔒 未達成',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: badge.isUnlocked ? kPrimaryColor : kTextSecondary,
-                ),
-              ),
-            ),
-            // 未達成かつ進捗あり → プログレスバー
-            if (!badge.isUnlocked && badge.progressRatio != null && badge.progressRatio! > 0) ...[
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '進捗',
-                          style: const TextStyle(fontSize: 12, color: kTextSecondary),
-                        ),
-                        Text(
-                          '${badge.progressCurrent} / ${badge.progressTarget}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: kPrimaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.0, end: badge.progressRatio!),
-                        duration: const Duration(milliseconds: 800),
-                        curve: Curves.easeOut,
-                        builder: (context, value, _) => LinearProgressIndicator(
-                          value: value,
-                          minHeight: 8,
-                          backgroundColor: Colors.grey.withValues(alpha: 0.2),
-                          valueColor: const AlwaysStoppedAnimation<Color>(kPrimaryColor),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            // 達成済みのときだけシェアボタンを表示
-            if (badge.isUnlocked) ...[
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    HapticService.lightImpact();
-                    final text =
-                        '🎓 小学生向けプログラミングアプリで「${badge.icon} ${badge.name}」バッジを獲得！\n'
-                        '${badge.description}\n#しょうがくプログラミング';
-                    Clipboard.setData(ClipboardData(text: text));
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('📋 シェア用テキストをコピーしました！'),
-                        duration: Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.share_outlined, size: 16),
-                  label: const Text('シェアする'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: BorderSide(color: kPrimaryColor.withValues(alpha: 0.5)),
-                    foregroundColor: kPrimaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-            const SizedBox(height: 12),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final ratio = badge.progressRatio;
-    final showProgress = !badge.isUnlocked && ratio != null && ratio > 0;
-
-    return GestureDetector(
-      onTap: () => _showDetails(context),
-      child: Container(
-      decoration: BoxDecoration(
-        color: badge.isUnlocked ? context.cardBg : context.subCardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: badge.isUnlocked
-              ? kPrimaryColor.withValues(alpha: 0.3)
-              : context.borderColor,
-        ),
-        boxShadow: badge.isUnlocked
-            ? [
-                BoxShadow(
-                  color: kPrimaryColor.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                ),
-              ]
-            : null,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              badge.isUnlocked ? badge.icon : '🔒',
-              style: TextStyle(
-                fontSize: 28,
-                color: badge.isUnlocked ? null : Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              badge.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: badge.isUnlocked ? context.textPrimary : kTextSecondary,
-              ),
-            ),
-            if (showProgress) ...[
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(3),
-                      child: TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.0, end: ratio),
-                        duration: const Duration(milliseconds: 700),
-                        curve: Curves.easeOut,
-                        builder: (context, value, _) => LinearProgressIndicator(
-                          value: value,
-                          minHeight: 4,
-                          backgroundColor: context.borderColor,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            kPrimaryColor.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      '${badge.progressCurrent}/${badge.progressTarget}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: kPrimaryColor.withValues(alpha: 0.8),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ] else ...[
-              const SizedBox(height: 1),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
-                  badge.description,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: kTextSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    ),
-    );
-  }
-}
-
-class _CompletedStageCard extends StatelessWidget {
-  final Stage challenge;
-  final int starsEarned;
-  final DateTime? completedAt;
-
-  const _CompletedStageCard({
-    required this.challenge,
-    required this.starsEarned,
-    required this.completedAt,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final levelColor = challenge.level == StageLevel.beginner
-        ? kPrimaryColor
-        : challenge.level == StageLevel.intermediate
-            ? const Color(0xFF9B59B6)
-            : const Color(0xFFE67E22);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border(left: BorderSide(color: levelColor, width: 4)),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Text(challenge.icon,
-              style: const TextStyle(fontSize: 28)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  challenge.title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: context.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Stage ${challenge.stageNumber}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: levelColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                if (completedAt != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    '${completedAt!.year}/${completedAt!.month.toString().padLeft(2, '0')}/${completedAt!.day.toString().padLeft(2, '0')} クリア',
-                    style: const TextStyle(
-                        fontSize: 10, color: kTextSecondary),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          Row(
-            children: List.generate(
-              challenge.maxStars,
-              (i) => Icon(
-                i < starsEarned ? Icons.star : Icons.star_border,
-                size: 18,
-                color: i < starsEarned ? kStarColor : context.borderColor,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ──────────── ヘッダー統計 ────────────────────────────────────────────────────
 
-class _HeaderStat extends StatelessWidget {
-  final String icon;
-  final String value;
-  final String label;
-
-  const _HeaderStat({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(icon, style: const TextStyle(fontSize: 20)),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 10, color: Colors.white70),
-        ),
-      ],
-    );
-  }
-}
 
 // ──────────── データクラス ────────────────────────────────────────────────────
 
 // ──────────── 次に解除できるバッジ カード ────────────────────────────────────────
 
-class _NextBadgeCard extends StatelessWidget {
-  final _Badge badge;
-  const _NextBadgeCard({required this.badge});
-
-  @override
-  Widget build(BuildContext context) {
-    final ratio = badge.progressRatio!;
-    final pct = (ratio * 100).round();
-    final remaining = badge.progressTarget! - badge.progressCurrent!;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            kPrimaryColor.withValues(alpha: 0.10),
-            kPrimaryColor.withValues(alpha: 0.04),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: kPrimaryColor.withValues(alpha: 0.35),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ヘッダー行
-          Row(
-            children: [
-              const Text('🎯', style: TextStyle(fontSize: 12)),
-              const SizedBox(width: 4),
-              const Text(
-                '次に解除できるバッジ',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: kPrimaryColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '$pct%',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: kPrimaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // バッジ情報行
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: kPrimaryColor.withValues(alpha: 0.08),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: kPrimaryColor.withValues(alpha: 0.25)),
-                ),
-                child: const Center(
-                  child: Text('🔒', style: TextStyle(fontSize: 22)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      badge.name,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: context.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      badge.description,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: kTextSecondary,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // 進捗ラベル
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${badge.progressCurrent} / ${badge.progressTarget}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: kTextSecondary,
-                ),
-              ),
-              Text(
-                'あと$remaining で解除！',
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: kPrimaryColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          // プログレスバー
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0.0, end: ratio),
-              duration: const Duration(milliseconds: 900),
-              curve: Curves.easeOut,
-              builder: (context, value, _) => LinearProgressIndicator(
-                value: value,
-                minHeight: 8,
-                backgroundColor: Colors.grey.withValues(alpha: 0.18),
-                valueColor: const AlwaysStoppedAnimation<Color>(kPrimaryColor),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 350.ms).slideY(begin: -0.06, end: 0, curve: Curves.easeOut);
-  }
-}
 
 // ──────────── バッジデータモデル ───────────────────────────────────────────────
 
-class _Badge {
-  final String icon;
-  final String name;
-  final String description;
-  final String category;
-  final bool isUnlocked;
-  /// 未解放バッジの進捗 (0〜progressTarget)
-  final int? progressCurrent;
-  final int? progressTarget;
-
-  const _Badge({
-    required this.icon,
-    required this.name,
-    required this.description,
-    required this.category,
-    required this.isUnlocked,
-    this.progressCurrent,
-    this.progressTarget,
-  });
-
-  double? get progressRatio {
-    if (progressCurrent == null || progressTarget == null || progressTarget == 0) return null;
-    return (progressCurrent! / progressTarget!).clamp(0.0, 1.0);
-  }
-}
 
 // ──────────── 統計タブ ────────────────────────────────────────────────────────
 
@@ -2205,11 +1479,11 @@ class _StatsTab extends ConsumerWidget {
               .animate().fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
           const SizedBox(height: 12),
           // ユニット別進捗
-          _StatCard(
+          StatCard(
             title: '📚 ユニット別進捗',
             child: Column(
               children: [
-                _UnitProgressRow(
+                UnitProgressRow(
                   icon: '🧩',
                   label: '初級',
                   completed: _completedInLevel(StageLevel.beginner),
@@ -2217,7 +1491,7 @@ class _StatsTab extends ConsumerWidget {
                   color: kPrimaryColor,
                 ),
                 const SizedBox(height: 14),
-                _UnitProgressRow(
+                UnitProgressRow(
                   icon: '🐍',
                   label: '中級',
                   completed: _completedInLevel(StageLevel.intermediate),
@@ -2225,7 +1499,7 @@ class _StatsTab extends ConsumerWidget {
                   color: const Color(0xFF9B59B6),
                 ),
                 const SizedBox(height: 14),
-                _UnitProgressRow(
+                UnitProgressRow(
                   icon: '🚀',
                   label: '上級',
                   completed: _completedInLevel(StageLevel.advanced),
@@ -2237,26 +1511,26 @@ class _StatsTab extends ConsumerWidget {
           ).animate(delay: 100.ms).fadeIn(duration: 350.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
           const SizedBox(height: 12),
           // サマリー
-          _StatCard(
+          StatCard(
             title: '📊 総合サマリー',
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _SummaryTile(
+                    SummaryTile(
                       emoji: '🔥',
                       numValue: streakDays,
                       suffix: '日',
                       label: '連続学習',
                     ),
-                    _SummaryTile(
+                    SummaryTile(
                       emoji: '✅',
                       numValue: completedCount,
                       suffix: '',
                       label: 'クリア済み',
                     ),
-                    _SummaryTile(
+                    SummaryTile(
                       emoji: '⭐',
                       numValue: totalStars,
                       suffix: '',
@@ -2306,7 +1580,7 @@ class _StatsTab extends ConsumerWidget {
           if (showDetailedStats) ...[
             const SizedBox(height: 4),
             // 週ごとの学習バーチャート
-            _StatCard(
+            StatCard(
               title: '📅 週ごとの学習（過去4週）',
               child: SizedBox(
                 height: 160,
@@ -2416,7 +1690,7 @@ class _StatsTab extends ConsumerWidget {
             const SizedBox(height: 12),
             // 累計回答数
             if (totalQuestionsAnswered > 0)
-              _StatCard(
+              StatCard(
                 title: '❓ 累計回答数',
                 child: Row(
                   children: [
@@ -2454,7 +1728,7 @@ class _StatsTab extends ConsumerWidget {
             if (totalSeconds > 0) ...[
               const SizedBox(height: 12),
               // 累計学習時間
-              _StatCard(
+              StatCard(
                 title: '⏱ 累計学習時間',
                 child: Row(
                   children: [
@@ -2525,7 +1799,7 @@ class _StatsTab extends ConsumerWidget {
     // 活動のあった日数をカウント
     final activeDays = allDays.where((d) => (activityByDate[d] ?? 0) > 0).length;
 
-    return _StatCard(
+    return StatCard(
       title: '📅 28日間の学習カレンダー',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2615,7 +1889,7 @@ class _StatsTab extends ConsumerWidget {
               ),
               const Spacer(),
               // 凡例
-              _HeatmapLegend(),
+              HeatmapLegend(),
             ],
           ),
         ],
@@ -2635,7 +1909,7 @@ class _StatsTab extends ConsumerWidget {
       Color(0xFFE67E22),
     ];
 
-    return _StatCard(
+    return StatCard(
       title: '⚡ タイムアタック',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2643,21 +1917,21 @@ class _StatsTab extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: _QualityMiniTile(
+                child: QualityStatTile(
                   emoji: '🎮',
                   value: '${taState.playCount}回',
                   label: 'プレイ数',
                 ),
               ),
               Expanded(
-                child: _QualityMiniTile(
+                child: QualityStatTile(
                   emoji: '🏆',
                   value: '${taState.bestScore}pt',
                   label: 'ベストスコア',
                 ),
               ),
               Expanded(
-                child: _QualityMiniTile(
+                child: QualityStatTile(
                   emoji: '✅',
                   value: '${taState.bestCorrect}問',
                   label: '最多正解',
@@ -2665,7 +1939,7 @@ class _StatsTab extends ConsumerWidget {
               ),
               if (taState.bestMaxCombo >= 2)
                 Expanded(
-                  child: _QualityMiniTile(
+                  child: QualityStatTile(
                     emoji: '🔥',
                     value: '${taState.bestMaxCombo}連続',
                     label: '最高コンボ',
@@ -2822,28 +2096,28 @@ class _StatsTab extends ConsumerWidget {
       }
     }
 
-    return _StatCard(
+    return StatCard(
       title: '✨ 学習品質',
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
-                child: _QualityMiniTile(
+                child: QualityStatTile(
                   emoji: '⭐',
                   value: avgStars.toStringAsFixed(1),
                   label: '平均スター',
                 ),
               ),
               Expanded(
-                child: _QualityMiniTile(
+                child: QualityStatTile(
                   emoji: '💯',
                   value: '$perfectPct%',
                   label: '満点率',
                 ),
               ),
               Expanded(
-                child: _QualityMiniTile(
+                child: QualityStatTile(
                   emoji: '🏆',
                   value: '$perfectCount',
                   label: '3つ星ステージ',
@@ -2851,7 +2125,7 @@ class _StatsTab extends ConsumerWidget {
               ),
               if (totalPerfectRuns > 0)
                 Expanded(
-                  child: _QualityMiniTile(
+                  child: QualityStatTile(
                     emoji: '💯',
                     value: '$totalPerfectRuns回',
                     label: '全問正解',
@@ -2945,7 +2219,7 @@ class _StatsTab extends ConsumerWidget {
         .where((c) => categoryProgress.containsKey(c))
         .toList();
 
-    return _StatCard(
+    return StatCard(
       title: '🛠️ 学習ツール',
       child: Column(
         children: [
@@ -3228,21 +2502,21 @@ class _StatsTab extends ConsumerWidget {
     final longestStreak = rv.longestReviewStreak;
     final total = rv.totalReviewsCompleted;
     if (total == 0) return const SizedBox.shrink();
-    return _StatCard(
+    return StatCard(
       title: '📖 今日の復習',
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
-                child: _QualityMiniTile(
+                child: QualityStatTile(
                   emoji: '📋',
                   value: '$total回',
                   label: '累計完了',
                 ),
               ),
               Expanded(
-                child: _QualityMiniTile(
+                child: QualityStatTile(
                   emoji: '🔥',
                   value: '$streak日',
                   label: '連続中',
@@ -3250,7 +2524,7 @@ class _StatsTab extends ConsumerWidget {
               ),
               if (longestStreak >= 3)
                 Expanded(
-                  child: _QualityMiniTile(
+                  child: QualityStatTile(
                     emoji: '🏅',
                     value: '$longestStreak日',
                     label: '最長連続',
@@ -3291,7 +2565,7 @@ class _StatsTab extends ConsumerWidget {
     final total = allChallenges.length;
     final remaining = total - completedCount;
     if (remaining <= 0) {
-      return _StatCard(
+      return StatCard(
         title: '🏁 完了予測',
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -3336,7 +2610,7 @@ class _StatsTab extends ConsumerWidget {
 
     final completionRate = completedCount / total;
 
-    return _StatCard(
+    return StatCard(
       title: '🏁 完了予測',
       child: Column(
         children: [
@@ -3399,220 +2673,8 @@ class _StatsTab extends ConsumerWidget {
   }
 }
 
-class _QualityMiniTile extends StatelessWidget {
-  final String emoji;
-  final String value;
-  final String label;
-
-  const _QualityMiniTile({
-    required this.emoji,
-    required this.value,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(emoji, style: const TextStyle(fontSize: 22)),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: context.textPrimary,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 10, color: kTextSecondary),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-}
 
 /// ヒートマップの凡例（薄い→濃いの色見本）
-class _HeatmapLegend extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Text('少', style: TextStyle(fontSize: 9, color: kTextSecondary)),
-        const SizedBox(width: 2),
-        ...List.generate(4, (i) {
-          final alphas = [0.08, 0.35, 0.6, 1.0];
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 1),
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: i == 0
-                  ? (kPrimaryColor.withValues(alpha: 0.08))
-                  : kPrimaryColor.withValues(alpha: alphas[i]),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          );
-        }),
-        const SizedBox(width: 2),
-        const Text('多', style: TextStyle(fontSize: 9, color: kTextSecondary)),
-      ],
-    );
-  }
-}
 
-class _StatCard extends StatelessWidget {
-  final String title;
-  final Widget child;
 
-  const _StatCard({required this.title, required this.child});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 14),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _UnitProgressRow extends StatelessWidget {
-  final String icon;
-  final String label;
-  final int completed;
-  final int total;
-  final Color color;
-
-  const _UnitProgressRow({
-    required this.icon,
-    required this.label,
-    required this.completed,
-    required this.total,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final pct = total == 0 ? 0.0 : completed / total;
-
-    return Row(
-      children: [
-        Text(icon, style: const TextStyle(fontSize: 22)),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: context.textPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    '$completed/$total',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: color,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0.0, end: pct),
-                duration: const Duration(milliseconds: 900),
-                curve: Curves.easeOut,
-                builder: (context, value, _) => ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: value,
-                    backgroundColor: color.withValues(alpha: 0.15),
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
-                    minHeight: 8,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SummaryTile extends StatelessWidget {
-  final String emoji;
-  final int numValue;
-  final String suffix;
-  final String label;
-
-  const _SummaryTile({
-    required this.emoji,
-    required this.numValue,
-    required this.suffix,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(emoji, style: const TextStyle(fontSize: 26)),
-        const SizedBox(height: 4),
-        TweenAnimationBuilder<int>(
-          tween: IntTween(begin: 0, end: numValue),
-          duration: const Duration(milliseconds: 900),
-          curve: Curves.easeOut,
-          builder: (context, value, _) => Text(
-            '$value$suffix',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
-            ),
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, color: kTextSecondary),
-        ),
-      ],
-    );
-  }
-}
