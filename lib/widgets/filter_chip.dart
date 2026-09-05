@@ -3,13 +3,13 @@ import '../config/theme.dart';
 import '../services/haptic_service.dart';
 
 /// Animated filter chip with optional custom color
-class FilterChip extends StatelessWidget {
+class CustomFilterChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
   final Color? selectedColor;
 
-  const FilterChip({
+  const CustomFilterChip({
     super.key,
     required this.label,
     required this.selected,

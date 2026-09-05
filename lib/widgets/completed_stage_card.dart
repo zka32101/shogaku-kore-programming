@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
+import '../config/constants.dart';
 import '../models/stage.dart';
 
 /// Card displaying a completed stage with stars and level indicator
