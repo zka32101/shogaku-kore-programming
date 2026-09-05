@@ -1087,20 +1087,20 @@ class _BadgesTabState extends State<_BadgesTab> {
         // フィルターチップ
         Row(
           children: [
-            _FilterChip(
+            _CustomFilterChip(
               label: '全て (${widget.badges.length})',
               selected: _filter == _BadgeFilter.all,
               onTap: () => setState(() => _filter = _BadgeFilter.all),
             ),
             const SizedBox(width: 8),
-            _FilterChip(
+            _CustomFilterChip(
               label: '✅ 解除済み ($unlockedCount)',
               selected: _filter == _BadgeFilter.unlocked,
               onTap: () => setState(() => _filter = _BadgeFilter.unlocked),
               selectedColor: const Color(0xFF27AE60),
             ),
             const SizedBox(width: 8),
-            _FilterChip(
+            _CustomFilterChip(
               label: '🔒 未解除 ($lockedCount)',
               selected: _filter == _BadgeFilter.locked,
               onTap: () => setState(() => _filter = _BadgeFilter.locked),
@@ -1212,7 +1212,7 @@ class _FilterChip extends StatelessWidget {
   final VoidCallback onTap;
   final Color? selectedColor;
 
-  const _FilterChip({
+  const _CustomFilterChip({
     required this.label,
     required this.selected,
     required this.onTap,
@@ -1341,13 +1341,13 @@ class _CompletedTabState extends State<_CompletedTab> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _FilterChip(
+                    _CustomFilterChip(
                       label: '全て (${widget.completedCount})',
                       selected: _levelFilter == null,
                       onTap: () => setState(() => _levelFilter = null),
                     ),
                     const SizedBox(width: 6),
-                    _FilterChip(
+                    _CustomFilterChip(
                       label: '🧩 初級',
                       selected: _levelFilter == StageLevel.beginner,
                       onTap: () => setState(() => _levelFilter =
@@ -1355,7 +1355,7 @@ class _CompletedTabState extends State<_CompletedTab> {
                       selectedColor: kPrimaryColor,
                     ),
                     const SizedBox(width: 6),
-                    _FilterChip(
+                    _CustomFilterChip(
                       label: '🐍 中級',
                       selected: _levelFilter == StageLevel.intermediate,
                       onTap: () => setState(() => _levelFilter =
@@ -1363,7 +1363,7 @@ class _CompletedTabState extends State<_CompletedTab> {
                       selectedColor: const Color(0xFF9B59B6),
                     ),
                     const SizedBox(width: 6),
-                    _FilterChip(
+                    _CustomFilterChip(
                       label: '🚀 上級',
                       selected: _levelFilter == StageLevel.advanced,
                       onTap: () => setState(() => _levelFilter =
