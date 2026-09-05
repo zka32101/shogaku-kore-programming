@@ -251,7 +251,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     return KeyEventResult.ignored;
   }
 
-  String _getStagType(Stage challenge) {
+  String _getStageType(Stage challenge) {
     final title = challenge.title.toLowerCase();
     if (title.contains('if') || title.contains('分岐') || title.contains('条件')) return 'branch';
     if (title.contains('ループ') || title.contains('for') || title.contains('while')) return 'loop';
