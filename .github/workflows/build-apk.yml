@@ -95,3 +95,11 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-to-google-drive:
+    needs: build
+    if: success()
+    uses: ./.github/workflows/google-drive-upload.yml
+    secrets:
+      GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+      GOOGLE_DRIVE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_DRIVE_SERVICE_ACCOUNT }}
