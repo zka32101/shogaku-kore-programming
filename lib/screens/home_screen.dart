@@ -7,7 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
-import '../models/challenge.dart';
+import '../models/challenge.dart' hide Question;
 import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
@@ -502,8 +502,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut)
-                  else
-                    _buildDailyMission(context, nextStage?)
+                  else if (nextStage != null)
+                    _buildDailyMission(context, nextStage)
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut),
@@ -1362,7 +1362,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }).toList();
 
-    final challenge = Stage?(
+    final challenge = Stage(
       id: 'wrong_answers_quiz',
       stageNumber: 0,
       title: '苦手問題クイズ',
@@ -2382,9 +2382,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     // 今週初達成ならボーナス（+20pt）とポップアップ
     if (isDone && !notifier.isHomeWeeklyBonusAwardedThisWeek) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
-        final awarded = notifier.awardHomeWeeklyBonus();
+        final awarded = await notifier.awardHomeWeeklyBonus();
         if (awarded) {
           HapticService.mediumImpact();
           SoundService().playComplete();
@@ -3026,12 +3026,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDailyMission(BuildContext context, Stage challenge) {
-    void openStage?() {
+    void openStage() {
       _openStageOrShowPaywall(context, challenge);
     }
 
     return TapScale(
-      onTap: openStage?,
+      onTap: openStage,
       child: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
@@ -4335,7 +4335,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
                           ),
                           child: Center(
                             child: Text(
-                              String.fromCharCode(0x41 + i), // A, B, C, D
+                              String.fromCharCode(0x41 + i.toInt()), // A, B, C, D
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
