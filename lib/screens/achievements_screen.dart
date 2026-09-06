@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -1115,7 +1115,7 @@ class _BadgesTabState extends State<_BadgesTab> {
           Builder(builder: (context) {
             final nextBadge = widget.badges
                 .where((b) => !b.isUnlocked && b.progressRatio != null && b.progressRatio! > 0)
-                .fold<_Badge?>(null, (best, b) =>
+                .fold<Badge?>(null, (best, b) =>
                     best == null || b.progressRatio! > best.progressRatio! ? b : best);
             if (nextBadge == null) return const SizedBox.shrink();
             return Padding(
