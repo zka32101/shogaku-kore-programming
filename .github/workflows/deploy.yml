@@ -183,3 +183,21 @@ jobs:
 # - Permissions limited to minimum required (contents write, checks write)
 # - No checkout of untrusted code; uses official Flutter action
 # - Artifacts uploaded for testing and distribution
+
+  emulator-test:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+      
+      - name: Run Android Emulator Tests
+        uses: zka32101/yourwish/.github/workflows/android-emulator-test.yml@main
+        with:
+          app-path: '.'
+          test-command: 'flutter test'
