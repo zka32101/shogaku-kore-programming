@@ -97,7 +97,7 @@ class Challenge {
   final DateTime startsAt;      // When challenge becomes available
   final DateTime? endsAt;       // When challenge expires
   final int totalCompletions;   // Total times completed by user
-  final int difficulty_multiplier; // Reward multiplier based on difficulty
+  final int difficultyMultiplier; // Reward multiplier based on difficulty
 
   Challenge({
     required this.challengeId,
@@ -115,7 +115,7 @@ class Challenge {
     required this.startsAt,
     this.endsAt,
     this.totalCompletions = 0,
-    this.difficulty_multiplier = 1,
+    this.difficultyMultiplier = 1,
   });
 
   /// Check if challenge is available now
@@ -159,7 +159,7 @@ class Challenge {
 
   /// Calculate adjusted reward based on difficulty
   int getAdjustedReward() {
-    return (reward.amount * difficulty_multiplier).toInt();
+    return (reward.amount * difficultyMultiplier).toInt();
   }
 
   Map<String, dynamic> toJson() => {
@@ -178,7 +178,7 @@ class Challenge {
         'startsAt': startsAt.toIso8601String(),
         'endsAt': endsAt?.toIso8601String(),
         'totalCompletions': totalCompletions,
-        'difficulty_multiplier': difficulty_multiplier,
+        'difficultyMultiplier': difficultyMultiplier,
       };
 
   factory Challenge.fromJson(Map<String, dynamic> json) => Challenge(
@@ -197,7 +197,7 @@ class Challenge {
         startsAt: DateTime.parse(json['startsAt'] as String),
         endsAt: json['endsAt'] != null ? DateTime.parse(json['endsAt'] as String) : null,
         totalCompletions: json['totalCompletions'] as int? ?? 0,
-        difficulty_multiplier: json['difficulty_multiplier'] as int? ?? 1,
+        difficultyMultiplier: json['difficultyMultiplier'] as int? ?? 1,
       );
 }
 

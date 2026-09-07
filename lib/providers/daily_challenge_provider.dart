@@ -399,7 +399,7 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         createdAt: now,
         startsAt: now,
         endsAt: now.add(const Duration(days: 1)),
-        difficulty_multiplier: 1,
+        difficultyMultiplier: 1,
       ),
       Challenge(
         challengeId: 'challenge-daily-2',
@@ -418,7 +418,7 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         createdAt: now,
         startsAt: now,
         endsAt: now.add(const Duration(days: 1)),
-        difficulty_multiplier: 1,
+        difficultyMultiplier: 1,
       ),
       Challenge(
         challengeId: 'challenge-weekly-1',
@@ -437,7 +437,7 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         createdAt: now,
         startsAt: now,
         endsAt: now.add(const Duration(days: 7)),
-        difficulty_multiplier: 2,
+        difficultyMultiplier: 2,
       ),
       Challenge(
         challengeId: 'challenge-math-1',
@@ -455,7 +455,7 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         createdAt: now,
         startsAt: now,
         endsAt: now.add(const Duration(days: 1)),
-        difficulty_multiplier: 1,
+        difficultyMultiplier: 1,
       ),
     ];
   }

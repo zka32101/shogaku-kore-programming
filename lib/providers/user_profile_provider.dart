@@ -564,7 +564,7 @@ final userProfileCollectionProvider = Provider.autoDispose<UserProfileCollection
   (ref) => ref.watch(userProfileProvider).collection,
 );
 
-final userProfileProvider_profile = Provider.autoDispose<UserProfile?>(
+final userProfileProviderProfile = Provider.autoDispose<UserProfile?>(
   (ref) => ref.watch(userProfileProvider).collection?.profile,
 );
 
