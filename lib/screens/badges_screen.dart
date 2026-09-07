@@ -430,20 +430,22 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
     );
   }
 
-  String _getCategoryLabel(BadgeCategory category) {
+  String _getCategoryLabel(String category) {
     switch (category) {
-      case BadgeCategory.quiz:
+      case 'quiz':
         return 'クイズ';
-      case BadgeCategory.progress:
+      case 'progress':
         return '進捗';
-      case BadgeCategory.consistency:
+      case 'consistency':
         return '継続';
-      case BadgeCategory.mastery:
+      case 'mastery':
         return '習熟';
-      case BadgeCategory.social:
+      case 'social':
         return 'ソーシャル';
-      case BadgeCategory.special:
+      case 'special':
         return 'スペシャル';
+      default:
+        return category;
     }
   }
 

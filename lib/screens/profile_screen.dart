@@ -4,6 +4,7 @@ import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
+import '../config/constants.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
 import '../widgets/learning_calendar.dart';
