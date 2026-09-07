@@ -10,7 +10,6 @@ import '../config/constants.dart';
 import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/challenges_provider.dart';
-import '../models/challenge.dart';
 import '../models/stage.dart';
 import '../models/badge.dart';
 import '../providers/time_attack_provider.dart';

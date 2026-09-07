@@ -2,7 +2,6 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/badge.dart';
 import '../providers/badge_provider.dart';
-import '../widgets/badge_card.dart';
 
 /// バッジ一覧画面
 class BadgesScreen extends ConsumerStatefulWidget {
