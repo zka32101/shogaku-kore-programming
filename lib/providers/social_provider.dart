@@ -60,8 +60,6 @@ class SocialNotifier extends StateNotifier<SocialState> {
   Future<void> loadFriendsData(String userId) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final prefs = await SharedPreferences.getInstance();
-
       // Parse stored data (simplified - in production use proper JSON parsing)
       final friends = <Friend>[];
       final friendsMap = <String, Friend>{};

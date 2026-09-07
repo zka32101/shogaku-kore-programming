@@ -281,23 +281,17 @@ class ShopNotifier extends StateNotifier<ShopState> {
 
       // Check purchase limit
       final timesOwned = catalog.inventory.getPurchaseCount(itemId);
-      if ((item.purchaseLimit ?? 0) > 0 && timesOwned >= (item.purchaseLimit ?? 0)) {
+      final purchaseLimit = item.purchaseLimit ?? 0;
+      if (purchaseLimit > 0 && timesOwned >= purchaseLimit) {
         return false;
       }
 
       // Calculate cost
-      int cost = 0;
-      switch (currency) {
-        case CurrencyType.xp:
-          cost = item.xpCost ?? 0;
-          break;
-        case CurrencyType.coins:
-          cost = item.coinCost ?? 0;
-          break;
-        case CurrencyType.premium:
-          cost = item.premiumCost ?? 0;
-          break;
-      }
+      final cost = switch (currency) {
+        CurrencyType.xp => item.xpCost ?? 0,
+        CurrencyType.coins => item.coinCost ?? 0,
+        CurrencyType.premium => item.premiumCost ?? 0,
+      };
 
       if (cost == 0) return false;
 

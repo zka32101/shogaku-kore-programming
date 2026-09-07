@@ -37,9 +37,6 @@ class AchievementState {
 class AchievementNotifier extends StateNotifier<AchievementState> {
   AchievementNotifier() : super(AchievementState());
 
-  String _generateId(String prefix) =>
-      '$prefix-${DateTime.now().millisecondsSinceEpoch}-${Random().nextInt(100000)}';
-
   /// デフォルトの達成リストを生成
   List<Achievement> _generateDefaultAchievements() => [
         // ストリーク系

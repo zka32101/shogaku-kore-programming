@@ -7,8 +7,6 @@ import 'dart:io';
 import '../models/certificate.dart';
 
 class CertificateGeneratorService {
-  static const String _fontAssetPath = 'assets/fonts/'; // 日本語フォント（後で追加）
-
   /// レベル別に認定証を生成
   static Future<Uint8List> generateCertificateImage(
     Certificate certificate,
