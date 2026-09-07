@@ -52,7 +52,9 @@ jobs:
           EOF
 
       - name: Clean build artifacts
-        run: flutter clean
+        run: |
+          flutter clean
+          rm -rf .dart_tool
 
       - name: Get dependencies
         run: flutter pub get
