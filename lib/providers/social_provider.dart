@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/social.dart';
-import '../models/learning_analytics.dart';
 
 class SocialState {
   final List<Friend> friends;
@@ -531,9 +530,11 @@ final friendActivityProvider =
 final socialDataProvider = Provider.autoDispose<SocialData>((ref) {
   final state = ref.watch(socialProvider);
   return SocialData(
+    userId: 'current_user',
     friends: state.friends,
-    friendRequests: state.pendingRequests,
-    activeChallenges: state.activeChallenges,
+    incomingRequests: state.pendingRequests,
+    outgoingRequests: const [],
+    friendChallenges: state.activeChallenges,
     activityFeed: state.activityFeed,
     generatedAt: state.lastUpdatedAt ?? DateTime.now(),
   );

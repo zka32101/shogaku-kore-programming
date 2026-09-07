@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// 認定証データモデル
 class Certificate {
   final String id;

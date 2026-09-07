@@ -273,15 +273,15 @@ class WeeklyChallengeNotifier extends StateNotifier<WeeklyChallengeState> {
                   collection.stats.totalChallengesThisWeek,
               completedChallenges: collection.stats.completedChallenges + 1,
               totalXpEarned: collection.stats.totalXpEarned +
-                  _calculateReward(
+                  (_calculateReward(
                     challenge,
                     newProgress.tier!,
-                  )['xp'] as int,
+                  )?['xp'] as int? ?? 0),
               totalCoinsEarned: collection.stats.totalCoinsEarned +
-                  _calculateReward(
+                  (_calculateReward(
                     challenge,
                     newProgress.tier!,
-                  )['coins'] as int,
+                  )?['coins'] as int? ?? 0),
               rewardHistory: [
                 ChallengeReward(
                   rewardId: _generateId('creward'),

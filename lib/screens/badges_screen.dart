@@ -34,7 +34,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
   @override
   Widget build(BuildContext context) {
     final badgeState = ref.watch(badgeProvider);
-    final unlockedBadges = ref.watch(unlockedBadgesProvider);
+    final categories = ['quiz', 'progress', 'consistency', 'mastery', 'social', 'special'];
 
     return Scaffold(
       appBar: AppBar(
@@ -42,26 +42,26 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
-          tabs: BadgeCategory.values
+          tabs: categories
               .map((category) => Tab(text: _getCategoryLabel(category)))
               .toList(),
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: BadgeCategory.values.map((category) {
+        children: categories.map((category) {
           return _buildCategoryView(category, badgeState);
         }).toList(),
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 16.0),
-        child: _buildBadgeStatsButton(unlockedBadges),
+        child: _buildBadgeStatsButton(badgeState),
       ),
     );
   }
 
   /// カテゴリビューを構築
-  Widget _buildCategoryView(BadgeCategory category, BadgeState badgeState) {
+  Widget _buildCategoryView(String category, BadgeState badgeState) {
     final badges = badgeState.badges.where((b) => b.category == category).toList();
 
     if (badges.isEmpty) {
@@ -122,26 +122,17 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
               itemCount: badges.length,
               itemBuilder: (context, index) {
                 final badge = badges[index];
-                final isUnlocked =
-                    badgeState.unlockedBadgeIds.contains(badge.id);
-                final currentValue =
-                    badgeState.badgeProgress[badge.id] ?? 0;
-                final remainingValue = (badge.requiredValue - currentValue).abs();
+                final currentValue = badge.progressCurrent ?? 0;
+                final targetValue = badge.progressTarget ?? 1;
+                final remainingValue = (targetValue - currentValue).abs();
                 final progressPercentage =
-                    (currentValue / badge.requiredValue * 100)
+                    (currentValue / targetValue * 100)
                         .clamp(0.0, 100.0);
 
-                final badgeInfo = BadgeProgressInfo(
-                  badge: badge,
-                  currentValue: currentValue,
-                  remainingValue: remainingValue,
-                  progressPercentage: progressPercentage,
-                  isUnlocked: isUnlocked,
-                  canUnlock: currentValue >= badge.requiredValue &&
-                      !isUnlocked,
+                return GestureDetector(
+                  onTap: () => _showBadgeDetails(badge),
+                  child: _buildBadgeCard(badge, currentValue, remainingValue, progressPercentage),
                 );
-
-                return _buildBadgeDetailCard(badgeInfo);
               },
             ),
           ],
@@ -150,27 +141,62 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
     );
   }
 
-  /// バッジ詳細カードを構築
-  Widget _buildBadgeDetailCard(BadgeProgressInfo badgeInfo) {
-    return GestureDetector(
-      onTap: () => _showBadgeDetails(badgeInfo),
-      child: BadgeCard(
-        badgeInfo: badgeInfo,
-        showProgress: true,
+  /// バッジカードを構築
+  Widget _buildBadgeCard(Badge badge, int currentValue, int remainingValue, double progressPercentage) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(badge.icon, style: const TextStyle(fontSize: 48)),
+            const SizedBox(height: 8),
+            Text(
+              badge.name,
+              style: Theme.of(context).textTheme.labelSmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            if (badge.progressTarget != null && badge.progressTarget! > 0)
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: progressPercentage / 100,
+                        minHeight: 4,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$currentValue/${badge.progressTarget}',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 
   /// バッジ詳細ダイアログを表示
-  void _showBadgeDetails(BadgeProgressInfo badgeInfo) {
+  void _showBadgeDetails(Badge badge) {
+    final currentValue = badge.progressCurrent ?? 0;
+    final targetValue = badge.progressTarget ?? 1;
+    final progressPercentage = (currentValue / targetValue * 100).clamp(0.0, 100.0);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Text(badgeInfo.badge.emoji, style: const TextStyle(fontSize: 32)),
+            Text(badge.icon, style: const TextStyle(fontSize: 32)),
             const SizedBox(width: 12),
-            Expanded(child: Text(badgeInfo.badge.name)),
+            Expanded(child: Text(badge.name)),
           ],
         ),
         content: SingleChildScrollView(
@@ -180,7 +206,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
             children: [
               // 説明
               Text(
-                badgeInfo.badge.description,
+                badge.description,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
@@ -197,7 +223,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      color: _getDifficultyColor(badgeInfo.badge.progressTarget ?? 0)
+                      color: _getDifficultyColor(badge.progressTarget ?? 0)
                           .withValues(alpha: 0.2),
                     ),
                     padding: const EdgeInsets.symmetric(
@@ -205,10 +231,10 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
                       vertical: 4,
                     ),
                     child: Text(
-                      'Lv.${(badgeInfo.badge.progressTarget ?? 0) ~/ 10 + 1}',
+                      'Lv.${(badge.progressTarget ?? 0) ~/ 10 + 1}',
                       style: TextStyle(
                         color: _getDifficultyColor(
-                          badgeInfo.badge.progressTarget ?? 0,
+                          badge.progressTarget ?? 0,
                         ),
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
@@ -221,7 +247,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
 
               // カテゴリ
               Text(
-                'カテゴリ: ${_getCategoryLabel(badgeInfo.badge.category)}',
+                'カテゴリ: ${_getCategoryLabel(badge.category)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -229,7 +255,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
               const SizedBox(height: 16),
 
               // 進捗情報
-              if (!badgeInfo.isUnlocked) ...[
+              if (!badge.isUnlocked) ...[
                 Text(
                   '進捗',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -240,7 +266,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
-                    value: badgeInfo.progressPercentage / 100,
+                    value: progressPercentage / 100,
                     minHeight: 12,
                     backgroundColor: Colors.grey[300],
                     valueColor: AlwaysStoppedAnimation<Color>(
@@ -250,15 +276,15 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${badgeInfo.currentValue}/${badgeInfo.badge.requiredValue} (${badgeInfo.progressPercentage.toStringAsFixed(1)}%)',
+                  '$currentValue/$targetValue (${progressPercentage.toStringAsFixed(1)}%)',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: Colors.grey[600],
                       ),
                 ),
-                if (badgeInfo.remainingValue > 0) ...[
+                if (currentValue < targetValue) ...[
                   const SizedBox(height: 8),
                   Text(
-                    'あと${badgeInfo.remainingValue}で獲得できます',
+                    'あと${targetValue - currentValue}で獲得できます',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Colors.orange[600],
                           fontWeight: FontWeight.bold,
@@ -283,47 +309,6 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
                     ),
                   ],
                 ),
-                if (badgeInfo.badge.unlockedAt != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    'アンロック日: ${_formatDate(badgeInfo.badge.unlockedAt!)}',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                  ),
-                ],
-              ],
-
-              // ヒント
-              if (badgeInfo.badge.hint != null &&
-                  badgeInfo.badge.hint!.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.lightbulb_outline,
-                        color: Colors.blue[600],
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          badgeInfo.badge.hint!,
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: Colors.blue[600],
-                              ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ],
           ),
@@ -339,31 +324,19 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
   }
 
   /// バッジ統計ボタンを構築
-  Widget _buildBadgeStatsButton(
-    AsyncValue<List<BadgeProgressInfo>> unlockedBadges,
-  ) {
-    return unlockedBadges.when(
-      data: (unlocked) {
-        return FloatingActionButton.extended(
-          onPressed: () => _showBadgeStats(unlocked),
-          icon: const Icon(Icons.emoji_events),
-          label: Text('${unlocked.length}個獲得'),
-        );
-      },
-      loading: () => const FloatingActionButton(
-        onPressed: null,
-        child: CircularProgressIndicator(),
-      ),
-      error: (error, stack) => FloatingActionButton(
-        onPressed: null,
-        child: const Icon(Icons.error),
-      ),
+  Widget _buildBadgeStatsButton(BadgeState badgeState) {
+    final unlockedCount = badgeState.badges.where((b) => b.isUnlocked).length;
+    return FloatingActionButton.extended(
+      onPressed: () => _showBadgeStats(badgeState),
+      icon: const Icon(Icons.emoji_events),
+      label: Text('$unlockedCount個獲得'),
     );
   }
 
   /// バッジ統計を表示
-  void _showBadgeStats(List<BadgeProgressInfo> unlockedBadges) {
-    final totalBadges = ref.read(badgeProvider).badges.length;
+  void _showBadgeStats(BadgeState badgeState) {
+    final totalBadges = badgeState.badges.length;
+    final unlockedCount = badgeState.badges.where((b) => b.isUnlocked).length;
 
     showDialog(
       context: context,
@@ -381,7 +354,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
               child: Column(
                 children: [
                   Text(
-                    '${unlockedBadges.length}/$totalBadges',
+                    '$unlockedCount/$totalBadges',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.primary,
@@ -403,7 +376,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
-                value: unlockedBadges.length / totalBadges,
+                value: totalBadges > 0 ? unlockedCount / totalBadges : 0,
                 minHeight: 8,
                 backgroundColor: Colors.grey[300],
                 valueColor: AlwaysStoppedAnimation<Color>(
@@ -413,7 +386,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              '完成度: ${(unlockedBadges.length / totalBadges * 100).toStringAsFixed(1)}%',
+              '完成度: ${totalBadges > 0 ? (unlockedCount / totalBadges * 100).toStringAsFixed(1) : '0'}%',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -500,7 +473,4 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.year}年${date.month}月${date.day}日';
-  }
 }

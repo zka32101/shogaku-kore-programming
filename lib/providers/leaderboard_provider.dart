@@ -2,10 +2,6 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/leaderboard.dart';
-import '../models/learning_analytics.dart';
-import '../models/multiplayer.dart';
-import 'learning_analytics_provider.dart';
-import 'multiplayer_provider.dart';
 
 /// ランキング状態
 class LeaderboardState {

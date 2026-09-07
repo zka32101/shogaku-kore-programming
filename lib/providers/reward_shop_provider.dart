@@ -274,13 +274,14 @@ class ShopNotifier extends StateNotifier<ShopState> {
       if (catalog == null) return false;
 
       final item = catalog.getItem(itemId);
+      if (item == null) return false;
 
       // Check if available
-      if (!item.isAvailable) return false;
+      if (!(item.isAvailable ?? true)) return false;
 
       // Check purchase limit
       final timesOwned = catalog.inventory.getPurchaseCount(itemId);
-      if (item.purchaseLimit > 0 && timesOwned >= item.purchaseLimit) {
+      if ((item.purchaseLimit ?? 0) > 0 && timesOwned >= (item.purchaseLimit ?? 0)) {
         return false;
       }
 
@@ -288,13 +289,13 @@ class ShopNotifier extends StateNotifier<ShopState> {
       int cost = 0;
       switch (currency) {
         case CurrencyType.xp:
-          cost = item.xpCost;
+          cost = item.xpCost ?? 0;
           break;
         case CurrencyType.coins:
-          cost = item.coinCost;
+          cost = item.coinCost ?? 0;
           break;
         case CurrencyType.premium:
-          cost = item.premiumCost;
+          cost = item.premiumCost ?? 0;
           break;
       }
 

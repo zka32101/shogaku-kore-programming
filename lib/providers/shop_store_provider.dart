@@ -378,6 +378,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
       description: '毎日100コイン獲得',
       category: ItemCategory.booster,
       rarity: ItemRarity.legendary,
+      coinPrice: 500,
       premiumCoinPrice: 50,
       acceptedCurrency: CurrencyType.premiumCoin,
       durationMinutes: 10080, // 7 days

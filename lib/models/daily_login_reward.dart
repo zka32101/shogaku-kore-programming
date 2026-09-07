@@ -1,5 +1,3 @@
-import 'learning_analytics.dart';
-
 /// ログインリワードのレベル（報酬の段階）
 enum RewardLevel {
   day1,      // 1日目

@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// フレンド関係のステータス
 enum FriendshipStatus {
   pending,    // 保留中
