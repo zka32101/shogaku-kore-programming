@@ -393,7 +393,7 @@ class _CertificateDetailSheet extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      dateStr + ' 修了',
+                      '$dateStr 修了',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],

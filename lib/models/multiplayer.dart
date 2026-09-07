@@ -1,5 +1,4 @@
 /// マルチプレイヤーシステムのモデル定義
-library multiplayer;
 
 import 'learning_analytics.dart';
 

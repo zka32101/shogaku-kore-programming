@@ -465,7 +465,7 @@ class StreakNotifier extends StateNotifier<StreakState> {
 
       tiers.add(DailyRewardTier(
         dayNumber: i,
-        rewardName: '${i}日目報酬',
+        rewardName: '$i日目報酬',
         coinReward: baseCoins,
         xpReward: baseXp,
         premiumCoinReward: isMilestone ? 1 : null,

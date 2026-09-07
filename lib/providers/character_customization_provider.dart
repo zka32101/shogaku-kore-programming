@@ -510,7 +510,9 @@ class CharacterCustomizationNotifier extends StateNotifier<CharacterCustomizatio
       if (cosmetic.accessoryType != null) accessoriesOwned++;
       if (cosmetic.rarity.index >= CosmeticRarity.rare.index) rareOrBetter++;
       if (cosmetic.rarity == CosmeticRarity.legendary ||
-          cosmetic.rarity == CosmeticRarity.mythic) legendaryOwned++;
+          cosmetic.rarity == CosmeticRarity.mythic) {
+        legendaryOwned++;
+      }
 
       final updatedStats = CustomizationStatistics(
         userId: userId,

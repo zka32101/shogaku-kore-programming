@@ -5,7 +5,7 @@ import 'package:shogaku_kore_programming/providers/daily_login_reward_provider.d
 
 /// Daily Login Reward screen displaying streak and claim UI
 class DailyRewardScreen extends ConsumerWidget {
-  const DailyRewardScreen({Key? key}) : super(key: key);
+  const DailyRewardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -299,7 +299,7 @@ class DailyRewardScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ...rewards.map((reward) => _buildMilestoneCard(context, reward)).toList(),
+          ...rewards.map((reward) => _buildMilestoneCard(context, reward)),
         ],
       ),
     );

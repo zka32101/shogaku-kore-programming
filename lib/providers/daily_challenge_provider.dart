@@ -256,9 +256,8 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         rewardEarned: totalReward,
         bonusRewardEarned: bonusEarned,
         completedAt: DateTime.now(),
-        timeSpentMinutes: progress.completedAt != null
-            ? progress.completedAt!.difference(progress.startedAt).inMinutes
-            : null,
+        timeSpentMinutes: progress.completedAt
+            ?.difference(progress.startedAt).inMinutes,
       );
 
       final newProgress = Map<String, ChallengeProgress>.from(collection.challenges.progress);

@@ -417,7 +417,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     // 次の未完了ステージを探す
-    final Stage? nextStage = allChallenges.firstWhere(
+    final Stage nextStage = allChallenges.firstWhere(
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
       orElse: () => allChallenges.first,
     );
