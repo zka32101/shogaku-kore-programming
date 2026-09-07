@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/badge.dart';
 import '../providers/badge_provider.dart';
@@ -20,7 +20,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: BadgeCategory.values.length,
+      length: 6, // 'quiz', 'progress', 'consistency', 'mastery', 'social', 'special'
       vsync: this,
     );
   }
