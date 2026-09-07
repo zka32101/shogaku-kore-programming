@@ -287,11 +287,18 @@ class ShopNotifier extends StateNotifier<ShopState> {
       }
 
       // Calculate cost
-      final cost = switch (currency) {
-        CurrencyType.xp => item.xpCost ?? 0,
-        CurrencyType.coins => item.coinCost ?? 0,
-        CurrencyType.premium => item.premiumCost ?? 0,
-      };
+      int cost = 0;
+      switch (currency) {
+        case CurrencyType.xp:
+          cost = item.xpCost ?? 0;
+          break;
+        case CurrencyType.coins:
+          cost = item.coinCost ?? 0;
+          break;
+        case CurrencyType.premium:
+          cost = item.premiumCost ?? 0;
+          break;
+      }
 
       if (cost == 0) return false;
 
