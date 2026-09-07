@@ -618,7 +618,7 @@ void main() {
 
   group('SettingsScreen - Scrolling and Layout', () {
     testWidgets('settings list is scrollable', (WidgetTester tester) async {
-      await tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
+      tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
       await tester.pumpWidget(
@@ -638,7 +638,7 @@ void main() {
     });
 
     testWidgets('can scroll to bottom of settings list', (WidgetTester tester) async {
-      await tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
+      tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
       await tester.pumpWidget(
@@ -658,7 +658,7 @@ void main() {
     });
 
     testWidgets('can scroll up to top of settings list', (WidgetTester tester) async {
-      await tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
+      tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
       await tester.pumpWidget(
@@ -906,7 +906,7 @@ void main() {
     });
 
     testWidgets('complete workflow: scroll through settings', (WidgetTester tester) async {
-      await tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
+      tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
       await tester.pumpWidget(

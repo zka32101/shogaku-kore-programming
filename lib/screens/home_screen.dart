@@ -501,7 +501,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.15, curve: Curves.easeOut)
-                  else if (nextStage != null)
+                  else
                     _buildDailyMission(context, nextStage)
                         .animate()
                         .fadeIn(duration: 350.ms)

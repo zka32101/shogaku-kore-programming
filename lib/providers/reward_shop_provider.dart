@@ -290,13 +290,13 @@ class ShopNotifier extends StateNotifier<ShopState> {
       int cost = 0;
       switch (currency) {
         case CurrencyType.xp:
-          cost = item.xpCost ?? 0;
+          cost = item.xpCost;
           break;
         case CurrencyType.coins:
-          cost = item.coinCost ?? 0;
+          cost = item.coinCost;
           break;
         case CurrencyType.premium:
-          cost = item.premiumCost ?? 0;
+          cost = item.premiumCost;
           break;
       }
 

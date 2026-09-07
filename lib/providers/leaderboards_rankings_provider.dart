@@ -240,7 +240,7 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
       // By start month leaderboards (2026年1月, 2月, etc.)
       final currentYear = DateTime.now().year;
       for (int month = 1; month <= 12; month++) {
-        final monthName = '${currentYear}年${month}月';
+        final monthName = '$currentYear年$month月';
         leaderboards.add(
           Leaderboard(
             leaderboardId:

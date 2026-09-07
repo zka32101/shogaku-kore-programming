@@ -1,4 +1,4 @@
-/// マルチプレイヤーシステムのモデル定義
+// マルチプレイヤーシステムのモデル定義
 
 import 'learning_analytics.dart';
 
