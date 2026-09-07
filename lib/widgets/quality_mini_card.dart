@@ -11,13 +11,13 @@ class QualityMiniCard extends StatelessWidget {
   final double progress;
 
   const QualityMiniCard({
-    Key? key,
+    super.key,
     required this.emoji,
     required this.value,
     required this.label,
     required this.color,
     required this.progress,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

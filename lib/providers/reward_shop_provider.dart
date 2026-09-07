@@ -281,7 +281,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
 
       // Check purchase limit
       final timesOwned = catalog.inventory.getPurchaseCount(itemId);
-      final purchaseLimit = item.purchaseLimit ?? 0;
+      final purchaseLimit = item.purchaseLimit;
       if (purchaseLimit > 0 && timesOwned >= purchaseLimit) {
         return false;
       }
