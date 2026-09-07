@@ -94,7 +94,7 @@ class DailyRewardScreen extends ConsumerWidget {
                 context,
                 'Current',
                 currentStreak,
-                Icons.flame,
+                Icons.local_fire_department,
               ),
               Container(
                 width: 1,

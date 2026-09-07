@@ -197,7 +197,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      color: _getDifficultyColor(badgeInfo.badge.difficulty)
+                      color: _getDifficultyColor(badgeInfo.badge.progressTarget ?? 0)
                           .withValues(alpha: 0.2),
                     ),
                     padding: const EdgeInsets.symmetric(
@@ -205,10 +205,10 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
                       vertical: 4,
                     ),
                     child: Text(
-                      badgeInfo.badge.difficulty.name.toUpperCase(),
+                      'Lv.${(badgeInfo.badge.progressTarget ?? 0) ~/ 10 + 1}',
                       style: TextStyle(
                         color: _getDifficultyColor(
-                          badgeInfo.badge.difficulty,
+                          badgeInfo.badge.progressTarget ?? 0,
                         ),
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
@@ -447,47 +447,55 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen>
     }
   }
 
-  String _getCategoryDescription(BadgeCategory category) {
+  String _getCategoryDescription(String category) {
     switch (category) {
-      case BadgeCategory.quiz:
+      case 'quiz':
         return 'クイズに関連するバッジ';
-      case BadgeCategory.progress:
+      case 'progress':
         return '学習の進捗に関連するバッジ';
-      case BadgeCategory.consistency:
+      case 'consistency':
         return '学習の継続性に関連するバッジ';
-      case BadgeCategory.mastery:
+      case 'mastery':
         return 'スキル習熟度に関連するバッジ';
-      case BadgeCategory.social:
+      case 'social':
         return 'ランキングやソーシャル機能に関連するバッジ';
-      case BadgeCategory.special:
+      case 'special':
         return 'スペシャルなマイルストーンバッジ';
+      default:
+        return 'バッジカテゴリー';
     }
   }
 
-  IconData _getCategoryIcon(BadgeCategory category) {
+  IconData _getCategoryIcon(String category) {
     switch (category) {
-      case BadgeCategory.quiz:
+      case 'quiz':
         return Icons.quiz;
-      case BadgeCategory.progress:
+      case 'progress':
         return Icons.trending_up;
-      case BadgeCategory.consistency:
+      case 'consistency':
         return Icons.local_fire_department;
-      case BadgeCategory.mastery:
+      case 'mastery':
         return Icons.star;
-      case BadgeCategory.social:
+      case 'social':
         return Icons.group;
-      case BadgeCategory.special:
+      case 'special':
         return Icons.emoji_events;
+      default:
+        return Icons.badge;
     }
   }
 
-  Color _getDifficultyColor(BadgeDifficulty difficulty) {
-    return switch (difficulty) {
-      BadgeDifficulty.bronze => Colors.brown,
-      BadgeDifficulty.silver => Colors.grey,
-      BadgeDifficulty.gold => Colors.amber,
-      BadgeDifficulty.platinum => Colors.purple,
-    };
+  Color _getDifficultyColor(int progressTarget) {
+    // Use progressTarget value to determine color
+    if (progressTarget <= 1) {
+      return Colors.brown;
+    } else if (progressTarget <= 10) {
+      return Colors.grey;
+    } else if (progressTarget <= 50) {
+      return Colors.amber;
+    } else {
+      return Colors.purple;
+    }
   }
 
   String _formatDate(DateTime date) {
