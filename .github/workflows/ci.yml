@@ -51,6 +51,9 @@ jobs:
           FIREBASE_IOS_BUNDLE_ID=com.schoolcode.programming
           EOF
 
+      - name: Clean build artifacts
+        run: flutter clean
+
       - name: Get dependencies
         run: flutter pub get
 
