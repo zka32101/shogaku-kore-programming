@@ -59,7 +59,6 @@ class ShareService {
         subject: '小学コレ！プログラミング 修了証',
       );
     } catch (e) {
-      print('Error sharing certificate: $e');
       rethrow;
     }
   }

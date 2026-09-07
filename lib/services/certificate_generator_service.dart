@@ -247,7 +247,7 @@ class CertificateGeneratorService {
         return await file.readAsBytes();
       }
     } catch (e) {
-      print('Error loading certificate: $e');
+      // Error silently handled
     }
     return null;
   }
@@ -260,7 +260,7 @@ class CertificateGeneratorService {
         await file.delete();
       }
     } catch (e) {
-      print('Error deleting certificate: $e');
+      // Error silently handled
     }
   }
 }

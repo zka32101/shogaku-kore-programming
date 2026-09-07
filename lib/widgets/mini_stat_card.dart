@@ -10,11 +10,12 @@ class MiniStatCard extends StatelessWidget {
   final Color color;
 
   const MiniStatCard({
+    Key? key,
     required this.emoji,
     required this.value,
     required this.label,
     required this.color,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
