@@ -112,7 +112,7 @@ class _BadgeUnlockNotificationState extends State<BadgeUnlockNotification>
                     return Transform.scale(
                       scale: value,
                       child: Text(
-                        badge.emoji,
+                        badge.icon,
                         style: const TextStyle(fontSize: 64),
                       ),
                     );

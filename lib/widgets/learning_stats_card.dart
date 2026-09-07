@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/analytics_model.dart';
-import '../theme/app_theme.dart';
+import '../config/theme.dart';
 
 class LearningStatsCard extends StatelessWidget {
   final MonthlyStats monthlyStats;

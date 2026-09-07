@@ -30,21 +30,12 @@ class CharacterReactionBubble extends ConsumerWidget {
       orElse: () => kAvailableCharacters.first,
     );
     final emoji = def.stageEmojis[character.stage] ?? '🐱';
-    final imagePath = def.stageImages[character.stage];
     final bubbleColor = isCorrect ? kPrimaryColor : const Color(0xFFFF9800);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        imagePath != null
-            ? Image.asset(
-                imagePath,
-                width: 40,
-                height: 40,
-                errorBuilder: (context, error, stackTrace) =>
-                    Text(emoji, style: const TextStyle(fontSize: 32)),
-              )
-            : Text(emoji, style: const TextStyle(fontSize: 32)),
+        Text(emoji, style: const TextStyle(fontSize: 32)),
         const SizedBox(width: 8),
         Expanded(
           child: Container(
