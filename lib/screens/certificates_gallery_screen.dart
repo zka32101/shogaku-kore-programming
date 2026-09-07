@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/certificate.dart';
 import '../providers/certificate_provider.dart';
 import '../services/share_service.dart';
-import '../config/constants.dart';
 import '../config/theme.dart';
 import 'package:intl/intl.dart';
 
