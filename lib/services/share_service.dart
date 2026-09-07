@@ -1,8 +1,6 @@
 import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import '../models/certificate.dart';
-import 'certificate_generator_service.dart';
 
 class ShareService {
   /// Twitter で共有
