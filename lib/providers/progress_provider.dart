@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../models/challenge.dart';
 import '../services/notification_service.dart';
 
 /// User progress for a challenge/stage

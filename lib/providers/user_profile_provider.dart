@@ -385,11 +385,10 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       final collection = state.collection;
       if (collection == null) return false;
 
-      final achievement = collection.achievements.firstWhere(
-        (a) => a.achievementId == achievementId,
-        orElse: () => null as dynamic,
-      );
-      if (achievement == null) return false;
+      final achievementList = collection.achievements
+          .where((a) => a.achievementId == achievementId);
+      if (achievementList.isEmpty) return false;
+      final achievement = achievementList.first;
 
       var newFeatured = List<UserAchievement>.from(collection.featuredAchievements);
 

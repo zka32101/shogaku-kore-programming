@@ -61,11 +61,6 @@ class SocialNotifier extends StateNotifier<SocialState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final prefs = await SharedPreferences.getInstance();
-      final friendsJson = prefs.getStringList('friends_$userId') ?? [];
-      final requestsJson = prefs.getStringList('friend_requests_$userId') ?? [];
-      final challengesJson =
-          prefs.getStringList('friend_challenges_$userId') ?? [];
-      final activityJson = prefs.getStringList('activity_feed_$userId') ?? [];
 
       // Parse stored data (simplified - in production use proper JSON parsing)
       final friends = <Friend>[];

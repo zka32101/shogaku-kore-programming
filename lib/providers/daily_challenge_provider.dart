@@ -110,9 +110,10 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
       final collection = state.collection;
       if (collection == null) return false;
 
-      final challenge = collection.challenges.availableChallenges
-          .firstWhere((c) => c.challengeId == challengeId, orElse: () => null as dynamic);
-      if (challenge == null) return false;
+      final challengeList = collection.challenges.availableChallenges
+          .where((c) => c.challengeId == challengeId);
+      if (challengeList.isEmpty) return false;
+      final challenge = challengeList.first;
 
       if (!challenge.isAvailable) return false;
 
@@ -177,9 +178,10 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
       final collection = state.collection;
       if (collection == null) return false;
 
-      final challenge = collection.challenges.availableChallenges
-          .firstWhere((c) => c.challengeId == challengeId, orElse: () => null as dynamic);
-      if (challenge == null) return false;
+      final challengeList = collection.challenges.availableChallenges
+          .where((c) => c.challengeId == challengeId);
+      if (challengeList.isEmpty) return false;
+      final challenge = challengeList.first;
 
       final progress = collection.challenges.progress[challengeId];
       if (progress == null) return false;
@@ -231,9 +233,10 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
       final collection = state.collection;
       if (collection == null) return false;
 
-      final challenge = collection.challenges.availableChallenges
-          .firstWhere((c) => c.challengeId == challengeId, orElse: () => null as dynamic);
-      if (challenge == null) return false;
+      final challengeList = collection.challenges.availableChallenges
+          .where((c) => c.challengeId == challengeId);
+      if (challengeList.isEmpty) return false;
+      final challenge = challengeList.first;
 
       final progress = collection.challenges.progress[challengeId];
       if (progress == null || !progress.isCompleted) return false;

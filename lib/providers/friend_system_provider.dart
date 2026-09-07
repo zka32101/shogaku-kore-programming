@@ -448,10 +448,11 @@ class FriendSystemNotifier extends StateNotifier<FriendSystemState> {
         return f;
       }).toList();
 
-      final favorited = updatedFriendships
-          .firstWhere((f) => f.friendId == friendId, orElse: () => null as dynamic)
-          ?.isFavorited ??
-          false;
+      final friendshipList = updatedFriendships
+          .where((f) => f.friendId == friendId);
+      final favorited = friendshipList.isNotEmpty
+          ? friendshipList.first.isFavorited
+          : false;
       final stats = collection.statistics;
       final updatedStats = FriendStatistics(
         userId: userId,

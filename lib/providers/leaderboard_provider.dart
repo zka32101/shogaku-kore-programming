@@ -97,9 +97,6 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      // 学習分析データを取得
-      final analyticsState = ref.read(learningAnalyticsProvider);
-
       // ランキングエントリを生成（実際のデータから）
       final entries = <GlobalLeaderboardEntry>[];
 
@@ -184,22 +181,23 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
       final leaderboard = state.leaderboardData ??
           await generateGlobalLeaderboard(timeUnit: timeUnit);
 
-      final entry = leaderboard.globalRankings
-          .firstWhere((e) => e.userId == userId, orElse: () => null as dynamic);
+      final entryList = leaderboard.globalRankings
+          .where((e) => e.userId == userId);
 
-      if (entry == null) {
+      if (entryList.isEmpty) {
         throw Exception('User not found in rankings');
       }
+      final entry = entryList.first;
 
       // カテゴリ別順位を取得
       final categoryRanks = <LearningCategory, int>{};
       for (final category in LearningCategory.values) {
         final categoryEntries =
             leaderboard.categoryRankings[category] ?? [];
-        final categoryEntry = categoryEntries
-            .firstWhere((e) => e.userId == userId, orElse: () => null as dynamic);
-        if (categoryEntry != null) {
-          categoryRanks[category] = categoryEntry.rank;
+        final categoryEntryList = categoryEntries
+            .where((e) => e.userId == userId);
+        if (categoryEntryList.isNotEmpty) {
+          categoryRanks[category] = categoryEntryList.first.rank;
         }
       }
 
@@ -410,7 +408,7 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
     // Simple JSON encoding - in production use json package
     if (value is String) return value;
     if (value is Map) {
-      final entries = (value as Map).entries.map((e) {
+      final entries = value.entries.map((e) {
         final key = '"${e.key}"';
         final val = _jsonEncode(e.value);
         return '$key:$val';
@@ -418,7 +416,7 @@ class LeaderboardNotifier extends StateNotifier<LeaderboardState> {
       return '{$entries}';
     }
     if (value is List) {
-      final items = (value as List).map(_jsonEncode).join(',');
+      final items = value.map(_jsonEncode).join(',');
       return '[$items]';
     }
     if (value is num || value is bool) return value.toString();

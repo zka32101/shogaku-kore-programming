@@ -177,9 +177,6 @@ class ShopNotifier extends StateNotifier<ShopState> {
       final updatedTransactions = [...collection.transactions, transaction];
 
       final stats = collection.statistics;
-      final spentAmount = currencyType == 'coin'
-          ? stats.totalCoinSpent + totalPrice
-          : stats.totalPremiumCoinSpent + totalPrice;
 
       final updatedStats = ShopStatistics(
         userId: userId,

@@ -255,7 +255,6 @@ class AchievementNotifier extends StateNotifier<AchievementState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final prefs = await SharedPreferences.getInstance();
-      final achievementsJson = prefs.getString('achievements_$userId');
       final statsJson = prefs.getString('achievement_stats_$userId');
 
       late AchievementStats stats;

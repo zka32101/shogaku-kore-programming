@@ -28,7 +28,6 @@ enum SchoolGrade {
       case SchoolGrade.sixthGrade:
         return SchoolGrade.sixthGrade;
     }
-    throw UnimplementedError('Unhandled grade: $this');
   }
 
   /// Calculate grade from birth year (Japanese school year: April-March)

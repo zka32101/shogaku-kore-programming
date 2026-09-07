@@ -7,7 +7,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
-import '../models/challenge.dart' hide Question;
 import '../models/stage.dart';
 import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';

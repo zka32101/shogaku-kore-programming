@@ -277,7 +277,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
       if (item == null) return false;
 
       // Check if available
-      if (!(item.isAvailable ?? true)) return false;
+      if (item.isAvailable == false) return false;
 
       // Check purchase limit
       final timesOwned = catalog.inventory.getPurchaseCount(itemId);

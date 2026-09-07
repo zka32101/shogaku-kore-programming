@@ -91,6 +91,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         countByType[notif.type] = (countByType[notif.type] ?? 0) + 1;
       }
 
+      final readNotifications = notifications.where((n) => n.isRead);
       final stats = NotificationStats(
         userId: userId,
         totalNotifications: notifications.length,
@@ -98,7 +99,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         readCount: readCount,
         countByChannel: countByChannel,
         countByType: countByType,
-        lastReadAt: notifications.firstWhere((n) => n.isRead, orElse: () => null as dynamic)?.readAt,
+        lastReadAt: readNotifications.isNotEmpty ? readNotifications.first.readAt : null,
         lastNotificationAt: notifications.isNotEmpty ? notifications.first.createdAt : null,
       );
 
@@ -447,6 +448,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       countByType[notif.type] = (countByType[notif.type] ?? 0) + 1;
     }
 
+    final readNotificationsForStats = notifications.where((n) => n.isRead);
     return NotificationStats(
       userId: oldStats.userId,
       totalNotifications: notifications.length,
@@ -454,7 +456,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       readCount: readCount,
       countByChannel: countByChannel,
       countByType: countByType,
-      lastReadAt: notifications.firstWhere((n) => n.isRead, orElse: () => null as dynamic)?.readAt,
+      lastReadAt: readNotificationsForStats.isNotEmpty ? readNotificationsForStats.first.readAt : null,
       lastNotificationAt: notifications.isNotEmpty ? notifications.first.createdAt : oldStats.lastNotificationAt,
     );
   }
