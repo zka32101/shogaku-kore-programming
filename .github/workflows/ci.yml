@@ -55,6 +55,7 @@ jobs:
         run: |
           flutter clean
           rm -rf .dart_tool
+          rm -f pubspec.lock
 
       - name: Get dependencies
         run: flutter pub get
