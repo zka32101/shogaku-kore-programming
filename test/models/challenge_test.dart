@@ -61,7 +61,7 @@ void main() {
         xpAmount: 100,
         coinAmount: 50,
         badgeId: 'badge-daily-1',
-        categoryBonusXp: {'variables': 25},
+        categoryBonusXp: {'programming': 25},
       );
     });
 
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('should include category bonuses', () {
-      expect(reward.categoryBonusXp['variables'], 25);
+      expect(reward.categoryBonusXp['programming'], 25);
     });
   });
 
