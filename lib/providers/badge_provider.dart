@@ -4,17 +4,29 @@ import '../models/badge.dart';
 /// バッジの状態を保持するクラス
 class BadgeState {
   final List<Badge> badges; // 全バッジ
+  final Map<String, int> badgeProgress; // バッジの進捗状況
+  final List<String> unlockedBadgeIds; // ロック解除されたバッジID
+  final DateTime? lastUpdatedAt; // 最後に更新された時刻
 
   const BadgeState({
     this.badges = const [],
+    this.badgeProgress = const {},
+    this.unlockedBadgeIds = const [],
+    this.lastUpdatedAt,
   });
 
   /// コピーメソッド
   BadgeState copyWith({
     List<Badge>? badges,
+    Map<String, int>? badgeProgress,
+    List<String>? unlockedBadgeIds,
+    DateTime? lastUpdatedAt,
   }) =>
       BadgeState(
         badges: badges ?? this.badges,
+        badgeProgress: badgeProgress ?? this.badgeProgress,
+        unlockedBadgeIds: unlockedBadgeIds ?? this.unlockedBadgeIds,
+        lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
       );
 
   @override
@@ -59,65 +71,79 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
 
   /// バッジを直接ロック解除
   Future<void> unlockBadge(String badgeId) async {
-    final updatedBadges = state.badges.map((badge) {
-      if (badge.name.contains(badgeId) || badge.icon == badgeId) {
-        return Badge(
-          icon: badge.icon,
-          name: badge.name,
-          description: badge.description,
-          category: badge.category,
-          isUnlocked: true,
-          progressCurrent: badge.progressCurrent,
-          progressTarget: badge.progressTarget,
-        );
-      }
-      return badge;
-    }).toList();
+    final unlockedIds = List<String>.from(state.unlockedBadgeIds);
+    if (!unlockedIds.contains(badgeId)) {
+      unlockedIds.add(badgeId);
+    }
 
-    state = BadgeState(badges: updatedBadges);
+    state = state.copyWith(
+      unlockedBadgeIds: unlockedIds,
+      lastUpdatedAt: DateTime.now(),
+    );
   }
 
   /// バッジの進捗を更新
   Future<void> updateBadgeProgress(String badgeId, int progress) async {
-    final updatedBadges = state.badges.map((badge) {
-      if (badge.name.contains(badgeId) || badge.icon == badgeId) {
-        return Badge(
-          icon: badge.icon,
-          name: badge.name,
-          description: badge.description,
-          category: badge.category,
-          isUnlocked: progress >= (badge.progressTarget ?? 0),
-          progressCurrent: progress,
-          progressTarget: badge.progressTarget,
-        );
-      }
-      return badge;
-    }).toList();
+    final progress_map = Map<String, int>.from(state.badgeProgress);
+    progress_map[badgeId] = progress;
 
-    state = BadgeState(badges: updatedBadges);
+    final unlockedIds = List<String>.from(state.unlockedBadgeIds);
+    if (!unlockedIds.contains(badgeId)) {
+      unlockedIds.add(badgeId);
+    }
+
+    state = state.copyWith(
+      badgeProgress: progress_map,
+      unlockedBadgeIds: unlockedIds,
+      lastUpdatedAt: DateTime.now(),
+    );
   }
 
   /// クイズ正答数をインクリメント
   Future<void> incrementQuizCorrectCount() async {
-    await updateBadgeProgress('quiz_starter', 1);
-    await updateBadgeProgress('quiz_master_10', 10);
+    final progress_map = Map<String, int>.from(state.badgeProgress);
+    progress_map['quiz_starter'] = (progress_map['quiz_starter'] ?? 0) + 1;
+    progress_map['quiz_master_10'] = (progress_map['quiz_master_10'] ?? 0) + 1;
+
+    state = state.copyWith(
+      badgeProgress: progress_map,
+      lastUpdatedAt: DateTime.now(),
+    );
   }
 
   /// レッスン完了
   Future<void> completeLesson() async {
-    await updateBadgeProgress('lesson_complete_1', 1);
-    await updateBadgeProgress('lesson_complete_10', 10);
+    final progress_map = Map<String, int>.from(state.badgeProgress);
+    progress_map['lesson_complete_1'] = (progress_map['lesson_complete_1'] ?? 0) + 1;
+    progress_map['lesson_complete_10'] = (progress_map['lesson_complete_10'] ?? 0) + 1;
+
+    state = state.copyWith(
+      badgeProgress: progress_map,
+      lastUpdatedAt: DateTime.now(),
+    );
   }
 
   /// 連続日数を更新
   Future<void> updateConsecutiveDays(int days) async {
-    await updateBadgeProgress('daily_1day', days);
-    await updateBadgeProgress('daily_7day', days);
+    final progress_map = Map<String, int>.from(state.badgeProgress);
+    progress_map['daily_1day'] = days;
+    progress_map['daily_7day'] = days;
+
+    state = state.copyWith(
+      badgeProgress: progress_map,
+      lastUpdatedAt: DateTime.now(),
+    );
   }
 
   /// 勉強時間を更新
   Future<void> updateStudyHours(int hours) async {
-    await updateBadgeProgress('milestone_100hours', hours);
+    final progress_map = Map<String, int>.from(state.badgeProgress);
+    progress_map['milestone_100hours'] = hours;
+
+    state = state.copyWith(
+      badgeProgress: progress_map,
+      lastUpdatedAt: DateTime.now(),
+    );
   }
 
   /// デフォルトバッジを作成
