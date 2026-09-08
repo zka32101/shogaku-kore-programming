@@ -389,8 +389,8 @@ class ChallengeStats {
   final int totalBonusesEarned;
   final int currentStreak;           // Consecutive days of challenge completion
   final int longestStreak;
-  final Map<ChallengeCategory, int> completionsByCategory;
-  final Map<ChallengeDifficulty, int> completionsByDifficulty;
+  final Map<DailyChallengeCategory, int> completionsByCategory;
+  final Map<DailyChallengeDifficulty, int> completionsByDifficulty;
   final DateTime lastCompletionAt;
   final DateTime lastUpdatedAt;
 
@@ -434,8 +434,8 @@ class ChallengeStats {
         'totalBonusesEarned': totalBonusesEarned,
         'currentStreak': currentStreak,
         'longestStreak': longestStreak,
-        'completionsByCategory': completionsByCategory.map((k, v) => MapEntry(k.name, v)),
-        'completionsByDifficulty': completionsByDifficulty.map((k, v) => MapEntry(k.name, v)),
+        'completionsByCategory': completionsByCategory.map<String, int>((k, v) => MapEntry(k.name, v)),
+        'completionsByDifficulty': completionsByDifficulty.map<String, int>((k, v) => MapEntry(k.name, v)),
         'lastCompletionAt': lastCompletionAt.toIso8601String(),
         'lastUpdatedAt': lastUpdatedAt.toIso8601String(),
       };
