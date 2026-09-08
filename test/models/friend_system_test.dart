@@ -328,19 +328,19 @@ void main() {
       );
       expect(newbieStats.getFriendTier(), '新米');
 
-      const friendlyStats = FriendStatistics(
+      final friendlyStats = FriendStatistics(
         userId: 'user2',
         totalFriends: 15,
-        lastFriendAddedAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        lastFriendAddedAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(friendlyStats.getFriendTier(), '友好');
 
-      const popularStats = FriendStatistics(
+      final popularStats = FriendStatistics(
         userId: 'user3',
         totalFriends: 60,
-        lastFriendAddedAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        lastFriendAddedAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(popularStats.getFriendTier(), '人気者');
     });

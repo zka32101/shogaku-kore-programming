@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shogaku_kore_programming/models/leaderboard.dart';
+import 'package:shogaku_kore_programming/models/learning_analytics.dart';
 
 void main() {
   group('LeaderboardTimeUnit', () {
