@@ -235,36 +235,36 @@ void main() {
       final stylist = CustomizationStatistics(
         userId: 'user2',
         totalCosmeticsOwned: 10,
-        firstCustomizationAt: DateTime(2024),
-        lastCustomizationAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstCustomizationAt: DateTime.utc(2024, 1, 1),
+        lastCustomizationAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(stylist.getCustomizationTier(), 'スタイリスト');
 
       final fashionista = CustomizationStatistics(
         userId: 'user3',
         totalCosmeticsOwned: 25,
-        firstCustomizationAt: DateTime(2024),
-        lastCustomizationAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstCustomizationAt: DateTime.utc(2024, 1, 1),
+        lastCustomizationAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(fashionista.getCustomizationTier(), 'ファッショニスタ');
 
       final designer = CustomizationStatistics(
         userId: 'user4',
         totalCosmeticsOwned: 40,
-        firstCustomizationAt: DateTime(2024),
-        lastCustomizationAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstCustomizationAt: DateTime.utc(2024, 1, 1),
+        lastCustomizationAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(designer.getCustomizationTier(), 'ファッションデザイナー');
 
       final master = CustomizationStatistics(
         userId: 'user5',
         totalCosmeticsOwned: 60,
-        firstCustomizationAt: DateTime(2024),
-        lastCustomizationAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstCustomizationAt: DateTime.utc(2024, 1, 1),
+        lastCustomizationAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(master.getCustomizationTier(), 'スタイルマスター');
     });
