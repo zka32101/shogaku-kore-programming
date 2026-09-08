@@ -276,10 +276,9 @@ class UserStatistics {
 
   /// Get learning level based on lessons completed
   String getLearningLevel() {
-    if (totalLessonsCompleted < 50) return '初級';
-    if (totalLessonsCompleted < 150) return '中級';
-    if (totalLessonsCompleted < 300) return '上級';
-    if (totalLessonsCompleted < 500) return '上級+';
+    if (totalLessonsCompleted < 100) return '初級';
+    if (totalLessonsCompleted < 300) return '中級';
+    if (totalLessonsCompleted < 500) return '上級';
     return 'マスター';
   }
 
