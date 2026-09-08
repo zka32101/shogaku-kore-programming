@@ -92,8 +92,8 @@ void main() {
           requiredAmount: 10,
         ),
         reward: ChallengeReward(xpAmount: 100, coinAmount: 50),
-        startedAt: DateTime(2026, 9, 1),
-        expiresAt: DateTime(2026, 9, 2),
+        startedAt: DateTime.utc(2026, 9, 1),
+        expiresAt: DateTime.utc(2026, 9, 2),
         isActive: true,
         isFree: true,
       );
@@ -116,8 +116,8 @@ void main() {
           requiredAmount: 5,
         ),
         reward: ChallengeReward(xpAmount: 50, coinAmount: 25),
-        startedAt: DateTime(2026, 8, 1),
-        expiresAt: DateTime(2026, 8, 31),
+        startedAt: DateTime.utc(2026, 8, 1),
+        expiresAt: DateTime.utc(2026, 8, 31),
         isActive: true,
         isFree: false,
       );
@@ -142,7 +142,7 @@ void main() {
         challengeId: 'ch-1',
         status: ChallengeStatus.inProgress,
         currentProgress: 5,
-        startedAt: DateTime(2026, 9, 1),
+        startedAt: DateTime.utc(2026, 9, 1),
         attemptCount: 1,
       );
     });
@@ -163,8 +163,8 @@ void main() {
         challengeId: 'ch-1',
         status: ChallengeStatus.completed,
         currentProgress: 10,
-        startedAt: DateTime(2026, 9, 1),
-        completedAt: DateTime(2026, 9, 1, 12),
+        startedAt: DateTime.utc(2026, 9, 1),
+        completedAt: DateTime.utc(2026, 9, 1, 12),
         attemptCount: 1,
       );
       expect(completed.isCompleted, true);

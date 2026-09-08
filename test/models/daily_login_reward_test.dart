@@ -200,10 +200,10 @@ void main() {
     });
 
     test('converts to JSON with ISO8601 dates', () {
-      final now = DateTime(2024, 1, 15, 10, 30, 0);
-      final startDate = DateTime(2024, 1, 10, 0, 0, 0);
-      final loginDate1 = DateTime(2024, 1, 14, 8, 0, 0);
-      final loginDate2 = DateTime(2024, 1, 15, 9, 0, 0);
+      final now = DateTime.utc(2024, 1, 15, 10, 30, 0);
+      final startDate = DateTime.utc(2024, 1, 10, 0, 0, 0);
+      final loginDate1 = DateTime.utc(2024, 1, 14, 8, 0, 0);
+      final loginDate2 = DateTime.utc(2024, 1, 15, 9, 0, 0);
 
       final streak = LoginStreak(
         userId: 'user123',
@@ -226,9 +226,9 @@ void main() {
     });
 
     test('deserializes from JSON with dates', () {
-      final now = DateTime(2024, 1, 15, 10, 30, 0);
-      final startDate = DateTime(2024, 1, 10, 0, 0, 0);
-      final loginDate1 = DateTime(2024, 1, 14, 8, 0, 0);
+      final now = DateTime.utc(2024, 1, 15, 10, 30, 0);
+      final startDate = DateTime.utc(2024, 1, 10, 0, 0, 0);
+      final loginDate1 = DateTime.utc(2024, 1, 14, 8, 0, 0);
 
       final json = {
         'userId': 'user456',
@@ -311,7 +311,7 @@ void main() {
     });
 
     test('converts to JSON correctly', () {
-      final now = DateTime(2024, 1, 15, 10, 30, 0);
+      final now = DateTime.utc(2024, 1, 15, 10, 30, 0);
       final claim = LoginRewardClaim(
         claimId: 'claim_003',
         userId: 'user456',
@@ -336,7 +336,7 @@ void main() {
     });
 
     test('deserializes from JSON correctly', () {
-      final now = DateTime(2024, 1, 15, 10, 30, 0);
+      final now = DateTime.utc(2024, 1, 15, 10, 30, 0);
       final json = {
         'claimId': 'claim_007',
         'userId': 'user789',
@@ -445,7 +445,7 @@ void main() {
     });
 
     test('converts to JSON correctly', () {
-      final now = DateTime(2024, 1, 15, 10, 30, 0);
+      final now = DateTime.utc(2024, 1, 15, 10, 30, 0);
       final stats = LoginRewardStats(
         userId: 'user456',
         totalRewardsClaimed: 10,
@@ -467,7 +467,7 @@ void main() {
     });
 
     test('deserializes from JSON correctly', () {
-      final now = DateTime(2024, 1, 15, 10, 30, 0);
+      final now = DateTime.utc(2024, 1, 15, 10, 30, 0);
       final json = {
         'userId': 'user789',
         'totalRewardsClaimed': 7,

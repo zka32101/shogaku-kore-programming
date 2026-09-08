@@ -70,7 +70,7 @@ void main() {
         currentStreak: 5,
         longestStreak: 15,
         tier: RankingTier.platinum,
-        lastUpdatedAt: DateTime(2026, 9, 1),
+        lastUpdatedAt: DateTime.utc(2026, 9, 1),
       );
     });
 
@@ -145,7 +145,7 @@ void main() {
         currentStreak: 2,
         longestStreak: 10,
         tier: RankingTier.gold,
-        lastUpdatedAt: DateTime(2026, 9, 1),
+        lastUpdatedAt: DateTime.utc(2026, 9, 1),
       );
 
       expect(entry2.profileImageUrl, isNull);
@@ -169,7 +169,7 @@ void main() {
         accuracy: 0.88,
         quizzesCompleted: 30,
         correctAnswers: 26,
-        lastUpdatedAt: DateTime(2026, 9, 1),
+        lastUpdatedAt: DateTime.utc(2026, 9, 1),
       );
     });
 
@@ -218,7 +218,7 @@ void main() {
         previousTier: RankingTier.gold,
         currentTier: RankingTier.gold,
         isPromotion: true,
-        createdAt: DateTime(2026, 9, 1),
+        createdAt: DateTime.utc(2026, 9, 1),
         isRead: false,
       );
     });
@@ -247,7 +247,7 @@ void main() {
         previousTier: RankingTier.gold,
         currentTier: RankingTier.silver,
         isPromotion: false,
-        createdAt: DateTime(2026, 9, 1),
+        createdAt: DateTime.utc(2026, 9, 1),
       );
 
       expect(decline.rankChange, -5); // 10 - 15 = -5
@@ -265,7 +265,7 @@ void main() {
         previousTier: RankingTier.gold,
         currentTier: RankingTier.platinum,
         isPromotion: true,
-        createdAt: DateTime(2026, 9, 1),
+        createdAt: DateTime.utc(2026, 9, 1),
       );
 
       expect(promotion.isTierPromotion, true);
@@ -283,7 +283,7 @@ void main() {
         previousTier: RankingTier.platinum,
         currentTier: RankingTier.gold,
         isPromotion: false,
-        createdAt: DateTime(2026, 9, 1),
+        createdAt: DateTime.utc(2026, 9, 1),
       );
 
       expect(demotion.isTierDemotion, true);
@@ -332,13 +332,13 @@ void main() {
           currentStreak: 5,
           longestStreak: 15,
           tier: RankingTier.platinum,
-          lastUpdatedAt: DateTime(2026, 9, 1),
+          lastUpdatedAt: DateTime.utc(2026, 9, 1),
         ),
       ];
 
       data = LeaderboardData(
         timeUnit: LeaderboardTimeUnit.allTime,
-        generatedAt: DateTime(2026, 9, 1),
+        generatedAt: DateTime.utc(2026, 9, 1),
         globalRankings: entries,
         categoryRankings: {},
         recentChanges: [],
@@ -370,7 +370,7 @@ void main() {
     test('should handle empty rankings', () {
       final emptyData = LeaderboardData(
         timeUnit: LeaderboardTimeUnit.daily,
-        generatedAt: DateTime(2026, 9, 1),
+        generatedAt: DateTime.utc(2026, 9, 1),
         globalRankings: [],
         categoryRankings: {},
         recentChanges: [],
@@ -396,7 +396,7 @@ void main() {
           LearningCategory.algorithms: 7,
         },
         previousGlobalRank: 8,
-        lastUpdatedAt: DateTime(2026, 9, 1),
+        lastUpdatedAt: DateTime.utc(2026, 9, 1),
       );
     });
 
@@ -426,7 +426,7 @@ void main() {
         tier: RankingTier.gold,
         categoryRanks: {},
         previousGlobalRank: 10,
-        lastUpdatedAt: DateTime(2026, 9, 1),
+        lastUpdatedAt: DateTime.utc(2026, 9, 1),
       );
 
       expect(unchangedPosition.isRankUnchanged, true);
@@ -439,7 +439,7 @@ void main() {
         tier: RankingTier.gold,
         categoryRanks: {},
         previousGlobalRank: 10,
-        lastUpdatedAt: DateTime(2026, 9, 1),
+        lastUpdatedAt: DateTime.utc(2026, 9, 1),
       );
 
       expect(declinedPosition.isRankDeclined, true);
