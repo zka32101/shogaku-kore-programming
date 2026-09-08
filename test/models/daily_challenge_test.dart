@@ -69,8 +69,8 @@ void main() {
         challengeId: 'ch1',
         title: 'チャレンジ',
         description: '説明',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -80,7 +80,7 @@ void main() {
 
       expect(challenge.challengeId, 'ch1');
       expect(challenge.title, 'チャレンジ');
-      expect(challenge.category, ChallengeCategory.reading);
+      expect(challenge.category, DailyChallengeCategory.reading);
       expect(challenge.totalCompletions, 0);
       expect(challenge.difficulty_multiplier, 1);
     });
@@ -91,8 +91,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -110,8 +110,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -128,8 +128,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -147,8 +147,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -166,8 +166,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -184,8 +184,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -203,8 +203,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -238,7 +238,7 @@ void main() {
 
       final challenge = Challenge.fromJson(json);
       expect(challenge.challengeId, 'ch1');
-      expect(challenge.difficulty, ChallengeDifficulty.normal);
+      expect(challenge.difficulty, DailyChallengeDifficulty.normal);
     });
   });
 
@@ -360,8 +360,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -374,8 +374,8 @@ void main() {
         challengeId: 'ch2',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -403,8 +403,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -416,8 +416,8 @@ void main() {
         challengeId: 'ch2',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.writing,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.writing,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -434,7 +434,7 @@ void main() {
         generatedAt: now,
       );
 
-      final reading = userChallenges.getChallengesByCategory(ChallengeCategory.reading);
+      final reading = userChallenges.getChallengesByCategory(DailyChallengeCategory.reading);
       expect(reading.length, 1);
       expect(reading[0].category, ChallengeCategory.reading);
     });
@@ -445,8 +445,8 @@ void main() {
         challengeId: 'ch1',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -458,8 +458,8 @@ void main() {
         challengeId: 'ch2',
         title: 'Test',
         description: 'Test',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.weekly,
         targetCount: 10,
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
@@ -570,12 +570,12 @@ void main() {
         currentStreak: 3,
         longestStreak: 5,
         completionsByCategory: {
-          ChallengeCategory.reading: 3,
-          ChallengeCategory.writing: 2,
+          DailyChallengeCategory.reading: 3,
+          DailyChallengeCategory.writing: 2,
         },
         completionsByDifficulty: {
-          ChallengeDifficulty.normal: 4,
-          ChallengeDifficulty.hard: 1,
+          DailyChallengeDifficulty.normal: 4,
+          DailyChallengeDifficulty.hard: 1,
         },
         lastCompletionAt: now,
         lastUpdatedAt: now,

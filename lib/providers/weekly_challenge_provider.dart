@@ -52,8 +52,8 @@ class WeeklyChallengeNotifier extends StateNotifier<WeeklyChallengeState> {
         challengeId: 'wch_learn_100',
         title: '100分学習チャレンジ',
         description: '今週100分以上学習する',
-        category: ChallengeCategory.learning,
-        difficulty: ChallengeDifficulty.normal,
+        category: WeeklyChallengeCategory.learning,
+        difficulty: WeeklyChallengeDifficulty.normal,
         iconId: 'icon_learn_100',
         targetValue: 100,
         metricKey: 'learning_minutes',
@@ -68,8 +68,8 @@ class WeeklyChallengeNotifier extends StateNotifier<WeeklyChallengeState> {
         challengeId: 'wch_quiz_10',
         title: 'クイズマスター',
         description: 'クイズに10回チャレンジ',
-        category: ChallengeCategory.quiz,
-        difficulty: ChallengeDifficulty.easy,
+        category: WeeklyChallengeCategory.quiz,
+        difficulty: WeeklyChallengeDifficulty.easy,
         iconId: 'icon_quiz_10',
         targetValue: 10,
         metricKey: 'quiz_attempts',
@@ -83,8 +83,8 @@ class WeeklyChallengeNotifier extends StateNotifier<WeeklyChallengeState> {
         challengeId: 'wch_read_5',
         title: 'リーディング チャレンジ',
         description: '5つの読解問題を完了',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: WeeklyChallengeCategory.reading,
+        difficulty: WeeklyChallengeDifficulty.normal,
         iconId: 'icon_read_5',
         targetValue: 5,
         metricKey: 'reading_completed',
@@ -99,8 +99,8 @@ class WeeklyChallengeNotifier extends StateNotifier<WeeklyChallengeState> {
         challengeId: 'wch_write_3',
         title: 'ライティング マスター',
         description: '3つのライティング課題を完了',
-        category: ChallengeCategory.writing,
-        difficulty: ChallengeDifficulty.hard,
+        category: WeeklyChallengeCategory.writing,
+        difficulty: WeeklyChallengeDifficulty.hard,
         iconId: 'icon_write_3',
         targetValue: 3,
         metricKey: 'writing_completed',
@@ -114,8 +114,8 @@ class WeeklyChallengeNotifier extends StateNotifier<WeeklyChallengeState> {
         challengeId: 'wch_listen_30',
         title: 'リスニング チャンピオン',
         description: 'リスニング30分以上',
-        category: ChallengeCategory.listening,
-        difficulty: ChallengeDifficulty.normal,
+        category: WeeklyChallengeCategory.listening,
+        difficulty: WeeklyChallengeDifficulty.normal,
         iconId: 'icon_listen_30',
         targetValue: 30,
         metricKey: 'listening_minutes',
@@ -129,8 +129,8 @@ class WeeklyChallengeNotifier extends StateNotifier<WeeklyChallengeState> {
         challengeId: 'wch_bonus_perfect',
         title: 'パーフェクトウィーク',
         description: 'すべてのチャレンジを完了',
-        category: ChallengeCategory.creative,
-        difficulty: ChallengeDifficulty.expert,
+        category: WeeklyChallengeCategory.creative,
+        difficulty: WeeklyChallengeDifficulty.expert,
         iconId: 'icon_perfect_week',
         targetValue: 5,
         metricKey: 'all_challenges_completed',
@@ -385,12 +385,12 @@ class WeeklyChallengeNotifier extends StateNotifier<WeeklyChallengeState> {
   }
 
   /// カテゴリ別にチャレンジを取得
-  List<WeeklyChallenge> getByCategory(ChallengeCategory category) {
+  List<WeeklyChallenge> getByCategory(WeeklyChallengeCategory category) {
     return state.collection?.getByCategory(category) ?? [];
   }
 
   /// 難易度別にチャレンジを取得
-  List<WeeklyChallenge> getByDifficulty(ChallengeDifficulty difficulty) {
+  List<WeeklyChallenge> getByDifficulty(WeeklyChallengeDifficulty difficulty) {
     return state.collection?.getByDifficulty(difficulty) ?? [];
   }
 

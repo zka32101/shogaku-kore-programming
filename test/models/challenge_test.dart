@@ -12,12 +12,12 @@ void main() {
     });
   });
 
-  group('ChallengeDifficulty enum', () {
+  group('CoreChallengeDifficulty enum', () {
     test('should have correct ordering', () {
-      expect(ChallengeDifficulty.easy.index, 0);
-      expect(ChallengeDifficulty.medium.index, 1);
-      expect(ChallengeDifficulty.hard.index, 2);
-      expect(ChallengeDifficulty.expert.index, 3);
+      expect(CoreChallengeDifficulty.easy.index, 0);
+      expect(CoreChallengeDifficulty.medium.index, 1);
+      expect(CoreChallengeDifficulty.hard.index, 2);
+      expect(CoreChallengeDifficulty.expert.index, 3);
     });
   });
 

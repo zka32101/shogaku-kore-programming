@@ -11,8 +11,8 @@ void main() {
         challengeId: 'wch_learn_100',
         title: '100分学習チャレンジ',
         description: '100分以上学習する',
-        category: ChallengeCategory.learning,
-        difficulty: ChallengeDifficulty.normal,
+        category: WeeklyChallengeCategory.learning,
+        difficulty: WeeklyChallengeDifficulty.normal,
         iconId: 'icon_learn',
         targetValue: 100,
         metricKey: 'learning_minutes',
@@ -24,8 +24,8 @@ void main() {
 
       expect(challenge.challengeId, 'wch_learn_100');
       expect(challenge.title, '100分学習チャレンジ');
-      expect(challenge.category, ChallengeCategory.learning);
-      expect(challenge.difficulty, ChallengeDifficulty.normal);
+      expect(challenge.category, WeeklyChallengeCategory.learning);
+      expect(challenge.difficulty, WeeklyChallengeDifficulty.normal);
       expect(challenge.targetValue, 100);
     });
 
@@ -37,8 +37,8 @@ void main() {
         challengeId: 'c1',
         title: 'Easy',
         description: '',
-        category: ChallengeCategory.quiz,
-        difficulty: ChallengeDifficulty.easy,
+        category: WeeklyChallengeCategory.quiz,
+        difficulty: WeeklyChallengeDifficulty.easy,
         iconId: 'i1',
         targetValue: 10,
         metricKey: 'm',
@@ -54,8 +54,8 @@ void main() {
         challengeId: 'c2',
         title: 'Hard',
         description: '',
-        category: ChallengeCategory.writing,
-        difficulty: ChallengeDifficulty.hard,
+        category: WeeklyChallengeCategory.writing,
+        difficulty: WeeklyChallengeDifficulty.hard,
         iconId: 'i2',
         targetValue: 10,
         metricKey: 'm',
@@ -77,8 +77,8 @@ void main() {
         challengeId: 'active',
         title: 'Active',
         description: '',
-        category: ChallengeCategory.learning,
-        difficulty: ChallengeDifficulty.normal,
+        category: WeeklyChallengeCategory.learning,
+        difficulty: WeeklyChallengeDifficulty.normal,
         iconId: 'i',
         targetValue: 100,
         metricKey: 'm',
@@ -99,8 +99,8 @@ void main() {
         challengeId: 'c',
         title: 'Test',
         description: '',
-        category: ChallengeCategory.learning,
-        difficulty: ChallengeDifficulty.normal,
+        category: WeeklyChallengeCategory.learning,
+        difficulty: WeeklyChallengeDifficulty.normal,
         iconId: 'i',
         targetValue: 100,
         metricKey: 'm',
@@ -121,8 +121,8 @@ void main() {
         challengeId: 'wch_test',
         title: 'Test Challenge',
         description: 'Test Description',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.hard,
+        category: WeeklyChallengeCategory.reading,
+        difficulty: WeeklyChallengeDifficulty.hard,
         iconId: 'icon_test',
         targetValue: 50,
         metricKey: 'test_metric',
@@ -386,8 +386,8 @@ void main() {
         challengeId: 'ch_learn',
         title: 'Learning',
         description: '',
-        category: ChallengeCategory.learning,
-        difficulty: ChallengeDifficulty.normal,
+        category: WeeklyChallengeCategory.learning,
+        difficulty: WeeklyChallengeDifficulty.normal,
         iconId: 'i1',
         targetValue: 100,
         metricKey: 'm',
@@ -401,8 +401,8 @@ void main() {
         challengeId: 'ch_quiz',
         title: 'Quiz',
         description: '',
-        category: ChallengeCategory.quiz,
-        difficulty: ChallengeDifficulty.easy,
+        category: WeeklyChallengeCategory.quiz,
+        difficulty: WeeklyChallengeDifficulty.easy,
         iconId: 'i2',
         targetValue: 10,
         metricKey: 'm',

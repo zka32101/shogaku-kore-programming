@@ -385,8 +385,8 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         challengeId: 'challenge-daily-1',
         title: '読解チャレンジ',
         description: '5つの記事を読む',
-        category: ChallengeCategory.reading,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.reading,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 5,
         timeLimit: 60,
@@ -404,8 +404,8 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         challengeId: 'challenge-daily-2',
         title: '単語マスター',
         description: '10個の新しい単語を学ぶ',
-        category: ChallengeCategory.vocabulary,
-        difficulty: ChallengeDifficulty.easy,
+        category: DailyChallengeCategory.vocabulary,
+        difficulty: DailyChallengeDifficulty.easy,
         frequency: ChallengeFrequency.daily,
         targetCount: 10,
         timeLimit: 45,
@@ -423,8 +423,8 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         challengeId: 'challenge-weekly-1',
         title: 'ライティングマスター',
         description: '3つの記事を書く',
-        category: ChallengeCategory.writing,
-        difficulty: ChallengeDifficulty.hard,
+        category: DailyChallengeCategory.writing,
+        difficulty: DailyChallengeDifficulty.hard,
         frequency: ChallengeFrequency.weekly,
         targetCount: 3,
         timeLimit: 180,
@@ -442,8 +442,8 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
         challengeId: 'challenge-math-1',
         title: '数学問題集',
         description: '20個の数学問題を解く',
-        category: ChallengeCategory.mathematics,
-        difficulty: ChallengeDifficulty.normal,
+        category: DailyChallengeCategory.mathematics,
+        difficulty: DailyChallengeDifficulty.normal,
         frequency: ChallengeFrequency.daily,
         targetCount: 20,
         reward: ChallengeReward(
@@ -484,8 +484,8 @@ class DailyChallengeNotifier extends StateNotifier<DailyChallengeState> {
     bool bonusEarned,
     int rewardAmount,
   ) {
-    final categoryCount = Map<ChallengeCategory, int>.from(oldStats.completionsByCategory);
-    final difficultyCount = Map<ChallengeDifficulty, int>.from(oldStats.completionsByDifficulty);
+    final categoryCount = Map<DailyChallengeCategory, int>.from(oldStats.completionsByCategory);
+    final difficultyCount = Map<DailyChallengeDifficulty, int>.from(oldStats.completionsByDifficulty);
 
     categoryCount[challenge.category] = (categoryCount[challenge.category] ?? 0) + 1;
     difficultyCount[challenge.difficulty] = (difficultyCount[challenge.difficulty] ?? 0) + 1;
@@ -556,12 +556,12 @@ final expiringChallengesProvider = Provider.autoDispose<List<Challenge>>(
 );
 
 final challengesByDifficultyProvider =
-    Provider.autoDispose.family<List<Challenge>, ChallengeDifficulty>(
+    Provider.autoDispose.family<List<Challenge>, DailyChallengeDifficulty>(
   (ref, difficulty) =>
       ref.watch(dailyChallengeProvider).collection?.challenges.getChallengesByDifficulty(difficulty) ?? [],
 );
 
-final challengesByCategoryProvider = Provider.autoDispose.family<List<Challenge>, ChallengeCategory>(
+final challengesByCategoryProvider = Provider.autoDispose.family<List<Challenge>, DailyChallengeCategory>(
   (ref, category) =>
       ref.watch(dailyChallengeProvider).collection?.challenges.getChallengesByCategory(category) ?? [],
 );

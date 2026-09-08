@@ -1,5 +1,5 @@
 /// Challenge difficulty level
-enum ChallengeDifficulty {
+enum DailyChallengeDifficulty {
   easy,      // Basic challenge
   normal,    // Standard challenge
   hard,      // Difficult challenge
@@ -8,7 +8,7 @@ enum ChallengeDifficulty {
 }
 
 /// Challenge category
-enum ChallengeCategory {
+enum DailyChallengeCategory {
   reading,        // Reading comprehension
   writing,        // Writing practice
   mathematics,    // Math problems
@@ -37,7 +37,7 @@ enum ChallengeFrequency {
 }
 
 /// Challenge status for user
-enum ChallengeStatus {
+enum DailyChallengeStatus {
   available,     // Can be started
   inProgress,    // Currently working on it
   completed,     // Completed
@@ -85,8 +85,8 @@ class Challenge {
   final String challengeId;
   final String title;           // Challenge title (Japanese)
   final String description;     // Challenge description
-  final ChallengeCategory category;
-  final ChallengeDifficulty difficulty;
+  final DailyChallengeCategory category;
+  final DailyChallengeDifficulty difficulty;
   final ChallengeFrequency frequency;
   final int targetCount;        // Number of tasks to complete
   final int? timeLimit;         // Time limit in minutes
@@ -144,15 +144,15 @@ class Challenge {
   /// Get formatted difficulty text
   String get difficultyText {
     switch (difficulty) {
-      case ChallengeDifficulty.easy:
+      case DailyChallengeDifficulty.easy:
         return '簡単';
-      case ChallengeDifficulty.normal:
+      case DailyChallengeDifficulty.normal:
         return '普通';
-      case ChallengeDifficulty.hard:
+      case DailyChallengeDifficulty.hard:
         return '難しい';
-      case ChallengeDifficulty.expert:
+      case DailyChallengeDifficulty.expert:
         return '非常に難しい';
-      case ChallengeDifficulty.insane:
+      case DailyChallengeDifficulty.insane:
         return '極難';
     }
   }
@@ -185,8 +185,8 @@ class Challenge {
         challengeId: json['challengeId'] as String,
         title: json['title'] as String,
         description: json['description'] as String,
-        category: ChallengeCategory.values.byName(json['category'] as String),
-        difficulty: ChallengeDifficulty.values.byName(json['difficulty'] as String),
+        category: DailyChallengeCategory.values.byName(json['category'] as String),
+        difficulty: DailyChallengeDifficulty.values.byName(json['difficulty'] as String),
         frequency: ChallengeFrequency.values.byName(json['frequency'] as String),
         targetCount: json['targetCount'] as int,
         timeLimit: json['timeLimit'] as int?,
