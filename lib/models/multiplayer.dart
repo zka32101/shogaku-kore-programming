@@ -126,7 +126,7 @@ class Friend {
   final String userId;
   final String friendUserId;
   final MultiplayerUserProfile friendProfile;
-  final FriendshipStatus status;
+  final MultiplayerFriendshipStatus status;
   final DateTime createdAt;
   final DateTime? acceptedAt;
 
@@ -140,8 +140,8 @@ class Friend {
     this.acceptedAt,
   });
 
-  bool get isConfirmed => status == FriendshipStatus.confirmed;
-  bool get isPending => status == FriendshipStatus.pending;
+  bool get isConfirmed => status == MultiplayerFriendshipStatus.confirmed;
+  bool get isPending => status == MultiplayerFriendshipStatus.pending;
 
   Map<String, dynamic> toJson() => {
     'friendId': friendId,
@@ -160,7 +160,7 @@ class Friend {
     friendProfile: MultiplayerUserProfile.fromJson(
       json['friendProfile'] as Map<String, dynamic>,
     ),
-    status: FriendshipStatus.values.byName(json['status'] as String),
+    status: MultiplayerFriendshipStatus.values.byName(json['status'] as String),
     createdAt: DateTime.parse(json['createdAt'] as String),
     acceptedAt: json['acceptedAt'] != null
         ? DateTime.parse(json['acceptedAt'] as String)
@@ -443,7 +443,7 @@ enum MatchStatus {
 }
 
 /// フレンドシップステータス
-enum FriendshipStatus {
+enum MultiplayerFriendshipStatus {
   pending,      // ペンディング
   confirmed,    // 確認済み
   blocked,      // ブロック

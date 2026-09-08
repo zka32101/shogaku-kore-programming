@@ -20,7 +20,7 @@ class FriendInfo {
   final String? displayName;
   final String? avatarId;
   final int currentLevel;
-  final UserRank userRank;
+  final FriendSystemUserRank userRank;
   final bool isOnline;
   final DateTime? lastSeenAt;
 
@@ -52,7 +52,7 @@ class FriendInfo {
         displayName: json['displayName'] as String?,
         avatarId: json['avatarId'] as String?,
         currentLevel: json['currentLevel'] as int? ?? 1,
-        userRank: UserRank.values.byName(json['userRank'] as String? ?? 'beginner'),
+        userRank: FriendSystemUserRank.values.byName(json['userRank'] as String? ?? 'beginner'),
         isOnline: json['isOnline'] as bool? ?? false,
         lastSeenAt: json['lastSeenAt'] != null ? DateTime.parse(json['lastSeenAt'] as String) : null,
       );
@@ -361,7 +361,7 @@ class FriendSystemCollection {
 }
 
 // Import for UserRank - needed for FriendInfo
-enum UserRank {
+enum FriendSystemUserRank {
   beginner,
   learner,
   intermediate,

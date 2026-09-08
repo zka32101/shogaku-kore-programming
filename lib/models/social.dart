@@ -1,5 +1,5 @@
 /// フレンド関係のステータス
-enum FriendshipStatus {
+enum SocialFriendshipStatus {
   pending,    // 保留中
   accepted,   // 承認済み
   blocked,    // ブロック中
@@ -23,7 +23,7 @@ class Friend {
   final int totalXp;
   final DateTime? lastSeenAt;
   final UserOnlineStatus onlineStatus;
-  final FriendshipStatus status;
+  final SocialFriendshipStatus status;
   final DateTime connectedAt;
   final DateTime? blockedAt;
 
@@ -42,10 +42,10 @@ class Friend {
   });
 
   /// フレンドシップが有効か判定
-  bool get isActive => status == FriendshipStatus.accepted;
+  bool get isActive => status == SocialFriendshipStatus.accepted;
 
   /// ブロック中か判定
-  bool get isBlocked => status == FriendshipStatus.blocked;
+  bool get isBlocked => status == SocialFriendshipStatus.blocked;
 
   Map<String, dynamic> toJson() => {
         'userId': userId,
@@ -73,7 +73,7 @@ class Friend {
             : null,
         onlineStatus:
             UserOnlineStatus.values.byName(json['onlineStatus'] as String),
-        status: FriendshipStatus.values.byName(json['status'] as String),
+        status: SocialFriendshipStatus.values.byName(json['status'] as String),
         connectedAt: DateTime.parse(json['connectedAt'] as String),
         blockedAt: json['blockedAt'] != null
             ? DateTime.parse(json['blockedAt'] as String)
