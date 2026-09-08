@@ -341,11 +341,11 @@ class WeeklyChallengeCollection {
       userProgress[challengeId];
 
   /// Get challenges by category
-  List<WeeklyChallenge> getByCategory(ChallengeCategory category) =>
+  List<WeeklyChallenge> getByCategory(WeeklyChallengeCategory category) =>
       challenges.where((c) => c.category == category).toList();
 
   /// Get challenges by difficulty
-  List<WeeklyChallenge> getByDifficulty(ChallengeDifficulty difficulty) =>
+  List<WeeklyChallenge> getByDifficulty(WeeklyChallengeDifficulty difficulty) =>
       challenges.where((c) => c.difficulty == difficulty).toList();
 
   /// Get active challenges (not yet completed)

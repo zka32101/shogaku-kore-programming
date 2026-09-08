@@ -197,7 +197,7 @@ class SocialNotifier extends StateNotifier<SocialState> {
         totalXp: 0,
         lastSeenAt: DateTime.now(),
         onlineStatus: UserOnlineStatus.offline,
-        status: FriendshipStatus.accepted,
+        status: SocialFriendshipStatus.accepted,
         connectedAt: DateTime.now(),
       );
 

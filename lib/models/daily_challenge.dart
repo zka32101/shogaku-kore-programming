@@ -336,11 +336,11 @@ class UserChallenges {
       }).toList();
 
   /// Get challenges by category
-  List<Challenge> getChallengesByCategory(ChallengeCategory category) =>
+  List<Challenge> getChallengesByCategory(DailyChallengeCategory category) =>
       availableChallenges.where((c) => c.category == category).toList();
 
   /// Get challenges by difficulty
-  List<Challenge> getChallengesByDifficulty(ChallengeDifficulty difficulty) =>
+  List<Challenge> getChallengesByDifficulty(DailyChallengeDifficulty difficulty) =>
       availableChallenges.where((c) => c.difficulty == difficulty).toList();
 
   /// Get daily challenges
@@ -442,9 +442,9 @@ class ChallengeStats {
 
   factory ChallengeStats.fromJson(Map<String, dynamic> json) {
     final categoryMap = (json['completionsByCategory'] as Map<String, dynamic>)
-        .map((k, v) => MapEntry(ChallengeCategory.values.byName(k), v as int));
+        .map((k, v) => MapEntry(DailyChallengeCategory.values.byName(k), v as int));
     final difficultyMap = (json['completionsByDifficulty'] as Map<String, dynamic>)
-        .map((k, v) => MapEntry(ChallengeDifficulty.values.byName(k), v as int));
+        .map((k, v) => MapEntry(DailyChallengeDifficulty.values.byName(k), v as int));
 
     return ChallengeStats(
       userId: json['userId'] as String,

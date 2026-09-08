@@ -499,7 +499,7 @@ class UserProfileNotifier extends StateNotifier<UserProfileState> {
       state.collection?.getUnlockedAchievements().length ?? 0;
 
   /// Get user rank
-  UserRank? getUserRank() => state.collection?.profile.getRank();
+  ProfileUserRank? getUserRank() => state.collection?.profile.getRank();
 
   /// Get engagement score
   int getEngagementScore() => state.collection?.statistics.getEngagementScore() ?? 0;
@@ -592,7 +592,7 @@ final lockedAchievementsProvider = Provider.autoDispose<List<UserAchievement>>(
   (ref) => ref.watch(userProfileProvider).collection?.getLockedAchievements() ?? [],
 );
 
-final userRankProvider = Provider.autoDispose<UserRank?>(
+final userRankProvider = Provider.autoDispose<ProfileUserRank?>(
   (ref) => ref.watch(userProfileProvider).collection?.profile.getRank(),
 );
 
