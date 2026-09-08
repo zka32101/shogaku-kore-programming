@@ -400,30 +400,30 @@ void main() {
       );
       expect(steadyStats.getStreakTier(), '着実');
 
-      const reliableStats = StreakStatistics(
+      final reliableStats = StreakStatistics(
         userId: 'user3',
         consecutiveDaysActive: 10,
-        firstLoginAt: DateTime(2024),
-        lastLoginAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstLoginAt: DateTime.utc(2024, 1, 1),
+        lastLoginAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(reliableStats.getStreakTier(), '堅実');
 
-      const habitFormingStats = StreakStatistics(
+      final habitFormingStats = StreakStatistics(
         userId: 'user4',
         consecutiveDaysActive: 20,
-        firstLoginAt: DateTime(2024),
-        lastLoginAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstLoginAt: DateTime.utc(2024, 1, 1),
+        lastLoginAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(habitFormingStats.getStreakTier(), '習慣形成');
 
-      const commitmentStats = StreakStatistics(
+      final commitmentStats = StreakStatistics(
         userId: 'user5',
         consecutiveDaysActive: 50,
-        firstLoginAt: DateTime(2024),
-        lastLoginAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstLoginAt: DateTime.utc(2024, 1, 1),
+        lastLoginAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(commitmentStats.getStreakTier(), 'コミットメント');
 
