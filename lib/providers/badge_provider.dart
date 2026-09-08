@@ -75,16 +75,17 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
       unlockedIds.add(badgeId);
     }
 
-    // Update the badge object to mark as unlocked
+    // Rebuild all badges with correct isUnlocked status based on unlockedIds
     final updatedBadges = state.badges.map((badge) {
-      if (badge.id == badgeId) {
+      final shouldBeUnlocked = unlockedIds.contains(badge.id);
+      if (badge.isUnlocked != shouldBeUnlocked) {
         return Badge(
           id: badge.id,
           icon: badge.icon,
           name: badge.name,
           description: badge.description,
           category: badge.category,
-          isUnlocked: true,
+          isUnlocked: shouldBeUnlocked,
           progressCurrent: badge.progressCurrent,
           progressTarget: badge.progressTarget,
         );
@@ -109,17 +110,36 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
       unlockedIds.add(badgeId);
     }
 
-    // Update the badge object with progress
+    // Rebuild all badges with correct progress and unlock status
     final updatedBadges = state.badges.map((badge) {
       if (badge.id == badgeId) {
+        final newProgress = progress;
+        final target = badge.progressTarget ?? 0;
+        final shouldBeUnlocked = newProgress >= target;
+
         return Badge(
           id: badge.id,
           icon: badge.icon,
           name: badge.name,
           description: badge.description,
           category: badge.category,
-          isUnlocked: progress >= (badge.progressTarget ?? 0),
-          progressCurrent: progress,
+          isUnlocked: shouldBeUnlocked,
+          progressCurrent: newProgress,
+          progressTarget: badge.progressTarget,
+        );
+      }
+
+      // Update isUnlocked status for all badges based on unlockedIds
+      final shouldBeUnlocked = unlockedIds.contains(badge.id);
+      if (badge.isUnlocked != shouldBeUnlocked) {
+        return Badge(
+          id: badge.id,
+          icon: badge.icon,
+          name: badge.name,
+          description: badge.description,
+          category: badge.category,
+          isUnlocked: shouldBeUnlocked,
+          progressCurrent: badge.progressCurrent,
           progressTarget: badge.progressTarget,
         );
       }
