@@ -85,7 +85,7 @@ void main() {
         title: 'Daily Challenge',
         description: 'Complete 10 quizzes today',
         type: ChallengeType.daily,
-        difficulty: ChallengeDifficulty.medium,
+        difficulty: CoreChallengeDifficulty.medium,
         condition: ChallengeCondition(
           conditionId: 'cond-1',
           description: 'Quiz completions',
@@ -109,7 +109,7 @@ void main() {
         title: 'Old Challenge',
         description: 'Old',
         type: ChallengeType.daily,
-        difficulty: ChallengeDifficulty.easy,
+        difficulty: CoreChallengeDifficulty.easy,
         condition: ChallengeCondition(
           conditionId: 'cond-2',
           description: 'Test',

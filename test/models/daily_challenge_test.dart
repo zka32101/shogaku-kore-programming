@@ -436,7 +436,7 @@ void main() {
 
       final reading = userChallenges.getChallengesByCategory(DailyChallengeCategory.reading);
       expect(reading.length, 1);
-      expect(reading[0].category, ChallengeCategory.reading);
+      expect(reading[0].category, DailyChallengeCategory.reading);
     });
 
     test('getDailyChallenges returns daily only', () {
