@@ -313,10 +313,10 @@ void main() {
       );
       expect(advancedStats.getLearningLevel(), '中級');
 
-      const masterStats = UserStatistics(
+      final masterStats = UserStatistics(
         userId: 'user3',
         totalLessonsCompleted: 550,
-        lastUpdatedAt: DateTime(2024),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(masterStats.getLearningLevel(), 'マスター');
     });

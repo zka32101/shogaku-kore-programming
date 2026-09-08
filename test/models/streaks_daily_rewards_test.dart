@@ -427,12 +427,12 @@ void main() {
       );
       expect(commitmentStats.getStreakTier(), 'コミットメント');
 
-      const legendStats = StreakStatistics(
+      final legendStats = StreakStatistics(
         userId: 'user6',
         consecutiveDaysActive: 100,
-        firstLoginAt: DateTime(2024),
-        lastLoginAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstLoginAt: DateTime.utc(2024, 1, 1),
+        lastLoginAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(legendStats.getStreakTier(), 'レジェンド');
     });

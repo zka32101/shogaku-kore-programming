@@ -309,21 +309,21 @@ void main() {
       );
       expect(browserStats.getSpenderTier(), 'ブラウザー');
 
-      const collectorStats = ShopStatistics(
+      final collectorStats = ShopStatistics(
         userId: 'user2',
         totalSpent: 1500,
-        firstPurchaseAt: DateTime(2024),
-        lastPurchaseAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstPurchaseAt: DateTime.utc(2024, 1, 1),
+        lastPurchaseAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(collectorStats.getSpenderTier(), 'コレクター');
 
-      const vipStats = ShopStatistics(
+      final vipStats = ShopStatistics(
         userId: 'user3',
         totalSpent: 6000,
-        firstPurchaseAt: DateTime(2024),
-        lastPurchaseAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstPurchaseAt: DateTime.utc(2024, 1, 1),
+        lastPurchaseAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(vipStats.getSpenderTier(), 'VIP');
     });
