@@ -187,7 +187,7 @@ void main() {
 
       expect(json['rank'], 5);
       expect(json['userId'], 'user-5');
-      expect(json['category'], 'variables');
+      expect(json['category'], 'programming');
       expect(json['accuracy'], 0.88);
       expect(json['quizzesCompleted'], 30);
       expect(json['correctAnswers'], 26);
@@ -468,8 +468,8 @@ void main() {
       final json = position.toJson();
 
       expect(json['categoryRanks'], isA<Map>());
-      expect(json['categoryRanks']['variables'], 3);
-      expect(json['categoryRanks']['loops'], 7);
+      expect(json['categoryRanks']['programming'], 3);
+      expect(json['categoryRanks']['algorithms'], 7);
     });
   });
 }

@@ -342,7 +342,7 @@ void main() {
         lastFriendAddedAt: DateTime.utc(2024, 1, 1),
         lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
-      expect(popularStats.getFriendTier(), '人気者');
+      expect(popularStats.getFriendTier(), 'ソーシャル');
     });
 
     test('toJson serializes statistics', () {
