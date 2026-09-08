@@ -77,7 +77,7 @@ class SocialNotifier extends StateNotifier<SocialState> {
           onlineStatus: i % 2 == 0
               ? UserOnlineStatus.online
               : UserOnlineStatus.offline,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: DateTime.now().subtract(Duration(days: 30 + i)),
         );
         friends.add(friend);
@@ -249,7 +249,7 @@ class SocialNotifier extends StateNotifier<SocialState> {
           totalXp: friend.totalXp,
           lastSeenAt: friend.lastSeenAt,
           onlineStatus: friend.onlineStatus,
-          status: FriendshipStatus.blocked,
+          status: SocialFriendshipStatus.blocked,
           connectedAt: friend.connectedAt,
           blockedAt: DateTime.now(),
         );
@@ -282,7 +282,7 @@ class SocialNotifier extends StateNotifier<SocialState> {
           totalXp: friend.totalXp,
           lastSeenAt: friend.lastSeenAt,
           onlineStatus: friend.onlineStatus,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: friend.connectedAt,
         );
 

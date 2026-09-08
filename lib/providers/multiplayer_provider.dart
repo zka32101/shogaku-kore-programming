@@ -138,7 +138,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
       userId: state.currentUserProfile!.userId,
       friendUserId: targetUser.userId,
       friendProfile: targetUser,
-      status: FriendshipStatus.pending,
+      status: MultiplayerFriendshipStatus.pending,
       createdAt: DateTime.now(),
     );
 
@@ -154,7 +154,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           userId: req.userId,
           friendUserId: req.friendUserId,
           friendProfile: req.friendProfile,
-          status: FriendshipStatus.confirmed,
+          status: MultiplayerFriendshipStatus.confirmed,
           createdAt: req.createdAt,
           acceptedAt: DateTime.now(),
         );
@@ -183,7 +183,7 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
           userId: friend.userId,
           friendUserId: friend.friendUserId,
           friendProfile: friend.friendProfile.copyWith(isBlocked: true),
-          status: FriendshipStatus.blocked,
+          status: MultiplayerFriendshipStatus.blocked,
           createdAt: friend.createdAt,
           acceptedAt: friend.acceptedAt,
         );
@@ -531,8 +531,8 @@ class MultiplayerNotifier extends StateNotifier<MultiplayerState> {
 
       state = state.copyWith(
         currentUserProfile: userProfile,
-        friendsList: friends.where((f) => f.status == FriendshipStatus.confirmed).toList(),
-        friendRequests: friends.where((f) => f.status == FriendshipStatus.pending).toList(),
+        friendsList: friends.where((f) => f.status == MultiplayerFriendshipStatus.confirmed).toList(),
+        friendRequests: friends.where((f) => f.status == MultiplayerFriendshipStatus.pending).toList(),
         matchHistory: matchHistory,
         notifications: notifications,
       );
