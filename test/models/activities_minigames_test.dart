@@ -348,45 +348,45 @@ void main() {
       final amateurStats = ActivityStatistics(
         userId: 'user2',
         totalActivitiesCompleted: 30,
-        firstActivityAt: DateTime(2024),
-        lastActivityAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstActivityAt: DateTime.utc(2024, 1, 1),
+        lastActivityAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(amateurStats.getActivityTier(), 'アマチュア');
 
       final intermediateStats = ActivityStatistics(
         userId: 'user3',
         totalActivitiesCompleted: 75,
-        firstActivityAt: DateTime(2024),
-        lastActivityAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstActivityAt: DateTime.utc(2024, 1, 1),
+        lastActivityAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(intermediateStats.getActivityTier(), 'インターミディエイト');
 
       final advanceStats = ActivityStatistics(
         userId: 'user4',
         totalActivitiesCompleted: 150,
-        firstActivityAt: DateTime(2024),
-        lastActivityAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstActivityAt: DateTime.utc(2024, 1, 1),
+        lastActivityAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(advanceStats.getActivityTier(), 'アドバンス');
 
       final expertStats = ActivityStatistics(
         userId: 'user5',
         totalActivitiesCompleted: 300,
-        firstActivityAt: DateTime(2024),
-        lastActivityAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstActivityAt: DateTime.utc(2024, 1, 1),
+        lastActivityAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(expertStats.getActivityTier(), 'エキスパート');
 
       final masterStats = ActivityStatistics(
         userId: 'user6',
         totalActivitiesCompleted: 600,
-        firstActivityAt: DateTime(2024),
-        lastActivityAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        firstActivityAt: DateTime.utc(2024, 1, 1),
+        lastActivityAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(masterStats.getActivityTier(), 'マスター');
     });
