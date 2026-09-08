@@ -70,7 +70,7 @@ void main() {
       final success = await notifier.purchaseItem(
         'test_user',
         itemId,
-        RewardRewardCurrencyType.xp,
+        RewardCurrencyType.xp,
       );
 
       expect(success, true);
