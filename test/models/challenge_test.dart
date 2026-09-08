@@ -92,8 +92,8 @@ void main() {
           requiredAmount: 10,
         ),
         reward: ChallengeReward(xpAmount: 100, coinAmount: 50),
-        startedAt: DateTime.utc(2026, 9, 1),
-        expiresAt: DateTime.utc(2026, 9, 2),
+        startedAt: DateTime.now().subtract(const Duration(days: 1)),
+        expiresAt: DateTime.now().add(const Duration(days: 1)),
         isActive: true,
         isFree: true,
       );
@@ -116,8 +116,8 @@ void main() {
           requiredAmount: 5,
         ),
         reward: ChallengeReward(xpAmount: 50, coinAmount: 25),
-        startedAt: DateTime.utc(2026, 8, 1),
-        expiresAt: DateTime.utc(2026, 8, 31),
+        startedAt: DateTime.now().subtract(const Duration(days: 2)),
+        expiresAt: DateTime.now().subtract(const Duration(days: 1)),
         isActive: true,
         isFree: false,
       );
