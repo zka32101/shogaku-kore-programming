@@ -157,10 +157,10 @@ void main() {
       );
 
       final week2 = WeeklyLearningStats(
-        startDate: DateTime.utc(2026, 9, 8),
+        startDate: DateTime.now().add(const Duration(days: 1)),
         dailyStats: [
           DailyLearningStats(
-            date: DateTime.utc(2026, 9, 8),
+            date: DateTime.now().add(const Duration(days: 1)),
             quizzesCompleted: 5,
             quizzesCorrect: 5,
           ),
@@ -188,22 +188,23 @@ void main() {
 
       final dailyStats2 = [
         DailyLearningStats(
-          date: DateTime.utc(2026, 9, 8),
+          date: DateTime.now().add(const Duration(days: 1)),
           quizzesCompleted: 10,
           quizzesCorrect: 8,
         ),
       ];
 
+      final today = DateTime.now();
       final monthly = MonthlyLearningStats(
-        year: 2026,
-        month: 9,
+        year: today.year,
+        month: today.month,
         weeklyStats: [
           WeeklyLearningStats(
             startDate: DateTime.now(),
             dailyStats: dailyStats1,
           ),
           WeeklyLearningStats(
-            startDate: DateTime.utc(2026, 9, 8),
+            startDate: DateTime.now().add(const Duration(days: 1)),
             dailyStats: dailyStats2,
           ),
         ],

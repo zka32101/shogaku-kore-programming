@@ -283,7 +283,7 @@ void main() {
     });
 
     test('LearningGoal JSON serialization', () {
-      final deadline = DateTime.utc(2026, 10, 1);
+      final deadline = DateTime.now().add(const Duration(days: 30));
       final goal = LearningGoal(
         goalId: 'goal123',
         childId: 'child123',

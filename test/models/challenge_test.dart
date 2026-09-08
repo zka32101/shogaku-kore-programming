@@ -164,7 +164,7 @@ void main() {
         status: ChallengeStatus.completed,
         currentProgress: 10,
         startedAt: DateTime.now(),
-        completedAt: DateTime.utc(2026, 9, 1, 12),
+        completedAt: DateTime.now(),
         attemptCount: 1,
       );
       expect(completed.isCompleted, true);
