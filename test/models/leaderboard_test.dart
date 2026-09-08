@@ -165,7 +165,7 @@ void main() {
         userId: 'user-5',
         username: 'user5',
         displayName: 'User Five',
-        category: LearningCategory.variables,
+        category: LearningCategory.programming,
         accuracy: 0.88,
         quizzesCompleted: 30,
         correctAnswers: 26,
@@ -176,7 +176,7 @@ void main() {
     test('should create entry with correct values', () {
       expect(entry.rank, 5);
       expect(entry.userId, 'user-5');
-      expect(entry.category, LearningCategory.variables);
+      expect(entry.category, LearningCategory.programming);
       expect(entry.accuracy, 0.88);
       expect(entry.quizzesCompleted, 30);
       expect(entry.correctAnswers, 26);
@@ -392,8 +392,8 @@ void main() {
         globalRank: 5,
         tier: RankingTier.platinum,
         categoryRanks: {
-          LearningCategory.variables: 3,
-          LearningCategory.loops: 7,
+          LearningCategory.programming: 3,
+          LearningCategory.algorithms: 7,
         },
         previousGlobalRank: 8,
         lastUpdatedAt: DateTime(2026, 9, 1),

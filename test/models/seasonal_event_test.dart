@@ -673,11 +673,11 @@ void main() {
       );
       expect(experiencedStats.getCompetitionLevel(), '経験者');
 
-      const veteranStats = EventStatistics(
+      final veteranStats = EventStatistics(
         userId: 'user3',
         totalEventsParticipated: 30,
-        lastEventParticipationAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        lastEventParticipationAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(veteranStats.getCompetitionLevel(), 'ベテラン');
     });

@@ -248,9 +248,11 @@ void main() {
       ];
 
       final data = SocialData(
+        userId: 'user1',
         friends: friends,
-        friendRequests: [],
-        activeChallenges: [],
+        incomingRequests: [],
+        outgoingRequests: [],
+        friendChallenges: [],
         activityFeed: [],
         generatedAt: DateTime.now(),
       );
@@ -288,9 +290,11 @@ void main() {
       ];
 
       final data = SocialData(
+        userId: 'user1',
         friends: friends,
-        friendRequests: [],
-        activeChallenges: [],
+        incomingRequests: [],
+        outgoingRequests: [],
+        friendChallenges: [],
         activityFeed: [],
         generatedAt: DateTime.now(),
       );
