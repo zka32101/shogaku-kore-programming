@@ -75,7 +75,7 @@ void main() {
         userId: 'user1',
         currentGrade: SchoolGrade.thirdGrade,
         birthYear: 2015,
-        lastGradeChangeAt: DateTime(now.year - 1, 4, 1),
+        lastGradeChangeAt: DateTime.utc(now.year - 1, 4, 1),
         firstEnrolledAt: now,
         autoPromoteEnabled: true,
       );

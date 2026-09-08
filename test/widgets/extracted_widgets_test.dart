@@ -341,7 +341,7 @@ void main() {
           estimatedTime: '15 min',
         );
 
-        final completedDate = DateTime(2026, 9, 5);
+        final completedDate = DateTime.utc(2026, 9, 5);
 
         await tester.pumpWidget(
           MaterialApp(
