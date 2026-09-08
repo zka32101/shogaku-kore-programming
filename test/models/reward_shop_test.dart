@@ -623,7 +623,8 @@ void main() {
       );
 
       final item = catalog.getItem('badge_7day');
-      expect(item.name, '7日バッジ');
+      expect(item, isNotNull);
+      expect(item!.name, '7日バッジ');
     });
 
     test('getByType filters items correctly', () {

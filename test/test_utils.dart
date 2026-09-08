@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class TestApp extends StatelessWidget {
   final Widget home;
   final List<Override> overrides;
+  final Brightness? brightness;
 
   const TestApp({
     required this.home,
     this.overrides = const [],
+    this.brightness,
     Key? key,
   }) : super(key: key);
 
@@ -19,6 +21,9 @@ class TestApp extends StatelessWidget {
       child: MaterialApp(
         home: home,
         localizationsDelegates: const [],
+        theme: brightness == Brightness.dark
+            ? ThemeData.dark()
+            : ThemeData.light(),
       ),
     );
   }
@@ -28,9 +33,11 @@ class TestApp extends StatelessWidget {
 Widget createTestApp(
   Widget home, {
   List<Override> overrides = const [],
+  Brightness? brightness,
 }) {
   return TestApp(
     home: home,
     overrides: overrides,
+    brightness: brightness,
   );
 }

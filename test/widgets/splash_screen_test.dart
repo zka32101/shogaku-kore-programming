@@ -187,8 +187,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Simulate orientation change
-      addTearDown(tester.binding.window.physicalSizeTestValue);
-      addTearDown(TestWidgetsFlutterBinding.instance.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
       // Should still be visible and functional
       expect(find.byType(SplashScreen), findsOneWidget);
@@ -212,11 +211,10 @@ void main() {
 
     testWidgets('splash elements scale appropriately for different screens',
         (WidgetTester tester) async {
-      addTearDown(tester.binding.window.physicalSizeTestValue);
-      addTearDown(TestWidgetsFlutterBinding.instance.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
       // Set to tablet size
-      tester.binding.window.physicalSizeTestValue = const Size(1024, 1366);
+      tester.binding.window.physicalSize = const Size(1024, 1366);
 
       await tester.pumpWidget(
         const ProviderScope(
