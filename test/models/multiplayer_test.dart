@@ -72,7 +72,7 @@ void main() {
         userId: 'user123',
         friendUserId: 'user456',
         friendProfile: targetProfile,
-        status: FriendshipStatus.pending,
+        status: MultiplayerFriendshipStatus.pending,
         createdAt: DateTime.now(),
       );
 
@@ -101,7 +101,7 @@ void main() {
         userId: 'user123',
         friendUserId: 'user456',
         friendProfile: targetProfile,
-        status: FriendshipStatus.confirmed,
+        status: MultiplayerFriendshipStatus.confirmed,
         createdAt: now,
         acceptedAt: now,
       );
@@ -339,9 +339,9 @@ void main() {
       expect(MatchStatus.values, contains(MatchStatus.inProgress));
     });
 
-    test('FriendshipStatus values exist', () {
-      expect(FriendshipStatus.values.length, 3);
-      expect(FriendshipStatus.values, contains(FriendshipStatus.confirmed));
+    test('MultiplayerFriendshipStatus values exist', () {
+      expect(MultiplayerFriendshipStatus.values.length, 3);
+      expect(MultiplayerFriendshipStatus.values, contains(MultiplayerFriendshipStatus.confirmed));
     });
 
     test('LiveNotificationType values exist', () {

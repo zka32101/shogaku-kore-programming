@@ -9,7 +9,7 @@ void main() {
         name: '7日バッジ',
         description: '7日連続ログイン',
         type: ShopItemType.badge,
-        rarity: ItemRarity.uncommon,
+        rarity: RewardItemRarity.uncommon,
         iconId: 'icon_7day',
         xpCost: 100,
         coinCost: 50,
@@ -18,7 +18,7 @@ void main() {
       expect(item.itemId, 'badge_7day');
       expect(item.name, '7日バッジ');
       expect(item.type, ShopItemType.badge);
-      expect(item.rarity, ItemRarity.uncommon);
+      expect(item.rarity, RewardItemRarity.uncommon);
       expect(item.xpCost, 100);
       expect(item.coinCost, 50);
     });
@@ -29,7 +29,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 50,
         coinCost: 25,
@@ -45,7 +45,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 50,
         coinCost: 25,
@@ -62,7 +62,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 50,
         coinCost: 25,
@@ -78,7 +78,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 50,
         coinCost: 25,
@@ -94,7 +94,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 50,
         coinCost: 25,
@@ -110,7 +110,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 200,
         coinCost: 100,
@@ -126,7 +126,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 100,
         coinCost: 0,
@@ -142,7 +142,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 100,
         coinCost: 50,
@@ -151,9 +151,9 @@ void main() {
 
       final currencies = item.getAvailableCurrencies();
       expect(currencies.length, 3);
-      expect(currencies.contains(CurrencyType.xp), true);
-      expect(currencies.contains(CurrencyType.coins), true);
-      expect(currencies.contains(CurrencyType.premium), true);
+      expect(currencies.contains(RewardCurrencyType.xp), true);
+      expect(currencies.contains(RewardCurrencyType.coins), true);
+      expect(currencies.contains(RewardCurrencyType.premium), true);
     });
 
     test('getAvailableCurrencies excludes zero-cost options', () {
@@ -162,7 +162,7 @@ void main() {
         name: 'Item 1',
         description: 'Test',
         type: ShopItemType.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon1',
         xpCost: 100,
         coinCost: 0,
@@ -171,7 +171,7 @@ void main() {
 
       final currencies = item.getAvailableCurrencies();
       expect(currencies.length, 1);
-      expect(currencies.contains(CurrencyType.xp), true);
+      expect(currencies.contains(RewardCurrencyType.xp), true);
     });
 
     test('JSON serialization round-trip', () {
@@ -181,7 +181,7 @@ void main() {
         name: 'テストバッジ',
         description: 'テスト説明',
         type: ShopItemType.badge,
-        rarity: ItemRarity.epic,
+        rarity: RewardItemRarity.epic,
         iconId: 'icon_test',
         xpCost: 150,
         coinCost: 75,
@@ -210,7 +210,7 @@ void main() {
         name: 'Item 1',
         description: 'Description',
         type: ShopItemType.theme,
-        rarity: ItemRarity.rare,
+        rarity: RewardItemRarity.rare,
         iconId: 'icon1',
         xpCost: 100,
         coinCost: 50,
@@ -233,14 +233,14 @@ void main() {
         itemId: 'item_1',
         quantityPurchased: 1,
         costPaid: 100,
-        currencyUsed: CurrencyType.xp,
+        currencyUsed: RewardCurrencyType.xp,
         purchasedAt: now,
       );
 
       expect(record.purchaseId, 'purchase_1');
       expect(record.userId, 'user_1');
       expect(record.costPaid, 100);
-      expect(record.currencyUsed, CurrencyType.xp);
+      expect(record.currencyUsed, RewardCurrencyType.xp);
       expect(record.isGift, false);
     });
 
@@ -252,7 +252,7 @@ void main() {
         itemId: 'item_1',
         quantityPurchased: 1,
         costPaid: 100,
-        currencyUsed: CurrencyType.coins,
+        currencyUsed: RewardCurrencyType.coins,
         purchasedAt: now,
         isGift: true,
         giftFromUserId: 'user_2',
@@ -270,7 +270,7 @@ void main() {
         itemId: 'item_test',
         quantityPurchased: 2,
         costPaid: 250,
-        currencyUsed: CurrencyType.premium,
+        currencyUsed: RewardCurrencyType.premium,
         purchasedAt: now,
         isGift: false,
       );
@@ -292,7 +292,7 @@ void main() {
         itemId: 'item_1',
         quantityPurchased: 5,
         costPaid: 500,
-        currencyUsed: CurrencyType.coins,
+        currencyUsed: RewardCurrencyType.coins,
         purchasedAt: now,
       );
 
@@ -383,7 +383,7 @@ void main() {
         itemId: 'item_1',
         quantityPurchased: 1,
         costPaid: 100,
-        currencyUsed: CurrencyType.xp,
+        currencyUsed: RewardCurrencyType.xp,
         purchasedAt: now,
       );
       final purchase2 = PurchaseRecord(
@@ -392,7 +392,7 @@ void main() {
         itemId: 'item_2',
         quantityPurchased: 1,
         costPaid: 50,
-        currencyUsed: CurrencyType.coins,
+        currencyUsed: RewardCurrencyType.coins,
         purchasedAt: now,
       );
 
@@ -436,7 +436,7 @@ void main() {
           itemId: 'item_1',
           quantityPurchased: 1,
           costPaid: 10,
-          currencyUsed: CurrencyType.coins,
+          currencyUsed: RewardCurrencyType.coins,
           purchasedAt: now,
         ),
       );
@@ -542,7 +542,7 @@ void main() {
           name: 'Item 1',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_1',
           xpCost: 50,
           coinCost: 25,
@@ -588,7 +588,7 @@ void main() {
           name: '7日バッジ',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.uncommon,
+          rarity: RewardItemRarity.uncommon,
           iconId: 'icon_7day',
           xpCost: 100,
           coinCost: 50,
@@ -634,7 +634,7 @@ void main() {
           name: 'Badge 1',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_1',
           xpCost: 50,
           coinCost: 25,
@@ -644,7 +644,7 @@ void main() {
           name: 'Theme 1',
           description: 'Test',
           type: ShopItemType.theme,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_2',
           xpCost: 50,
           coinCost: 25,
@@ -691,7 +691,7 @@ void main() {
           name: 'Common',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_1',
           xpCost: 50,
           coinCost: 25,
@@ -701,7 +701,7 @@ void main() {
           name: 'Epic',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.epic,
+          rarity: RewardItemRarity.epic,
           iconId: 'icon_2',
           xpCost: 500,
           coinCost: 250,
@@ -735,7 +735,7 @@ void main() {
         generatedAt: now,
       );
 
-      final epics = catalog.getByRarity(ItemRarity.epic);
+      final epics = catalog.getByRarity(RewardItemRarity.epic);
       expect(epics.length, 1);
       expect(epics.first.itemId, 'item_epic');
     });
@@ -748,7 +748,7 @@ void main() {
           name: 'Available',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_1',
           xpCost: 50,
           coinCost: 25,
@@ -759,7 +759,7 @@ void main() {
           name: 'Sold Out',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_2',
           xpCost: 50,
           coinCost: 25,
@@ -807,7 +807,7 @@ void main() {
           name: 'Featured',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_1',
           xpCost: 50,
           coinCost: 25,
@@ -818,7 +818,7 @@ void main() {
           name: 'Normal',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_2',
           xpCost: 50,
           coinCost: 25,
@@ -866,7 +866,7 @@ void main() {
           name: 'New',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_1',
           xpCost: 50,
           coinCost: 25,
@@ -877,7 +877,7 @@ void main() {
           name: 'Old',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_2',
           xpCost: 50,
           coinCost: 25,
@@ -925,7 +925,7 @@ void main() {
           name: 'Cheap XP',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_1',
           xpCost: 50,
           coinCost: 0,
@@ -935,7 +935,7 @@ void main() {
           name: 'Expensive',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.epic,
+          rarity: RewardItemRarity.epic,
           iconId: 'icon_2',
           xpCost: 500,
           coinCost: 250,
@@ -982,7 +982,7 @@ void main() {
           name: 'Test',
           description: 'Test',
           type: ShopItemType.badge,
-          rarity: ItemRarity.common,
+          rarity: RewardItemRarity.common,
           iconId: 'icon_test',
           xpCost: 50,
           coinCost: 25,

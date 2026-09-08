@@ -10,17 +10,17 @@ void main() {
     });
   });
 
-  group('ItemRarity Enum', () {
+  group('ShopItemRarity Enum', () {
     test('has all expected rarities', () {
-      expect(ItemRarity.values.length, 5);
-      expect(ItemRarity.values, contains(ItemRarity.legendary));
+      expect(ShopItemRarity.values.length, 5);
+      expect(ShopItemRarity.values, contains(ShopItemRarity.legendary));
     });
   });
 
-  group('CurrencyType Enum', () {
+  group('ShopCurrencyType Enum', () {
     test('has all expected types', () {
-      expect(CurrencyType.values.length, 3);
-      expect(CurrencyType.values, contains(CurrencyType.both));
+      expect(ShopCurrencyType.values.length, 3);
+      expect(ShopCurrencyType.values, contains(ShopCurrencyType.both));
     });
   });
 
@@ -32,9 +32,9 @@ void main() {
         name: 'テスト',
         description: 'Test item',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         addedAt: now,
       );
 
@@ -50,9 +50,9 @@ void main() {
         name: 'Test',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         isLimited: false,
         addedAt: now,
       );
@@ -67,9 +67,9 @@ void main() {
         name: 'Test',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         isLimited: true,
         limitedUntil: now.add(const Duration(days: 1)),
         addedAt: now,
@@ -85,9 +85,9 @@ void main() {
         name: 'Test',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         isLimited: true,
         limitedUntil: now.subtract(const Duration(days: 1)),
         addedAt: now,
@@ -103,9 +103,9 @@ void main() {
         name: 'Test',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         salesCount: 150,
         addedAt: now,
       );
@@ -120,10 +120,10 @@ void main() {
         name: 'Test',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
         premiumCoinPrice: 10,
-        acceptedCurrency: CurrencyType.both,
+        acceptedCurrency: ShopCurrencyType.both,
         addedAt: now,
       );
 
@@ -137,9 +137,9 @@ void main() {
         name: 'Test',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         salesCount: 50,
         addedAt: now,
       );
@@ -375,9 +375,9 @@ void main() {
         name: 'Available',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         isLimited: false,
         addedAt: now,
       );
@@ -386,9 +386,9 @@ void main() {
         name: 'Expired',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         isLimited: true,
         limitedUntil: now.subtract(const Duration(days: 1)),
         addedAt: now,
@@ -422,9 +422,9 @@ void main() {
         name: 'Avatar',
         description: 'Test',
         category: ItemCategory.cosmetic,
-        rarity: ItemRarity.common,
+        rarity: ShopItemRarity.common,
         coinPrice: 500,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         addedAt: now,
       );
       final powerup = ShopItem(
@@ -432,9 +432,9 @@ void main() {
         name: 'Booster',
         description: 'Test',
         category: ItemCategory.powerup,
-        rarity: ItemRarity.rare,
+        rarity: ShopItemRarity.rare,
         coinPrice: 1000,
-        acceptedCurrency: CurrencyType.coin,
+        acceptedCurrency: ShopCurrencyType.coin,
         addedAt: now,
       );
 

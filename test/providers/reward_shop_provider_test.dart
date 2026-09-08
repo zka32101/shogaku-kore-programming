@@ -70,7 +70,7 @@ void main() {
       final success = await notifier.purchaseItem(
         'test_user',
         itemId,
-        CurrencyType.xp,
+        RewardRewardCurrencyType.xp,
       );
 
       expect(success, true);
@@ -89,7 +89,7 @@ void main() {
       final success = await notifier.purchaseItem(
         'test_user',
         item.itemId,
-        CurrencyType.coins,
+        RewardCurrencyType.coins,
       );
 
       expect(success, true);
@@ -107,7 +107,7 @@ void main() {
       final success = await notifier.purchaseItem(
         'test_user',
         item.itemId,
-        CurrencyType.premium,
+        RewardCurrencyType.premium,
       );
 
       expect(success, true);
@@ -126,7 +126,7 @@ void main() {
         name: 'Test',
         description: 'Test',
         type: ShopItemType.badge,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon',
         xpCost: 0,
         coinCost: 50,
@@ -135,7 +135,7 @@ void main() {
       final success = await notifier.purchaseItem(
         'test_user',
         'test_item',
-        CurrencyType.xp,
+        RewardCurrencyType.xp,
       );
 
       expect(success, false);
@@ -152,7 +152,7 @@ void main() {
       final first = await notifier.purchaseItem(
         'test_user',
         item.itemId,
-        CurrencyType.xp,
+        RewardCurrencyType.xp,
       );
       expect(first, true);
 
@@ -160,7 +160,7 @@ void main() {
       final second = await notifier.purchaseItem(
         'test_user',
         item.itemId,
-        CurrencyType.xp,
+        RewardCurrencyType.xp,
       );
       expect(second, false);
     });
@@ -175,7 +175,7 @@ void main() {
         name: 'Sold Out',
         description: 'Test',
         type: ShopItemType.badge,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon',
         xpCost: 50,
         coinCost: 25,
@@ -185,7 +185,7 @@ void main() {
       final success = await notifier.purchaseItem(
         'test_user',
         'sold_out',
-        CurrencyType.xp,
+        RewardCurrencyType.xp,
       );
 
       expect(success, false);
@@ -200,7 +200,7 @@ void main() {
       await notifier.purchaseItem(
         'test_user',
         itemId,
-        CurrencyType.xp,
+        RewardCurrencyType.xp,
         quantity: 2,
       );
 
@@ -219,7 +219,7 @@ void main() {
       await notifier.purchaseItem(
         'test_user',
         item.itemId,
-        CurrencyType.xp,
+        RewardCurrencyType.xp,
       );
 
       final state = container.read(shopProvider);
@@ -237,7 +237,7 @@ void main() {
       await notifier.purchaseItem(
         'test_user',
         itemId,
-        CurrencyType.xp,
+        RewardCurrencyType.xp,
       );
 
       final state = container.read(shopProvider);
@@ -253,7 +253,7 @@ void main() {
       final success = await notifier.purchaseItem(
         'test_user',
         itemId,
-        CurrencyType.coins,
+        RewardCurrencyType.coins,
         giftToUserId: 'user_2',
       );
 
@@ -271,7 +271,7 @@ void main() {
 
       final itemId = container.read(shopProvider).catalog!.allItems.first.itemId;
 
-      await notifier.purchaseItem('test_user', itemId, CurrencyType.xp);
+      await notifier.purchaseItem('test_user', itemId, RewardCurrencyType.xp);
 
       var state = container.read(shopProvider);
       final purchaseId = state.catalog!.inventory.purchaseHistory.first.purchaseId;
@@ -289,7 +289,7 @@ void main() {
 
       final itemId = container.read(shopProvider).catalog!.allItems.first.itemId;
 
-      await notifier.purchaseItem('test_user', itemId, CurrencyType.coins);
+      await notifier.purchaseItem('test_user', itemId, RewardCurrencyType.coins);
 
       var state = container.read(shopProvider);
       expect(state.catalog!.inventory.getItemCount(itemId), 1);
@@ -308,7 +308,7 @@ void main() {
       final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.coinCost > 0);
 
-      await notifier.purchaseItem('test_user', item.itemId, CurrencyType.coins);
+      await notifier.purchaseItem('test_user', item.itemId, RewardCurrencyType.coins);
 
       var state = container.read(shopProvider);
       final initialSpent = state.catalog!.stats.totalCoinsSpent;
@@ -352,7 +352,7 @@ void main() {
       await notifier.initializeShop('test_user');
 
       final itemId = container.read(shopProvider).catalog!.allItems.first.itemId;
-      await notifier.purchaseItem('test_user', itemId, CurrencyType.xp);
+      await notifier.purchaseItem('test_user', itemId, RewardCurrencyType.xp);
 
       var state = container.read(shopProvider);
       expect(state.recentlyCompleted.isNotEmpty, true);
@@ -370,7 +370,7 @@ void main() {
       final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.xpCost > 0);
 
-      await notifier.purchaseItem('test_user', item.itemId, CurrencyType.xp);
+      await notifier.purchaseItem('test_user', item.itemId, RewardCurrencyType.xp);
 
       final total = notifier.getTotalSpent();
       expect(total, greaterThan(0));
@@ -381,7 +381,7 @@ void main() {
       await notifier.initializeShop('persist_test');
 
       final itemId = container.read(shopProvider).catalog!.allItems.first.itemId;
-      await notifier.purchaseItem('persist_test', itemId, CurrencyType.coins);
+      await notifier.purchaseItem('persist_test', itemId, RewardCurrencyType.coins);
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.containsKey('shop_inventory_persist_test'), true);
@@ -395,8 +395,8 @@ void main() {
       final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.purchaseLimit == -1);
 
-      await notifier.purchaseItem('test_user', item.itemId, CurrencyType.xp);
-      await notifier.purchaseItem('test_user', item.itemId, CurrencyType.xp);
+      await notifier.purchaseItem('test_user', item.itemId, RewardCurrencyType.xp);
+      await notifier.purchaseItem('test_user', item.itemId, RewardCurrencyType.xp);
 
       final state = container.read(shopProvider);
       expect(state.catalog!.inventory.getPurchaseCount(item.itemId), 2);
@@ -410,8 +410,8 @@ void main() {
       final item = container.read(shopProvider).catalog!.allItems
           .firstWhere((i) => i.xpCost > 0 && i.coinCost > 0);
 
-      await notifier.purchaseItem('test_user', item.itemId, CurrencyType.xp);
-      await notifier.purchaseItem('test_user', item.itemId, CurrencyType.coins);
+      await notifier.purchaseItem('test_user', item.itemId, RewardCurrencyType.xp);
+      await notifier.purchaseItem('test_user', item.itemId, RewardCurrencyType.coins);
 
       final state = container.read(shopProvider);
       expect(state.catalog!.stats.totalXpSpent, greaterThan(0));
@@ -488,7 +488,7 @@ void main() {
       final success = await notifier.purchaseItem(
         'test_user',
         bundle.itemId,
-        CurrencyType.xp,
+        RewardCurrencyType.xp,
       );
 
       expect(success, true);
@@ -508,7 +508,7 @@ void main() {
         final success = await notifier.purchaseItem(
           'test_user',
           item.itemId,
-          CurrencyType.xp,
+          RewardCurrencyType.xp,
         );
         expect(success, false);
       }
@@ -523,7 +523,7 @@ void main() {
 
       // Simulate multiple purchases
       for (int i = 0; i < 105; i++) {
-        await notifier.purchaseItem('test_user', item.itemId, CurrencyType.coins);
+        await notifier.purchaseItem('test_user', item.itemId, RewardCurrencyType.coins);
       }
 
       final state = container.read(shopProvider);

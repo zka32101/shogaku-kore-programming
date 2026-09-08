@@ -122,7 +122,7 @@ void main() {
       var state = container.read(shopProvider);
       // Find item that only accepts premium coins
       final itemId = state.collection!.allItems
-          .firstWhere((i) => i.acceptedCurrency == CurrencyType.premiumCoin)
+          .firstWhere((i) => i.acceptedCurrency == ShopCurrencyType.premiumCoin)
           .itemId;
 
       await notifier.purchaseItem('test_user', itemId, 1, 'coin');
@@ -262,7 +262,7 @@ void main() {
       final notifier = container.read(shopProvider.notifier);
       await notifier.initializeShop('test_user');
 
-      final common = container.read(itemsByRarityProvider(ItemRarity.common));
+      final common = container.read(itemsByRarityProvider(ShopItemRarity.common));
       expect(common.isNotEmpty, true);
     });
 
