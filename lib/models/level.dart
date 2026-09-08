@@ -100,12 +100,16 @@ class UserLevelProgress {
   /// レベルアップ可能か判定
   bool get canLevelUp => remainingXp == 0;
 
-  /// XP要件に基づいて次のレベルまでのXPを計算
+  /// XP要件に基づいて次のレベルまでの累積XPを計算
   static int _calculateRequiredXp(int nextLevelNumber) {
-    // 指数関数的な成長: 各レベルは前のレベルより1.15倍のXPが必要
-    // レベル1: 100XP, レベル2: 115XP, ..., レベル50: 数千XP
-    int baseXp = 100;
-    return (baseXp * pow(1.15, nextLevelNumber - 1)).toInt();
+    // 指数関数的成長: 累積XP (各レベルは1.15倍のXPが必要)
+    // レベル1: 100XP, レベル2: 215XP (100+115), ..., レベル50: 数千XP
+    const baseXp = 100;
+    int cumulativeXp = 0;
+    for (int i = 1; i <= nextLevelNumber; i++) {
+      cumulativeXp += (baseXp * pow(1.15, i - 1)).toInt();
+    }
+    return cumulativeXp;
   }
 
   @override
@@ -208,10 +212,14 @@ class DefaultLevels {
   }
 
   static int _calculateLevelXp(int levelNumber) {
-    // 指数関数的成長: 各レベルは1.15倍のXPが必要
-    // レベル1: 100XP, レベル2: 115XP, ..., レベル50: ~50,000 XP
+    // 指数関数的成長: 累積XP (各レベルは1.15倍のXPが必要)
+    // レベル1: 100XP, レベル2: 215XP (100+115), ..., レベル50: 数千XP
     const baseXp = 100;
-    return (baseXp * pow(1.15, levelNumber - 1)).toInt();
+    int cumulativeXp = 0;
+    for (int i = 1; i <= levelNumber; i++) {
+      cumulativeXp += (baseXp * pow(1.15, i - 1)).toInt();
+    }
+    return cumulativeXp;
   }
 
   /// デフォルトレベルを取得
