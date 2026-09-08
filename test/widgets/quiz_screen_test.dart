@@ -25,10 +25,12 @@ void main() {
     // Create a mock challenge for testing
     final mockChallenge = Stage(
       id: 'test_challenge_1',
+      stageNumber: 1,
       title: 'Python基礎',
       description: 'Python基本の問題です',
-      level: StageLevel.beginner,
-      iconId: 'icon_1',
+      level: '初級',
+      icon: 'icon_1',
+      isFree: true,
       questions: [
         Question(
           id: 'q1',
@@ -49,7 +51,6 @@ void main() {
           hint: '2足す3は？',
         ),
       ],
-      requiredStars: 1,
       conceptExplanation: 'Pythonの基本的な文法を学びます',
       type: 'quiz',
     );
@@ -216,10 +217,12 @@ void main() {
       // Create a single-question challenge for easier testing
       final singleQuestionChallenge = Stage(
         id: 'test_single',
+        stageNumber: 1,
         title: 'Single Question Quiz',
         description: 'One question',
-        level: StageLevel.beginner,
-        iconId: 'icon_1',
+        level: '初級',
+        icon: 'icon_1',
+        isFree: true,
         questions: [
           Question(
             id: 'q1',
@@ -230,7 +233,6 @@ void main() {
             hint: 'Basic math',
           ),
         ],
-        requiredStars: 1,
         type: 'quiz',
       );
 

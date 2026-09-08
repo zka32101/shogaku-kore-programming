@@ -272,10 +272,9 @@ void main() {
           icon: '🧩',
           stageNumber: 1,
           level: '初級',
+          type: 'quiz',
+          isFree: true,
           questions: const [],
-          hints: const [],
-          maxStars: 3,
-          estimatedTime: '5 min',
         );
 
         await tester.pumpWidget(
@@ -302,10 +301,9 @@ void main() {
           icon: '📦',
           stageNumber: 2,
           level: '中級',
+          type: 'quiz',
+          isFree: true,
           questions: const [],
-          hints: const [],
-          maxStars: 3,
-          estimatedTime: '10 min',
         );
 
         await tester.pumpWidget(
@@ -335,10 +333,9 @@ void main() {
           icon: '🔄',
           stageNumber: 3,
           level: '上級',
+          type: 'quiz',
+          isFree: true,
           questions: const [],
-          hints: const [],
-          maxStars: 3,
-          estimatedTime: '15 min',
         );
 
         final completedDate = DateTime.utc(2026, 9, 5);
@@ -367,10 +364,9 @@ void main() {
           icon: '⚙️',
           stageNumber: 4,
           level: '初級',
+          type: 'quiz',
+          isFree: true,
           questions: const [],
-          hints: const [],
-          maxStars: 3,
-          estimatedTime: '12 min',
         );
 
         await tester.pumpWidget(

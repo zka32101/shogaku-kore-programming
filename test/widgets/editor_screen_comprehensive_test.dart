@@ -26,12 +26,13 @@ void main() {
   // Create mock challenge for testing
   final mockChallenge = Stage(
     id: 'editor_test_1',
+    stageNumber: 1,
     title: 'ブロックプログラミング基礎',
     description: '視覚的なブロックでプログラムを組み立てます',
-    level: StageLevel.beginner,
-    iconId: 'icon_1',
+    level: '初級',
+    icon: 'icon_1',
+    isFree: true,
     questions: [],
-    requiredStars: 1,
     conceptExplanation: 'ブロックを組み合わせてロボットを動かします',
     type: 'editor',
   );

@@ -25,10 +25,12 @@ void main() {
   // Create mock stage/challenge for testing
   final mockStage = Stage(
     id: 'quiz_test_1',
+    stageNumber: 1,
     title: 'Python基礎',
     description: 'Python基本の問題です',
-    level: StageLevel.beginner,
-    iconId: 'icon_1',
+    level: '初級',
+    icon: 'icon_1',
+    isFree: true,
     questions: [
       Question(
         id: 'q1',
@@ -58,7 +60,6 @@ void main() {
         hint: '角括弧を使用します',
       ),
     ],
-    requiredStars: 1,
     conceptExplanation: 'Pythonの基本的な文法を学びます',
     type: 'quiz',
   );
@@ -940,12 +941,13 @@ void main() {
           (WidgetTester tester) async {
         final emptyStage = Stage(
           id: 'empty',
+          stageNumber: 2,
           title: 'Empty Quiz',
           description: 'No questions',
-          level: StageLevel.beginner,
-          iconId: 'icon_1',
+          level: '初級',
+          icon: 'icon_1',
+          isFree: true,
           questions: [],
-          requiredStars: 1,
           type: 'quiz',
         );
 
@@ -966,21 +968,22 @@ void main() {
           (WidgetTester tester) async {
         final noExplainStage = Stage(
           id: 'no_explain',
+          stageNumber: 3,
           title: 'Quiz',
           description: 'Test',
-          level: StageLevel.beginner,
-          iconId: 'icon_1',
+          level: '初級',
+          icon: 'icon_1',
+          isFree: true,
           questions: [
             Question(
               id: 'q1',
               text: 'Question without explanation?',
               options: ['a', 'b', 'c', 'd'],
               correctIndex: 0,
-              // No explanation provided
+              explanation: 'The answer is a',
               hint: 'No hint',
             ),
           ],
-          requiredStars: 1,
           type: 'quiz',
         );
 

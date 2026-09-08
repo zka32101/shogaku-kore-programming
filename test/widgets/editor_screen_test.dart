@@ -25,12 +25,13 @@ void main() {
     // Create a mock challenge for visual programming
     final mockChallenge = Stage(
       id: 'editor_test_1',
+      stageNumber: 1,
       title: 'ロボット移動プログラム',
       description: 'ロボットを右に3歩、下に2歩動かしましょう',
-      level: StageLevel.beginner,
-      iconId: 'icon_robot',
+      level: '初級',
+      icon: 'icon_robot',
+      isFree: true,
       questions: const [],
-      requiredStars: 1,
       conceptExplanation: '順序を意識してブロックを組み立てます',
       type: 'editor',
       blockLibrary: [

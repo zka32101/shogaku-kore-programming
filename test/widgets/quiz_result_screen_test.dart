@@ -44,12 +44,13 @@ void main() {
     // Create mock challenge
     final mockChallenge = Stage(
       id: 'test_challenge',
+      stageNumber: 1,
       title: 'Math Quiz',
       description: 'Basic math questions',
-      level: StageLevel.beginner,
-      iconId: 'icon_1',
+      level: '初級',
+      icon: 'icon_1',
+      isFree: true,
       questions: const [],
-      requiredStars: 1,
       type: 'quiz',
     );
 
@@ -402,12 +403,13 @@ void main() {
         (WidgetTester tester) async {
       final nextChallenge = Stage(
         id: 'test_challenge_2',
+        stageNumber: 2,
         title: 'Advanced Math',
         description: 'More complex math',
-        level: StageLevel.intermediate,
-        iconId: 'icon_2',
+        level: '中級',
+        icon: 'icon_2',
+        isFree: true,
         questions: const [],
-        requiredStars: 2,
         type: 'quiz',
       );
 
