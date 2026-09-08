@@ -344,8 +344,8 @@ void main() {
           challengeId: 'ch_1',
           title: 'Challenge 1',
           description: '',
-          category: ChallengeCategory.learning,
-          difficulty: ChallengeDifficulty.normal,
+          category: WeeklyChallengeCategory.learning,
+          difficulty: WeeklyChallengeDifficulty.normal,
           iconId: 'i1',
           targetValue: 100,
           metricKey: 'm1',
@@ -430,7 +430,7 @@ void main() {
         generatedAt: now,
       );
 
-      final learningList = collection.getByCategory(ChallengeCategory.learning);
+      final learningList = collection.getByCategory(WeeklyChallengeCategory.learning);
       expect(learningList.length, 1);
       expect(learningList.first.challengeId, 'ch_learn');
     });
