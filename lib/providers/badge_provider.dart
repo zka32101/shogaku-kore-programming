@@ -77,7 +77,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
 
     // Rebuild all badges with correct isUnlocked status based on unlockedIds
     final updatedBadges = state.badges.map((badge) {
-      final shouldBeUnlocked = unlockedIds.contains(badge.id);
+      final shouldBeUnlocked = badge.id != null && unlockedIds.contains(badge.id);
       if (badge.isUnlocked != shouldBeUnlocked) {
         return Badge(
           id: badge.id,
@@ -130,7 +130,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
       }
 
       // Update isUnlocked status for all badges based on unlockedIds
-      final shouldBeUnlocked = unlockedIds.contains(badge.id);
+      final shouldBeUnlocked = badge.id != null && unlockedIds.contains(badge.id);
       if (badge.isUnlocked != shouldBeUnlocked) {
         return Badge(
           id: badge.id,
