@@ -63,9 +63,8 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
   }
 
   /// バッジの初期化
-  Future<void> _initializeBadges() async {
+  void _initializeBadges() {
     final badges = _createDefaultBadges();
-
     state = BadgeState(badges: badges);
   }
 
