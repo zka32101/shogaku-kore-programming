@@ -1,5 +1,6 @@
 /// Achievement badge model
 class Badge {
+  final String? id; // Unique identifier for badge
   final String icon;
   final String name;
   final String description;
@@ -11,6 +12,7 @@ class Badge {
   final int? progressTarget;
 
   const Badge({
+    this.id,
     required this.icon,
     required this.name,
     required this.description,

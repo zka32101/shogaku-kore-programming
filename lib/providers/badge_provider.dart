@@ -76,7 +76,25 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
       unlockedIds.add(badgeId);
     }
 
+    // Update the badge object to mark as unlocked
+    final updatedBadges = state.badges.map((badge) {
+      if (badge.id == badgeId) {
+        return Badge(
+          id: badge.id,
+          icon: badge.icon,
+          name: badge.name,
+          description: badge.description,
+          category: badge.category,
+          isUnlocked: true,
+          progressCurrent: badge.progressCurrent,
+          progressTarget: badge.progressTarget,
+        );
+      }
+      return badge;
+    }).toList();
+
     state = state.copyWith(
+      badges: updatedBadges,
       unlockedBadgeIds: unlockedIds,
       lastUpdatedAt: DateTime.now(),
     );
@@ -92,7 +110,25 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
       unlockedIds.add(badgeId);
     }
 
+    // Update the badge object with progress
+    final updatedBadges = state.badges.map((badge) {
+      if (badge.id == badgeId) {
+        return Badge(
+          id: badge.id,
+          icon: badge.icon,
+          name: badge.name,
+          description: badge.description,
+          category: badge.category,
+          isUnlocked: progress >= (badge.progressTarget ?? 0),
+          progressCurrent: progress,
+          progressTarget: badge.progressTarget,
+        );
+      }
+      return badge;
+    }).toList();
+
     state = state.copyWith(
+      badges: updatedBadges,
       badgeProgress: progress_map,
       unlockedBadgeIds: unlockedIds,
       lastUpdatedAt: DateTime.now(),
@@ -150,6 +186,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
   static List<Badge> _createDefaultBadges() => [
         // クイズ系バッジ
         Badge(
+          id: 'quiz_starter',
           icon: '🎯',
           name: 'クイズ始める',
           description: '初めてクイズに挑戦した',
@@ -158,6 +195,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
           progressTarget: 1,
         ),
         Badge(
+          id: 'quiz_master_10',
           icon: '⭐',
           name: 'クイズマスター Lv.1',
           description: 'クイズを10問正解した',
@@ -166,6 +204,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
           progressTarget: 10,
         ),
         Badge(
+          id: 'quiz_master_50',
           icon: '✨',
           name: 'クイズマスター Lv.2',
           description: 'クイズを50問正解した',
@@ -174,6 +213,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
           progressTarget: 50,
         ),
         Badge(
+          id: 'quiz_master_100',
           icon: '👑',
           name: 'クイズマスター Lv.3',
           description: 'クイズを100問正解した',
@@ -184,6 +224,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
 
         // 進捗系バッジ
         Badge(
+          id: 'lesson_complete_1',
           icon: '✅',
           name: 'レッスン完了',
           description: 'レッスンを1つ完了した',
@@ -192,6 +233,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
           progressTarget: 1,
         ),
         Badge(
+          id: 'lesson_complete_10',
           icon: '🎓',
           name: 'レッスン達成者',
           description: 'レッスンを10個完了した',
@@ -202,6 +244,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
 
         // 継続系バッジ
         Badge(
+          id: 'daily_1day',
           icon: '🔥',
           name: '毎日挑戦',
           description: '1日連続で学習した',
@@ -210,6 +253,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
           progressTarget: 1,
         ),
         Badge(
+          id: 'daily_7day',
           icon: '🌟',
           name: '1週間チャレンジ',
           description: '7日連続で学習した',
@@ -220,6 +264,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
 
         // 習熟系バッジ
         Badge(
+          id: 'mastery_accuracy_90',
           icon: '🎯',
           name: '正確性マスター',
           description: 'クイズの正答率が90%以上',
@@ -230,6 +275,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
 
         // ソーシャル系バッジ
         Badge(
+          id: 'social_ranking_top10',
           icon: '🏆',
           name: 'ランキング入賞',
           description: 'ランキングでトップ10に入った',
@@ -240,6 +286,7 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
 
         // スペシャル系バッジ
         Badge(
+          id: 'milestone_100hours',
           icon: '💎',
           name: '100時間マイルストーン',
           description: '学習時間が累計100時間に達した',
