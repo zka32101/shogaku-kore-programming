@@ -66,7 +66,7 @@ void main() {
 
   group('WeeklyLearningStats Tests', () {
     test('WeeklyLearningStats calculation', () {
-      final monday = DateTime.utc(2026, 9, 1); // Tuesday actually
+      final monday = DateTime.now(); // Tuesday actually
       final dailyStats = [
         DailyLearningStats(
           date: monday,
@@ -92,7 +92,7 @@ void main() {
     });
 
     test('WeeklyLearningStats consecutiveDays calculation', () {
-      final monday = DateTime.utc(2026, 9, 1);
+      final monday = DateTime.now();
       final dailyStats = [
         DailyLearningStats(
           date: monday,
@@ -121,7 +121,7 @@ void main() {
     });
 
     test('WeeklyLearningStats JSON serialization', () {
-      final monday = DateTime.utc(2026, 9, 1);
+      final monday = DateTime.now();
       final dailyStats = [
         DailyLearningStats(
           date: monday,
@@ -146,10 +146,10 @@ void main() {
   group('MonthlyLearningStats Tests', () {
     test('MonthlyLearningStats calculation', () {
       final week1 = WeeklyLearningStats(
-        startDate: DateTime.utc(2026, 9, 1),
+        startDate: DateTime.now(),
         dailyStats: [
           DailyLearningStats(
-            date: DateTime.utc(2026, 9, 1),
+            date: DateTime.now(),
             quizzesCompleted: 10,
             quizzesCorrect: 8,
           ),
@@ -180,7 +180,7 @@ void main() {
     test('MonthlyLearningStats average accuracy calculation', () {
       final dailyStats1 = [
         DailyLearningStats(
-          date: DateTime.utc(2026, 9, 1),
+          date: DateTime.now(),
           quizzesCompleted: 10,
           quizzesCorrect: 10,
         ),
@@ -199,7 +199,7 @@ void main() {
         month: 9,
         weeklyStats: [
           WeeklyLearningStats(
-            startDate: DateTime.utc(2026, 9, 1),
+            startDate: DateTime.now(),
             dailyStats: dailyStats1,
           ),
           WeeklyLearningStats(
@@ -218,10 +218,10 @@ void main() {
         month: 9,
         weeklyStats: [
           WeeklyLearningStats(
-            startDate: DateTime.utc(2026, 9, 1),
+            startDate: DateTime.now(),
             dailyStats: [
               DailyLearningStats(
-                date: DateTime.utc(2026, 9, 1),
+                date: DateTime.now(),
                 quizzesCompleted: 10,
               ),
             ],

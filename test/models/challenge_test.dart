@@ -142,7 +142,7 @@ void main() {
         challengeId: 'ch-1',
         status: ChallengeStatus.inProgress,
         currentProgress: 5,
-        startedAt: DateTime.utc(2026, 9, 1),
+        startedAt: DateTime.now(),
         attemptCount: 1,
       );
     });
@@ -163,7 +163,7 @@ void main() {
         challengeId: 'ch-1',
         status: ChallengeStatus.completed,
         currentProgress: 10,
-        startedAt: DateTime.utc(2026, 9, 1),
+        startedAt: DateTime.now(),
         completedAt: DateTime.utc(2026, 9, 1, 12),
         attemptCount: 1,
       );
