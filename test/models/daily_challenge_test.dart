@@ -82,7 +82,7 @@ void main() {
       expect(challenge.title, 'チャレンジ');
       expect(challenge.category, DailyChallengeCategory.reading);
       expect(challenge.totalCompletions, 0);
-      expect(challenge.difficulty_multiplier, 1);
+      expect(challenge.difficultyMultiplier, 1);
     });
 
     test('isAvailable returns true for active challenges', () {
@@ -191,7 +191,7 @@ void main() {
         reward: ChallengeReward(currency: RewardCurrency.xp, amount: 100),
         createdAt: now,
         startsAt: now,
-        difficulty_multiplier: 2,
+        difficultyMultiplier: 2,
       );
 
       expect(challenge.getAdjustedReward(), 200);
