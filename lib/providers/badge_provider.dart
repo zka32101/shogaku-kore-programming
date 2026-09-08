@@ -57,6 +57,69 @@ class BadgeNotifier extends StateNotifier<BadgeState> {
     state = BadgeState(badges: badges);
   }
 
+  /// バッジを直接ロック解除
+  Future<void> unlockBadge(String badgeId) async {
+    final updatedBadges = state.badges.map((badge) {
+      if (badge.name.contains(badgeId) || badge.icon == badgeId) {
+        return Badge(
+          icon: badge.icon,
+          name: badge.name,
+          description: badge.description,
+          category: badge.category,
+          isUnlocked: true,
+          progressCurrent: badge.progressCurrent,
+          progressTarget: badge.progressTarget,
+        );
+      }
+      return badge;
+    }).toList();
+
+    state = BadgeState(badges: updatedBadges);
+  }
+
+  /// バッジの進捗を更新
+  Future<void> updateBadgeProgress(String badgeId, int progress) async {
+    final updatedBadges = state.badges.map((badge) {
+      if (badge.name.contains(badgeId) || badge.icon == badgeId) {
+        return Badge(
+          icon: badge.icon,
+          name: badge.name,
+          description: badge.description,
+          category: badge.category,
+          isUnlocked: progress >= (badge.progressTarget ?? 0),
+          progressCurrent: progress,
+          progressTarget: badge.progressTarget,
+        );
+      }
+      return badge;
+    }).toList();
+
+    state = BadgeState(badges: updatedBadges);
+  }
+
+  /// クイズ正答数をインクリメント
+  Future<void> incrementQuizCorrectCount() async {
+    await updateBadgeProgress('quiz_starter', 1);
+    await updateBadgeProgress('quiz_master_10', 10);
+  }
+
+  /// レッスン完了
+  Future<void> completeLesson() async {
+    await updateBadgeProgress('lesson_complete_1', 1);
+    await updateBadgeProgress('lesson_complete_10', 10);
+  }
+
+  /// 連続日数を更新
+  Future<void> updateConsecutiveDays(int days) async {
+    await updateBadgeProgress('daily_1day', days);
+    await updateBadgeProgress('daily_7day', days);
+  }
+
+  /// 勉強時間を更新
+  Future<void> updateStudyHours(int hours) async {
+    await updateBadgeProgress('milestone_100hours', hours);
+  }
+
   /// デフォルトバッジを作成
   static List<Badge> _createDefaultBadges() => [
         // クイズ系バッジ
