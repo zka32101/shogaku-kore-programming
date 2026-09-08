@@ -176,7 +176,7 @@ void main() {
           ProviderScope(
             child: MaterialApp(
               home: StageListScreen(
-                initialLevel: StageLevel.intermediate,
+                initialLevel: '中級',
               ),
             ),
           ),
