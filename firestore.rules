@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── ユーティリティ ───
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // ─── users コレクション ───
+    // 公開プロフィール（nickname / avatarEmoji / points のみ）。
+    // フレンドをユーザーIDで検索できるよう、認証済みユーザーなら誰でも
+    // 読み取り可能にする。書き込み（公開プロフィールの同期）は本人のみ。
+    // メールアドレス等の個人情報はここには一切保存しない。
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow write: if isOwner(userId);
+
+      // フレンド一覧: 自分の一覧は自分だけが読める。
+      // 承認時に「相手の friends に自分のエントリを書く」必要があるため、
+      // 書き込みは「自分の friends に自分が書く」か「friendId が自分（＝相手が
+      // 自分を追加する）」のいずれかを許可する。
+      match /friends/{friendId} {
+        allow read: if isOwner(userId);
+        allow write: if isAuth() &&
+          (request.auth.uid == userId || request.auth.uid == friendId);
+      }
+
+      // 受信中フレンド申請: 自分宛の申請は自分だけが読める・削除できる
+      // （承認・拒否）。書き込み（申請の送信）は申請先(userId)以外の
+      // 認証済みユーザーが、ドキュメントID(=自分のuid)を自分のuidと
+      // 一致させた場合のみ許可する（他人になりすました申請を防ぐ）。
+      match /friendRequests/{fromUserId} {
+        allow read, delete: if isOwner(userId);
+        allow create: if isAuth() &&
+          request.auth.uid == fromUserId &&
+          request.auth.uid != userId;
+        allow update: if false;
+      }
+    }
+
+    // ─── その他のコレクションは拒否 ───
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

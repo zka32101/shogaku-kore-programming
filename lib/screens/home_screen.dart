@@ -26,6 +26,8 @@ import 'wrong_answers_list_screen.dart';
 import 'quiz_result_screen.dart' show QuizAnswer;
 import 'flashcard_screen.dart';
 import 'profile_screen.dart';
+import 'friends_list_screen.dart';
+import '../providers/friends_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../providers/wrong_answers_provider.dart';
 import '../providers/favorites_provider.dart';
@@ -70,6 +72,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
     _tipIndex = dayOfYear % _tips.length;
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+    // フレンド数バッジ表示用に、ホーム画面表示時にフレンド一覧を軽く読み込んでおく
+    // （公開プロフィールの同期は負荷が高いため friends_list_screen 側でのみ行う）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(friendsProvider.notifier).loadFriends();
+    });
   }
 
   @override
@@ -3533,6 +3540,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ? '✅ 習得済み $masteredCount / ${kFlashcards.length}枚'
         : '単語・概念を暗記しよう';
     final wrongState = ref.watch(wrongAnswersProvider);
+    final friendCount = ref.watch(friendCountProvider);
     return Column(
       children: [
         Row(
@@ -3581,6 +3589,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SoundService().playTap();
             Navigator.of(context).push(
               smoothPageRoute(const FlashcardScreen()),
+            );
+          },
+        ),
+        const SizedBox(height: 10),
+        _MiniGameCard(
+          emoji: '👫',
+          label: 'フレンド',
+          sublabel: friendCount > 0 ? 'フレンド $friendCount人' : '友だちを追加してみよう',
+          color: const Color(0xFF3498DB),
+          onTap: () {
+            HapticService.lightImpact();
+            SoundService().playTap();
+            Navigator.of(context).push(
+              smoothPageRoute(const FriendsListScreen()),
             );
           },
         ),

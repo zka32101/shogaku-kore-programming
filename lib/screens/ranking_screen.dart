@@ -9,12 +9,16 @@ import '../providers/profile_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
+import '../providers/friends_provider.dart';
 import '../widgets/shortcut_help.dart';
+import '../utils/page_transitions.dart';
 import 'badge_unlock_screen.dart';
+import 'friends_list_screen.dart';
 
-// このアプリには他ユーザーのスコアを集計するバックエンド（対戦サーバー）が
-// まだ無いため、この画面では「自分の記録」と「今週のチャレンジ」のみを表示する。
-// 友だちとのランキング対戦機能は今後実装予定。
+// このアプリには全国のユーザーのスコアを集計するバックエンド（対戦サーバー）が
+// まだ無いため、この画面では「自分の記録」「今週のチャレンジ」に加えて、
+// フレンド機能（friends_provider）を使った「フレンドランキング」を表示する。
+// 全国ランキングは今後実装予定。
 
 class RankingScreen extends ConsumerStatefulWidget {
   const RankingScreen({super.key});
@@ -30,6 +34,11 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(friendsProvider.notifier).loadFriends();
+      // フレンドランキング表示のため、各フレンドの最新ポイントを取得し直す
+      await ref.read(friendsProvider.notifier).refreshFriendPoints();
+    });
   }
 
   @override
@@ -84,6 +93,8 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                 onRefresh: () async {
                   ref.invalidate(progressProvider);
                   ref.invalidate(profileProvider);
+                  await ref.read(friendsProvider.notifier).loadFriends();
+                  await ref.read(friendsProvider.notifier).refreshFriendPoints();
                   await Future.delayed(const Duration(milliseconds: 400));
                 },
                 child: ListView(
@@ -94,6 +105,10 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                         .animate()
                         .fadeIn(duration: 350.ms)
                         .slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+                    _FriendRankingCard(myPoints: myPoints, myName: profile.nickname, myIcon: profile.avatarEmoji)
+                        .animate(delay: 100.ms)
+                        .fadeIn(duration: 300.ms)
+                        .slideY(begin: 0.08, curve: Curves.easeOut, duration: 300.ms),
                     _ComingSoonBanner()
                         .animate(delay: 150.ms)
                         .fadeIn(duration: 300.ms),
@@ -197,7 +212,7 @@ class _ComingSoonBanner extends StatelessWidget {
           const Text('🚧', style: TextStyle(fontSize: 28)),
           const SizedBox(height: 8),
           Text(
-            'みんなとのランキング対戦は準備中',
+            '全国みんなとのランキング対戦は準備中',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -207,7 +222,7 @@ class _ComingSoonBanner extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '友だちや全国のみんなと点数を競える機能を今後追加予定です。\nそれまでは「今週のチャレンジ」で自分の記録を伸ばそう！',
+            '全国のみんなと点数を競える機能は今後追加予定です。\nそれまでは上の「フレンドランキング」や「今週のチャレンジ」で\n自分の記録を伸ばそう！',
             style: TextStyle(
               fontSize: 12,
               color: context.textSecondary,
@@ -215,6 +230,154 @@ class _ComingSoonBanner extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── フレンドランキングカード ────────────────────────────────────────────────
+class _FriendRankingCard extends ConsumerWidget {
+  final int myPoints;
+  final String myName;
+  final String myIcon;
+
+  const _FriendRankingCard({
+    required this.myPoints,
+    required this.myName,
+    required this.myIcon,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final friendRanking = ref.watch(friendRankingProvider);
+
+    // 自分を含めた順位表を作る
+    final entries = <(String name, String icon, int points, bool isMe)>[
+      (myName, myIcon, myPoints, true),
+      for (final f in friendRanking) (f.nickname, f.avatarEmoji, f.points, false),
+    ]..sort((a, b) => b.$3.compareTo(a.$3));
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: context.cardBg,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(color: context.shadowColor, blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF3498DB), Color(0xFF2980B9)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+            ),
+            child: Row(
+              children: [
+                const Text('👫', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 6),
+                const Expanded(
+                  child: Text(
+                    'フレンドランキング',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    HapticService.lightImpact();
+                    Navigator.of(context).push(smoothPageRoute(const FriendsListScreen()));
+                  },
+                  icon: const Icon(Icons.person_add_alt_1, size: 14, color: Colors.white),
+                  label: const Text(
+                    'フレンド管理',
+                    style: TextStyle(fontSize: 11, color: Colors.white),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (friendRanking.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'フレンドを追加すると、ここでポイントを競い合えるよ！',
+                style: TextStyle(fontSize: 12, color: context.textSecondary, height: 1.5),
+                textAlign: TextAlign.center,
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: entries.asMap().entries.map((entry) {
+                  final rank = entry.key + 1;
+                  final (name, icon, points, isMe) = entry.value;
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isMe
+                          ? const Color(0xFF3498DB).withValues(alpha: 0.1)
+                          : context.shadowColor.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(8),
+                      border: isMe
+                          ? Border.all(color: const Color(0xFF3498DB).withValues(alpha: 0.4))
+                          : null,
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 22,
+                          child: Text(
+                            '$rank',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: context.textSecondary,
+                            ),
+                          ),
+                        ),
+                        Text(icon, style: const TextStyle(fontSize: 16)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            isMe ? '$name（あなた）' : name,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: context.textPrimary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          '${points}pt',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF3498DB),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
         ],
       ),
     );
