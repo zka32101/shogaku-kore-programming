@@ -38,6 +38,9 @@ dependencies:
 
   # Share functionality
   share_plus: ^13.3.0
+
+  # Phase 4.2: RevenueCat SDK for subscription management
+  purchases_flutter: ^8.2.0
   path_provider: ^2.1.0
 
   # Date formatting

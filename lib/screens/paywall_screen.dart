@@ -1,461 +1,324 @@
+// Paywall / Subscription Screen
+// Phase 4.2: RevenueCat subscription UI
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import '../config/theme.dart';
-import '../config/constants.dart';
-import '../widgets/shortcut_help.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/subscription_provider.dart';
+import '../utils/constants.dart';
 
-class PaywallScreen extends StatefulWidget {
-  const PaywallScreen({super.key});
+class PaywallScreen extends ConsumerStatefulWidget {
+  const PaywallScreen({Key? key}) : super(key: key);
 
   @override
-  State<PaywallScreen> createState() => _PaywallScreenState();
+  ConsumerState<PaywallScreen> createState() => _PaywallScreenState();
 }
 
-class _PaywallScreenState extends State<PaywallScreen>
-    with SingleTickerProviderStateMixin {
-  int _selectedPlan = 1; // 0=月額, 1=年額（推奨）
-  late AnimationController _starController;
-  late Animation<double> _starAnimation;
-  final FocusNode _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    _starController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _starAnimation = CurvedAnimation(
-      parent: _starController,
-      curve: Curves.easeInOut,
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
-  }
-
-  @override
-  void dispose() {
-    _starController.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent) return KeyEventResult.ignored;
-    final key = event.logicalKey;
-    if (key == LogicalKeyboardKey.digit1 || key == LogicalKeyboardKey.numpad1) {
-      setState(() => _selectedPlan = 0);
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.digit2 || key == LogicalKeyboardKey.numpad2) {
-      setState(() => _selectedPlan = 1);
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.escape ||
-        key == LogicalKeyboardKey.backspace) {
-      Navigator.pop(context);
-      return KeyEventResult.handled;
-    }
-    // ? → キーボードショートカット一覧
-    if (key == LogicalKeyboardKey.slash &&
-        HardwareKeyboard.instance.isShiftPressed) {
-      showShortcutsHelpDialog(context, shortcuts: const [
-        ('1', '月額プランを選択'),
-        ('2', '年額プランを選択'),
-        ('Esc / BS', '戻る'),
-        ('?', 'このヘルプを表示'),
-      ]);
-      return KeyEventResult.handled;
-    }
-    return KeyEventResult.ignored;
-  }
+class _PaywallScreenState extends ConsumerState<PaywallScreen> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      focusNode: _focusNode,
-      onKeyEvent: _handleKeyEvent,
-      child: Scaffold(
-        body: Column(
-          children: [
-            // グラジェントヘッダー
-            _buildHeader(context),
-          // スクロールコンテンツ
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Column(
-                children: [
-                  // 特徴リスト
-                  _buildFeatureList(context)
-                      .animate()
-                      .fadeIn(duration: 350.ms)
-                      .slideY(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
-                  const SizedBox(height: 20),
-                  // 料金プラン
-                  _PricingCard(
-                    isSelected: _selectedPlan == 0,
-                    title: '月額プラン',
-                    price: '¥999',
-                    unit: '/ 月',
-                    description: '毎月自動更新',
-                    badge: null,
-                    onTap: () => setState(() => _selectedPlan = 0),
-                  ).animate(delay: 100.ms).fadeIn(duration: 300.ms).slideY(
-                        begin: 0.1,
-                        curve: Curves.easeOut,
-                        duration: 300.ms,
-                      ),
-                  const SizedBox(height: 10),
-                  _PricingCard(
-                    isSelected: _selectedPlan == 1,
-                    title: '年額プラン',
-                    price: '¥5,980',
-                    unit: '/ 年',
-                    description: '月あたり約¥498（お得！）',
-                    badge: '2ヶ月分お得',
-                    onTap: () => setState(() => _selectedPlan = 1),
-                  ).animate(delay: 180.ms).fadeIn(duration: 300.ms).slideY(
-                        begin: 0.1,
-                        curve: Curves.easeOut,
-                        duration: 300.ms,
-                      ),
-                  const SizedBox(height: 16),
-                  // 保護者向けメモ
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: context.isDark ? context.subCardBg : const Color(0xFFFFF9E6),
-                      borderRadius: BorderRadius.circular(10),
-                      border: const Border(
-                        left: BorderSide(color: Color(0xFFF39C12), width: 3),
-                      ),
-                    ),
-                    child: Text(
-                      '💡 保護者のクレジットカードでのお支払いです。\n課金前にご確認ください。',
-                      style: TextStyle(
-                          fontSize: 12, color: context.textPrimary, height: 1.4),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // 登録ボタン
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('まもなく開始予定です！お楽しみに 🎉'),
-                            backgroundColor: kPrimaryColor,
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 4,
-                        shadowColor: kPrimaryColor.withValues(alpha: 0.4),
-                      ),
-                      child: Text(
-                        _selectedPlan == 1
-                            ? '年額プランで始める（¥5,980）'
-                            : '月額プランで始める（¥999/月）',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      '今は無料で続ける',
-                      style: TextStyle(color: kTextSecondary, fontSize: 14),
-                    ),
-                  ),
-                  const Text(
-                    '初月7日間無料トライアル · いつでもキャンセル可',
-                    style: TextStyle(fontSize: 11, color: kTextSecondary),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                ],
+    final subscriptionState = ref.watch(subscriptionProvider);
+    final detailsState = ref.watch(subscriptionDetailsProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('プレミアム版に登録'),
+        centerTitle: true,
+      ),
+      body: ListView(
+        children: [
+          // Header Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade400, Colors.purple.shade400],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-          ),
-        ],
-      ),
-      ),  // closes Scaffold (child of Focus)
-    );    // closes Focus return
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF8E44AD), Color(0xFF5B2C6F)],
-        ),
-      ),
-      padding: EdgeInsets.fromLTRB(
-        16,
-        MediaQuery.of(context).padding.top + 8,
-        16,
-        24,
-      ),
-      child: Column(
-        children: [
-          // 閉じるボタン
-          Align(
-            alignment: Alignment.centerRight,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white70),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          // アニメーション付きアイコン
-          AnimatedBuilder(
-            animation: _starAnimation,
-            builder: (_, child) => Transform.scale(
-              scale: 1.0 + _starAnimation.value * 0.08,
-              child: child,
-            ),
-            child: const Text('⭐', style: TextStyle(fontSize: 64)),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'プレミアムプラン',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'すべてのステージを解放して\nプログラミングを極めよう！',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeatureList(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: context.shadowColor,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'プレミアム特典',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _FeatureItem(
-              emoji: '🚀',
-              text: '全${AppConstants.totalStages}ステージ解放！上級Python も学べる'),
-          const _FeatureItem(
-              emoji: '🐍',
-              text: 'ファイル操作・文字列処理・クラス応用'),
-          const _FeatureItem(
-              emoji: '🏆',
-              text: 'バッジ・実績を全て獲得できる'),
-          const _FeatureItem(emoji: '🔕', text: '広告なしで集中して学習'),
-          const _FeatureItem(
-              emoji: '👨‍👩‍👧',
-              text: '保護者ダッシュボードで詳細な学習管理'),
-        ],
-      ),
-    );
-  }
-}
-
-class _FeatureItem extends StatelessWidget {
-  final String emoji;
-  final String text;
-
-  const _FeatureItem({required this.emoji, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(fontSize: 13, color: context.textPrimary),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PricingCard extends StatelessWidget {
-  final bool isSelected;
-  final String title;
-  final String price;
-  final String unit;
-  final String description;
-  final String? badge;
-  final VoidCallback onTap;
-
-  const _PricingCard({
-    required this.isSelected,
-    required this.title,
-    required this.price,
-    required this.unit,
-    required this.description,
-    required this.badge,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          color: context.cardBg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF8E44AD) : context.borderColor,
-            width: isSelected ? 2.5 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected
-                  ? const Color(0xFF8E44AD).withValues(alpha: 0.2)
-                  : context.shadowColor,
-              blurRadius: isSelected ? 12 : 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // 選択インジケーター
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFF8E44AD)
-                      : const Color(0xFFCCCCCC),
-                  width: 2,
-                ),
-                color:
-                    isSelected ? const Color(0xFF8E44AD) : Colors.transparent,
-              ),
-              child: isSelected
-                  ? const Icon(Icons.check, size: 14, color: Colors.white)
-                  : null,
-            ),
-            const SizedBox(width: 12),
-            // プラン情報
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: context.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    description,
-                    style: const TextStyle(fontSize: 11, color: kTextSecondary),
-                  ),
-                ],
-              ),
-            ),
-            // 価格
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            child: Column(
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      price,
-                      style: TextStyle(
-                        fontSize: 20,
+                const Icon(Icons.star, size: 60, color: Colors.white),
+                const SizedBox(height: 16),
+                Text(
+                  '${AppConstants.appName}プレミアム',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        color: context.textPrimary,
+                      ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '無制限でクイズを学習できます',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.white70,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+
+          // Features Section
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'プレミアムの特典',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                _buildFeatureItem(
+                  context,
+                  icon: Icons.remove_circle,
+                  title: '広告なし',
+                  description: 'クイズ中の広告がなくなります',
+                ),
+                const SizedBox(height: 12),
+                _buildFeatureItem(
+                  context,
+                  icon: Icons.infinite,
+                  title: '無制限クイズ',
+                  description: '毎日無制限にクイズができます',
+                ),
+                const SizedBox(height: 12),
+                _buildFeatureItem(
+                  context,
+                  icon: Icons.psychology,
+                  title: 'AI相談機能',
+                  description: '分からない問題を質問できます',
+                ),
+              ],
+            ),
+          ),
+
+          const Divider(),
+
+          // Pricing Section
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: detailsState.when(
+              data: (details) => Column(
+                children: [
+                  Text(
+                    '価格',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          details.localizedPrice,
+                          style: Theme.of(context)
+                              .textTheme
+                              .displaySmall
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '月額（7日間無料トライアル付き）',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              loading: () => const CircularProgressIndicator(),
+              error: (err, _) => Text('価格情報を取得できません: $err'),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Action Buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handlePurchase,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    Text(
-                      unit,
-                      style: const TextStyle(
-                          fontSize: 11, color: kTextSecondary),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                        : const Text(
+                            'プレミアムに登録する',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: _isLoading ? null : _handleRestore,
+                    child: const Text('以前の購入を復元'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Footer
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                Text(
+                  '利用規約に同意する必要があります',
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        // Open terms
+                      },
+                      child: const Text('利用規約'),
+                    ),
+                    const Text('・'),
+                    TextButton(
+                      onPressed: () {
+                        // Open privacy policy
+                      },
+                      child: const Text('プライバシーポリシー'),
                     ),
                   ],
                 ),
-                if (badge != null)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8E44AD),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      badge!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
               ],
             ),
-          ],
-        ),
+          ),
+
+          const SizedBox(height: 20),
+        ],
       ),
     );
+  }
+
+  Widget _buildFeatureItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String description,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 32, color: Colors.blue),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _handlePurchase() async {
+    setState(() => _isLoading = true);
+
+    try {
+      await ref
+          .read(subscriptionProvider.notifier)
+          .purchaseSubscription();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('登録が完了しました！')),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('エラーが発生しました: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _handleRestore() async {
+    setState(() => _isLoading = true);
+
+    try {
+      await ref
+          .read(subscriptionProvider.notifier)
+          .restorePurchases();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('復元が完了しました！')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('復元に失敗しました: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 }
