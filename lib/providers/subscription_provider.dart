@@ -119,7 +119,7 @@ class SubscriptionDetailsNotifier
           packageId: monthlyPackage.identifier,
           price: monthlyPackage.storeProduct.priceString,
           localizedPrice: monthlyPackage.storeProduct.priceString,
-          currencyCode: monthlyPackage.storeProduct.currencyCode ?? 'JPY',
+          currencyCode: monthlyPackage.storeProduct.currencyCode,
           expirationDate: expirationDate,
           isActive: isSubscribed,
         ),

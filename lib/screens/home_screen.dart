@@ -49,6 +49,7 @@ import '../providers/coin_provider.dart';
 import '../providers/character_provider.dart';
 import '../models/character_model.dart';
 import '../utils/page_transitions.dart';
+import 'package:shared_core/widgets/cross_promo_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -963,10 +964,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const SizedBox(height: 16),
 
                   // クロスプロモーション（他アプリ紹介）
-                  const CrossPromoSection(
-                    currentAppId: 'com.example.shogaku_kore_programming',
-                    currentCategory: '小学コレ',
-                  ),
+                  const CrossPromoWidget(maxAppsToShow: 3),
 
                   const SizedBox(height: 16),
                 ],

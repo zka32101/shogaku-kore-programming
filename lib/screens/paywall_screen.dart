@@ -18,7 +18,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subscriptionState = ref.watch(subscriptionProvider);
     final detailsState = ref.watch(subscriptionDetailsProvider);
 
     return Scaffold(
