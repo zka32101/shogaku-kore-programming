@@ -6,7 +6,7 @@ class ShareService {
   /// Twitter で共有
   static Future<void> shareToTwitter(Certificate certificate) async {
     final message = _buildTwitterMessage(certificate);
-    await Share.share(
+    await SharePlus.instance.share(
       message,
       subject: '小学コレ！プログラミング 修了証',
     );
@@ -15,7 +15,7 @@ class ShareService {
   /// Instagram で共有（テキストのみ — Instagram はダイレクトシェア非対応）
   static Future<void> shareToInstagram(Certificate certificate) async {
     final message = _buildInstagramMessage(certificate);
-    await Share.share(
+    await SharePlus.instance.share(
       message,
       subject: '小学コレ！プログラミング',
     );
@@ -29,13 +29,13 @@ class ShareService {
     final message = _buildGenericMessage(certificate);
 
     if (filePath != null && File(filePath).existsSync()) {
-      await Share.shareXFiles(
+      await SharePlus.instance.shareXFiles(
         [XFile(filePath, mimeType: 'application/pdf')],
         text: message,
         subject: '小学コレ！プログラミング 修了証',
       );
     } else {
-      await Share.share(
+      await SharePlus.instance.share(
         message,
         subject: '小学コレ！プログラミング 修了証',
       );
@@ -53,7 +53,7 @@ class ShareService {
       }
 
       final message = _buildGenericMessage(certificate);
-      await Share.shareXFiles(
+      await SharePlus.instance.shareXFiles(
         [XFile(filePath, mimeType: 'application/pdf')],
         text: message,
         subject: '小学コレ！プログラミング 修了証',
