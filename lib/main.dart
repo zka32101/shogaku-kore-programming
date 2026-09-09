@@ -12,6 +12,7 @@ import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
 import 'providers/friends_provider.dart';
+import 'providers/screen_time_provider.dart';
 import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
@@ -30,8 +31,11 @@ Future<void> main() async {
   // This reduces app startup time by ~600ms
 
   runApp(
-    const ProviderScope(
-      child: ShogakuKoreProgrammingApp(),
+    ProviderScope(
+      overrides: [
+        screenTimeProvider.overrideWith(ScreenTimeNotifier.new),
+      ],
+      child: const ShogakuKoreProgrammingApp(),
     ),
   );
 }
@@ -277,6 +281,15 @@ class _MainNavigatorState extends ConsumerState<MainNavigator> {
   @override
   Widget build(BuildContext context) {
     final wrongCount = ref.watch(wrongAnswersProvider).count;
+    // 利用時間の上限に達したら、タブ操作より優先して全画面オーバーレイを表示する。
+    // ref.watch でタイマー更新のたびに state を監視し、isLimitReached を都度評価する。
+    ref.watch(screenTimeProvider);
+    final isScreenTimeLimitReached =
+        ref.read(screenTimeProvider.notifier).isLimitReached;
+
+    if (isScreenTimeLimitReached) {
+      return const ScreenTimeLimitReachedWidget(primaryColor: kPrimaryColor);
+    }
 
     return Focus(
       focusNode: _focusNode,
