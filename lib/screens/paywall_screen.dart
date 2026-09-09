@@ -7,7 +7,7 @@ import '../providers/subscription_provider.dart';
 import '../utils/constants.dart';
 
 class PaywallScreen extends ConsumerStatefulWidget {
-  const PaywallScreen({Key? key}) : super(key: key);
+  const PaywallScreen({super.key});
 
   @override
   ConsumerState<PaywallScreen> createState() => _PaywallScreenState();
