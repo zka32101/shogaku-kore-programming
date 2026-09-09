@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_core/shared_core.dart' show WeeklyReportNotificationScheduler;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 
@@ -79,41 +80,32 @@ class NotificationService {
   // ────────── 週次レポート（毎月曜朝） ─────────────────────────────────────
 
   /// 毎週月曜日の [hour]:[minute] に「今週もがんばろう！」通知
+  ///
+  /// shared_core の [WeeklyReportNotificationScheduler] に委譲する
+  /// （本メソッドはこのスケジューラの参照実装だったもの）。
   Future<void> scheduleWeeklyReport({
     required int hour,
     required int minute,
     bool enabled = true,
   }) async {
-    await _plugin.cancel(_weeklyReportId);
-    if (!enabled) return;
+    final scheduler = WeeklyReportNotificationScheduler(_plugin);
+
+    if (!enabled) {
+      await scheduler.cancelWeeklyReport(_weeklyReportId);
+      return;
+    }
 
     await initialize();
 
-    // 次の月曜日を計算 (Dart DateTime は常にデバイスローカル時刻)
-    final nowLocal = DateTime.now();
-    final daysUntilMonday = (DateTime.monday - nowLocal.weekday + 7) % 7;
-    var nextLocal = DateTime(
-      nowLocal.year,
-      nowLocal.month,
-      nowLocal.day + daysUntilMonday,
-      hour,
-      minute,
-    );
-    if (nextLocal.isBefore(nowLocal)) {
-      nextLocal = nextLocal.add(const Duration(days: 7));
-    }
-    final next = tz.TZDateTime.from(nextLocal, tz.UTC);
-
-    await _plugin.zonedSchedule(
-      _weeklyReportId,
-      '📊 週次レポート',
-      '今週もプログラミングをがんばろう！先週の成果を確認してみよう✨',
-      next,
-      _details(importance: Importance.defaultImportance),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+    await scheduler.scheduleWeeklyReport(
+      notificationId: _weeklyReportId,
+      title: '📊 週次レポート',
+      body: '今週もプログラミングをがんばろう！先週の成果を確認してみよう✨',
+      weekday: DateTime.monday,
+      hour: hour,
+      minute: minute,
+      channelId: _channelId,
+      channelName: _channelName,
     );
   }
 
@@ -210,6 +202,14 @@ class NotificationService {
   }
 
   /// 週次レポートを即時送信（週次サマリー表示用）
+  ///
+  /// 注: shared_core の [WeeklyReportNotificationScheduler] は
+  /// スケジュール済み通知（zonedSchedule）と重複送信防止用の
+  /// 週キー管理（shouldSendThisWeek/markSentThisWeek）のみを提供し、
+  /// 即時表示（show）に対応するメソッドを持たないため、
+  /// このメソッドはこれまでどおり `_plugin.show()` を直接呼び出す。
+  /// 重複送信防止ロジック自体は呼び出し元（main.dart）に残っており、
+  /// このメソッドの動作・文言・タイミングは変更していない。
   Future<void> sendWeeklyReportNow({
     required int weeklyCleared,
     required int totalStars,
