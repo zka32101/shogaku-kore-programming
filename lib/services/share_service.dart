@@ -33,10 +33,12 @@ class ShareService {
     final message = _buildGenericMessage(certificate);
 
     if (filePath != null && File(filePath).existsSync()) {
-      await Share.shareXFiles(
-        [XFile(filePath, mimeType: 'application/pdf')],
-        text: message,
-        subject: '小学コレ！プログラミング 修了証',
+      await SharePlus.instance.share(
+        ShareParams(
+          text: message,
+          subject: '小学コレ！プログラミング 修了証',
+          files: [XFile(filePath, mimeType: 'application/pdf')],
+        ),
       );
     } else {
       await SharePlus.instance.share(
@@ -59,10 +61,12 @@ class ShareService {
       }
 
       final message = _buildGenericMessage(certificate);
-      await Share.shareXFiles(
-        [XFile(filePath, mimeType: 'application/pdf')],
-        text: message,
-        subject: '小学コレ！プログラミング 修了証',
+      await SharePlus.instance.share(
+        ShareParams(
+          text: message,
+          subject: '小学コレ！プログラミング 修了証',
+          files: [XFile(filePath, mimeType: 'application/pdf')],
+        ),
       );
     } catch (e) {
       rethrow;
