@@ -14,11 +14,8 @@ import '../widgets/shortcut_help.dart';
 import '../utils/page_transitions.dart';
 import 'badge_unlock_screen.dart';
 import 'friends_list_screen.dart';
-
-// このアプリには全国のユーザーのスコアを集計するバックエンド（対戦サーバー）が
-// まだ無いため、この画面では「自分の記録」「今週のチャレンジ」に加えて、
-// フレンド機能（friends_provider）を使った「フレンドランキング」を表示する。
-// 全国ランキングは今後実装予定。
+import 'package:shared_core/shared_core.dart'
+    show globalRankingProvider, GlobalRankingEntry;
 
 class RankingScreen extends ConsumerStatefulWidget {
   const RankingScreen({super.key});
@@ -27,23 +24,34 @@ class RankingScreen extends ConsumerStatefulWidget {
   ConsumerState<RankingScreen> createState() => _RankingScreenState();
 }
 
-class _RankingScreenState extends ConsumerState<RankingScreen> {
+class _RankingScreenState extends ConsumerState<RankingScreen>
+    with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(friendsProvider.notifier).loadFriends();
       // フレンドランキング表示のため、各フレンドの最新ポイントを取得し直す
       await ref.read(friendsProvider.notifier).refreshFriendPoints();
+      // グローバルランキングを取得
+      await ref
+          .read(globalRankingProvider.notifier)
+          .fetchGlobalRanking();
+      await ref
+          .read(globalRankingProvider.notifier)
+          .fetchSubjectRanking('programming');
     });
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -86,32 +94,59 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
           children: [
             // ヘッダー
             _buildHeader(context, myPoints, profile.nickname, profile.avatarEmoji),
-            // 今週のチャレンジ + 準備中バナー
+            // タブバー
+            Container(
+              color: context.cardBg,
+              child: TabBar(
+                controller: _tabController,
+                labelColor: Colors.indigo,
+                unselectedLabelColor: context.textSecondary,
+                indicatorColor: Colors.indigo,
+                indicatorSize: TabBarIndicatorSize.tab,
+                tabs: const [
+                  Tab(text: '🌍 グローバル'),
+                  Tab(text: '📚 プログラミング'),
+                  Tab(text: '👫 フレンド'),
+                ],
+              ),
+            ),
+            // タブコンテンツ
             Expanded(
               child: RefreshIndicator(
                 color: kPrimaryColor,
                 onRefresh: () async {
                   ref.invalidate(progressProvider);
                   ref.invalidate(profileProvider);
+                  ref.invalidate(globalRankingProvider);
+                  await ref.read(globalRankingProvider.notifier).fetchGlobalRanking();
+                  await ref
+                      .read(globalRankingProvider.notifier)
+                      .fetchSubjectRanking('programming');
                   await ref.read(friendsProvider.notifier).loadFriends();
                   await ref.read(friendsProvider.notifier).refreshFriendPoints();
                   await Future.delayed(const Duration(milliseconds: 400));
                 },
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(16),
+                child: TabBarView(
+                  controller: _tabController,
                   children: [
-                    _WeeklyChallengesCard()
-                        .animate()
-                        .fadeIn(duration: 350.ms)
-                        .slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
-                    _FriendRankingCard(myPoints: myPoints, myName: profile.nickname, myIcon: profile.avatarEmoji)
-                        .animate(delay: 100.ms)
-                        .fadeIn(duration: 300.ms)
-                        .slideY(begin: 0.08, curve: Curves.easeOut, duration: 300.ms),
-                    _ComingSoonBanner()
-                        .animate(delay: 150.ms)
-                        .fadeIn(duration: 300.ms),
+                    // グローバルランキング
+                    _GlobalRankingTab(
+                      myPoints: myPoints,
+                      myName: profile.nickname,
+                      myIcon: profile.avatarEmoji,
+                    ),
+                    // 教科別ランキング（プログラミング）
+                    _SubjectRankingTab(
+                      myPoints: myPoints,
+                      myName: profile.nickname,
+                      myIcon: profile.avatarEmoji,
+                    ),
+                    // フレンドランキング
+                    _FriendRankingTab(
+                      myPoints: myPoints,
+                      myName: profile.nickname,
+                      myIcon: profile.avatarEmoji,
+                    ),
                   ],
                 ),
               ),
@@ -195,40 +230,160 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
   }
 }
 
-// ─── 準備中バナー ────────────────────────────────────────────────────────
-class _ComingSoonBanner extends StatelessWidget {
+// ─── グローバルランキングタブ ────────────────────────────────────────────
+class _GlobalRankingTab extends ConsumerWidget {
+  final int myPoints;
+  final String myName;
+  final String myIcon;
+
+  const _GlobalRankingTab({
+    required this.myPoints,
+    required this.myName,
+    required this.myIcon,
+  });
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final globalRanking = ref.watch(globalRankingProvider);
+
+    return globalRanking.when(
+      data: (entries) {
+        int? myRank;
+        final profileUserId = ref.read(profileProvider).userId;
+        final foundIndex = entries.indexWhere((e) => e.userId == profileUserId);
+        if (foundIndex >= 0) {
+          myRank = foundIndex + 1;
+        }
+
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            _buildMyRankCard(context, myRank),
+            const SizedBox(height: 16),
+            _buildRankingList(context, entries),
+          ],
+        );
+      },
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: Colors.indigo),
+      ),
+      error: (error, stack) => Center(
+        child: Text('エラーが発生しました: $error'),
+      ),
+    );
+  }
+
+  Widget _buildMyRankCard(BuildContext context, int? rank) {
+    final rankText = rank != null ? '#$rank' : '未定';
     return Container(
-      margin: const EdgeInsets.only(top: 4),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.cardBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.indigo, width: 2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Colors.indigo, Color(0xFF3F51B5)],
+              ),
+            ),
+            child: Center(
+              child: Text(myIcon, style: const TextStyle(fontSize: 22)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'あなたの順位',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.indigo,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  myName,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: context.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            rankText,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.indigo,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRankingList(
+      BuildContext context, List<GlobalRankingEntry> entries) {
+    return Container(
       decoration: BoxDecoration(
         color: context.cardBg,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: context.borderColor),
+        boxShadow: [
+          BoxShadow(
+              color: context.shadowColor,
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
+        ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('🚧', style: TextStyle(fontSize: 28)),
-          const SizedBox(height: 8),
-          Text(
-            '全国みんなとのランキング対戦は準備中',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.indigo, Color(0xFF3F51B5)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
             ),
-            textAlign: TextAlign.center,
+            child: const Text(
+              '🌍 全国ランキング TOP 100',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            '全国のみんなと点数を競える機能は今後追加予定です。\nそれまでは上の「フレンドランキング」や「今週のチャレンジ」で\n自分の記録を伸ばそう！',
-            style: TextStyle(
-              fontSize: 12,
-              color: context.textSecondary,
-              height: 1.5,
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: entries.take(100).toList().asMap().entries.map((e) {
+                final rank = e.key + 1;
+                final entry = e.value;
+                return _RankEntryCard(
+                  rank: rank,
+                  entry: entry,
+                  accentColor: Colors.indigo,
+                );
+              }).toList(),
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -236,13 +391,174 @@ class _ComingSoonBanner extends StatelessWidget {
   }
 }
 
-// ─── フレンドランキングカード ────────────────────────────────────────────────
-class _FriendRankingCard extends ConsumerWidget {
+// ─── 教科別ランキングタブ ────────────────────────────────────────────
+class _SubjectRankingTab extends ConsumerWidget {
   final int myPoints;
   final String myName;
   final String myIcon;
 
-  const _FriendRankingCard({
+  const _SubjectRankingTab({
+    required this.myPoints,
+    required this.myName,
+    required this.myIcon,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final subjectRanking = ref.watch(globalRankingProvider);
+
+    return subjectRanking.when(
+      data: (entries) {
+        int? myRank;
+        final profileUserId = ref.read(profileProvider).userId;
+        final foundIndex = entries.indexWhere((e) => e.userId == profileUserId);
+        if (foundIndex >= 0) {
+          myRank = foundIndex + 1;
+        }
+
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            _buildMyRankCard(context, myRank),
+            const SizedBox(height: 16),
+            _buildRankingList(context, entries),
+          ],
+        );
+      },
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: Colors.indigo),
+      ),
+      error: (error, stack) => Center(
+        child: Text('エラーが発生しました: $error'),
+      ),
+    );
+  }
+
+  Widget _buildMyRankCard(BuildContext context, int? rank) {
+    final rankText = rank != null ? '#$rank' : '未定';
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: context.cardBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.indigo, width: 2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Colors.indigo, Color(0xFF3F51B5)],
+              ),
+            ),
+            child: Center(
+              child: Text(myIcon, style: const TextStyle(fontSize: 22)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'プログラミングでの順位',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.indigo,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  myName,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: context.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            rankText,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.indigo,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRankingList(
+      BuildContext context, List<GlobalRankingEntry> entries) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.cardBg,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+              color: context.shadowColor,
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.indigo, Color(0xFF3F51B5)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+            ),
+            child: const Text(
+              '📚 プログラミング TOP 100',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: entries.take(100).toList().asMap().entries.map((e) {
+                final rank = e.key + 1;
+                final entry = e.value;
+                return _RankEntryCard(
+                  rank: rank,
+                  entry: entry,
+                  accentColor: Colors.indigo,
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── フレンドランキングタブ ────────────────────────────────────────────
+class _FriendRankingTab extends ConsumerWidget {
+  final int myPoints;
+  final String myName;
+  final String myIcon;
+
+  const _FriendRankingTab({
     required this.myPoints,
     required this.myName,
     required this.myIcon,
@@ -258,131 +574,262 @@ class _FriendRankingCard extends ConsumerWidget {
       for (final f in friendRanking) (f.nickname, f.avatarEmoji, f.points, false),
     ]..sort((a, b) => b.$3.compareTo(a.$3));
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: context.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(color: context.shadowColor, blurRadius: 8, offset: const Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF3498DB), Color(0xFF2980B9)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        _WeeklyChallengesCard()
+            .animate()
+            .fadeIn(duration: 350.ms)
+            .slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+        const SizedBox(height: 16),
+        Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: context.cardBg,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                  color: context.shadowColor,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2)),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF3498DB), Color(0xFF2980B9)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+                ),
+                child: Row(
+                  children: [
+                    const Text('👫', style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 6),
+                    const Expanded(
+                      child: Text(
+                        'フレンドランキング',
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        HapticService.lightImpact();
+                        Navigator.of(context)
+                            .push(smoothPageRoute(const FriendsListScreen()));
+                      },
+                      icon: const Icon(Icons.person_add_alt_1,
+                          size: 14, color: Colors.white),
+                      label: const Text(
+                        'フレンド管理',
+                        style:
+                            TextStyle(fontSize: 11, color: Colors.white),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-            ),
-            child: Row(
-              children: [
-                const Text('👫', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 6),
-                const Expanded(
+              if (friendRanking.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Text(
-                    'フレンドランキング',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                    'フレンドを追加すると、ここでポイントを競い合えるよ！',
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: context.textSecondary,
+                        height: 1.5),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    children: entries.asMap().entries.map((entry) {
+                      final rank = entry.key + 1;
+                      final (name, icon, points, isMe) = entry.value;
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isMe
+                              ? const Color(0xFF3498DB).withValues(alpha: 0.1)
+                              : context.shadowColor.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(8),
+                          border: isMe
+                              ? Border.all(
+                                  color: const Color(0xFF3498DB)
+                                      .withValues(alpha: 0.4))
+                              : null,
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 22,
+                              child: Text(
+                                '$rank',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: context.textSecondary,
+                                ),
+                              ),
+                            ),
+                            Text(icon,
+                                style: const TextStyle(fontSize: 16)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                isMe ? '$name（あなた）' : name,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: context.textPrimary,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Text(
+                              '${points}pt',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF3498DB),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-                TextButton.icon(
-                  onPressed: () {
-                    HapticService.lightImpact();
-                    Navigator.of(context).push(smoothPageRoute(const FriendsListScreen()));
-                  },
-                  icon: const Icon(Icons.person_add_alt_1, size: 14, color: Colors.white),
-                  label: const Text(
-                    'フレンド管理',
-                    style: TextStyle(fontSize: 11, color: Colors.white),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── ランキング エントリカード ────────────────────────────────────────────
+class _RankEntryCard extends StatelessWidget {
+  final int rank;
+  final GlobalRankingEntry entry;
+  final Color accentColor;
+
+  const _RankEntryCard({
+    required this.rank,
+    required this.entry,
+    required this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // entry のスコアフィールドを取得
+    // GlobalRankingEntry が持つフィールドに応じて調整
+    final score = entry.score ?? entry.points ?? 0;
+    final userName = entry.userName ?? entry.name ?? 'ユーザー';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: context.shadowColor.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Row(
+        children: [
+          // 順位
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  accentColor,
+                  accentColor.withValues(alpha: 0.7),
+                ],
+              ),
+            ),
+            child: Center(
+              child: Text(
+                '$rank',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // ユーザー名とスコア
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: context.textPrimary,
                   ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '$score pt',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: context.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
-          if (friendRanking.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'フレンドを追加すると、ここでポイントを競い合えるよ！',
-                style: TextStyle(fontSize: 12, color: context.textSecondary, height: 1.5),
-                textAlign: TextAlign.center,
+          // メダルアイコン
+          if (rank <= 3)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(4),
               ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: entries.asMap().entries.map((entry) {
-                  final rank = entry.key + 1;
-                  final (name, icon, points, isMe) = entry.value;
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isMe
-                          ? const Color(0xFF3498DB).withValues(alpha: 0.1)
-                          : context.shadowColor.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(8),
-                      border: isMe
-                          ? Border.all(color: const Color(0xFF3498DB).withValues(alpha: 0.4))
-                          : null,
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 22,
-                          child: Text(
-                            '$rank',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: context.textSecondary,
-                            ),
-                          ),
-                        ),
-                        Text(icon, style: const TextStyle(fontSize: 16)),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            isMe ? '$name（あなた）' : name,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: context.textPrimary,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(
-                          '${points}pt',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF3498DB),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+              child: Text(
+                rank == 1
+                    ? '🥇'
+                    : rank == 2
+                        ? '🥈'
+                        : '🥉',
+                style: const TextStyle(fontSize: 14),
               ),
             ),
         ],
       ),
     );
   }
-}
+
 
 // ─── 週間チャレンジカード ────────────────────────────────────────────────────
 class _WeeklyChallengesCard extends ConsumerWidget {
