@@ -249,18 +249,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final flashState = ref.watch(flashcardProvider);
     final masteredCards = flashState.masteredIds.length;
     // 今週習得したフラッシュカード数
-    final fcWeekStart = DateTime.now().subtract(
-      Duration(days: DateTime.now().weekday - 1),
-    );
-    final fcWeekStartDay = DateTime(
-      fcWeekStart.year, fcWeekStart.month, fcWeekStart.day,
-    );
+    final now = DateTime.now();
+    final fcWeekStart = now.subtract(Duration(days: now.weekday - 1));
+    final fcWeekStartDay = DateTime(fcWeekStart.year, fcWeekStart.month, fcWeekStart.day);
     final weeklyMasteredCards = flashState.masteredDates.values
         .where((d) => !d.isBefore(fcWeekStartDay))
         .length;
-    final taBestMaxCombo  = ref.watch(timeAttackProvider).bestMaxCombo;
-    final taPlayCount     = ref.watch(timeAttackProvider).playCount;
-    final taBestCorrect   = ref.watch(timeAttackProvider).bestCorrect;
+    final taState = ref.watch(
+      timeAttackProvider.select((s) => (
+        bestMaxCombo: s.bestMaxCombo,
+        playCount: s.playCount,
+        bestCorrect: s.bestCorrect,
+      )),
+    );
+    final taBestMaxCombo = taState.bestMaxCombo;
+    final taPlayCount = taState.playCount;
+    final taBestCorrect = taState.bestCorrect;
     final completedCount = progressNotifier.completedCount;
     final totalStars = progressNotifier.totalStarsEarned;
     final level = progressNotifier.currentLevel;
