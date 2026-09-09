@@ -17,6 +17,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   Future<void> _initialize() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now(); // DateTime.now() は一度だけ呼び出す（パフォーマンス最適化）
 
       final trialStartDateStr = prefs.getString(_keyTrialStartDate);
       final hasUsedTrial = prefs.getBool(_keyTrialUsed) ?? false;
@@ -33,12 +34,12 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
       }
 
       // トライアルの有効性を判定
-      final isTrialActive = _isTrialActive(trialStartDate, hasUsedTrial);
-      final trialDaysRemaining = _calculateTrialDaysRemaining(trialStartDate);
+      final isTrialActive = _isTrialActive(trialStartDate, hasUsedTrial, now);
+      final trialDaysRemaining = _calculateTrialDaysRemaining(trialStartDate, now);
 
       // プレミアム購読の有効性を判定
-      final isPremiumSubscriber = premiumExpiryDate != null &&
-          premiumExpiryDate.isAfter(DateTime.now());
+      final isPremiumSubscriber =
+          premiumExpiryDate != null && premiumExpiryDate.isAfter(now);
 
       state = SubscriptionState(
         trialStartDate: trialStartDate,
@@ -106,25 +107,22 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   }
 
   /// トライアルが有効かどうかを判定
-  bool _isTrialActive(DateTime? trialStartDate, bool hasUsedTrial) {
+  bool _isTrialActive(DateTime? trialStartDate, bool hasUsedTrial, DateTime now) {
     if (!hasUsedTrial || trialStartDate == null) {
       return false;
     }
 
-    final now = DateTime.now();
     final trialEndDate =
         trialStartDate.add(const Duration(days: _trialDurationDays));
-
     return now.isBefore(trialEndDate);
   }
 
   /// 残りトライアル日数を計算
-  int _calculateTrialDaysRemaining(DateTime? trialStartDate) {
+  int _calculateTrialDaysRemaining(DateTime? trialStartDate, DateTime now) {
     if (trialStartDate == null) {
       return 0;
     }
 
-    final now = DateTime.now();
     final trialEndDate =
         trialStartDate.add(const Duration(days: _trialDurationDays));
 
