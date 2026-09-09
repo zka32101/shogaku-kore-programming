@@ -37,6 +37,7 @@ import '../widgets/daily_puzzle_card.dart';
 import '../widgets/tap_scale.dart';
 import 'why_programming_screen.dart';
 import 'programming_basics_screen.dart';
+import 'lesson_screen.dart';
 import 'shop_screen.dart';
 import 'reverse_teaching_screen.dart';
 import 'gallery_screen.dart';
@@ -892,6 +893,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   )
                       .animate()
                       .fadeIn(duration: 350.ms, delay: 320.ms)
+                      .slideY(begin: 0.08, curve: Curves.easeOut),
+
+                  const SizedBox(height: 10),
+
+                  // 学ぶ（解説メニュー）への導線
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        HapticService.lightImpact();
+                        SoundService().playTap();
+                        Navigator.of(context).push(
+                          smoothPageRoute(const LessonScreen()),
+                        );
+                      },
+                      icon: const Text('📖', style: TextStyle(fontSize: 16)),
+                      label: const Text(
+                        '学ぶ（解説記事を読む）',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 350.ms, delay: 340.ms)
                       .slideY(begin: 0.08, curve: Curves.easeOut),
 
                   const SizedBox(height: 10),
