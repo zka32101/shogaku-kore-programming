@@ -11,6 +11,7 @@ import 'config/constants.dart';
 import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
+import 'providers/friends_provider.dart';
 import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
@@ -69,6 +70,15 @@ class _ShogakuKoreProgrammingAppState
       // 起動時に自動でサインインする。失敗時はローカルIDにフォールバック）
       try {
         await AuthService().signInAnonymously();
+        // フレンド検索・フレンドランキングのため、公開プロフィールを同期しておく
+        // （Firestore未接続・オフライン等で失敗しても学習機能には影響させない）
+        final profile = ref.read(profileProvider);
+        final points = ref.read(progressProvider.notifier).totalStarsEarned * 50;
+        await ref.read(friendsProvider.notifier).syncMyPublicProfile(
+              nickname: profile.nickname,
+              avatarEmoji: profile.avatarEmoji,
+              points: points,
+            );
       } catch (_) {
         // 匿名ログインに失敗しても学習機能自体は使えるようにする
       }
