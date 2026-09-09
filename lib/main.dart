@@ -23,8 +23,6 @@ import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
-import 'package:cross_promo_kit/cross_promo_kit.dart'
-    show CrossPromoService;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

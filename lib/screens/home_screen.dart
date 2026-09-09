@@ -49,7 +49,6 @@ import '../providers/coin_provider.dart';
 import '../providers/character_provider.dart';
 import '../models/character_model.dart';
 import '../utils/page_transitions.dart';
-import 'package:cross_promo_kit/cross_promo_kit.dart'
     show CrossPromoSection;
 
 class HomeScreen extends ConsumerStatefulWidget {
