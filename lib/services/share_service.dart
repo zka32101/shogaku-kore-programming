@@ -7,8 +7,10 @@ class ShareService {
   static Future<void> shareToTwitter(Certificate certificate) async {
     final message = _buildTwitterMessage(certificate);
     await SharePlus.instance.share(
-      message,
-      subject: '小学コレ！プログラミング 修了証',
+      ShareParams(
+        text: message,
+        subject: '小学コレ！プログラミング 修了証',
+      ),
     );
   }
 
@@ -16,8 +18,10 @@ class ShareService {
   static Future<void> shareToInstagram(Certificate certificate) async {
     final message = _buildInstagramMessage(certificate);
     await SharePlus.instance.share(
-      message,
-      subject: '小学コレ！プログラミング',
+      ShareParams(
+        text: message,
+        subject: '小学コレ！プログラミング',
+      ),
     );
   }
 
@@ -29,15 +33,19 @@ class ShareService {
     final message = _buildGenericMessage(certificate);
 
     if (filePath != null && File(filePath).existsSync()) {
-      await SharePlus.instance.shareXFiles(
-        [XFile(filePath, mimeType: 'application/pdf')],
-        text: message,
-        subject: '小学コレ！プログラミング 修了証',
+      await SharePlus.instance.share(
+        ShareParams(
+          text: message,
+          subject: '小学コレ！プログラミング 修了証',
+          files: [XFile(filePath, mimeType: 'application/pdf')],
+        ),
       );
     } else {
       await SharePlus.instance.share(
-        message,
-        subject: '小学コレ！プログラミング 修了証',
+        ShareParams(
+          text: message,
+          subject: '小学コレ！プログラミング 修了証',
+        ),
       );
     }
   }
@@ -53,10 +61,12 @@ class ShareService {
       }
 
       final message = _buildGenericMessage(certificate);
-      await SharePlus.instance.shareXFiles(
-        [XFile(filePath, mimeType: 'application/pdf')],
-        text: message,
-        subject: '小学コレ！プログラミング 修了証',
+      await SharePlus.instance.share(
+        ShareParams(
+          text: message,
+          subject: '小学コレ！プログラミング 修了証',
+          files: [XFile(filePath, mimeType: 'application/pdf')],
+        ),
       );
     } catch (e) {
       rethrow;
