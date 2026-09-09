@@ -87,6 +87,19 @@ final ThemeData appTheme = ThemeData(
     unselectedLabelColor: kTextSecondary,
     indicatorColor: kPrimaryColor,
   ),
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: const Color(0xFFF9F9F9),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: kPrimaryColor, width: 2),
+    ),
+    hintStyle: const TextStyle(color: Color(0xFFBDBDBD)),
+  ),
 );
 
 // ─── ダークテーマ ────────────────────────────────────────────────────────────
@@ -155,7 +168,12 @@ final ThemeData darkAppTheme = ThemeData(
     fillColor: kDarkSurface2,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide.none,
+      borderSide: const BorderSide(color: Color(0xFF424242)),
     ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: kPrimaryColor, width: 2),
+    ),
+    hintStyle: const TextStyle(color: Color(0xFF757575)),
   ),
 );
