@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_card.dart';
 import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
@@ -2408,7 +2409,7 @@ class _StageSearchDelegate extends SearchDelegate<Stage?> {
           _ => '初級',
         };
 
-        return Card(
+        return AppCard(
           margin: const EdgeInsets.only(bottom: 10),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           elevation: 0,

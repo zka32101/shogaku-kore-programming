@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_card.dart';
 import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
@@ -1368,7 +1369,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       }
     }
 
-    return Card(
+    return AppCard(
       elevation: 0,
       color: Colors.blue.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
