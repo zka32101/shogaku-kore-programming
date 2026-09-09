@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/shared_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -13,6 +14,7 @@ import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
+import 'services/feedback_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
@@ -45,6 +47,14 @@ class _ShogakuKoreProgrammingAppState
   @override
   void initState() {
     super.initState();
+
+    // バグ報告・改善要望フォーム（shared_core の FeedbackFormPage）の送信ハンドラを登録。
+    // このアプリは Firestore を導入していないため、実際の送信処理は
+    // SharedPreferences のローカルキューに蓄積するだけの簡易実装（詳細は
+    // services/feedback_service.dart 参照）。フォームを開く前に必ず登録が
+    // 完了している必要があるため、postFrameCallback を待たず同期的に行う。
+    ref.read(feedbackProvider.notifier).setSubmitHandler(FeedbackService().submit);
+
     // Initialize Firebase after UI is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
