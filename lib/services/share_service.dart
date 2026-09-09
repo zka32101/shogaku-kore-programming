@@ -3,21 +3,27 @@ import 'dart:io';
 import '../models/certificate.dart';
 
 class ShareService {
+  static const String _certificateSubject = '小学コレ！プログラミング 修了証';
+  static const String _appNameSubject = '小学コレ！プログラミング';
   /// Twitter で共有
   static Future<void> shareToTwitter(Certificate certificate) async {
     final message = _buildTwitterMessage(certificate);
-    await Share.share(
-      message,
-      subject: '小学コレ！プログラミング 修了証',
+    await SharePlus.instance.share(
+      ShareParams(
+        text: message,
+        subject: _certificateSubject,
+      ),
     );
   }
 
   /// Instagram で共有（テキストのみ — Instagram はダイレクトシェア非対応）
   static Future<void> shareToInstagram(Certificate certificate) async {
     final message = _buildInstagramMessage(certificate);
-    await Share.share(
-      message,
-      subject: '小学コレ！プログラミング',
+    await SharePlus.instance.share(
+      ShareParams(
+        text: message,
+        subject: _appNameSubject,
+      ),
     );
   }
 
@@ -27,19 +33,17 @@ class ShareService {
     String? filePath,
   }) async {
     final message = _buildGenericMessage(certificate);
+    final files = (filePath != null && File(filePath).existsSync())
+        ? [XFile(filePath, mimeType: 'application/pdf')]
+        : <XFile>[];
 
-    if (filePath != null && File(filePath).existsSync()) {
-      await Share.shareXFiles(
-        [XFile(filePath, mimeType: 'application/pdf')],
+    await SharePlus.instance.share(
+      ShareParams(
         text: message,
-        subject: '小学コレ！プログラミング 修了証',
-      );
-    } else {
-      await Share.share(
-        message,
-        subject: '小学コレ！プログラミング 修了証',
-      );
-    }
+        subject: _certificateSubject,
+        files: files.isEmpty ? null : files,
+      ),
+    );
   }
 
   /// ファイル＋テキストでシェア
@@ -47,20 +51,18 @@ class ShareService {
     Certificate certificate,
     String filePath,
   ) async {
-    try {
-      if (!File(filePath).existsSync()) {
-        throw Exception('Certificate file not found: $filePath');
-      }
-
-      final message = _buildGenericMessage(certificate);
-      await Share.shareXFiles(
-        [XFile(filePath, mimeType: 'application/pdf')],
-        text: message,
-        subject: '小学コレ！プログラミング 修了証',
-      );
-    } catch (e) {
-      rethrow;
+    if (!File(filePath).existsSync()) {
+      throw Exception('Certificate file not found: $filePath');
     }
+
+    final message = _buildGenericMessage(certificate);
+    await SharePlus.instance.share(
+      ShareParams(
+        text: message,
+        subject: _certificateSubject,
+        files: [XFile(filePath, mimeType: 'application/pdf')],
+      ),
+    );
   }
 
   /// Twitter メッセージ生成

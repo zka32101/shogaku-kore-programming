@@ -40,9 +40,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
       final isPremiumSubscriber = premiumExpiryDate != null &&
           premiumExpiryDate.isAfter(DateTime.now());
 
-      // 広告表示判定
-      final shouldShowAds = !isTrialActive && !isPremiumSubscriber;
-
       state = SubscriptionState(
         trialStartDate: trialStartDate,
         isTrialActive: isTrialActive,
@@ -50,7 +47,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         hasUsedTrial: hasUsedTrial,
         isPremiumSubscriber: isPremiumSubscriber,
         premiumExpiryDate: premiumExpiryDate,
-        shouldShowAds: shouldShowAds,
       );
     } catch (e) {
       state = const SubscriptionState();
@@ -71,7 +67,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         isTrialActive: true,
         trialDaysRemaining: _trialDurationDays,
         hasUsedTrial: true,
-        shouldShowAds: false,
       );
     } catch (e) {
       // Error starting trial
@@ -89,7 +84,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
       state = state.copyWith(
         isPremiumSubscriber: true,
         premiumExpiryDate: expiryDate,
-        shouldShowAds: false,
       );
     } catch (e) {
       // Error setting premium subscription
@@ -105,20 +99,9 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
       state = state.copyWith(
         isPremiumSubscriber: false,
         premiumExpiryDate: null,
-        shouldShowAds: !state.isTrialActive,
       );
     } catch (e) {
       // Error canceling premium subscription
-    }
-  }
-
-  /// トライアル終了後に広告表示を有効化
-  Future<void> expireTrialAndShowAds() async {
-    if (state.isTrialActive) {
-      state = state.copyWith(
-        isTrialActive: false,
-        shouldShowAds: !state.isPremiumSubscriber,
-      );
     }
   }
 
@@ -171,10 +154,6 @@ final isTrialActiveProvider = Provider<bool>((ref) {
 
 final canAccessPremiumProvider = Provider<bool>((ref) {
   return ref.watch(subscriptionProvider).canAccessPremiumContent();
-});
-
-final shouldShowAdsProvider = Provider<bool>((ref) {
-  return ref.watch(subscriptionProvider).shouldShowAds;
 });
 
 final trialDaysRemainingProvider = Provider<int>((ref) {
