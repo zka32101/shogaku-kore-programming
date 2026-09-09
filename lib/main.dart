@@ -9,6 +9,7 @@ import 'config/constants.dart';
 import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
+import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
@@ -52,6 +53,13 @@ class _ShogakuKoreProgrammingAppState
         );
       } catch (_) {
         // Firebase initialization failed, continue anyway
+      }
+      // 匿名ログイン（他の小学コレシリーズと統一：ログイン画面は持たず
+      // 起動時に自動でサインインする。失敗時はローカルIDにフォールバック）
+      try {
+        await AuthService().signInAnonymously();
+      } catch (_) {
+        // 匿名ログインに失敗しても学習機能自体は使えるようにする
       }
     });
 
