@@ -67,13 +67,6 @@ class _ShogakuKoreProgrammingAppState
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
-
-        // クロスプロモーション初期化
-        try {
-          await CrossPromoService.init();
-        } catch (e) {
-          // エラーでも起動は継続
-        }
       } catch (_) {
         // Firebase initialization failed, continue anyway
       }
