@@ -12,7 +12,6 @@ import '../providers/flashcard_provider.dart';
 import '../providers/friends_provider.dart';
 import '../widgets/shortcut_help.dart';
 import '../utils/page_transitions.dart';
-import 'badge_unlock_screen.dart';
 import 'friends_list_screen.dart';
 
 class RankingScreen extends ConsumerStatefulWidget {
