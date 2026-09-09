@@ -58,9 +58,9 @@ class ChallengeNotifier extends StateNotifier<ChallengeState> {
           description: 'Complete ${10 + (i * 5)} quiz questions',
           type: ChallengeType.daily,
           difficulty: [
-            ChallengeDifficulty.easy,
-            ChallengeDifficulty.medium,
-            ChallengeDifficulty.hard,
+            CoreChallengeDifficulty.easy,
+            CoreChallengeDifficulty.medium,
+            CoreChallengeDifficulty.hard,
           ][i % 3],
           condition: ChallengeCondition(
             conditionId: _generateId('condition'),

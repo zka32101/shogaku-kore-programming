@@ -9,7 +9,7 @@ enum ItemCategory {
 }
 
 /// Item rarity tier
-enum ItemRarity {
+enum ShopItemRarity {
   common,        // Standard items
   uncommon,      // More valuable
   rare,          // Hard to find
@@ -18,7 +18,7 @@ enum ItemRarity {
 }
 
 /// Currency type for purchases
-enum CurrencyType {
+enum ShopCurrencyType {
   coin,          // In-game currency
   premiumCoin,   // Premium/paid currency
   both,          // Accepts either
@@ -30,11 +30,11 @@ class ShopItem {
   final String name;                 // Item name (Japanese)
   final String description;
   final ItemCategory category;
-  final ItemRarity rarity;
+  final ShopItemRarity rarity;
   final String? imageId;
   final int coinPrice;               // 0 if not available for coins
   final int? premiumCoinPrice;       // null if not available for premium
-  final CurrencyType acceptedCurrency;
+  final ShopCurrencyType acceptedCurrency;
   final int? durationMinutes;        // For timed power-ups (null = permanent)
   final String? effectDescription;   // Effect if it's a power-up
   final int? maxStackable;           // Max times user can own this
@@ -122,11 +122,11 @@ class ShopItem {
         name: json['name'] as String,
         description: json['description'] as String,
         category: ItemCategory.values.byName(json['category'] as String),
-        rarity: ItemRarity.values.byName(json['rarity'] as String),
+        rarity: ShopItemRarity.values.byName(json['rarity'] as String),
         imageId: json['imageId'] as String?,
         coinPrice: json['coinPrice'] as int? ?? 0,
         premiumCoinPrice: json['premiumCoinPrice'] as int?,
-        acceptedCurrency: CurrencyType.values.byName(json['acceptedCurrency'] as String? ?? 'both'),
+        acceptedCurrency: ShopCurrencyType.values.byName(json['acceptedCurrency'] as String? ?? 'coin'),
         durationMinutes: json['durationMinutes'] as int?,
         effectDescription: json['effectDescription'] as String?,
         maxStackable: json['maxStackable'] as int?,
@@ -356,7 +356,7 @@ class ShopCollection {
       allItems.where((item) => item.category == category).toList();
 
   /// Get items by rarity
-  List<ShopItem> getItemsByRarity(ItemRarity rarity) =>
+  List<ShopItem> getItemsByRarity(ShopItemRarity rarity) =>
       allItems.where((item) => item.rarity == rarity).toList();
 
   /// Get featured/popular items

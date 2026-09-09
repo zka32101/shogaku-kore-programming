@@ -9,14 +9,14 @@ enum ShopItemType {
 }
 
 /// Currency type for pricing
-enum CurrencyType {
+enum RewardCurrencyType {
   xp,            // Experience points
   coins,         // In-game coins
   premium,       // Premium currency (real money)
 }
 
 /// Item rarity/exclusivity
-enum ItemRarity {
+enum RewardItemRarity {
   common,        // Easy to obtain
   uncommon,      // Moderately rare
   rare,          // Hard to obtain
@@ -30,7 +30,7 @@ class ShopItem {
   final String name;                 // Item name (Japanese)
   final String description;          // Item description
   final ShopItemType type;
-  final ItemRarity rarity;
+  final RewardItemRarity rarity;
   final String iconId;               // Icon/image identifier
   final int xpCost;                  // Cost in XP (0 if not available)
   final int coinCost;                // Cost in coins (0 if not available)
@@ -83,11 +83,11 @@ class ShopItem {
   }
 
   /// Get available currency options
-  List<CurrencyType> getAvailableCurrencies() {
-    final currencies = <CurrencyType>[];
-    if (xpCost > 0) currencies.add(CurrencyType.xp);
-    if (coinCost > 0) currencies.add(CurrencyType.coins);
-    if (premiumCost > 0) currencies.add(CurrencyType.premium);
+  List<RewardCurrencyType> getAvailableCurrencies() {
+    final currencies = <RewardCurrencyType>[];
+    if (xpCost > 0) currencies.add(RewardCurrencyType.xp);
+    if (coinCost > 0) currencies.add(RewardCurrencyType.coins);
+    if (premiumCost > 0) currencies.add(RewardCurrencyType.premium);
     return currencies;
   }
 
@@ -114,7 +114,7 @@ class ShopItem {
         name: json['name'] as String,
         description: json['description'] as String,
         type: ShopItemType.values.byName(json['type'] as String),
-        rarity: ItemRarity.values.byName(json['rarity'] as String),
+        rarity: RewardItemRarity.values.byName(json['rarity'] as String),
         iconId: json['iconId'] as String,
         xpCost: json['xpCost'] as int? ?? 0,
         coinCost: json['coinCost'] as int? ?? 0,
@@ -138,7 +138,7 @@ class PurchaseRecord {
   final String itemId;
   final int quantityPurchased;
   final int costPaid;               // Actual cost paid (could be discounted)
-  final CurrencyType currencyUsed;
+  final RewardCurrencyType currencyUsed;
   final DateTime purchasedAt;
   final bool isGift;                // Was this a gift?
   final String? giftFromUserId;     // If gift, who sent it
@@ -174,7 +174,7 @@ class PurchaseRecord {
         itemId: json['itemId'] as String,
         quantityPurchased: json['quantityPurchased'] as int,
         costPaid: json['costPaid'] as int,
-        currencyUsed: CurrencyType.values.byName(json['currencyUsed'] as String),
+        currencyUsed: RewardCurrencyType.values.byName(json['currencyUsed'] as String),
         purchasedAt: DateTime.parse(json['purchasedAt'] as String),
         isGift: json['isGift'] as bool? ?? false,
         giftFromUserId: json['giftFromUserId'] as String?,
@@ -313,7 +313,7 @@ class ShopCatalog {
       allItems.where((item) => item.type == type).toList();
 
   /// Get items by rarity
-  List<ShopItem> getByRarity(ItemRarity rarity) =>
+  List<ShopItem> getByRarity(RewardItemRarity rarity) =>
       allItems.where((item) => item.rarity == rarity).toList();
 
   /// Get available items (in stock, not expired)

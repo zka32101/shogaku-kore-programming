@@ -1,5 +1,5 @@
 /// Challenge difficulty level
-enum ChallengeDifficulty {
+enum DailyChallengeDifficulty {
   easy,      // Basic challenge
   normal,    // Standard challenge
   hard,      // Difficult challenge
@@ -8,7 +8,7 @@ enum ChallengeDifficulty {
 }
 
 /// Challenge category
-enum ChallengeCategory {
+enum DailyChallengeCategory {
   reading,        // Reading comprehension
   writing,        // Writing practice
   mathematics,    // Math problems
@@ -37,7 +37,7 @@ enum ChallengeFrequency {
 }
 
 /// Challenge status for user
-enum ChallengeStatus {
+enum DailyChallengeStatus {
   available,     // Can be started
   inProgress,    // Currently working on it
   completed,     // Completed
@@ -85,8 +85,8 @@ class Challenge {
   final String challengeId;
   final String title;           // Challenge title (Japanese)
   final String description;     // Challenge description
-  final ChallengeCategory category;
-  final ChallengeDifficulty difficulty;
+  final DailyChallengeCategory category;
+  final DailyChallengeDifficulty difficulty;
   final ChallengeFrequency frequency;
   final int targetCount;        // Number of tasks to complete
   final int? timeLimit;         // Time limit in minutes
@@ -144,15 +144,15 @@ class Challenge {
   /// Get formatted difficulty text
   String get difficultyText {
     switch (difficulty) {
-      case ChallengeDifficulty.easy:
+      case DailyChallengeDifficulty.easy:
         return '簡単';
-      case ChallengeDifficulty.normal:
+      case DailyChallengeDifficulty.normal:
         return '普通';
-      case ChallengeDifficulty.hard:
+      case DailyChallengeDifficulty.hard:
         return '難しい';
-      case ChallengeDifficulty.expert:
+      case DailyChallengeDifficulty.expert:
         return '非常に難しい';
-      case ChallengeDifficulty.insane:
+      case DailyChallengeDifficulty.insane:
         return '極難';
     }
   }
@@ -185,8 +185,8 @@ class Challenge {
         challengeId: json['challengeId'] as String,
         title: json['title'] as String,
         description: json['description'] as String,
-        category: ChallengeCategory.values.byName(json['category'] as String),
-        difficulty: ChallengeDifficulty.values.byName(json['difficulty'] as String),
+        category: DailyChallengeCategory.values.byName(json['category'] as String),
+        difficulty: DailyChallengeDifficulty.values.byName(json['difficulty'] as String),
         frequency: ChallengeFrequency.values.byName(json['frequency'] as String),
         targetCount: json['targetCount'] as int,
         timeLimit: json['timeLimit'] as int?,
@@ -336,11 +336,11 @@ class UserChallenges {
       }).toList();
 
   /// Get challenges by category
-  List<Challenge> getChallengesByCategory(ChallengeCategory category) =>
+  List<Challenge> getChallengesByCategory(DailyChallengeCategory category) =>
       availableChallenges.where((c) => c.category == category).toList();
 
   /// Get challenges by difficulty
-  List<Challenge> getChallengesByDifficulty(ChallengeDifficulty difficulty) =>
+  List<Challenge> getChallengesByDifficulty(DailyChallengeDifficulty difficulty) =>
       availableChallenges.where((c) => c.difficulty == difficulty).toList();
 
   /// Get daily challenges
@@ -389,8 +389,8 @@ class ChallengeStats {
   final int totalBonusesEarned;
   final int currentStreak;           // Consecutive days of challenge completion
   final int longestStreak;
-  final Map<ChallengeCategory, int> completionsByCategory;
-  final Map<ChallengeDifficulty, int> completionsByDifficulty;
+  final Map<DailyChallengeCategory, int> completionsByCategory;
+  final Map<DailyChallengeDifficulty, int> completionsByDifficulty;
   final DateTime lastCompletionAt;
   final DateTime lastUpdatedAt;
 
@@ -434,17 +434,17 @@ class ChallengeStats {
         'totalBonusesEarned': totalBonusesEarned,
         'currentStreak': currentStreak,
         'longestStreak': longestStreak,
-        'completionsByCategory': completionsByCategory.map((k, v) => MapEntry(k.name, v)),
-        'completionsByDifficulty': completionsByDifficulty.map((k, v) => MapEntry(k.name, v)),
+        'completionsByCategory': completionsByCategory.map<String, int>((k, v) => MapEntry(k.name, v)),
+        'completionsByDifficulty': completionsByDifficulty.map<String, int>((k, v) => MapEntry(k.name, v)),
         'lastCompletionAt': lastCompletionAt.toIso8601String(),
         'lastUpdatedAt': lastUpdatedAt.toIso8601String(),
       };
 
   factory ChallengeStats.fromJson(Map<String, dynamic> json) {
     final categoryMap = (json['completionsByCategory'] as Map<String, dynamic>)
-        .map((k, v) => MapEntry(ChallengeCategory.values.byName(k), v as int));
+        .map((k, v) => MapEntry(DailyChallengeCategory.values.byName(k), v as int));
     final difficultyMap = (json['completionsByDifficulty'] as Map<String, dynamic>)
-        .map((k, v) => MapEntry(ChallengeDifficulty.values.byName(k), v as int));
+        .map((k, v) => MapEntry(DailyChallengeDifficulty.values.byName(k), v as int));
 
     return ChallengeStats(
       userId: json['userId'] as String,

@@ -2,11 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shogaku_kore_programming/models/activities_minigames.dart';
 
 void main() {
-  group('ActivityType Enum', () {
+  group('MiniGameType Enum', () {
     test('has all expected types', () {
-      expect(ActivityType.values.length, 8);
-      expect(ActivityType.values, contains(ActivityType.quickGame));
-      expect(ActivityType.values, contains(ActivityType.memoryGame));
+      expect(MiniGameType.values.length, 8);
+      expect(MiniGameType.values, contains(MiniGameType.quickGame));
+      expect(MiniGameType.values, contains(MiniGameType.memoryGame));
     });
   });
 
@@ -25,7 +25,7 @@ void main() {
         activityId: 'act1',
         name: 'テスト',
         description: 'Test activity',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -43,7 +43,7 @@ void main() {
         activityId: 'act1',
         name: 'Test',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -60,7 +60,7 @@ void main() {
         activityId: 'act1',
         name: 'Test',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -77,7 +77,7 @@ void main() {
         activityId: 'act1',
         name: 'Test',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -95,7 +95,7 @@ void main() {
         activityId: 'a1',
         name: 'Easy',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -107,7 +107,7 @@ void main() {
         activityId: 'a2',
         name: 'Hard',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.hard,
         baseCoins: 50,
         baseXp: 25,
@@ -119,7 +119,7 @@ void main() {
         activityId: 'a3',
         name: 'Expert',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.expert,
         baseCoins: 50,
         baseXp: 25,
@@ -134,7 +134,7 @@ void main() {
         activityId: 'act1',
         name: 'Test',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -164,7 +164,7 @@ void main() {
 
       final activity = Activity.fromJson(json);
       expect(activity.activityId, 'act1');
-      expect(activity.type, ActivityType.quickGame);
+      expect(activity.type, MiniGameType.quickGame);
     });
   });
 
@@ -456,7 +456,7 @@ void main() {
         activityId: 'act1',
         name: 'Available',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -467,7 +467,7 @@ void main() {
         activityId: 'act2',
         name: 'Expired',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -502,7 +502,7 @@ void main() {
         activityId: 'act1',
         name: 'Memory',
         description: 'Test',
-        type: ActivityType.memoryGame,
+        type: MiniGameType.memoryGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -512,7 +512,7 @@ void main() {
         activityId: 'act2',
         name: 'Speed',
         description: 'Test',
-        type: ActivityType.speedGame,
+        type: MiniGameType.speedGame,
         difficulty: ActivityDifficulty.normal,
         baseCoins: 75,
         baseXp: 40,
@@ -535,9 +535,9 @@ void main() {
         generatedAt: now,
       );
 
-      final memoryList = collection.getActivitiesByType(ActivityType.memoryGame);
+      final memoryList = collection.getActivitiesByType(MiniGameType.memoryGame);
       expect(memoryList.length, 1);
-      expect(memoryList[0].type, ActivityType.memoryGame);
+      expect(memoryList[0].type, MiniGameType.memoryGame);
     });
 
     test('getFeaturedActivities returns featured only', () {
@@ -546,7 +546,7 @@ void main() {
         activityId: 'act1',
         name: 'Featured',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,
@@ -557,7 +557,7 @@ void main() {
         activityId: 'act2',
         name: 'Regular',
         description: 'Test',
-        type: ActivityType.quickGame,
+        type: MiniGameType.quickGame,
         difficulty: ActivityDifficulty.easy,
         baseCoins: 50,
         baseXp: 25,

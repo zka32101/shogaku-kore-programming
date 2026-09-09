@@ -361,16 +361,16 @@ void main() {
       final notifier = container.read(dailyChallengeProvider.notifier);
       await notifier.initializeChallenges('test_user');
 
-      final easy = container.read(challengesByDifficultyProvider(ChallengeDifficulty.easy));
-      expect(easy.every((c) => c.difficulty == ChallengeDifficulty.easy), true);
+      final easy = container.read(challengesByDifficultyProvider(DailyChallengeDifficulty.easy));
+      expect(easy.every((c) => c.difficulty == DailyChallengeDifficulty.easy), true);
     });
 
     test('challengesByCategoryProvider filters by category', () async {
       final notifier = container.read(dailyChallengeProvider.notifier);
       await notifier.initializeChallenges('test_user');
 
-      final reading = container.read(challengesByCategoryProvider(ChallengeCategory.reading));
-      expect(reading.every((c) => c.category == ChallengeCategory.reading), true);
+      final reading = container.read(challengesByCategoryProvider(DailyChallengeCategory.reading));
+      expect(reading.every((c) => c.category == DailyChallengeCategory.reading), true);
     });
 
     test('challengeStatsProvider provides stats', () async {

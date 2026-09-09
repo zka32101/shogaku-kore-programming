@@ -1,5 +1,5 @@
 /// Challenge difficulty levels
-enum ChallengeDifficulty {
+enum WeeklyChallengeDifficulty {
   easy,      // Beginner friendly
   normal,    // Standard difficulty
   hard,      // Challenging
@@ -7,7 +7,7 @@ enum ChallengeDifficulty {
 }
 
 /// Challenge category/type
-enum ChallengeCategory {
+enum WeeklyChallengeCategory {
   learning,      // Learning-focused
   practice,      // Practice sessions
   reading,       // Reading comprehension
@@ -31,8 +31,8 @@ class WeeklyChallenge {
   final String challengeId;
   final String title;               // Challenge title (Japanese)
   final String description;         // Challenge description
-  final ChallengeCategory category;
-  final ChallengeDifficulty difficulty;
+  final WeeklyChallengeCategory category;
+  final WeeklyChallengeDifficulty difficulty;
   final String iconId;              // Icon/badge identifier
   final int targetValue;            // Goal to achieve
   final String metricKey;           // Metric being tracked
@@ -67,13 +67,13 @@ class WeeklyChallenge {
   /// Calculate reward multiplier based on difficulty
   double get difficultyMultiplier {
     switch (difficulty) {
-      case ChallengeDifficulty.easy:
+      case WeeklyChallengeDifficulty.easy:
         return 1.0;
-      case ChallengeDifficulty.normal:
+      case WeeklyChallengeDifficulty.normal:
         return 1.5;
-      case ChallengeDifficulty.hard:
+      case WeeklyChallengeDifficulty.hard:
         return 2.0;
-      case ChallengeDifficulty.expert:
+      case WeeklyChallengeDifficulty.expert:
         return 3.0;
     }
   }
@@ -115,8 +115,8 @@ class WeeklyChallenge {
         challengeId: json['challengeId'] as String,
         title: json['title'] as String,
         description: json['description'] as String,
-        category: ChallengeCategory.values.byName(json['category'] as String),
-        difficulty: ChallengeDifficulty.values.byName(json['difficulty'] as String),
+        category: WeeklyChallengeCategory.values.byName(json['category'] as String),
+        difficulty: WeeklyChallengeDifficulty.values.byName(json['difficulty'] as String),
         iconId: json['iconId'] as String,
         targetValue: json['targetValue'] as int,
         metricKey: json['metricKey'] as String,
@@ -341,11 +341,11 @@ class WeeklyChallengeCollection {
       userProgress[challengeId];
 
   /// Get challenges by category
-  List<WeeklyChallenge> getByCategory(ChallengeCategory category) =>
+  List<WeeklyChallenge> getByCategory(WeeklyChallengeCategory category) =>
       challenges.where((c) => c.category == category).toList();
 
   /// Get challenges by difficulty
-  List<WeeklyChallenge> getByDifficulty(ChallengeDifficulty difficulty) =>
+  List<WeeklyChallenge> getByDifficulty(WeeklyChallengeDifficulty difficulty) =>
       challenges.where((c) => c.difficulty == difficulty).toList();
 
   /// Get active challenges (not yet completed)

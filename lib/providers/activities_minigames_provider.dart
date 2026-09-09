@@ -335,7 +335,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'quick_memory_1',
       name: 'メモリーチャレンジ',
       description: 'タイルをマッチさせてください',
-      type: ActivityType.memoryGame,
+      type: MiniGameType.memoryGame,
       difficulty: ActivityDifficulty.easy,
       baseCoins: 50,
       baseXp: 25,
@@ -349,7 +349,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'quick_speed_1',
       name: 'スピードマス',
       description: '素早く計算問題を解く',
-      type: ActivityType.speedGame,
+      type: MiniGameType.speedGame,
       difficulty: ActivityDifficulty.normal,
       baseCoins: 75,
       baseXp: 40,
@@ -362,7 +362,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'quick_word_1',
       name: 'ワードビルダー',
       description: 'letters から単語を作成',
-      type: ActivityType.wordGame,
+      type: MiniGameType.wordGame,
       difficulty: ActivityDifficulty.normal,
       baseCoins: 60,
       baseXp: 30,
@@ -376,7 +376,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'daily_math_1',
       name: '数学パズル',
       description: '毎日の数学チャレンジ',
-      type: ActivityType.mathGame,
+      type: MiniGameType.mathGame,
       difficulty: ActivityDifficulty.hard,
       baseCoins: 100,
       baseXp: 60,
@@ -390,7 +390,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'daily_trivia_1',
       name: 'トリビアマスター',
       description: '一般知識トリビア',
-      type: ActivityType.trivia,
+      type: MiniGameType.trivia,
       difficulty: ActivityDifficulty.normal,
       baseCoins: 70,
       baseXp: 45,
@@ -403,7 +403,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'puzzle_logic_1',
       name: 'ロジックパズル',
       description: '論理的思考力を鍛える',
-      type: ActivityType.puzzleGame,
+      type: MiniGameType.puzzleGame,
       difficulty: ActivityDifficulty.hard,
       requiredLevel: 5,
       baseCoins: 150,
@@ -417,7 +417,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'puzzle_pattern_1',
       name: 'パターンマッチ',
       description: 'パターンを完成させる',
-      type: ActivityType.puzzleGame,
+      type: MiniGameType.puzzleGame,
       difficulty: ActivityDifficulty.normal,
       baseCoins: 80,
       baseXp: 50,
@@ -429,7 +429,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'expert_challenge_1',
       name: 'エキスパートチャレンジ',
       description: '究極の難易度',
-      type: ActivityType.speedGame,
+      type: MiniGameType.speedGame,
       difficulty: ActivityDifficulty.expert,
       requiredLevel: 20,
       baseCoins: 300,
@@ -444,7 +444,7 @@ class ActivityNotifier extends StateNotifier<ActivityState> {
       activityId: 'weekly_achievement_1',
       name: '週間チャレンジ',
       description: '1週間のみ利用可能',
-      type: ActivityType.speedGame,
+      type: MiniGameType.speedGame,
       difficulty: ActivityDifficulty.hard,
       baseCoins: 200,
       baseXp: 120,
@@ -509,7 +509,7 @@ final featuredActivitiesProvider = Provider<List<Activity>>((ref) {
 });
 
 final activitiesByTypeProvider =
-    Provider.family<List<Activity>, ActivityType>((ref, type) {
+    Provider.family<List<Activity>, MiniGameType>((ref, type) {
   final collection = ref.watch(activityCollectionProvider);
   return collection?.getActivitiesByType(type) ?? [];
 });

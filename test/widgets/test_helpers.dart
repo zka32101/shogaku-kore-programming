@@ -30,7 +30,9 @@ class TestApp extends StatelessWidget {
 void setupTestEnvironment({
   Map<String, dynamic> sharedPrefsValues = const {},
 }) {
-  SharedPreferences.setMockInitialValues(sharedPrefsValues);
+  SharedPreferences.setMockInitialValues(
+    sharedPrefsValues.cast<String, Object>(),
+  );
 }
 
 /// Helper to pump a widget with all required dependencies

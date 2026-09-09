@@ -1,5 +1,5 @@
 /// User level rank
-enum UserRank {
+enum ProfileUserRank {
   beginner,      // Level 1-10
   learner,       // Level 11-25
   intermediate,  // Level 26-50
@@ -149,29 +149,29 @@ class UserProfile {
   });
 
   /// Get user rank based on level
-  UserRank getRank() {
-    if (currentLevel <= 10) return UserRank.beginner;
-    if (currentLevel <= 25) return UserRank.learner;
-    if (currentLevel <= 50) return UserRank.intermediate;
-    if (currentLevel <= 75) return UserRank.advanced;
-    if (currentLevel <= 100) return UserRank.expert;
-    return UserRank.master;
+  ProfileUserRank getRank() {
+    if (currentLevel <= 10) return ProfileUserRank.beginner;
+    if (currentLevel <= 25) return ProfileUserRank.learner;
+    if (currentLevel <= 50) return ProfileUserRank.intermediate;
+    if (currentLevel <= 75) return ProfileUserRank.advanced;
+    if (currentLevel <= 100) return ProfileUserRank.expert;
+    return ProfileUserRank.master;
   }
 
   /// Get rank title in Japanese
   String getRankTitle() {
     switch (getRank()) {
-      case UserRank.beginner:
+      case ProfileUserRank.beginner:
         return '初心者';
-      case UserRank.learner:
+      case ProfileUserRank.learner:
         return '学習者';
-      case UserRank.intermediate:
+      case ProfileUserRank.intermediate:
         return '中級者';
-      case UserRank.advanced:
+      case ProfileUserRank.advanced:
         return '上級者';
-      case UserRank.expert:
+      case ProfileUserRank.expert:
         return 'エキスパート';
-      case UserRank.master:
+      case ProfileUserRank.master:
         return 'マスター';
     }
   }
@@ -276,10 +276,9 @@ class UserStatistics {
 
   /// Get learning level based on lessons completed
   String getLearningLevel() {
-    if (totalLessonsCompleted < 50) return '初級';
-    if (totalLessonsCompleted < 150) return '中級';
-    if (totalLessonsCompleted < 300) return '上級';
-    if (totalLessonsCompleted < 500) return '上級+';
+    if (totalLessonsCompleted < 100) return '初級';
+    if (totalLessonsCompleted < 300) return '中級';
+    if (totalLessonsCompleted < 500) return '上級';
     return 'マスター';
   }
 

@@ -151,8 +151,8 @@ void main() {
         challengeId: 'test',
         title: 'Test',
         description: '',
-        category: ChallengeCategory.writing,
-        difficulty: ChallengeDifficulty.hard,  // 2.0x multiplier
+        category: WeeklyChallengeCategory.writing,
+        difficulty: WeeklyChallengeDifficulty.hard,  // 2.0x multiplier
         iconId: 'i',
         targetValue: 100,
         metricKey: 'm',
@@ -216,16 +216,16 @@ void main() {
       final notifier = container.read(weeklyChallengeProvider.notifier);
       await notifier.initializeChallenges('test_user');
 
-      final learning = notifier.getByCategory(ChallengeCategory.learning);
+      final learning = notifier.getByCategory(WeeklyChallengeCategory.learning);
       expect(learning.isNotEmpty, true);
-      expect(learning.every((c) => c.category == ChallengeCategory.learning), true);
+      expect(learning.every((c) => c.category == WeeklyChallengeCategory.learning), true);
     });
 
     test('getByDifficulty filters correctly', () async {
       final notifier = container.read(weeklyChallengeProvider.notifier);
       await notifier.initializeChallenges('test_user');
 
-      final normal = notifier.getByDifficulty(ChallengeDifficulty.normal);
+      final normal = notifier.getByDifficulty(WeeklyChallengeDifficulty.normal);
       expect(normal.isNotEmpty, true);
     });
 

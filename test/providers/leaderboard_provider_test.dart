@@ -32,7 +32,7 @@ void main() {
     });
 
     test('copyWith should preserve unspecified fields', () {
-      final timestamp = DateTime.utc(2026, 9, 1);
+      final timestamp = DateTime.now();
       final originalState = LeaderboardState(
         isLoading: true,
         lastUpdatedAt: timestamp,

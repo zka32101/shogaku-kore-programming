@@ -50,7 +50,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: '7日連続バッジ',
         description: '7日間連続ログインの証',
         type: ShopItemType.badge,
-        rarity: ItemRarity.uncommon,
+        rarity: RewardItemRarity.uncommon,
         iconId: 'icon_badge_7day',
         xpCost: 100,
         coinCost: 50,
@@ -64,7 +64,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: '30日連続バッジ',
         description: '30日間連続ログインの証',
         type: ShopItemType.badge,
-        rarity: ItemRarity.rare,
+        rarity: RewardItemRarity.rare,
         iconId: 'icon_badge_30day',
         xpCost: 300,
         coinCost: 150,
@@ -77,7 +77,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: 'マスターラーナーバッジ',
         description: '1000XP達成記念',
         type: ShopItemType.badge,
-        rarity: ItemRarity.epic,
+        rarity: RewardItemRarity.epic,
         iconId: 'icon_badge_learner',
         xpCost: 500,
         coinCost: 250,
@@ -92,7 +92,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: 'ダークフォレスト',
         description: '落ち着いた緑色のテーマ',
         type: ShopItemType.theme,
-        rarity: ItemRarity.common,
+        rarity: RewardItemRarity.common,
         iconId: 'icon_theme_forest',
         xpCost: 50,
         coinCost: 25,
@@ -106,7 +106,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: 'ネオンナイト',
         description: 'サイバーパンク風テーマ',
         type: ShopItemType.theme,
-        rarity: ItemRarity.uncommon,
+        rarity: RewardItemRarity.uncommon,
         iconId: 'icon_theme_neon',
         xpCost: 150,
         coinCost: 75,
@@ -120,7 +120,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: '桜の春',
         description: '日本の春をテーマにしたカラフルなテーマ',
         type: ShopItemType.theme,
-        rarity: ItemRarity.rare,
+        rarity: RewardItemRarity.rare,
         iconId: 'icon_theme_sakura',
         xpCost: 250,
         coinCost: 125,
@@ -134,7 +134,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: 'ブルーニンジャ',
         description: '青いニンジャアバター',
         type: ShopItemType.avatar,
-        rarity: ItemRarity.uncommon,
+        rarity: RewardItemRarity.uncommon,
         iconId: 'icon_avatar_ninja_blue',
         xpCost: 80,
         coinCost: 40,
@@ -147,7 +147,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: 'ゴールドウィザード',
         description: '魔法使いアバター（ゴールド）',
         type: ShopItemType.avatar,
-        rarity: ItemRarity.epic,
+        rarity: RewardItemRarity.epic,
         iconId: 'icon_avatar_wizard',
         xpCost: 400,
         coinCost: 200,
@@ -162,7 +162,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: 'ダブルXP（1時間）',
         description: '1時間XPを2倍獲得',
         type: ShopItemType.powerup,
-        rarity: ItemRarity.uncommon,
+        rarity: RewardItemRarity.uncommon,
         iconId: 'icon_powerup_xp',
         xpCost: 0,
         coinCost: 100,
@@ -175,7 +175,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: 'チャレンジリセット',
         description: 'チャレンジの進捗をリセット',
         type: ShopItemType.powerup,
-        rarity: ItemRarity.rare,
+        rarity: RewardItemRarity.rare,
         iconId: 'icon_powerup_reset',
         xpCost: 200,
         coinCost: 0,
@@ -190,7 +190,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
         name: 'スターターパック',
         description: 'バッジ＋テーマ＋アバター',
         type: ShopItemType.bundle,
-        rarity: ItemRarity.rare,
+        rarity: RewardItemRarity.rare,
         iconId: 'icon_bundle_starter',
         xpCost: 300,
         coinCost: 150,
@@ -266,7 +266,7 @@ class ShopNotifier extends StateNotifier<ShopState> {
   Future<bool> purchaseItem(
     String userId,
     String itemId,
-    CurrencyType currency,
+    RewardCurrencyType currency,
     {int quantity = 1, String? giftToUserId}
   ) async {
     try {
@@ -289,13 +289,13 @@ class ShopNotifier extends StateNotifier<ShopState> {
       // Calculate cost
       int cost = 0;
       switch (currency) {
-        case CurrencyType.xp:
+        case RewardCurrencyType.xp:
           cost = item.xpCost;
           break;
-        case CurrencyType.coins:
+        case RewardCurrencyType.coins:
           cost = item.coinCost;
           break;
-        case CurrencyType.premium:
+        case RewardCurrencyType.premium:
           cost = item.premiumCost;
           break;
       }
@@ -338,13 +338,13 @@ class ShopNotifier extends StateNotifier<ShopState> {
       // Update stats
       int xpSpent = 0, coinSpent = 0, premiumSpent = 0;
       switch (currency) {
-        case CurrencyType.xp:
+        case RewardCurrencyType.xp:
           xpSpent = cost * quantity;
           break;
-        case CurrencyType.coins:
+        case RewardCurrencyType.coins:
           coinSpent = cost * quantity;
           break;
-        case CurrencyType.premium:
+        case RewardCurrencyType.premium:
           premiumSpent = cost * quantity;
           break;
       }
@@ -415,13 +415,13 @@ class ShopNotifier extends StateNotifier<ShopState> {
       // Update stats
       int xpRefund = 0, coinRefund = 0, premiumRefund = 0;
       switch (purchase.currencyUsed) {
-        case CurrencyType.xp:
+        case RewardCurrencyType.xp:
           xpRefund = purchase.costPaid;
           break;
-        case CurrencyType.coins:
+        case RewardCurrencyType.coins:
           coinRefund = purchase.costPaid;
           break;
-        case CurrencyType.premium:
+        case RewardCurrencyType.premium:
           premiumRefund = purchase.costPaid;
           break;
       }

@@ -76,7 +76,7 @@ void main() {
 
   group('LearningTimeTrend Tests', () {
     test('LearningTimeTrend creation', () {
-      final date = DateTime.utc(2026, 9, 1);
+      final date = DateTime.now();
       final trend = LearningTimeTrend(
         date: date,
         timeSpent: const Duration(minutes: 30),
@@ -89,7 +89,7 @@ void main() {
     });
 
     test('LearningTimeTrend JSON serialization', () {
-      final date = DateTime.utc(2026, 9, 1);
+      final date = DateTime.now();
       final trend = LearningTimeTrend(
         date: date,
         timeSpent: const Duration(hours: 1, minutes: 15),
@@ -283,7 +283,7 @@ void main() {
     });
 
     test('LearningGoal JSON serialization', () {
-      final deadline = DateTime.utc(2026, 10, 1);
+      final deadline = DateTime.now().add(const Duration(days: 30));
       final goal = LearningGoal(
         goalId: 'goal123',
         childId: 'child123',
@@ -294,7 +294,7 @@ void main() {
         targetQuizzesCount: 75,
         deadline: deadline,
         isCompleted: false,
-        createdAt: DateTime.utc(2026, 9, 1),
+        createdAt: DateTime.now(),
       );
 
       final json = goal.toJson();

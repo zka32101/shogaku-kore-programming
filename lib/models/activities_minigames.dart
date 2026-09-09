@@ -1,5 +1,5 @@
-/// Activity type
-enum ActivityType {
+/// Mini-game type
+enum MiniGameType {
   quickGame,          // Quick 1-3 minute games
   dailyChallenge,     // Daily challenges
   puzzleGame,         // Puzzle/logic games
@@ -31,7 +31,7 @@ class Activity {
   final String activityId;
   final String name;                  // Activity name (Japanese)
   final String description;
-  final ActivityType type;
+  final MiniGameType type;
   final ActivityDifficulty difficulty;
   final int requiredLevel;            // Minimum level to unlock
   final int timeLimit;                // Seconds (0 = no limit)
@@ -137,7 +137,7 @@ class Activity {
         activityId: json['activityId'] as String,
         name: json['name'] as String,
         description: json['description'] as String,
-        type: ActivityType.values.byName(json['type'] as String),
+        type: MiniGameType.values.byName(json['type'] as String),
         difficulty: ActivityDifficulty.values.byName(json['difficulty'] as String),
         requiredLevel: json['requiredLevel'] as int? ?? 1,
         timeLimit: json['timeLimit'] as int? ?? 0,
@@ -388,7 +388,7 @@ class ActivityCollection {
       allActivities.where((a) => a.isAvailable).toList();
 
   /// Get activities by type
-  List<Activity> getActivitiesByType(ActivityType type) =>
+  List<Activity> getActivitiesByType(MiniGameType type) =>
       allActivities.where((a) => a.type == type).toList();
 
   /// Get activities by difficulty

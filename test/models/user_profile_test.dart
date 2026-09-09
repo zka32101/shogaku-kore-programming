@@ -4,9 +4,9 @@ import 'package:shogaku_kore_programming/models/user_profile.dart';
 void main() {
   group('UserRank Enum', () {
     test('has all expected ranks', () {
-      expect(UserRank.values.length, 6);
-      expect(UserRank.values, contains(UserRank.beginner));
-      expect(UserRank.values, contains(UserRank.master));
+      expect(ProfileUserRank.values.length, 6);
+      expect(ProfileUserRank.values, contains(ProfileUserRank.beginner));
+      expect(ProfileUserRank.values, contains(ProfileUserRank.master));
     });
   });
 
@@ -156,7 +156,7 @@ void main() {
         currentLevel: 5,
         createdAt: now,
       );
-      expect(beginnerProfile.getRank(), UserRank.beginner);
+      expect(beginnerProfile.getRank(), ProfileUserRank.beginner);
 
       final learnerProfile = UserProfile(
         userId: 'user2',
@@ -164,7 +164,7 @@ void main() {
         currentLevel: 15,
         createdAt: now,
       );
-      expect(learnerProfile.getRank(), UserRank.learner);
+      expect(learnerProfile.getRank(), ProfileUserRank.learner);
 
       final masterProfile = UserProfile(
         userId: 'user3',
@@ -172,7 +172,7 @@ void main() {
         currentLevel: 101,
         createdAt: now,
       );
-      expect(masterProfile.getRank(), UserRank.master);
+      expect(masterProfile.getRank(), ProfileUserRank.master);
     });
 
     test('getRankTitle returns correct Japanese text', () {

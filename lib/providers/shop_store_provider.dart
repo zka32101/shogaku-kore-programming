@@ -320,10 +320,10 @@ class ShopNotifier extends StateNotifier<ShopState> {
       name: 'かわいいロボット',
       description: 'キュートなロボットアバター',
       category: ItemCategory.cosmetic,
-      rarity: ItemRarity.common,
+      rarity: ShopItemRarity.common,
       coinPrice: 500,
       premiumCoinPrice: 5,
-      acceptedCurrency: CurrencyType.both,
+      acceptedCurrency: ShopCurrencyType.both,
       addedAt: now,
     ));
 
@@ -332,10 +332,10 @@ class ShopNotifier extends StateNotifier<ShopState> {
       name: 'ダークテーマ',
       description: 'ダークモード UI テーマ',
       category: ItemCategory.cosmetic,
-      rarity: ItemRarity.uncommon,
+      rarity: ShopItemRarity.uncommon,
       coinPrice: 1000,
       premiumCoinPrice: 10,
-      acceptedCurrency: CurrencyType.both,
+      acceptedCurrency: ShopCurrencyType.both,
       addedAt: now,
     ));
 
@@ -345,10 +345,10 @@ class ShopNotifier extends StateNotifier<ShopState> {
       name: '2倍 XP ブースター',
       description: '1時間、XPを2倍獲得',
       category: ItemCategory.powerup,
-      rarity: ItemRarity.rare,
+      rarity: ShopItemRarity.rare,
       coinPrice: 2000,
       premiumCoinPrice: 20,
-      acceptedCurrency: CurrencyType.both,
+      acceptedCurrency: ShopCurrencyType.both,
       durationMinutes: 60,
       effectDescription: 'XP x2 for 1 hour',
       addedAt: now,
@@ -359,10 +359,10 @@ class ShopNotifier extends StateNotifier<ShopState> {
       name: 'ストリーク保護',
       description: '1日逃してもストリークが保護される',
       category: ItemCategory.powerup,
-      rarity: ItemRarity.epic,
+      rarity: ShopItemRarity.epic,
       coinPrice: 3000,
       premiumCoinPrice: 30,
-      acceptedCurrency: CurrencyType.both,
+      acceptedCurrency: ShopCurrencyType.both,
       durationMinutes: 1440, // 24 hours
       effectDescription: 'Protects streak for 1 missed day',
       addedAt: now,
@@ -374,10 +374,10 @@ class ShopNotifier extends StateNotifier<ShopState> {
       name: 'コイン発電機',
       description: '毎日100コイン獲得',
       category: ItemCategory.booster,
-      rarity: ItemRarity.legendary,
+      rarity: ShopItemRarity.legendary,
       coinPrice: 500,
       premiumCoinPrice: 50,
-      acceptedCurrency: CurrencyType.premiumCoin,
+      acceptedCurrency: ShopCurrencyType.premiumCoin,
       durationMinutes: 10080, // 7 days
       effectDescription: '+100 coins daily',
       addedAt: now,
@@ -389,10 +389,10 @@ class ShopNotifier extends StateNotifier<ShopState> {
       name: 'ラッキーチケット',
       description: '1回、ボーナスコインを獲得するチャンス',
       category: ItemCategory.consumable,
-      rarity: ItemRarity.uncommon,
+      rarity: ShopItemRarity.uncommon,
       coinPrice: 500,
       premiumCoinPrice: 5,
-      acceptedCurrency: CurrencyType.both,
+      acceptedCurrency: ShopCurrencyType.both,
       maxStackable: 99,
       addedAt: now,
     ));
@@ -403,10 +403,10 @@ class ShopNotifier extends StateNotifier<ShopState> {
       name: '桜バッジ',
       description: '春の季節限定バッジ',
       category: ItemCategory.badge,
-      rarity: ItemRarity.legendary,
+      rarity: ShopItemRarity.legendary,
       coinPrice: 5000,
       premiumCoinPrice: 50,
-      acceptedCurrency: CurrencyType.both,
+      acceptedCurrency: ShopCurrencyType.both,
       isLimited: true,
       limitedUntil: now.add(const Duration(days: 7)),
       addedAt: now,
@@ -447,7 +447,7 @@ final itemsByCategoryProvider =
   return collection?.getItemsByCategory(category) ?? [];
 });
 
-final itemsByRarityProvider = Provider.family<List<ShopItem>, ItemRarity>((ref, rarity) {
+final itemsByRarityProvider = Provider.family<List<ShopItem>, ShopItemRarity>((ref, rarity) {
   final collection = ref.watch(shopCollectionProvider);
   return collection?.getItemsByRarity(rarity) ?? [];
 });

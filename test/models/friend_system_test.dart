@@ -24,7 +24,7 @@ void main() {
         friendId: 'friend1',
         username: 'testfriend',
         currentLevel: 10,
-        userRank: UserRank.learner,
+        userRank: FriendSystemUserRank.learner,
       );
 
       expect(friendInfo.friendId, 'friend1');
@@ -38,7 +38,7 @@ void main() {
         username: 'testfriend',
         displayName: 'Test Friend',
         currentLevel: 10,
-        userRank: UserRank.learner,
+        userRank: FriendSystemUserRank.learner,
         isOnline: true,
       );
 

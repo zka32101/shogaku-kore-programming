@@ -338,7 +338,8 @@ void main() {
           questions: const [],
         );
 
-        final completedDate = DateTime.utc(2026, 9, 5);
+        final completedDate = DateTime.now();
+        final formattedDate = '${completedDate.year}/${completedDate.month.toString().padLeft(2, '0')}/${completedDate.day.toString().padLeft(2, '0')}';
 
         await tester.pumpWidget(
           MaterialApp(
@@ -352,7 +353,7 @@ void main() {
           ),
         );
 
-        expect(find.text('2026/09/05 クリア'), findsOneWidget);
+        expect(find.text('$formattedDate クリア'), findsOneWidget);
       });
 
       testWidgets('renders with stage level color indicator',

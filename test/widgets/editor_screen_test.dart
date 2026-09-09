@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,45 +35,30 @@ void main() {
       questions: const [],
       conceptExplanation: '順序を意識してブロックを組み立てます',
       type: 'editor',
-      blockLibrary: [
-        BlockDefinition(
+      availableBlocks: [
+        const BlockTemplate(
           id: 'move_right',
-          label: '右に進む',
-          color: Colors.blue,
+          name: '右に進む',
+          icon: '📍',
           category: 'movement',
-          params: [
-            BlockParam(
-              name: 'steps',
-              type: 'number',
-              defaultValue: 1,
-            ),
-          ],
+          description: 'ロボットを右に進める',
+          properties: {'steps': 1},
         ),
-        BlockDefinition(
+        const BlockTemplate(
           id: 'move_down',
-          label: '下に進む',
-          color: Colors.green,
+          name: '下に進む',
+          icon: '📍',
           category: 'movement',
-          params: [
-            BlockParam(
-              name: 'steps',
-              type: 'number',
-              defaultValue: 1,
-            ),
-          ],
+          description: 'ロボットを下に進める',
+          properties: {'steps': 1},
         ),
-        BlockDefinition(
+        const BlockTemplate(
           id: 'repeat',
-          label: '繰り返す',
-          color: Colors.orange,
+          name: '繰り返す',
+          icon: '🔁',
           category: 'control',
-          params: [
-            BlockParam(
-              name: 'times',
-              type: 'number',
-              defaultValue: 2,
-            ),
-          ],
+          description: '処理を繰り返す',
+          properties: {'times': 2},
         ),
       ],
     );

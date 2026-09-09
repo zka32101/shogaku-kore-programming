@@ -49,8 +49,8 @@ enum ChallengeType {
   special,    // 特別イベント
 }
 
-/// チャレンジの難易度
-enum ChallengeDifficulty {
+/// チャレンジの難易度（コアチャレンジ用）
+enum CoreChallengeDifficulty {
   easy,       // 簡単
   medium,     // 普通
   hard,       // 難しい
@@ -139,7 +139,7 @@ class Challenge {
   final String title;
   final String description;
   final ChallengeType type;
-  final ChallengeDifficulty difficulty;
+  final CoreChallengeDifficulty difficulty;
   final ChallengeCondition condition;
   final ChallengeReward reward;
   final DateTime startedAt;
@@ -187,7 +187,7 @@ class Challenge {
         description: json['description'] as String,
         type: ChallengeType.values.byName(json['type'] as String),
         difficulty:
-            ChallengeDifficulty.values.byName(json['difficulty'] as String),
+            CoreChallengeDifficulty.values.byName(json['difficulty'] as String),
         condition: ChallengeCondition.fromJson(
             json['condition'] as Map<String, dynamic>),
         reward:

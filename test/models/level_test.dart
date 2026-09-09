@@ -180,18 +180,20 @@ void main() {
         emoji: '🌱',
       );
 
-      // Level 1 requires 100 XP, Level 2 requires ~115 XP
+      // Level 1 requires 100 XP cumulative, Level 2 requires ~115 XP cumulative
+      // Progress1: At 50% of level 1
       final progress1 = UserLevelProgress(
         level: level,
         currentXp: 50,
-        totalXpEarned: 150,
+        totalXpEarned: 50,
         progress: 50.0,
       );
 
+      // Progress2: At 100% of level 1 (ready to level up)
       final progress2 = UserLevelProgress(
         level: level,
-        currentXp: 115,
-        totalXpEarned: 215,
+        currentXp: 100,
+        totalXpEarned: 100,
         progress: 100.0,
       );
 
@@ -211,17 +213,19 @@ void main() {
         emoji: '🌱',
       );
 
+      // Not ready: 50% progress
       final notReady = UserLevelProgress(
         level: level,
         currentXp: 50,
-        totalXpEarned: 150,
+        totalXpEarned: 50,
         progress: 50.0,
       );
 
+      // Ready: 100% progress (ready to level up)
       final ready = UserLevelProgress(
         level: level,
-        currentXp: 115,
-        totalXpEarned: 215,
+        currentXp: 100,
+        totalXpEarned: 100,
         progress: 100.0,
       );
 

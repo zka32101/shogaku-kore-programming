@@ -345,8 +345,8 @@ void main() {
         generatedAt: DateTime.now(),
       );
 
-      expect(collection.getAchievement('ach_1').name, 'First');
-      expect(collection.getAchievement('ach_2').name, 'Second');
+      expect(collection.getAchievement('ach_1')?.name, 'First');
+      expect(collection.getAchievement('ach_2')?.name, 'Second');
     });
 
     test('getByType filters achievements correctly', () {
