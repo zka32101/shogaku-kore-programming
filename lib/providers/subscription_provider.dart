@@ -1,163 +1,171 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/subscription.dart';
+// Subscription Provider
+// Phase 4.2: RevenueCat-based subscription state management
 
-/// トライアル・サブスクリプション状態を管理するプロバイダー
-class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
-  SubscriptionNotifier() : super(const SubscriptionState()) {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import '../services/revenue_cat_service.dart';
+import '../utils/constants.dart';
+
+// ─── Subscription Status Provider ───────────────────────────────────────────
+// Notifier for subscription state
+
+class SubscriptionNotifier extends StateNotifier<AsyncValue<bool>> {
+  final RevenueCatService _revenueCat;
+
+  SubscriptionNotifier(this._revenueCat) : super(const AsyncValue.loading()) {
     _initialize();
   }
 
-  static const _keyTrialStartDate = 'subscription_trial_start_date';
-  static const _keyTrialUsed = 'subscription_trial_used';
-  static const _keyPremiumExpiry = 'subscription_premium_expiry';
-  static const _trialDurationDays = 14;
-
-  /// 初期化：SharedPreferences からデータを読み込む
   Future<void> _initialize() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final now = DateTime.now(); // DateTime.now() は一度だけ呼び出す（パフォーマンス最適化）
+      await _revenueCat.initialize();
+      final isSubscribed = await _revenueCat.isSubscribed();
+      state = AsyncValue.data(isSubscribed);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 
-      final trialStartDateStr = prefs.getString(_keyTrialStartDate);
-      final hasUsedTrial = prefs.getBool(_keyTrialUsed) ?? false;
-      final premiumExpiryStr = prefs.getString(_keyPremiumExpiry);
-
-      DateTime? trialStartDate;
-      if (trialStartDateStr != null) {
-        trialStartDate = DateTime.parse(trialStartDateStr);
+  /// Purchase subscription
+  Future<void> purchaseSubscription() async {
+    try {
+      final offerings = await _revenueCat.getOfferings();
+      if (offerings == null || offerings.isEmpty) {
+        throw Exception('No offerings available');
       }
 
-      DateTime? premiumExpiryDate;
-      if (premiumExpiryStr != null) {
-        premiumExpiryDate = DateTime.parse(premiumExpiryStr);
+      // Get the monthly package (adjust logic if multiple packages)
+      final monthlyPackage = offerings.firstWhere(
+        (pkg) =>
+            pkg.identifier.contains(AppConstants.subscriptionProductId) ||
+            pkg.packageType == PackageType.monthly,
+        orElse: () => offerings.first,
+      );
+
+      state = const AsyncValue.loading();
+      final success = await _revenueCat.purchaseSubscription(
+        package: monthlyPackage,
+      );
+
+      if (success) {
+        state = const AsyncValue.data(true);
+      } else {
+        throw Exception('Purchase failed');
       }
-
-      // トライアルの有効性を判定
-      final isTrialActive = _isTrialActive(trialStartDate, hasUsedTrial, now);
-      final trialDaysRemaining = _calculateTrialDaysRemaining(trialStartDate, now);
-
-      // プレミアム購読の有効性を判定
-      final isPremiumSubscriber =
-          premiumExpiryDate != null && premiumExpiryDate.isAfter(now);
-
-      state = SubscriptionState(
-        trialStartDate: trialStartDate,
-        isTrialActive: isTrialActive,
-        trialDaysRemaining: trialDaysRemaining,
-        hasUsedTrial: hasUsedTrial,
-        isPremiumSubscriber: isPremiumSubscriber,
-        premiumExpiryDate: premiumExpiryDate,
-      );
-    } catch (e) {
-      state = const SubscriptionState();
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
     }
   }
 
-  /// トライアルを開始
-  Future<void> startTrial() async {
+  /// Restore previous purchases
+  Future<void> restorePurchases() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final now = DateTime.now();
-
-      await prefs.setString(_keyTrialStartDate, now.toIso8601String());
-      await prefs.setBool(_keyTrialUsed, true);
-
-      state = state.copyWith(
-        trialStartDate: now,
-        isTrialActive: true,
-        trialDaysRemaining: _trialDurationDays,
-        hasUsedTrial: true,
-      );
-    } catch (e) {
-      // Error starting trial
+      state = const AsyncValue.loading();
+      final success = await _revenueCat.restorePurchases();
+      state = AsyncValue.data(success);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
     }
   }
 
-  /// プレミアム購読を設定（1ヶ月間）
-  Future<void> setPremiumSubscription({int monthsDuration = 1}) async {
+  /// Refresh subscription status
+  Future<void> refreshSubscriptionStatus() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final expiryDate = DateTime.now().add(Duration(days: monthsDuration * 30));
-
-      await prefs.setString(_keyPremiumExpiry, expiryDate.toIso8601String());
-
-      state = state.copyWith(
-        isPremiumSubscriber: true,
-        premiumExpiryDate: expiryDate,
-      );
-    } catch (e) {
-      // Error setting premium subscription
+      final isSubscribed = await _revenueCat.isSubscribed();
+      state = AsyncValue.data(isSubscribed);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
-  }
-
-  /// プレミアム購読をキャンセル
-  Future<void> cancelPremiumSubscription() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_keyPremiumExpiry);
-
-      state = state.copyWith(
-        isPremiumSubscriber: false,
-        premiumExpiryDate: null,
-      );
-    } catch (e) {
-      // Error canceling premium subscription
-    }
-  }
-
-  /// トライアルが有効かどうかを判定
-  bool _isTrialActive(DateTime? trialStartDate, bool hasUsedTrial, DateTime now) {
-    if (!hasUsedTrial || trialStartDate == null) {
-      return false;
-    }
-
-    final trialEndDate =
-        trialStartDate.add(const Duration(days: _trialDurationDays));
-    return now.isBefore(trialEndDate);
-  }
-
-  /// 残りトライアル日数を計算
-  int _calculateTrialDaysRemaining(DateTime? trialStartDate, DateTime now) {
-    if (trialStartDate == null) {
-      return 0;
-    }
-
-    final trialEndDate =
-        trialStartDate.add(const Duration(days: _trialDurationDays));
-
-    if (now.isAfter(trialEndDate)) {
-      return 0;
-    }
-
-    return trialEndDate.difference(now).inDays + 1;
-  }
-
-  /// トライアル状態を更新（毎日チェック用）
-  Future<void> refreshTrialStatus() async {
-    await _initialize();
   }
 }
 
-/// グローバルプロバイダー
+/// Subscription status provider (watch this in UI)
 final subscriptionProvider =
-    StateNotifierProvider<SubscriptionNotifier, SubscriptionState>((ref) {
-  return SubscriptionNotifier();
+    StateNotifierProvider<SubscriptionNotifier, AsyncValue<bool>>((ref) {
+  final revenueCat = RevenueCatService();
+  return SubscriptionNotifier(revenueCat);
 });
 
-/// トライアル関連のヘルパープロバイダー
-final isTrialActiveProvider = Provider<bool>((ref) {
-  return ref.watch(subscriptionProvider).isTrialActive;
+// ─── Subscription Details Provider ─────────────────────────────────────────
+
+class SubscriptionDetailsNotifier
+    extends StateNotifier<AsyncValue<SubscriptionDetails>> {
+  final RevenueCatService _revenueCat;
+
+  SubscriptionDetailsNotifier(this._revenueCat)
+      : super(const AsyncValue.loading()) {
+    _loadDetails();
+  }
+
+  Future<void> _loadDetails() async {
+    try {
+      final offerings = await _revenueCat.getOfferings();
+      if (offerings == null || offerings.isEmpty) {
+        throw Exception('No offerings available');
+      }
+
+      final monthlyPackage = offerings.firstWhere(
+        (pkg) => pkg.packageType == PackageType.monthly,
+        orElse: () => offerings.first,
+      );
+
+      final expirationDate = await _revenueCat.getSubscriptionExpirationDate();
+      final isSubscribed = await _revenueCat.isSubscribed();
+
+      state = AsyncValue.data(
+        SubscriptionDetails(
+          packageId: monthlyPackage.identifier,
+          price: monthlyPackage.storeProduct.priceString,
+          localizedPrice: monthlyPackage.storeProduct.priceString,
+          currencyCode: monthlyPackage.storeProduct.currencyCode ?? 'JPY',
+          expirationDate: expirationDate,
+          isActive: isSubscribed,
+        ),
+      );
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> refresh() => _loadDetails();
+}
+
+/// Subscription details provider
+final subscriptionDetailsProvider = StateNotifierProvider<
+    SubscriptionDetailsNotifier,
+    AsyncValue<SubscriptionDetails>>((ref) {
+  final revenueCat = RevenueCatService();
+  return SubscriptionDetailsNotifier(revenueCat);
 });
 
-final canAccessPremiumProvider = Provider<bool>((ref) {
-  return ref.watch(subscriptionProvider).canAccessPremiumContent();
-});
+// ─── Models ────────────────────────────────────────────────────────────────
 
-final trialDaysRemainingProvider = Provider<int>((ref) {
-  return ref.watch(subscriptionProvider).trialDaysRemaining;
-});
+class SubscriptionDetails {
+  final String packageId;
+  final String price;
+  final String localizedPrice;
+  final String currencyCode;
+  final DateTime? expirationDate;
+  final bool isActive;
 
-final trialProgressProvider = Provider<double>((ref) {
-  return ref.watch(subscriptionProvider).getTrialProgress();
-});
+  SubscriptionDetails({
+    required this.packageId,
+    required this.price,
+    required this.localizedPrice,
+    required this.currencyCode,
+    required this.expirationDate,
+    required this.isActive,
+  });
+
+  bool get isExpired {
+    if (expirationDate == null) return false;
+    return DateTime.now().isAfter(expirationDate!);
+  }
+
+  String get expirationText {
+    if (expirationDate == null) return '未取得';
+    return '${expirationDate!.year}年${expirationDate!.month}月${expirationDate!.day}日';
+  }
+}
