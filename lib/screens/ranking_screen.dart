@@ -12,25 +12,9 @@ import '../providers/flashcard_provider.dart';
 import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
 
-// ランキングデータモデル
-class RankEntry {
-  final int rank;
-  final String name;
-  final int points;
-  final String icon;
-  final bool isMe;
-
-  const RankEntry({
-    required this.rank,
-    required this.name,
-    required this.points,
-    required this.icon,
-    this.isMe = false,
-  });
-}
-
-// ランキングタブ
-enum RankingPeriod { weekly, monthly, allTime }
+// このアプリには他ユーザーのスコアを集計するバックエンド（対戦サーバー）が
+// まだ無いため、この画面では「自分の記録」と「今週のチャレンジ」のみを表示する。
+// 友だちとのランキング対戦機能は今後実装予定。
 
 class RankingScreen extends ConsumerStatefulWidget {
   const RankingScreen({super.key});
@@ -40,7 +24,6 @@ class RankingScreen extends ConsumerStatefulWidget {
 }
 
 class _RankingScreenState extends ConsumerState<RankingScreen> {
-  RankingPeriod _period = RankingPeriod.weekly;
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -58,49 +41,8 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final key = event.logicalKey;
-    if (key == LogicalKeyboardKey.digit1 || key == LogicalKeyboardKey.numpad1) {
-      HapticService.selectionClick();
-      setState(() => _period = RankingPeriod.weekly);
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.digit2 || key == LogicalKeyboardKey.numpad2) {
-      HapticService.selectionClick();
-      setState(() => _period = RankingPeriod.monthly);
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.digit3 || key == LogicalKeyboardKey.numpad3) {
-      HapticService.selectionClick();
-      setState(() => _period = RankingPeriod.allTime);
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.arrowLeft) {
-      HapticService.selectionClick();
-      setState(() {
-        if (_period == RankingPeriod.monthly) {
-          _period = RankingPeriod.weekly;
-        } else if (_period == RankingPeriod.allTime) {
-          _period = RankingPeriod.monthly;
-        }
-      });
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.arrowRight) {
-      HapticService.selectionClick();
-      setState(() {
-        if (_period == RankingPeriod.weekly) {
-          _period = RankingPeriod.monthly;
-        } else if (_period == RankingPeriod.monthly) {
-          _period = RankingPeriod.allTime;
-        }
-      });
-      return KeyEventResult.handled;
-    }
     if (key == LogicalKeyboardKey.keyS) {
-      final myPoints = ref.read(progressProvider.notifier).totalStarsEarned * 50;
-      final profile = ref.read(profileProvider);
-      final rankings = _buildRankings(myPoints, profile.nickname, profile.avatarEmoji);
-      final myEntry = rankings.firstWhere((e) => e.isMe);
-      _shareRanking(context, myEntry);
+      _shareRecord(context);
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.escape || key == LogicalKeyboardKey.backspace) {
@@ -111,11 +53,7 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
     if (key == LogicalKeyboardKey.slash &&
         HardwareKeyboard.instance.isShiftPressed) {
       showShortcutsHelpDialog(context, shortcuts: const [
-        ('1', '週間ランキング'),
-        ('2', '月間ランキング'),
-        ('3', '全期間ランキング'),
-        ('← / →', '前/次の期間'),
-        ('S', '順位をシェア'),
+        ('S', '記録をシェア'),
         ('Esc / BS', '戻る'),
         ('?', 'このヘルプを表示'),
       ]);
@@ -124,83 +62,12 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
     return KeyEventResult.ignored;
   }
 
-  // ダミーランキングデータ
-  List<RankEntry> _buildRankings(int myPoints, String myName, String myIcon) {
-    final base = _period == RankingPeriod.weekly
-        ? [
-            const RankEntry(rank: 1, name: 'コード探偵まさき', points: 4850, icon: '🏆'),
-            const RankEntry(rank: 2, name: 'プログラマーゆき', points: 4200, icon: '🥈'),
-            const RankEntry(rank: 3, name: 'Python名人りく', points: 3780, icon: '🥉'),
-            const RankEntry(rank: 4, name: 'ブロック達人はな', points: 3100, icon: '🎯'),
-            const RankEntry(rank: 5, name: 'コードマスターそら', points: 2850, icon: '⭐'),
-            const RankEntry(rank: 6, name: 'アルゴリズムけん', points: 2400, icon: '💡'),
-            const RankEntry(rank: 7, name: 'デバッガーあかり', points: 2100, icon: '🔧'),
-          ]
-        : _period == RankingPeriod.monthly
-            ? [
-                const RankEntry(rank: 1, name: 'プログラマーゆき', points: 18500, icon: '🏆'),
-                const RankEntry(rank: 2, name: 'コード探偵まさき', points: 17200, icon: '🥈'),
-                const RankEntry(rank: 3, name: 'アルゴリズムけん', points: 15800, icon: '🥉'),
-                const RankEntry(rank: 4, name: 'Python名人りく', points: 14200, icon: '🎯'),
-                const RankEntry(rank: 5, name: 'ブロック達人はな', points: 12900, icon: '⭐'),
-              ]
-            : [
-                const RankEntry(rank: 1, name: 'Python名人りく', points: 95000, icon: '🏆'),
-                const RankEntry(rank: 2, name: 'コード探偵まさき', points: 88500, icon: '🥈'),
-                const RankEntry(rank: 3, name: 'プログラマーゆき', points: 82100, icon: '🥉'),
-                const RankEntry(rank: 4, name: 'ブロック達人はな', points: 76400, icon: '🎯'),
-                const RankEntry(rank: 5, name: 'デバッガーあかり', points: 68200, icon: '⭐'),
-                const RankEntry(rank: 6, name: 'アルゴリズムけん', points: 61500, icon: '💡'),
-                const RankEntry(rank: 7, name: 'コードマスターそら', points: 55000, icon: '🔧'),
-                const RankEntry(rank: 8, name: 'バグハンターみお', points: 48300, icon: '🐛'),
-              ];
-
-    // 自分のエントリーを含めてポイント降順に並べ替え、順位を振り直す
-    // （挿入位置の既存ランク番号をそのまま使うと重複が発生するため、
-    //   ソート後のインデックスから連番で採番する）
-    final combined = [
-      ...base,
-      RankEntry(
-        rank: 0,
-        name: myName,
-        points: myPoints,
-        icon: myIcon,
-        isMe: true,
-      ),
-    ]..sort((a, b) => b.points.compareTo(a.points));
-
-    return [
-      for (int i = 0; i < combined.length; i++)
-        RankEntry(
-          rank: i + 1,
-          name: combined[i].name,
-          points: combined[i].points,
-          icon: combined[i].icon,
-          isMe: combined[i].isMe,
-        ),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
     // ボーナス付与などで進捗/プロフィールが変化したら再描画されるよう watch する
     ref.watch(progressProvider);
     final profile = ref.watch(profileProvider);
     final myPoints = ref.read(progressProvider.notifier).totalStarsEarned * 50;
-    final rankings = _buildRankings(myPoints, profile.nickname, profile.avatarEmoji);
-    final myEntry = rankings.firstWhere((e) => e.isMe);
-    final showChallenges = _period == RankingPeriod.weekly;
-
-    // Build flat list with gap separators (null = separator)
-    final List<RankEntry?> flatItems = [];
-    for (int i = 0; i < rankings.length; i++) {
-      if (i > 0) {
-        final prev = rankings[i - 1];
-        final curr = rankings[i];
-        if (curr.rank > prev.rank + 1) flatItems.add(null);
-      }
-      flatItems.add(rankings[i]);
-    }
 
     return Focus(
       focusNode: _focusNode,
@@ -209,8 +76,8 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
         body: Column(
           children: [
             // ヘッダー
-            _buildHeader(context, myEntry, rankings),
-            // ランキングリスト（＋週間チャレンジ）
+            _buildHeader(context, myPoints, profile.nickname, profile.avatarEmoji),
+            // 今週のチャレンジ + 準備中バナー
             Expanded(
               child: RefreshIndicator(
                 color: kPrimaryColor,
@@ -219,44 +86,18 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
                   ref.invalidate(profileProvider);
                   await Future.delayed(const Duration(milliseconds: 400));
                 },
-                child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                itemCount: flatItems.length + (showChallenges ? 1 : 0),
-                itemBuilder: (context, index) {
-                  // 週間チャレンジカード（先頭）
-                  if (showChallenges && index == 0) {
-                    return _WeeklyChallengesCard()
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _WeeklyChallengesCard()
                         .animate()
                         .fadeIn(duration: 350.ms)
-                        .slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms);
-                  }
-                  final actualIndex = showChallenges ? index - 1 : index;
-                  final item = flatItems[actualIndex];
-                  // ギャップセパレーター
-                  if (item == null) {
-                    return _RankGapSeparator()
-                        .animate(delay: Duration(milliseconds: 60 * actualIndex))
-                        .fadeIn(duration: 200.ms);
-                  }
-                  final isTop3 = item.rank <= 3;
-                  return _RankItem(entry: item)
-                      .animate(delay: Duration(milliseconds: 60 * actualIndex))
-                      .fadeIn(duration: 300.ms)
-                      .then()
-                      .custom(
-                        duration: isTop3 ? 400.ms : 300.ms,
-                        builder: (context, value, child) => Transform.translate(
-                          offset: Offset(isTop3 ? 0 : (1 - value) * 24, 0),
-                          child: isTop3
-                              ? Transform.scale(
-                                  scale: 0.85 + value * 0.15,
-                                  child: child,
-                                )
-                              : child,
-                        ),
-                      );
-                },
+                        .slideY(begin: 0.08, curve: Curves.easeOut, duration: 350.ms),
+                    _ComingSoonBanner()
+                        .animate(delay: 150.ms)
+                        .fadeIn(duration: 300.ms),
+                  ],
                 ),
               ),
             ),
@@ -266,30 +107,26 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
     );
   }
 
-  void _shareRanking(BuildContext context, RankEntry myEntry) {
+  void _shareRecord(BuildContext context) {
     HapticService.lightImpact();
-    final periodLabel = switch (_period) {
-      RankingPeriod.weekly  => '今週',
-      RankingPeriod.monthly => '今月',
-      RankingPeriod.allTime => '全期間',
-    };
+    final profile = ref.read(profileProvider);
+    final myPoints = ref.read(progressProvider.notifier).totalStarsEarned * 50;
     final text =
-        '🏆 しょうがくプログラミング ランキング\n'
-        '【$periodLabel】${myEntry.rank}位\n'
-        '${myEntry.icon} ${myEntry.name}\n'
-        '${myEntry.points} pt\n'
+        '🏆 しょうがくプログラミング 記録\n'
+        '${profile.avatarEmoji} ${profile.nickname}\n'
+        '$myPoints pt\n'
         '#しょうがくプログラミング';
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('📋 ランキングをコピーしました！'),
+        content: Text('📋 記録をコピーしました！'),
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 2),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, RankEntry myEntry, List<RankEntry> rankings) {
+  Widget _buildHeader(BuildContext context, int myPoints, String myName, String myIcon) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -326,107 +163,57 @@ class _RankingScreenState extends ConsumerState<RankingScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.share_outlined, color: Colors.white70, size: 20),
-                tooltip: '順位をシェア (S)',
-                onPressed: () => _shareRanking(context, myEntry),
+                tooltip: '記録をシェア (S)',
+                onPressed: () => _shareRecord(context),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          // タブボタン
-          Row(
-            children: [
-              _TabButton(
-                label: '今週',
-                isActive: _period == RankingPeriod.weekly,
-                onTap: () {
-                  HapticService.selectionClick();
-                  setState(() => _period = RankingPeriod.weekly);
-                },
-              ),
-              const SizedBox(width: 8),
-              _TabButton(
-                label: '今月',
-                isActive: _period == RankingPeriod.monthly,
-                onTap: () {
-                  HapticService.selectionClick();
-                  setState(() => _period = RankingPeriod.monthly);
-                },
-              ),
-              const SizedBox(width: 8),
-              _TabButton(
-                label: '全期間',
-                isActive: _period == RankingPeriod.allTime,
-                onTap: () {
-                  HapticService.selectionClick();
-                  setState(() => _period = RankingPeriod.allTime);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // 自分のランク
-          _MyRankCard(entry: myEntry)
+          // 自分の記録
+          _MyStatsCard(name: myName, icon: myIcon, points: myPoints)
               .animate()
               .fadeIn(duration: 350.ms)
               .slideY(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 8),
-          // 次のランクまでの距離
-          _buildNextRankBanner(rankings, myEntry)
-              .animate(delay: 200.ms)
-              .fadeIn(duration: 300.ms),
         ],
       ),
     );
   }
+}
 
-  Widget _buildNextRankBanner(List<RankEntry> rankings, RankEntry myEntry) {
-    if (myEntry.rank <= 1) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Text(
-          '🏆 あなたは1位です！おめでとう！',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      );
-    }
-    // 1つ上のランクのエントリーを探す
-    final above = rankings
-        .where((e) => !e.isMe && e.rank < myEntry.rank)
-        .toList()
-      ..sort((a, b) => b.rank.compareTo(a.rank));
-    if (above.isEmpty) return const SizedBox.shrink();
-    final target = above.first;
-    final gap = target.points - myEntry.points;
-    if (gap <= 0) return const SizedBox.shrink();
+// ─── 準備中バナー ────────────────────────────────────────────────────────
+class _ComingSoonBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: const EdgeInsets.only(top: 4),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(10),
+        color: context.cardBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: context.borderColor),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
         children: [
-          const Text('🚀', style: TextStyle(fontSize: 13)),
-          const SizedBox(width: 6),
+          const Text('🚧', style: TextStyle(fontSize: 28)),
+          const SizedBox(height: 8),
           Text(
-            'あと ${gap}pt で ${target.rank}位！',
-            style: const TextStyle(
-              fontSize: 12,
+            'みんなとのランキング対戦は準備中',
+            style: TextStyle(
+              fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: context.textPrimary,
             ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '友だちや全国のみんなと点数を競える機能を今後追加予定です。\nそれまでは「今週のチャレンジ」で自分の記録を伸ばそう！',
+            style: TextStyle(
+              fontSize: 12,
+              color: context.textSecondary,
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -729,72 +516,16 @@ class _WeeklyChallengesCard extends ConsumerWidget {
   }
 }
 
-// ─── ランクギャップセパレーター ────────────────────────────────────────────────
-class _RankGapSeparator extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          for (int i = 0; i < 3; i++)
-            Container(
-              width: 4,
-              height: 4,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              decoration: BoxDecoration(
-                color: kTextSecondary.withValues(alpha: 0.4),
-                shape: BoxShape.circle,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
+class _MyStatsCard extends StatelessWidget {
+  final String name;
+  final String icon;
+  final int points;
 
-class _TabButton extends StatelessWidget {
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _TabButton({
-    required this.label,
-    required this.isActive,
-    required this.onTap,
+  const _MyStatsCard({
+    required this.name,
+    required this.icon,
+    required this.points,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive
-              ? Colors.white
-              : Colors.white.withValues(alpha: 0.25),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: isActive ? kPrimaryColor : Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MyRankCard extends StatelessWidget {
-  final RankEntry entry;
-
-  const _MyRankCard({required this.entry});
 
   @override
   Widget build(BuildContext context) {
@@ -810,36 +541,26 @@ class _MyRankCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // ランクバッジ
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [kPrimaryColor, kPrimaryDark],
               ),
             ),
             child: Center(
-              child: Text(
-                '${entry.rank}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+              child: Text(icon, style: const TextStyle(fontSize: 22)),
             ),
           ),
           const SizedBox(width: 12),
-          Text(entry.icon, style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'あなたの順位',
+                  'あなたの記録',
                   style: TextStyle(
                     fontSize: 11,
                     color: Color(0xFFD68910),
@@ -847,7 +568,7 @@ class _MyRankCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${entry.rank}位  ${entry.name}',
+                  name,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -858,7 +579,7 @@ class _MyRankCard extends StatelessWidget {
             ),
           ),
           TweenAnimationBuilder<int>(
-            tween: IntTween(begin: 0, end: entry.points),
+            tween: IntTween(begin: 0, end: points),
             duration: const Duration(milliseconds: 1200),
             curve: Curves.easeOut,
             builder: (context, value, _) => Text(
@@ -871,146 +592,6 @@ class _MyRankCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _RankItem extends StatelessWidget {
-  final RankEntry entry;
-
-  const _RankItem({required this.entry});
-
-  Color get _medalBg1 {
-    switch (entry.rank) {
-      case 1: return const Color(0xFFFFD700);
-      case 2: return const Color(0xFFC0C0C0);
-      case 3: return const Color(0xFFCD7F32);
-      default: return kPrimaryColor;
-    }
-  }
-
-  Color get _medalBg2 {
-    switch (entry.rank) {
-      case 1: return const Color(0xFFFFC700);
-      case 2: return const Color(0xFFA9A9A9);
-      case 3: return const Color(0xFFB87333);
-      default: return kPrimaryDark;
-    }
-  }
-
-  Color? get _borderColor {
-    switch (entry.rank) {
-      case 1: return const Color(0xFFDAA520);
-      case 2: return const Color(0xFF808080);
-      case 3: return const Color(0xFF8B4513);
-      default: return null;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isTop3 = entry.rank <= 3;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: entry.isMe
-            ? kPrimaryColor.withValues(alpha: 0.06)
-            : context.cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: entry.isMe
-            ? Border.all(color: kPrimaryColor, width: 2)
-            : _borderColor != null
-                ? Border.all(color: _borderColor!, width: 2)
-                : null,
-        boxShadow: [
-          BoxShadow(
-            color: entry.isMe
-                ? kPrimaryColor.withValues(alpha: 0.15)
-                : isTop3
-                    ? _medalBg1.withValues(alpha: 0.2)
-                    : context.shadowColor,
-            blurRadius: entry.isMe ? 10 : isTop3 ? 12 : 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // ランクバッジ
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [_medalBg1, _medalBg2],
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  entry.rank <= 3
-                      ? ['🥇', '🥈', '🥉'][entry.rank - 1]
-                      : '${entry.rank}',
-                  style: TextStyle(
-                    fontSize: entry.rank <= 3 ? 20 : 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            // アイコン
-            Text(entry.icon, style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: 10),
-            // 名前
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (entry.isMe)
-                    const Text(
-                      'あなた',
-                      style: TextStyle(
-                        fontSize: 9,
-                        color: kPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  Text(
-                    entry.name,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: isTop3 ? FontWeight.bold : FontWeight.w500,
-                      color: context.textPrimary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // ポイント（入場アニメーション）
-            TweenAnimationBuilder<int>(
-              tween: IntTween(begin: 0, end: entry.points),
-              duration: const Duration(milliseconds: 900),
-              curve: Curves.easeOut,
-              builder: (context, value, _) => Text(
-                '${value}pt',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

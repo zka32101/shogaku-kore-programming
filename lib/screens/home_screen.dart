@@ -3553,7 +3553,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: _MiniGameCard(
                 emoji: '🏆',
                 label: 'ランキング',
-                sublabel: 'トップを目指せ',
+                sublabel: '自分の記録をチェック',
                 color: const Color(0xFF9B59B6),
                 onTap: () {
                   HapticService.lightImpact();
