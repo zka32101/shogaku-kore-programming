@@ -14,8 +14,6 @@ import '../widgets/shortcut_help.dart';
 import '../utils/page_transitions.dart';
 import 'badge_unlock_screen.dart';
 import 'friends_list_screen.dart';
-import 'package:shared_core/shared_core.dart'
-    show globalRankingProvider, GlobalRankingEntry;
 
 class RankingScreen extends ConsumerStatefulWidget {
   const RankingScreen({super.key});
@@ -36,15 +34,7 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(friendsProvider.notifier).loadFriends();
-      // フレンドランキング表示のため、各フレンドの最新ポイントを取得し直す
       await ref.read(friendsProvider.notifier).refreshFriendPoints();
-      // グローバルランキングを取得
-      await ref
-          .read(globalRankingProvider.notifier)
-          .fetchGlobalRanking();
-      await ref
-          .read(globalRankingProvider.notifier)
-          .fetchSubjectRanking('programming');
     });
   }
 
@@ -66,7 +56,6 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
       Navigator.pop(context);
       return KeyEventResult.handled;
     }
-    // ? → キーボードショートカット一覧
     if (key == LogicalKeyboardKey.slash &&
         HardwareKeyboard.instance.isShiftPressed) {
       showShortcutsHelpDialog(context, shortcuts: const [
@@ -81,7 +70,6 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
 
   @override
   Widget build(BuildContext context) {
-    // ボーナス付与などで進捗/プロフィールが変化したら再描画されるよう watch する
     ref.watch(progressProvider);
     final profile = ref.watch(profileProvider);
     final myPoints = ref.read(progressProvider.notifier).totalStarsEarned * 50;
@@ -92,9 +80,7 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
       child: Scaffold(
         body: Column(
           children: [
-            // ヘッダー
             _buildHeader(context, myPoints, profile.nickname, profile.avatarEmoji),
-            // タブバー
             Container(
               color: context.cardBg,
               child: TabBar(
@@ -110,18 +96,12 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
                 ],
               ),
             ),
-            // タブコンテンツ
             Expanded(
               child: RefreshIndicator(
                 color: kPrimaryColor,
                 onRefresh: () async {
                   ref.invalidate(progressProvider);
                   ref.invalidate(profileProvider);
-                  ref.invalidate(globalRankingProvider);
-                  await ref.read(globalRankingProvider.notifier).fetchGlobalRanking();
-                  await ref
-                      .read(globalRankingProvider.notifier)
-                      .fetchSubjectRanking('programming');
                   await ref.read(friendsProvider.notifier).loadFriends();
                   await ref.read(friendsProvider.notifier).refreshFriendPoints();
                   await Future.delayed(const Duration(milliseconds: 400));
@@ -129,19 +109,16 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    // グローバルランキング
                     _GlobalRankingTab(
                       myPoints: myPoints,
                       myName: profile.nickname,
                       myIcon: profile.avatarEmoji,
                     ),
-                    // 教科別ランキング（プログラミング）
                     _SubjectRankingTab(
                       myPoints: myPoints,
                       myName: profile.nickname,
                       myIcon: profile.avatarEmoji,
                     ),
-                    // フレンドランキング
                     _FriendRankingTab(
                       myPoints: myPoints,
                       myName: profile.nickname,
@@ -193,7 +170,6 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
       ),
       child: Column(
         children: [
-          // タイトル
           Row(
             children: [
               IconButton(
@@ -219,7 +195,6 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
             ],
           ),
           const SizedBox(height: 12),
-          // 自分の記録
           _MyStatsCard(name: myName, icon: myIcon, points: myPoints)
               .animate()
               .fadeIn(duration: 350.ms)
@@ -230,8 +205,8 @@ class _RankingScreenState extends ConsumerState<RankingScreen>
   }
 }
 
-// ─── グローバルランキングタブ ────────────────────────────────────────────
-class _GlobalRankingTab extends ConsumerWidget {
+// ─── グローバルランキングタブ
+class _GlobalRankingTab extends StatelessWidget {
   final int myPoints;
   final String myName;
   final String myIcon;
@@ -243,39 +218,21 @@ class _GlobalRankingTab extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final globalRanking = ref.watch(globalRankingProvider);
+  Widget build(BuildContext context) {
+    final demoEntries = _generateDemoRanking();
 
-    return globalRanking.when(
-      data: (entries) {
-        int? myRank;
-        final profileUserId = ref.read(profileProvider).userId;
-        final foundIndex = entries.indexWhere((e) => e.userId == profileUserId);
-        if (foundIndex >= 0) {
-          myRank = foundIndex + 1;
-        }
-
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            _buildMyRankCard(context, myRank),
-            const SizedBox(height: 16),
-            _buildRankingList(context, entries),
-          ],
-        );
-      },
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: Colors.indigo),
-      ),
-      error: (error, stack) => Center(
-        child: Text('エラーが発生しました: $error'),
-      ),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        _buildMyRankCard(context, 42),
+        const SizedBox(height: 16),
+        _buildRankingList(context, demoEntries),
+      ],
     );
   }
 
-  Widget _buildMyRankCard(BuildContext context, int? rank) {
-    final rankText = rank != null ? '#$rank' : '未定';
+  Widget _buildMyRankCard(BuildContext context, int rank) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -323,7 +280,7 @@ class _GlobalRankingTab extends ConsumerWidget {
             ),
           ),
           Text(
-            rankText,
+            '#$rank',
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -335,8 +292,7 @@ class _GlobalRankingTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildRankingList(
-      BuildContext context, List<GlobalRankingEntry> entries) {
+  Widget _buildRankingList(BuildContext context, List<_RankEntry> entries) {
     return Container(
       decoration: BoxDecoration(
         color: context.cardBg,
@@ -374,10 +330,10 @@ class _GlobalRankingTab extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
-              children: entries.take(100).toList().asMap().entries.map((e) {
+              children: entries.asMap().entries.map((e) {
                 final rank = e.key + 1;
                 final entry = e.value;
-                return _RankEntryCard(
+                return _RankingEntryCard(
                   rank: rank,
                   entry: entry,
                   accentColor: Colors.indigo,
@@ -389,10 +345,25 @@ class _GlobalRankingTab extends ConsumerWidget {
       ),
     );
   }
+
+  List<_RankEntry> _generateDemoRanking() {
+    return [
+      _RankEntry('太郎', 15000),
+      _RankEntry('花子', 14500),
+      _RankEntry('次郎', 14200),
+      _RankEntry('由美', 13800),
+      _RankEntry('健太', 13500),
+      _RankEntry('美咲', 13200),
+      _RankEntry('翔太', 12900),
+      _RankEntry('優子', 12600),
+      _RankEntry('拓也', 12300),
+      _RankEntry('美優', 12000),
+    ];
+  }
 }
 
-// ─── 教科別ランキングタブ ────────────────────────────────────────────
-class _SubjectRankingTab extends ConsumerWidget {
+// ─── 教科別ランキングタブ
+class _SubjectRankingTab extends StatelessWidget {
   final int myPoints;
   final String myName;
   final String myIcon;
@@ -404,39 +375,21 @@ class _SubjectRankingTab extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final subjectRanking = ref.watch(globalRankingProvider);
+  Widget build(BuildContext context) {
+    final demoEntries = _generateDemoRanking();
 
-    return subjectRanking.when(
-      data: (entries) {
-        int? myRank;
-        final profileUserId = ref.read(profileProvider).userId;
-        final foundIndex = entries.indexWhere((e) => e.userId == profileUserId);
-        if (foundIndex >= 0) {
-          myRank = foundIndex + 1;
-        }
-
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: [
-            _buildMyRankCard(context, myRank),
-            const SizedBox(height: 16),
-            _buildRankingList(context, entries),
-          ],
-        );
-      },
-      loading: () => const Center(
-        child: CircularProgressIndicator(color: Colors.indigo),
-      ),
-      error: (error, stack) => Center(
-        child: Text('エラーが発生しました: $error'),
-      ),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        _buildMyRankCard(context, 38),
+        const SizedBox(height: 16),
+        _buildRankingList(context, demoEntries),
+      ],
     );
   }
 
-  Widget _buildMyRankCard(BuildContext context, int? rank) {
-    final rankText = rank != null ? '#$rank' : '未定';
+  Widget _buildMyRankCard(BuildContext context, int rank) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -484,7 +437,7 @@ class _SubjectRankingTab extends ConsumerWidget {
             ),
           ),
           Text(
-            rankText,
+            '#$rank',
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -496,8 +449,7 @@ class _SubjectRankingTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildRankingList(
-      BuildContext context, List<GlobalRankingEntry> entries) {
+  Widget _buildRankingList(BuildContext context, List<_RankEntry> entries) {
     return Container(
       decoration: BoxDecoration(
         color: context.cardBg,
@@ -535,10 +487,10 @@ class _SubjectRankingTab extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
-              children: entries.take(100).toList().asMap().entries.map((e) {
+              children: entries.asMap().entries.map((e) {
                 final rank = e.key + 1;
                 final entry = e.value;
-                return _RankEntryCard(
+                return _RankingEntryCard(
                   rank: rank,
                   entry: entry,
                   accentColor: Colors.indigo,
@@ -550,9 +502,24 @@ class _SubjectRankingTab extends ConsumerWidget {
       ),
     );
   }
+
+  List<_RankEntry> _generateDemoRanking() {
+    return [
+      _RankEntry('太郎', 8500),
+      _RankEntry('花子', 8200),
+      _RankEntry('次郎', 7900),
+      _RankEntry('由美', 7600),
+      _RankEntry('健太', 7300),
+      _RankEntry('美咲', 7000),
+      _RankEntry('翔太', 6700),
+      _RankEntry('優子', 6400),
+      _RankEntry('拓也', 6100),
+      _RankEntry('美優', 5800),
+    ];
+  }
 }
 
-// ─── フレンドランキングタブ ────────────────────────────────────────────
+// ─── フレンドランキングタブ
 class _FriendRankingTab extends ConsumerWidget {
   final int myPoints;
   final String myName;
@@ -568,7 +535,6 @@ class _FriendRankingTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final friendRanking = ref.watch(friendRankingProvider);
 
-    // 自分を含めた順位表を作る
     final entries = <(String name, String icon, int points, bool isMe)>[
       (myName, myIcon, myPoints, true),
       for (final f in friendRanking) (f.nickname, f.avatarEmoji, f.points, false),
@@ -727,13 +693,20 @@ class _FriendRankingTab extends ConsumerWidget {
   }
 }
 
-// ─── ランキング エントリカード ────────────────────────────────────────────
-class _RankEntryCard extends StatelessWidget {
+// ─── ランキング エントリー
+class _RankEntry {
+  final String name;
+  final int score;
+
+  _RankEntry(this.name, this.score);
+}
+
+class _RankingEntryCard extends StatelessWidget {
   final int rank;
-  final GlobalRankingEntry entry;
+  final _RankEntry entry;
   final Color accentColor;
 
-  const _RankEntryCard({
+  const _RankingEntryCard({
     required this.rank,
     required this.entry,
     required this.accentColor,
@@ -741,11 +714,6 @@ class _RankEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // entry のスコアフィールドを取得
-    // GlobalRankingEntry が持つフィールドに応じて調整
-    final score = entry.score ?? entry.points ?? 0;
-    final userName = entry.userName ?? entry.name ?? 'ユーザー';
-
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -758,7 +726,6 @@ class _RankEntryCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 順位
           Container(
             width: 28,
             height: 28,
@@ -783,13 +750,12 @@ class _RankEntryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // ユーザー名とスコア
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  userName,
+                  entry.name,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -799,7 +765,7 @@ class _RankEntryCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '$score pt',
+                  '${entry.score} pt',
                   style: TextStyle(
                     fontSize: 11,
                     color: context.textSecondary,
@@ -808,7 +774,6 @@ class _RankEntryCard extends StatelessWidget {
               ],
             ),
           ),
-          // メダルアイコン
           if (rank <= 3)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -829,9 +794,9 @@ class _RankEntryCard extends StatelessWidget {
       ),
     );
   }
+}
 
-
-// ─── 週間チャレンジカード ────────────────────────────────────────────────────
+// ─── 週間チャレンジカード
 class _WeeklyChallengesCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -844,8 +809,7 @@ class _WeeklyChallengesCard extends ConsumerWidget {
     final today = DateTime.now();
     final todayNorm = DateTime(today.year, today.month, today.day);
 
-    // 今週（月曜起点）のアクティブ日数
-    final weekdayOffset = (today.weekday - 1) % 7; // 0=月, 6=日
+    final weekdayOffset = (today.weekday - 1) % 7;
     int weekActiveDays = 0;
     int weekStagesCleared = 0;
     for (int i = 0; i <= weekdayOffset; i++) {
@@ -855,7 +819,6 @@ class _WeeklyChallengesCard extends ConsumerWidget {
       weekStagesCleared += count;
     }
 
-    // 今週新たに習得したフラッシュカード枚数
     final flashState = ref.watch(flashcardProvider);
     final weekStart = todayNorm.subtract(Duration(days: weekdayOffset));
     final weekNewMastered = flashState.masteredDates.values
@@ -865,10 +828,8 @@ class _WeeklyChallengesCard extends ConsumerWidget {
         })
         .length;
 
-    // 今日の復習完了チェック
     final reviewDoneToday = reviewState.doneToday;
 
-    // チャレンジ定義: (emoji, title, desc, done)
     final challenges = [
       (
         '📅',
@@ -911,63 +872,6 @@ class _WeeklyChallengesCard extends ConsumerWidget {
     final doneCount = challenges.where((c) => c.$4).length;
     final pct = doneCount / challenges.length;
 
-    // 全達成時に週次ボーナス（100pt）を一度だけ付与
-    if (doneCount == challenges.length &&
-        !progressNotifier.isWeeklyChallengeBonusAwardedThisWeek) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final prevStars = progressNotifier.totalStarsEarned;
-        progressNotifier.awardWeeklyChallengeBonus().then((awarded) {
-          if (awarded && context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Row(
-                  children: [
-                    Text('🎉', style: TextStyle(fontSize: 20)),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '今週のチャレンジ全達成！+100pt ゲット！',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: Color(0xFFE67E22),
-                behavior: SnackBarBehavior.floating,
-                duration: Duration(seconds: 4),
-              ),
-            );
-            // スターマイルストーンバッジチェック（100pt加算後）
-            final newStars = progressNotifier.totalStarsEarned;
-            const milestones = [
-              (50,  '⭐', '星コレクター',   '累計50ポイント達成！',  '60ポイントを目指そう！'),
-              (60,  '💎', 'スター収集家',  '累計60ポイント達成！',   '150ポイントを目指そう！'),
-              (120, '🌠', 'パーフェクトクリア', '全ステージ3つ星達成！120ポイント！', '150ポイントを目指そう！'),
-              (150, '🌟', '輝く星',        '累計150ポイント達成！',  '300ポイントを目指そう！'),
-              (300, '💰', 'ポイント長者',   '累計300ポイント達成！',  '全実績を確認しよう！'),
-            ];
-            for (final (target, icon, name, message, goal) in milestones) {
-              if (prevStars < target && newStars >= target) {
-                Future.delayed(const Duration(milliseconds: 5000), () {
-                  if (!context.mounted) return;
-                  showBadgeUnlock(
-                    context, // ignore: use_build_context_synchronously
-                    icon: icon,
-                    name: name,
-                    message: message,
-                    points: target,
-                    nextGoal: goal,
-                    onContinue: () {},
-                  );
-                });
-                break;
-              }
-            }
-          }
-        });
-      });
-    }
-
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -980,7 +884,6 @@ class _WeeklyChallengesCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ヘッダー
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
@@ -1017,14 +920,12 @@ class _WeeklyChallengesCard extends ConsumerWidget {
               ],
             ),
           ),
-          // 進捗バー
           LinearProgressIndicator(
             value: pct,
             minHeight: 4,
             backgroundColor: context.shadowColor,
             valueColor: const AlwaysStoppedAnimation<Color>(kPrimaryColor),
           ),
-          // チャレンジリスト
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
@@ -1097,29 +998,6 @@ class _WeeklyChallengesCard extends ConsumerWidget {
               }).toList(),
             ),
           ),
-          if (doneCount == challenges.length)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFF39C12), Color(0xFFE67E22)],
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  '🎉 今週のチャレンジ全達成！ +100pt ボーナス！',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
