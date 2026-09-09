@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/certificate.dart';
 import '../providers/certificate_provider.dart';
@@ -409,30 +410,24 @@ class _CertificateDetailSheet extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton.icon(
+                    child: AppButton(
                       onPressed: () {
                         ShareService.shareToTwitter(certificate);
                       },
                       icon: const Icon(Icons.share),
                       label: const Text('Twitter'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1DA1F2),
                         foregroundColor: Colors.white,
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton.icon(
+                    child: AppButton(
                       onPressed: () {
                         ShareService.shareGeneric(certificate);
                       },
                       icon: const Icon(Icons.share),
                       label: const Text('シェア'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: color,
-                        foregroundColor: Colors.white,
-                      ),
                     ),
                   ),
                 ],
@@ -470,7 +465,7 @@ class _CertificateDetailSheet extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('キャンセル'),
+            label: 'キャンセル',
           ),
           TextButton(
             onPressed: () {

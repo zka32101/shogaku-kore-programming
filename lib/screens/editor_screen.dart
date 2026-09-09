@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -1241,7 +1242,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               const SizedBox(width: 8),
               Expanded(
                 flex: 2,
-                child: ElevatedButton.icon(
+                child: AppButton(
                   onPressed: (editorState.scriptBlocks.isEmpty || editorState.hasSubmitted || _stepExecutionMode)
                       ? null
                       : () {
@@ -1255,8 +1256,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         },
                   icon: const Icon(Icons.check, size: 16),
                   label: const Text('回答する'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -1327,7 +1326,7 @@ class _BlockPaletteItem extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+            label: 'OK',
           ),
         ],
       ),
@@ -1729,11 +1728,8 @@ class _ParamEditorSheetState extends State<_ParamEditorSheet> {
             }),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: AppButton(
                 onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _color,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1962,15 +1958,13 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
           if (widget.isCorrect && widget.nextStage != null && widget.onNext != null) ...[
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
+              child: AppButton(
                 onPressed: widget.onNext,
                 icon: const Text('🚀', style: TextStyle(fontSize: 16)),
                 label: Text(
                   '次へ: ${widget.nextStage!.title}',
                   overflow: TextOverflow.ellipsis,
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: kPrimaryColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1993,30 +1987,26 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text('一覧へ'),
+                    label: '一覧へ',
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   flex: 2,
-                  child: ElevatedButton(
+                  child: AppButton(
                     onPressed: widget.onRetry,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text('もう一度'),
+                    label: 'もう一度',
                   ),
                 ),
               ] else ...[
                 // 正解: [一覧へ]
                 Expanded(
-                  child: ElevatedButton(
+                  child: AppButton(
                     onPressed: widget.onComplete,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
                       backgroundColor: context.subCardBg,
                       foregroundColor: context.textPrimary,
                       elevation: 0,
@@ -2024,7 +2014,7 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text('一覧へ'),
+                    label: '一覧へ',
                   ),
                 ),
               ],

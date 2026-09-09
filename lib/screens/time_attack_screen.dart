@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -389,13 +390,11 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
                 padding: const EdgeInsets.only(bottom: 10),
                 child: SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: AppButton(
                     onPressed: () {
                       setState(() => _selectedDifficulty = dialogDifficulty);
                       Navigator.pop(ctx, '__weak__');
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
                       backgroundColor: const Color(0xFFFF6B35),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
@@ -1131,10 +1130,8 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
           children: [
             if (!_hasAnswered) ...[
               Expanded(
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: _selectedIndex != null ? _submitAnswer : null,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -1144,10 +1141,8 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
               ),
             ] else ...[
               Expanded(
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: _nextQuestion,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -1628,25 +1623,23 @@ class _TimeAttackResultScreenState
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text('ホームへ'),
+                          label: 'ホームへ',
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton(
+                        child: AppButton(
                           onPressed: () => Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) => const TimeAttackScreen(),
                             ),
                           ),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text('もう一度'),
+                          label: 'もう一度',
                         ),
                       ),
                     ],
@@ -1704,7 +1697,7 @@ class _TimeAttackResultScreenState
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+            label: 'OK',
           ),
         ],
       ),

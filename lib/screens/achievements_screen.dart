@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter/services.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

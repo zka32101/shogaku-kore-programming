@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../config/theme.dart';
 import 'programming_basics_screen.dart';
@@ -129,14 +130,14 @@ class _WhyProgrammingScreenState extends State<WhyProgrammingScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('もどる'),
+                        label: 'もどる',
                       ),
                     ),
                     const SizedBox(width: 12),
                   ],
                   Expanded(
                     flex: _currentPage > 0 ? 2 : 1,
-                    child: ElevatedButton(
+                    child: AppButton(
                       onPressed: () {
                         if (_currentPage < _pages.length - 1) {
                           _pageController.nextPage(
@@ -152,9 +153,6 @@ class _WhyProgrammingScreenState extends State<WhyProgrammingScreen> {
                           );
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _pages[_currentPage].color,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

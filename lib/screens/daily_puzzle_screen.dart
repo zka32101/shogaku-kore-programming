@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/daily_puzzle_provider.dart';
 import '../services/ai_programming_coach_service.dart';
@@ -234,11 +235,8 @@ class _DailyPuzzleScreenState extends ConsumerState<DailyPuzzleScreen> {
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: _isEvaluating ? null : _submitSolution,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   child: _isEvaluating
                       ? const SizedBox(
@@ -289,7 +287,7 @@ class _DailyPuzzleScreenState extends ConsumerState<DailyPuzzleScreen> {
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: _isCorrect
                       ? () => Navigator.of(context).pop()
                       : () {
@@ -298,10 +296,6 @@ class _DailyPuzzleScreenState extends ConsumerState<DailyPuzzleScreen> {
                             _feedback = null;
                           });
                         },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        _isCorrect ? Colors.green : Colors.orange,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   child: Text(
                     _isCorrect ? '✓ 完了' : 'もう一度挑戦する',

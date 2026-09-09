@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1219,7 +1220,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
           // ボタン
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
+            child: AppButton(
               onPressed: () {
                 HapticService.lightImpact();
                 Navigator.of(context).push(
@@ -1228,8 +1229,6 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
               },
               icon: const Text('🃏', style: TextStyle(fontSize: 14)),
               label: const Text('フラッシュカードを開く'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF9C27B0),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(
@@ -1318,7 +1317,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
           if (widget.nextStage != null && widget.stars >= 1) ...[
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
+              child: AppButton(
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
@@ -1332,8 +1331,6 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                   '次へ: ${widget.nextStage!.title}',
                   overflow: TextOverflow.ellipsis,
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1374,7 +1371,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
             // 間違いだけ再挑戦
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
+              child: AppButton(
                 onPressed: () {
                   HapticService.lightImpact();
                   final questions = widget.challenge.questions ?? [];
@@ -1402,8 +1399,6 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                 label: Text(
                   '間違いだけ再挑戦 (${widget.answers.where((a) => !a.isCorrect).length}問)',
                 ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
                   backgroundColor: const Color(0xFFE67E22),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -1439,16 +1434,14 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('もう一度'),
+                  label: 'もう一度',
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 flex: 2,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 13),
                     backgroundColor: context.subCardBg,
                     foregroundColor: context.textPrimary,
                     elevation: 0,
@@ -1456,7 +1449,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('ステージ一覧へ'),
+                  label: 'ステージ一覧へ',
                 ),
               ),
             ],

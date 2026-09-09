@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/gallery_provider.dart';
 import '../models/user_work.dart';
@@ -48,7 +49,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton.icon(
+                  AppButton(
                     onPressed: () => ref.invalidate(galleryProvider),
                     icon: const Icon(Icons.refresh),
                     label: const Text('もう一度読み込む'),
@@ -148,7 +149,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('閉じる'),
+                label: '閉じる',
               ),
             ],
           ),

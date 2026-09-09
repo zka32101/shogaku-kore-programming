@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
@@ -942,7 +943,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: TapScale(
-                      child: ElevatedButton(
+                      child: AppButton(
                         onPressed: () {
                           HapticService.lightImpact();
                           SoundService().playTap();
@@ -950,8 +951,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             smoothPageRoute(const StageListScreen()),
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -4501,7 +4500,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('閉じる'),
+                      label: '閉じる',
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -4515,7 +4514,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('次の問題 →'),
+                      label: '次の問題 →',
                     ),
                   ),
                 ],
@@ -4621,7 +4620,7 @@ class _LevelUpOverlay extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('やった！'),
+                  label: 'やった！',
                 )
                     .animate(delay: 600.ms)
                     .fadeIn(duration: 300.ms),

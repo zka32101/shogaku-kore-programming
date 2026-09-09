@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../config/theme.dart';
 
@@ -101,11 +102,8 @@ class _ProgrammingBasicsScreenState extends State<ProgrammingBasicsScreen> {
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
               child: SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _tabs[_selectedTab].color,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

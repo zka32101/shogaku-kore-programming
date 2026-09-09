@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -1233,21 +1234,19 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('スキップ'),
+                  label: 'スキップ',
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 flex: 2,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: _selectedOptionIndex != null ? _submitAnswer : null,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('確認する'),
+                  label: '確認する',
                 ),
               ),
             ] else ...[
@@ -1261,10 +1260,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                       children: [
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton(
+                          child: AppButton(
                             onPressed: _nextQuestion,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -1415,13 +1412,11 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
           // スタートボタン
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: AppButton(
               onPressed: () {
                 HapticService.lightImpact();
                 setState(() => _showConceptCard = false);
               },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),

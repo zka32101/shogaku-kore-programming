@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -418,19 +419,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () => setState(() => _editing = false),
-                  child: const Text('キャンセル'),
+                  label: 'キャンセル',
                 ),
                 const SizedBox(width: 4),
-                ElevatedButton(
+                AppButton(
                   onPressed: _saveName,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text('保存'),
+                  label: '保存',
                 ),
               ],
             )

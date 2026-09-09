@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -455,7 +456,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text('戻る'),
+                label: '戻る',
               ),
             )
           else
@@ -463,10 +464,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
-            child: ElevatedButton(
+            child: AppButton(
               onPressed: _nextPage,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

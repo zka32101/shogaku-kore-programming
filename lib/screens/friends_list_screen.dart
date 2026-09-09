@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
@@ -192,7 +193,7 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 20),
-        ElevatedButton.icon(
+        AppButton(
           onPressed: () {
             HapticService.lightImpact();
             SoundService().playTap();
@@ -200,10 +201,6 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen> {
           },
           icon: const Icon(Icons.person_add_alt_1),
           label: const Text('フレンドを追加'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: kPrimaryColor,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
@@ -220,7 +217,7 @@ class _FriendsListScreenState extends ConsumerState<FriendsListScreen> {
         title: const Text('フレンドを削除しますか？'),
         content: Text('${friend.nickname} さんをフレンドから削除します。'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('やめる')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), label: 'やめる'),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('削除する', style: TextStyle(color: Color(0xFFE74C3C))),

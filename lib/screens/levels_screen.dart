@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/level.dart';
 import '../providers/level_provider.dart';
@@ -380,7 +381,7 @@ class _LevelsScreenState extends ConsumerState<LevelsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            label: 'Close',
           ),
         ],
       ),

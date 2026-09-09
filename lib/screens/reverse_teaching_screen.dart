@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
@@ -107,7 +108,7 @@ class _ReverseTeachingScreenState extends ConsumerState<ReverseTeachingScreen> {
               Navigator.of(context).pop();
               Navigator.of(context).pop();
             },
-            child: const Text('戻る'),
+            label: '戻る',
           ),
         ],
       ),
@@ -220,10 +221,8 @@ class _ReverseTeachingScreenState extends ConsumerState<ReverseTeachingScreen> {
             if (_aiEvaluation == null)
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: _isLoading ? null : _submitExplanation,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF9B59B6),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   child: _isLoading
@@ -268,12 +267,10 @@ class _ReverseTeachingScreenState extends ConsumerState<ReverseTeachingScreen> {
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
+                child: AppButton(
                   onPressed: _nextQuestion,
                   icon: const Icon(Icons.arrow_forward),
                   label: const Text('次へ'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF27AE60),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
@@ -184,14 +185,11 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
             icon: const Icon(Icons.share_outlined, size: 16),
             label: const Text('シェア'),
           ),
-          ElevatedButton(
+          AppButton(
             onPressed: () => Navigator.pop(ctx),
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('閉じる'),
+            label: '閉じる',
           ),
         ],
       ),
@@ -873,7 +871,7 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
           // 次へ / 完了
           Expanded(
             flex: 2,
-            child: ElevatedButton.icon(
+            child: AppButton(
               onPressed: _isLast
                   ? _showFinishDialog
                   : () {
@@ -889,8 +887,6 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
                 style: const TextStyle(fontSize: 14),
               ),
               label: Text(_isLast ? '復習完了！' : '次の問題へ'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor:
                     _isLast ? kPrimaryColor : const Color(0xFFE74C3C),
                 shape: RoundedRectangleBorder(

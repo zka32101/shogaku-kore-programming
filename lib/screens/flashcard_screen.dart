@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -1316,7 +1317,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
+            AppButton(
               onPressed: () {
                 _sessionStart = DateTime.now();
                 setState(() {
@@ -1326,7 +1327,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                   _elapsedSeconds = 0;
                 });
               },
-              child: const Text('全て表示'),
+              label: '全て表示',
             ),
           ],
         ),
@@ -1551,12 +1552,10 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: AppButton(
                     onPressed: _markCorrect,
                     icon: const Text('👍', style: TextStyle(fontSize: 16)),
                     label: const Text('知ってた！'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
                       backgroundColor: kPrimaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -1569,12 +1568,10 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
           ] else ...[
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
+              child: AppButton(
                 onPressed: _flipCard,
                 icon: const Icon(Icons.flip, size: 18),
                 label: const Text('カードをめくる'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: const Color(0xFF8E44AD),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1825,12 +1822,10 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
+              child: AppButton(
                 onPressed: _quizNext,
                 icon: const Icon(Icons.arrow_forward, size: 18),
                 label: const Text('次のカードへ'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: const Color(0xFF8E44AD),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -1839,10 +1834,8 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
           ] else ...[
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: AppButton(
                 onPressed: _quizSelectedIndex != null ? () => _submitQuizAnswer(_quizSelectedIndex!) : null,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: const Color(0xFF8E44AD),
                   disabledBackgroundColor: Colors.grey.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1957,26 +1950,24 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('削除'),
+                      label: '削除',
                     ),
                   ),
                 if (initial.isNotEmpty) const SizedBox(width: 10),
                 Expanded(
                   flex: 2,
-                  child: ElevatedButton(
+                  child: AppButton(
                     onPressed: () {
                       HapticService.lightImpact();
                       ref.read(flashcardProvider.notifier).setNote(card.id, controller.text);
                       Navigator.pop(ctx);
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8E44AD),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text('保存'),
+                    label: '保存',
                   ),
                 ),
               ],
@@ -2109,11 +2100,10 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('キャンセル'),
+            label: 'キャンセル',
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8E44AD)),
+          AppButton(
+            onPressed: () => Navigator.pop(ctx, true)),
             child: const Text('習得済みにする', style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -2788,7 +2778,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
           // ボタン
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
+            child: AppButton(
               onPressed: () {
                 _sessionStart = DateTime.now();
                 setState(() {
@@ -2806,8 +2796,6 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
               },
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('もう一度チャレンジ'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: const Color(0xFF8E44AD),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

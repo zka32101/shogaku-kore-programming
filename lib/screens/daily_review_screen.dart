@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -732,12 +733,10 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
+            AppButton(
               onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.arrow_back, size: 18),
               label: const Text('もどる'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1038,10 +1037,8 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                       children: [
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton(
+                          child: AppButton(
                             onPressed: _nextQuestion,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
                               backgroundColor: const Color(0xFF1ABC9C),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -1089,10 +1086,8 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                       children: [
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton(
+                          child: AppButton(
                             onPressed: _selectedIndex != null ? _submitAnswer : null,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
                               backgroundColor: const Color(0xFF1ABC9C),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -1577,10 +1572,8 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: AppButton(
               onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: const Color(0xFF1ABC9C),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

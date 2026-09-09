@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
@@ -147,7 +148,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('わかった'),
+              label: 'わかった',
             ),
           ],
         ),
@@ -167,11 +168,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('やめる'),
+            label: 'やめる',
           ),
-          ElevatedButton(
+          AppButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
             child: const Text(
               '買う！',
               style: TextStyle(color: Colors.white),

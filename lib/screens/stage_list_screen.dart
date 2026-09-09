@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
@@ -1209,7 +1210,7 @@ class _StageNodeState extends State<_StageNode>
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('閉じる'),
+                        label: '閉じる',
                       ),
                     ],
                   ),
@@ -1819,11 +1820,8 @@ class _StageInfoSheet extends ConsumerWidget {
           // 開始ボタン
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: AppButton(
               onPressed: onStart,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: typeColor,
-                padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1949,10 +1947,8 @@ class _PremiumGateSheet extends StatelessWidget {
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: AppButton(
                 onPressed: onUpgrade,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF39C12),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

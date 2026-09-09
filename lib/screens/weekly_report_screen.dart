@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/constants.dart';
 import '../providers/weekly_report_provider.dart';
@@ -81,7 +82,7 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
+                child: AppButton(
                   onPressed: reportState.isLoading
                       ? null
                       : () => _generateReport(context, ref, profileState),
@@ -90,9 +91,6 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
                     'レポートを生成',
                     style: TextStyle(fontSize: 16),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
               ),
@@ -155,7 +153,7 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
+                child: AppButton(
                   onPressed: () {
                     HapticService.lightImpact();
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -167,9 +165,6 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
                   },
                   icon: const Icon(Icons.mail_outline),
                   label: const Text('メールで送信'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
               ),

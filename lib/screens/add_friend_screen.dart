@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_core/widgets/components/app_button.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/theme.dart';
@@ -99,7 +100,7 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
+                  child: AppButton(
                     onPressed: _submitting ? null : _submit,
                     icon: _submitting
                         ? const SizedBox(
@@ -112,10 +113,6 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                           )
                         : const Icon(Icons.send),
                     label: Text(_submitting ? '送信中…' : 'フレンド申請を送る'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimaryColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
