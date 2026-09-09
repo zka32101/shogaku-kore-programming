@@ -49,11 +49,6 @@ class MonetizationService {
     return subscription.canAccessPremiumContent();
   }
 
-  /// 広告表示判定
-  static bool shouldDisplayAds(SubscriptionState subscription) {
-    return subscription.shouldShowAds;
-  }
-
   /// トライアルが利用可能かどうか
   static bool isTrialAvailable(SubscriptionState subscription) {
     return !subscription.hasUsedTrial;
