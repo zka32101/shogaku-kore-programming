@@ -23,6 +23,8 @@ import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'package:cross_promo_kit/cross_promo_kit.dart'
+    show CrossPromoService;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,6 +69,13 @@ class _ShogakuKoreProgrammingAppState
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
+
+        // クロスプロモーション初期化
+        try {
+          await CrossPromoService.init();
+        } catch (e) {
+          // エラーでも起動は継続
+        }
       } catch (_) {
         // Firebase initialization failed, continue anyway
       }
