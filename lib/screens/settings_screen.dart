@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/shared_core.dart' show FeedbackFormPage;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -368,6 +369,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       icon: '💬',
                       title: 'お問い合わせ',
                       onTap: () => _showContact(context),
+                    ),
+                    _SettingsTile(
+                      icon: '🐞',
+                      title: 'バグ報告・ご意見',
+                      subtitle: '不具合や改善要望をアプリから直接送信',
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const FeedbackFormPage(
+                            appName: 'shogaku_kore_programming',
+                            appVersion: '0.1.0',
+                          ),
+                        ),
+                      ),
                     ),
                     const _Divider(),
                   ],
