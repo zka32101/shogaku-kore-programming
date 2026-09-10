@@ -7,7 +7,7 @@ import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, feedbackProvider;
+    show badgeProvider, BadgeNotifier, feedbackProvider, rankingProvider, friendProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -23,6 +23,8 @@ import 'services/sound_service.dart';
 import 'services/notification_service.dart';
 import 'services/feedback_service.dart';
 import 'services/revenue_cat_service.dart';
+import 'services/firestore_ranking_service.dart';
+import 'services/firestore_friend_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
@@ -42,6 +44,16 @@ Future<void> main() async {
       badgeProvider.overrideWith(() => BadgeNotifier()),
     ],
   );
+
+  // Phase 4.3: マルチアプリランキング・フレンド機能（Firestore連携）
+  final rankingService = FirestoreRankingService();
+  final friendService = FirestoreFriendService();
+
+  container.read(rankingProvider.notifier).setFetchHandler(rankingService.fetchRankings);
+  container.read(friendProvider.notifier)
+    ..setFetchHandler(friendService.fetchFriends)
+    ..setAddFriendHandler(friendService.addFriend)
+    ..setRemoveFriendHandler(friendService.removeFriend);
 
   runApp(
     UncontrolledProviderScope(
