@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
-    show FeedbackFormPage, ScreenTimeSettingsWidget, requireParentalGate;
+    show FeedbackFormPage, requireParentalGate;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -340,13 +340,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         MaterialPageRoute(
                             builder: (_) => const ParentDashboardScreen()),
                       ),
-                    ),
-                    _SettingsTile(
-                      icon: '⏰',
-                      iconBg: const Color(0xFFE3F2FD),
-                      title: '利用時間制限',
-                      subtitle: '1日の利用時間に上限を設定できます',
-                      onTap: () => _navigateToScreenTimeSettings(context),
                     ),
                     const _Divider(),
                   ],
@@ -828,25 +821,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  /// 利用時間制限の設定画面へ移動する前に、保護者ゲートを通す。
-  /// ゲートを通過（正解）した場合のみ設定画面へ遷移する。
-  Future<void> _navigateToScreenTimeSettings(BuildContext context) async {
-    final passedGate = await requireParentalGate(
-      context,
-      title: '保護者の方へ確認',
-      description: 'これは大人の方が行う操作です。\n下の計算の答えを入力してください。',
-    );
-    if (!passedGate || !context.mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text('利用時間の設定')),
-          body: const ScreenTimeSettingsWidget(primaryColor: kPrimaryColor),
-        ),
-      ),
-    );
-  }
 }
 
 // ─── 共通ウィジェット ──────────────────────────────────────────────────────────
