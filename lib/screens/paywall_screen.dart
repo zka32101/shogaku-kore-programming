@@ -1,8 +1,6 @@
-// Paywall / Subscription Screen
-// Phase 4.2: RevenueCat subscription UI
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/subscription_provider.dart';
 import '../utils/constants.dart';
 

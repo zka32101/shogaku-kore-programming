@@ -1,54 +1,56 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
-import '../services/sound_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../config/theme.dart';
+
 import '../config/constants.dart';
+import '../config/theme.dart';
+import '../models/character_model.dart';
 import '../models/stage.dart';
-import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
-import '../providers/profile_provider.dart';
-import 'achievements_screen.dart';
-import 'badge_unlock_screen.dart';
-import 'stage_list_screen.dart';
-import 'editor_screen.dart';
-import 'quiz_screen.dart';
-import 'paywall_screen.dart';
-import '../widgets/app_dialog.dart';
-import 'daily_review_screen.dart';
-import 'time_attack_screen.dart';
-import 'ranking_screen.dart';
-import 'quiz_review_screen.dart';
-import 'wrong_answers_list_screen.dart';
-import 'quiz_result_screen.dart' show QuizAnswer;
-import 'flashcard_screen.dart';
-import 'profile_screen.dart';
-import 'friends_list_screen.dart';
-import '../providers/friends_provider.dart';
+import '../providers/character_provider.dart';
+import '../providers/coin_provider.dart';
 import '../providers/daily_review_provider.dart';
-import '../providers/wrong_answers_provider.dart';
 import '../providers/favorites_provider.dart';
-import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
-import '../widgets/shortcut_help.dart';
+import '../providers/friends_provider.dart';
+import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
+import '../providers/time_attack_provider.dart';
+import '../providers/wrong_answers_provider.dart';
+import '../services/haptic_service.dart';
+import '../services/sound_service.dart';
+import '../utils/page_transitions.dart';
+import '../widgets/app_dialog.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/daily_puzzle_card.dart';
+import '../widgets/shortcut_help.dart';
 import '../widgets/tap_scale.dart';
-import 'why_programming_screen.dart';
-import 'programming_basics_screen.dart';
-import 'lesson_screen.dart';
-import 'shop_screen.dart';
-import 'reverse_teaching_screen.dart';
-import 'gallery_screen.dart';
-import 'weekly_report_screen.dart';
+import 'achievements_screen.dart';
+import 'badge_unlock_screen.dart';
 import 'character_screen.dart';
-import '../providers/coin_provider.dart';
-import '../providers/character_provider.dart';
-import '../models/character_model.dart';
-import '../utils/page_transitions.dart';
+import 'daily_review_screen.dart';
+import 'editor_screen.dart';
+import 'flashcard_screen.dart';
+import 'friends_list_screen.dart';
+import 'gallery_screen.dart';
+import 'lesson_screen.dart';
+import 'paywall_screen.dart';
+import 'profile_screen.dart';
+import 'programming_basics_screen.dart';
+import 'quiz_result_screen.dart' show QuizAnswer;
+import 'quiz_review_screen.dart';
+import 'quiz_screen.dart';
+import 'ranking_screen.dart';
+import 'reverse_teaching_screen.dart';
+import 'shop_screen.dart';
+import 'stage_list_screen.dart';
+import 'time_attack_screen.dart';
+import 'weekly_report_screen.dart';
+import 'why_programming_screen.dart';
+import 'wrong_answers_list_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -4843,4 +4845,3 @@ class _CapabilityBadge extends StatelessWidget {
     );
   }
 }
-

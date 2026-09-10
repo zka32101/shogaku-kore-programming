@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../config/theme.dart';
 import '../providers/wrong_answers_provider.dart';
+import '../services/haptic_service.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
 import 'quiz_result_screen.dart' show QuizAnswer;

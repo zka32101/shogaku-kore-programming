@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../config/theme.dart';
-import '../widgets/code_highlight.dart';
-import '../services/sound_service.dart';
 import '../providers/flashcard_provider.dart';
-import '../providers/progress_provider.dart';
 import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
+import '../services/haptic_service.dart';
+import '../services/sound_service.dart';
+import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
 

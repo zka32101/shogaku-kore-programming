@@ -1,5 +1,7 @@
-import 'package:share_plus/share_plus.dart';
 import 'dart:io';
+
+import 'package:share_plus/share_plus.dart';
+
 import '../models/certificate.dart';
 
 class ShareService {

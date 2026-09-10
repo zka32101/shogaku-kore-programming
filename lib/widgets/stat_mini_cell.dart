@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../config/theme.dart';
 
 /// Small stat cell displaying a colored value and label

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../config/theme.dart';
-import '../providers/progress_provider.dart';
-import '../providers/profile_provider.dart';
 import '../providers/daily_review_provider.dart';
-import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
 import '../providers/friends_provider.dart';
-import '../widgets/shortcut_help.dart';
+import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
+import '../providers/time_attack_provider.dart';
+import '../services/haptic_service.dart';
 import '../utils/page_transitions.dart';
+import '../widgets/shortcut_help.dart';
 import 'friends_list_screen.dart';
 
 class RankingScreen extends ConsumerStatefulWidget {

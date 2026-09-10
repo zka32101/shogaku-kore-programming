@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/step_executor_provider.dart';
+
 import '../config/theme.dart';
+import '../providers/step_executor_provider.dart';
 
 class StepExecutionControls extends ConsumerWidget {
   final int totalBlocks;

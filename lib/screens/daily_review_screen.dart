@@ -1,26 +1,28 @@
 import 'dart:async';
 import 'dart:math';
+
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:confetti/confetti.dart';
+
 import '../config/theme.dart';
 import '../models/stage.dart';
+import '../providers/ai_programming_coach_provider.dart';
 import '../providers/challenges_provider.dart';
-import '../providers/progress_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
 import '../providers/wrong_answers_provider.dart';
+import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
-import '../widgets/code_highlight.dart';
-import 'quiz_result_screen.dart';
-import 'badge_unlock_screen.dart';
-import '../widgets/shortcut_help.dart';
-import 'quiz_review_screen.dart';
-import '../providers/ai_programming_coach_provider.dart';
 import '../widgets/ai_response_dialog.dart';
+import '../widgets/code_highlight.dart';
+import '../widgets/shortcut_help.dart';
+import 'badge_unlock_screen.dart';
+import 'quiz_result_screen.dart';
+import 'quiz_review_screen.dart';
 
 // ── 今日の復習 (Daily Review) ────────────────────────────────────────────────
 // 完了済みステージからランダムに5問を抽出する毎日リセット型の復習クイズ。

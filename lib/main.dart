@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderContainer, UncontrolledProviderScope;
 import 'package:shared_core/shared_core.dart'
+
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
     show badgeProvider, unifiedBadges, BadgeNotifier, feedbackProvider;
@@ -20,6 +21,7 @@ import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
 import 'services/feedback_service.dart';
+import 'services/revenue_cat_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
@@ -80,6 +82,12 @@ class _ShogakuKoreProgrammingAppState
         );
       } catch (_) {
         // Firebase initialization failed, continue anyway
+      }
+      // RevenueCat初期化（サブスクリプション管理）
+      try {
+        await RevenueCatService().initialize();
+      } catch (_) {
+        // RevenueCat initialization failed, continue anyway
       }
       // 匿名ログイン（他の小学コレシリーズと統一：ログイン画面は持たず
       // 起動時に自動でサインインする。失敗時はローカルIDにフォールバック）
