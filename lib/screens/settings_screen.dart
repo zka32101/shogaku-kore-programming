@@ -1,3 +1,4 @@
+// Settings screen with pricing and notification preferences
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
