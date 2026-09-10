@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
-    hide profileProvider, progressProvider, ProfileState;
+    hide profileProvider, progressProvider, ProfileState, lessonProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -13,6 +13,7 @@ import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
 import 'providers/friends_provider.dart';
 import 'providers/screen_time_provider.dart';
+import 'providers/lesson_provider.dart' show LessonNotifier, lessonProvider;
 import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
@@ -34,6 +35,7 @@ Future<void> main() async {
     ProviderScope(
       overrides: [
         screenTimeProvider.overrideWith(ScreenTimeNotifier.new),
+        lessonProvider.overrideWith(LessonNotifier.new),
       ],
       child: const ShogakuKoreProgrammingApp(),
     ),
