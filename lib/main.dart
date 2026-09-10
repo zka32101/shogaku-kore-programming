@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
+import 'package:shared_core/shared_core.dart'
+    show badgeProvider, unifiedBadges, BadgeNotifier;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -34,6 +36,12 @@ Future<void> main() async {
     ProviderScope(
       overrides: [
         lessonProvider.overrideWith(LessonNotifier.new),
+        // 統一バッジシステム（Phase 4.1）: プログラミングコレ用バッジを主題タグで初期化
+        badgeProvider.overrideWith((ref) {
+          final notifier = BadgeNotifier();
+          notifier.setBadgeDefinitions(unifiedBadges, subject: 'programming');
+          return notifier;
+        }),
       ],
       child: const ShogakuKoreProgrammingApp(),
     ),
