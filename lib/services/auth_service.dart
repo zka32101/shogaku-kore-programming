@@ -47,11 +47,11 @@ class AuthService {
       final userCredential = await _firebaseAuth.signInAnonymously();
       final user = userCredential.user;
       if (user == null) {
-        return _signInWithLocalFallback();
+        return await _signInWithLocalFallback();
       }
       return AppUser.fromFirebaseUser(user);
     } catch (_) {
-      return _signInWithLocalFallback();
+      return await _signInWithLocalFallback();
     }
   }
 

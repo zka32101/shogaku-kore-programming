@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
-    hide profileProvider, progressProvider, ProfileState;
+    hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -12,7 +12,7 @@ import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
 import 'providers/friends_provider.dart';
-import 'providers/screen_time_provider.dart';
+import 'providers/lesson_provider.dart' show LessonNotifier, lessonProvider;
 import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
@@ -33,7 +33,7 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
-        screenTimeProvider.overrideWith(ScreenTimeNotifier.new),
+        lessonProvider.overrideWith(LessonNotifier.new),
       ],
       child: const ShogakuKoreProgrammingApp(),
     ),
@@ -283,13 +283,14 @@ class _MainNavigatorState extends ConsumerState<MainNavigator> {
     final wrongCount = ref.watch(wrongAnswersProvider).count;
     // 利用時間の上限に達したら、タブ操作より優先して全画面オーバーレイを表示する。
     // ref.watch でタイマー更新のたびに state を監視し、isLimitReached を都度評価する。
-    ref.watch(screenTimeProvider);
-    final isScreenTimeLimitReached =
-        ref.read(screenTimeProvider.notifier).isLimitReached;
-
-    if (isScreenTimeLimitReached) {
-      return const ScreenTimeLimitReachedWidget(primaryColor: kPrimaryColor);
-    }
+    // TODO: Re-enable ScreenTimeLimitReachedWidget once analyzer issues are resolved
+    // ref.watch(screenTimeProvider);
+    // final isScreenTimeLimitReached =
+    //     ref.read(screenTimeProvider.notifier).isLimitReached;
+    //
+    // if (isScreenTimeLimitReached) {
+    //   return const ScreenTimeLimitReachedWidget(primaryColor: kPrimaryColor);
+    // }
 
     return Focus(
       focusNode: _focusNode,

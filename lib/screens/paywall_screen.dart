@@ -7,7 +7,7 @@ import '../providers/subscription_provider.dart';
 import '../utils/constants.dart';
 
 class PaywallScreen extends ConsumerStatefulWidget {
-  const PaywallScreen({Key? key}) : super(key: key);
+  const PaywallScreen({super.key});
 
   @override
   ConsumerState<PaywallScreen> createState() => _PaywallScreenState();
@@ -18,7 +18,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subscriptionState = ref.watch(subscriptionProvider);
     final detailsState = ref.watch(subscriptionDetailsProvider);
 
     return Scaffold(
@@ -84,7 +83,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 const SizedBox(height: 12),
                 _buildFeatureItem(
                   context,
-                  icon: Icons.infinite,
+                  icon: Icons.all_inclusive,
                   title: '無制限クイズ',
                   description: '毎日無制限にクイズができます',
                 ),
