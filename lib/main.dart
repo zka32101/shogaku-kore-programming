@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderContainer, 
 import 'package:shared_core/shared_core.dart'
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, unifiedBadges, BadgeNotifier;
+    show badgeProvider, unifiedBadges, BadgeNotifier, feedbackProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
