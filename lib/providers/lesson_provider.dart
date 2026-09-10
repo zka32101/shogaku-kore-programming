@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_core/shared_core.dart' show LessonContent;
-import '../data/lesson_data.dart';
 
 const _readPrefix = 'programming_lesson_read_';
 const _favoritePrefix = 'programming_lesson_favorite_';
