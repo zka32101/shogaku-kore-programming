@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
-    show FeedbackFormPage, requireParentalGate;
+    show requireParentalGate;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -123,7 +123,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       icon: '⭐',
                       iconBg: const Color(0xFFFFF8E1),
                       title: 'プレミアムプラン',
-                      subtitle: '月額 ¥999 / 年額 ¥5,980 — 全ステージ解放',
+                      subtitle: '月額 ¥300 / 年額 ¥2,400 — 全ステージ解放',
                       onTap: () => _navigateToPaywall(context),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(
@@ -270,7 +270,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       _SwitchTile(
                         icon: '🌙',
                         iconBg: const Color(0xFFEDE7F6),
-                        title: '夕方ナッジ',
+                        title: '夜間ナッジ',
                         subtitle: '学習を忘れそうな夜に追加リマインダー',
                         value: profile.eveningNudgeEnabled,
                         onChanged: (v) async {
@@ -364,25 +364,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       icon: '📄',
                       title: '利用規約',
                       onTap: () => _showTermsOfService(context),
-                    ),
-                    _SettingsTile(
-                      icon: '💬',
-                      title: 'お問い合わせ',
-                      onTap: () => _showContact(context),
-                    ),
-                    _SettingsTile(
-                      icon: '🐞',
-                      title: 'バグ報告・ご意見',
-                      subtitle: '不具合や改善要望をアプリから直接送信',
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const FeedbackFormPage(
-                            appName: 'shogaku_kore_programming',
-                            appVersion: '0.1.0',
-                          ),
-                        ),
-                      ),
                     ),
                     const _Divider(),
                   ],
@@ -695,27 +676,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       _InfoSection(
         body: '最終更新日: 2025年1月',
-      ),
-    ]);
-  }
-
-  void _showContact(BuildContext context) {
-    _showInfoSheet(context, '💬 お問い合わせ', [
-      _InfoSection(
-        heading: 'バグ報告・機能リクエスト',
-        body: 'アプリのバグや改善要望は、App Store / Google Playのレビュー欄、またはメール（support@petit-studio.jp）にてお知らせください。',
-      ),
-      _InfoSection(
-        heading: '学習内容について',
-        body: 'クイズの問題や解説の誤りを発見した場合は、ぜひご連絡ください。内容改善に役立てます。',
-      ),
-      _InfoSection(
-        heading: '保護者の方へ',
-        body: 'お子様の利用に関するご心配やご不明点がございましたら、お気軽にお問い合わせください。お子様が安全・安心に学習できる環境づくりを大切にしています。',
-      ),
-      _InfoSection(
-        heading: '返信について',
-        body: 'お問い合わせへの返信には数日いただく場合があります。あらかじめご了承ください。',
       ),
     ]);
   }
