@@ -449,6 +449,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       focusNode: _focusNode,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
+      backgroundColor: Colors.white,
       floatingActionButton: completedCount > 0
           ? Builder(builder: (ctx) {
               final hasWrong = !wrongAnswersState.isEmpty;

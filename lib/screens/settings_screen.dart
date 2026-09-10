@@ -97,6 +97,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       focusNode: _focusNode,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           // ヘッダー
