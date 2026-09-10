@@ -96,7 +96,7 @@ class _PaywallScreenState extends State<PaywallScreen>
                   _PricingCard(
                     isSelected: _selectedPlan == 0,
                     title: '月額プラン',
-                    price: '¥999',
+                    price: '¥300',
                     unit: '/ 月',
                     description: '毎月自動更新',
                     badge: null,
@@ -110,9 +110,9 @@ class _PaywallScreenState extends State<PaywallScreen>
                   _PricingCard(
                     isSelected: _selectedPlan == 1,
                     title: '年額プラン',
-                    price: '¥5,980',
+                    price: '¥2,400',
                     unit: '/ 年',
-                    description: '月あたり約¥498（お得！）',
+                    description: '月あたり約¥200（お得！）',
                     badge: '2ヶ月分お得',
                     onTap: () => setState(() => _selectedPlan = 1),
                   ).animate(delay: 180.ms).fadeIn(duration: 300.ms).slideY(
@@ -162,8 +162,8 @@ class _PaywallScreenState extends State<PaywallScreen>
                       ),
                       child: Text(
                         _selectedPlan == 1
-                            ? '年額プランで始める（¥5,980）'
-                            : '月額プランで始める（¥999/月）',
+                            ? '年額プランで始める（¥2,400）'
+                            : '月額プランで始める（¥300/月）',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
