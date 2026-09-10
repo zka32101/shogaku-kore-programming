@@ -32,7 +32,10 @@ jobs:
           channel: 'stable'
 
       - name: Get dependencies
-        run: flutter pub get
+        run: |
+          rm -rf .dart_tool pubspec.lock
+          flutter clean
+          flutter pub get
 
       - name: Ensure Gradle wrapper JAR
         working-directory: android
