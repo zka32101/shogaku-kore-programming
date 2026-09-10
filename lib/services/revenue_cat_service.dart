@@ -89,7 +89,7 @@ class RevenueCatService {
   }) async {
     try {
       final result = await Purchases.purchasePackage(package);
-      final isActive = result.customerInfo.entitlements.active
+      final isActive = result.entitlements.active
           .containsKey(AppConstants.premiumEntitlementId);
 
       if (kDebugMode) {
