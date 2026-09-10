@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
-    show ProviderContainer, UncontrolledProviderScope, ConsumerState, ConsumerWidget, ConsumerStatefulWidget;
+    show ProviderContainer, UncontrolledProviderScope, ConsumerState, ConsumerStatefulWidget;
 import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;

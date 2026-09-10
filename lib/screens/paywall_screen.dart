@@ -16,8 +16,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subscription = ref.watch(subscriptionProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('プレミアム版に登録'),
