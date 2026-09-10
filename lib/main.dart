@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderContainer, UncontrolledProviderScope;
 import 'package:shared_core/shared_core.dart'
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
@@ -32,17 +32,20 @@ Future<void> main() async {
   // Firebase initialization will happen after UI is rendered (see _ShogakuKoreProgrammingAppState)
   // This reduces app startup time by ~600ms
 
+  final container = ProviderContainer(
+    overrides: [
+      lessonProvider.overrideWith(LessonNotifier.new),
+      // 統一バッジシステム（Phase 4.1）: プログラミングコレ用バッジを主題タグで初期化
+      badgeProvider.overrideWith(() => BadgeNotifier()),
+    ],
+  );
+
+  // バッジシステム初期化: 統一バッジを主題タグで初期化
+  container.read(badgeProvider.notifier).setBadgeDefinitions(unifiedBadges, subject: 'programming');
+
   runApp(
-    ProviderScope(
-      overrides: [
-        lessonProvider.overrideWith(LessonNotifier.new),
-        // 統一バッジシステム（Phase 4.1）: プログラミングコレ用バッジを主題タグで初期化
-        badgeProvider.overrideWith((ref) {
-          final notifier = BadgeNotifier();
-          notifier.setBadgeDefinitions(unifiedBadges, subject: 'programming');
-          return notifier;
-        }),
-      ],
+    UncontrolledProviderScope(
+      container: container,
       child: const ShogakuKoreProgrammingApp(),
     ),
   );
