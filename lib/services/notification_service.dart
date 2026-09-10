@@ -1,5 +1,4 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:shared_core/shared_core.dart' show WeeklyReportNotificationScheduler;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 
@@ -81,32 +80,17 @@ class NotificationService {
 
   /// 毎週月曜日の [hour]:[minute] に「今週もがんばろう！」通知
   ///
-  /// shared_core の [WeeklyReportNotificationScheduler] に委譲する
-  /// （本メソッドはこのスケジューラの参照実装だったもの）。
+  /// TODO: Phase 4 (December 2026) - Implement via shared_core WeeklyReportNotificationScheduler
+  /// Currently stubbed as no-op pending shared_core implementation.
   Future<void> scheduleWeeklyReport({
     required int hour,
     required int minute,
     bool enabled = true,
   }) async {
-    final scheduler = WeeklyReportNotificationScheduler(_plugin);
-
+    // Phase 4 feature - implementation pending
     if (!enabled) {
-      await scheduler.cancelWeeklyReport(_weeklyReportId);
-      return;
+      await _plugin.cancel(_weeklyReportId);
     }
-
-    await initialize();
-
-    await scheduler.scheduleWeeklyReport(
-      notificationId: _weeklyReportId,
-      title: '📊 週次レポート',
-      body: '今週もプログラミングをがんばろう！先週の成果を確認してみよう✨',
-      weekday: DateTime.monday,
-      hour: hour,
-      minute: minute,
-      channelId: _channelId,
-      channelName: _channelName,
-    );
   }
 
   // ────────── 苦手問題リマインダー ─────────────────────────────────────────────

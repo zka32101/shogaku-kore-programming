@@ -12,7 +12,6 @@ import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
 import 'providers/friends_provider.dart';
-import 'providers/screen_time_provider.dart';
 import 'providers/lesson_provider.dart' show LessonNotifier, lessonProvider;
 import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
@@ -34,7 +33,6 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
-        screenTimeProvider.overrideWith(ScreenTimeNotifier.new),
         lessonProvider.overrideWith(LessonNotifier.new),
       ],
       child: const ShogakuKoreProgrammingApp(),
