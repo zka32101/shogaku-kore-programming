@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +27,7 @@ import 'services/feedback_service.dart';
 import 'services/revenue_cat_service.dart';
 import 'services/firestore_ranking_service.dart';
 import 'services/firestore_friend_service.dart';
+import 'services/firestore_mission_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
@@ -52,6 +55,7 @@ Future<void> main() async {
   // Phase 4.3: マルチアプリランキング・フレンド機能（Firestore連携）
   final rankingService = FirestoreRankingService();
   final friendService = FirestoreFriendService();
+  final missionService = FirestoreMissionService();
 
   container.read(rankingProvider.notifier).setFetchHandler(rankingService.fetchRankings);
   container.read(globalRankingProvider.notifier).setFetchHandler(rankingService.fetchGlobalRankings);
@@ -59,6 +63,13 @@ Future<void> main() async {
     ..setFetchHandler(friendService.fetchFriends)
     ..setAddFriendHandler(friendService.addFriend)
     ..setRemoveFriendHandler(friendService.removeFriend);
+
+  // Phase 4.5: デイリーミッション統一
+  // ミッション初期化: 現在のユーザー ID で初期化
+  final currentUserId = missionService.getCurrentUserId();
+  if (currentUserId != null) {
+    unawaited(container.read(missionProvider.notifier).initializeMissions(currentUserId));
+  }
 
   runApp(
     UncontrolledProviderScope(
