@@ -50,6 +50,7 @@ Future<void> main() async {
   final friendService = FirestoreFriendService();
 
   container.read(rankingProvider.notifier).setFetchHandler(rankingService.fetchRankings);
+  container.read(globalRankingProvider.notifier).setFetchHandler(rankingService.fetchGlobalRankings);
   container.read(friendProvider.notifier)
     ..setFetchHandler(friendService.fetchFriends)
     ..setAddFriendHandler(friendService.addFriend)
