@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/shared_core.dart' show FriendsListPage;
 
 import '../config/constants.dart';
 import '../config/theme.dart';
@@ -1027,21 +1028,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 科目ラベル
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'プログラミング',
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+          // ヘッダー top row: 科目ラベル + アクションボタン
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 科目ラベル
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  'プログラミング',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
+              // アクションボタン（フレンド）
+              IconButton(
+                onPressed: () {
+                  HapticService.lightImpact();
+                  SoundService().playTap();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const FriendsListPage()),
+                  );
+                },
+                icon: const Icon(Icons.people, color: Colors.white, size: 20),
+                tooltip: 'フレンド',
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  shape: const CircleBorder(),
+                  minimumSize: const Size(40, 40),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
