@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_core/shared_core.dart' show FriendsListPage;
+import 'package:shared_core/shared_core.dart'
+    show
+        FriendsListPage,
+        DailyMissionPage;
 
 import '../config/constants.dart';
 import '../config/theme.dart';
@@ -1046,6 +1049,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
+                ),
+              ),
+              // デイリーミッションボタン
+              IconButton(
+                onPressed: () {
+                  HapticService.lightImpact();
+                  SoundService().playTap();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => DailyMissionPage(
+                        primaryColor: kPrimaryColor,
+                        appTitle: '小学コレ！プログラミング',
+                        filterSubject: 'programming',
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.assignment, color: Colors.white, size: 18),
+                tooltip: 'デイリーミッション',
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  shape: const CircleBorder(),
+                  minimumSize: const Size(40, 40),
                 ),
               ),
               // アクションボタン（フレンド）
