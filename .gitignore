@@ -67,3 +67,4 @@ Podfile.lock
 build/
 DerivedData/
 *.xcarchive
+*.backup.dart
