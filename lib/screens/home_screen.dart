@@ -63,7 +63,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int? _prevStreak;
   bool _goalCelebrated = false;
   bool _codeKingChecked = false;
-  bool _showMoreStats = false;
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -81,10 +80,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void dispose() {
     _focusNode.dispose();
     super.dispose();
-  }
-
-  void _nextTip() {
-    setState(() => _tipIndex = (_tipIndex + 1) % _tips.length);
   }
 
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
@@ -167,10 +162,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final reviewState = ref.watch(dailyReviewProvider);
     final reviewDoneToday = reviewState.doneToday;
     final reviewStreak = reviewState.reviewStreak;
-    final longestReviewStreak = reviewState.longestReviewStreak;
 
     final wrongAnswersState = ref.watch(wrongAnswersProvider);
-    final favoritesState = ref.watch(favoritesProvider);
     final flashState = ref.watch(flashcardProvider);
     final masteredCards = flashState.masteredIds.length;
     final now = DateTime.now();
@@ -255,8 +248,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _prevStreak ??= streakDays;
 
     final todayCleared = progressNotifier.todayClearedCount;
-    final comebackDays = progressNotifier.comebackDays;
-    final progressPercent = completedCount / AppConstants.totalStages;
 
     // Listener 3: 1日の目標達成検出
     if (!_goalCelebrated &&
@@ -301,8 +292,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         }
       });
     }
-    final starsToNext = progressNotifier.starsToNextLevel;
-    final levelProgress = progressNotifier.levelProgress;
 
     // Listener 4: コード王バッジ検出
     if (!_codeKingChecked &&
@@ -359,9 +348,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       StageLevel.intermediate,
       StageLevel.advanced,
     ];
-    final currentLevelIndex = levels.indexOf(currentUnitLevel);
-    final nextUnitLevel =
-        currentLevelIndex < levels.length - 1 ? levels[currentLevelIndex + 1] : null;
 
     return Focus(
       focusNode: _focusNode,
@@ -468,7 +454,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   // Wrong answers card
                   if (!wrongAnswersState.isEmpty)
-                    _buildWrongAnswersCard(context, wrongAnswersState.length),
+                    _buildWrongAnswersCard(context, wrongAnswersState.count),
                   if (!wrongAnswersState.isEmpty)
                     const SizedBox(height: 16),
 
@@ -941,8 +927,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Navigator.of(context).push(
       smoothPageRoute(
         QuizScreen(
-          stage: nextStage,
-          heroTag: 'next_stage',
+          challenge: nextStage,
         ),
       ),
     );
@@ -1073,7 +1058,6 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
   int? _selectedIndex;
   bool _answered = false;
   late Question _currentQuestion;
-  late String _currentTitle;
   late int _questionIndex;
   final Random _rng = Random();
 
@@ -1081,7 +1065,6 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
   void initState() {
     super.initState();
     _currentQuestion = widget.question;
-    _currentTitle = widget.challengeTitle;
     _questionIndex = 0;
   }
 
@@ -1090,7 +1073,6 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
       final item = widget.pool[_rng.nextInt(widget.pool.length)];
       setState(() {
         _currentQuestion = item.$1;
-        _currentTitle = item.$2;
         _selectedIndex = null;
         _answered = false;
         _questionIndex++;
@@ -1107,20 +1089,16 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
     final correct = _selectedIndex == _currentQuestion.correctIndex;
     if (correct) {
       SoundService().playCorrect();
-      ref.read(progressProvider.notifier).recordQuestionAnswer(
-        questionText: _currentQuestion.text,
-        isCorrect: true,
-      );
+      ref.read(progressProvider.notifier).recordQuestionsAnswered(1);
     } else {
       SoundService().playWrong();
-      ref.read(wrongAnswersProvider.notifier).addWrongAnswer(
+      ref.read(wrongAnswersProvider.notifier).addWrongAnswers([
         QuizAnswer(
           questionText: _currentQuestion.text,
           selectedAnswer: _currentQuestion.options[_selectedIndex!],
           correctAnswer: _currentQuestion.options[_currentQuestion.correctIndex],
-          difficulty: '',
         ),
-      );
+      ]);
     }
 
     setState(() => _answered = true);
