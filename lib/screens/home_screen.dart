@@ -58,7 +58,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  late int _tipIndex;
   int? _prevLevel;
   int? _prevStreak;
   bool _goalCelebrated = false;
@@ -68,8 +67,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
-    _tipIndex = dayOfYear % _tips.length;
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(friendsProvider.notifier).loadFriends();
@@ -130,7 +127,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (key == LogicalKeyboardKey.keyH) {
       HapticService.lightImpact();
       SoundService().playTap();
-      showDialog(context: context, builder: (c) => const ShortcutHelp());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('キーボードショートカット: T=時間攻撃, R=復習, W=苦手問題, L=リスト, A=実績, F=友達, P=プロフィール')),
+      );
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -335,19 +334,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       (c) => !(progressMap[c.id]?.isCompleted ?? false),
       orElse: () => allChallenges.first,
     );
-
-    final currentUnitLevel = allChallenges
-        .firstWhere(
-          (c) => !(progressMap[c.id]?.isCompleted ?? false),
-          orElse: () => allChallenges.last,
-        )
-        .level;
-
-    const levels = [
-      StageLevel.beginner,
-      StageLevel.intermediate,
-      StageLevel.advanced,
-    ];
 
     return Focus(
       focusNode: _focusNode,
@@ -1095,6 +1081,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
       ref.read(wrongAnswersProvider.notifier).addWrongAnswers([
         QuizAnswer(
           questionText: _currentQuestion.text,
+          isCorrect: false,
           selectedAnswer: _currentQuestion.options[_selectedIndex!],
           correctAnswer: _currentQuestion.options[_currentQuestion.correctIndex],
         ),
