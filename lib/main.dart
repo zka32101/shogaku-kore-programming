@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
@@ -9,7 +10,7 @@ import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier;
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -119,6 +120,30 @@ class _ShogakuKoreProgrammingAppState
       } catch (_) {
         // Firebase initialization failed, continue anyway
       }
+
+      // Phase 4.18: プッシュ通知サービス初期化
+      final pushService = PushNotificationService();
+      try {
+        await pushService.initialize(
+          onMessageHandler: (RemoteMessage message) {
+            debugPrint('Received message: ${message.notification?.title}');
+          },
+        );
+      } catch (_) {
+        // PushNotificationService initialization failed, continue anyway
+      }
+
+      // FCM トークンを取得・保存
+      try {
+        final fcmToken = await pushService.getFCMToken();
+        if (fcmToken != null) {
+          debugPrint('FCM Token obtained: ${fcmToken.substring(0, 20)}...');
+          // 将来: await updateUserFCMToken(userId, fcmToken);
+        }
+      } catch (_) {
+        // FCM token retrieval failed, continue anyway
+      }
+
       // RevenueCat初期化（サブスクリプション管理）
       final revenueCatService = RevenueCatService();
       try {
