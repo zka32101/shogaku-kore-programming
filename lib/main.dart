@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'
+    show ProviderContainer, UncontrolledProviderScope, ConsumerState, ConsumerStatefulWidget;
 import 'package:shared_core/shared_core.dart'
+
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
+import 'package:shared_core/shared_core.dart'
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -18,11 +24,16 @@ import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
 import 'services/feedback_service.dart';
+import 'services/revenue_cat_service.dart';
+import 'services/firestore_ranking_service.dart';
+import 'services/firestore_friend_service.dart';
+import 'services/firestore_mission_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/mission/mission_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,11 +41,39 @@ Future<void> main() async {
   // Firebase initialization will happen after UI is rendered (see _ShogakuKoreProgrammingAppState)
   // This reduces app startup time by ~600ms
 
+  final container = ProviderContainer(
+    overrides: [
+      lessonProvider.overrideWith(LessonNotifier.new),
+      // 統一バッジシステム（Phase 4.1）: プログラミングコレ用バッジ
+      badgeProvider.overrideWith(() => BadgeNotifier()),
+    ],
+  );
+
+  // バッジシステム初期化: 統一バッジをプログラミング教科タグで初期化
+  container.read(badgeProvider.notifier).setBadgeDefinitions(unifiedBadges, subject: 'programming');
+
+  // Phase 4.3: マルチアプリランキング・フレンド機能（Firestore連携）
+  final rankingService = FirestoreRankingService();
+  final friendService = FirestoreFriendService();
+  final missionService = FirestoreMissionService();
+
+  container.read(rankingProvider.notifier).setFetchHandler(rankingService.fetchRankings);
+  container.read(globalRankingProvider.notifier).setFetchHandler(rankingService.fetchGlobalRankings);
+  container.read(friendProvider.notifier)
+    ..setFetchHandler(friendService.fetchFriends)
+    ..setAddFriendHandler(friendService.addFriend)
+    ..setRemoveFriendHandler(friendService.removeFriend);
+
+  // Phase 4.5: デイリーミッション統一
+  // ミッション初期化: 現在のユーザー ID で初期化
+  final currentUserId = missionService.getCurrentUserId();
+  if (currentUserId != null) {
+    unawaited(container.read(missionProvider.notifier).initializeMissions(currentUserId));
+  }
+
   runApp(
-    ProviderScope(
-      overrides: [
-        lessonProvider.overrideWith(LessonNotifier.new),
-      ],
+    UncontrolledProviderScope(
+      container: container,
       child: const ShogakuKoreProgrammingApp(),
     ),
   );
@@ -69,6 +108,12 @@ class _ShogakuKoreProgrammingAppState
         );
       } catch (_) {
         // Firebase initialization failed, continue anyway
+      }
+      // RevenueCat初期化（サブスクリプション管理）
+      try {
+        await RevenueCatService().initialize();
+      } catch (_) {
+        // RevenueCat initialization failed, continue anyway
       }
       // 匿名ログイン（他の小学コレシリーズと統一：ログイン画面は持たず
       // 起動時に自動でサインインする。失敗時はローカルIDにフォールバック）

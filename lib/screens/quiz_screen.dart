@@ -1,27 +1,29 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../config/theme.dart';
 import '../models/stage.dart';
-import '../providers/progress_provider.dart';
+import '../providers/ai_programming_coach_provider.dart';
+import '../providers/bgm_provider.dart';
 import '../providers/challenges_provider.dart';
-import '../providers/wrong_answers_provider.dart';
-import '../providers/profile_provider.dart';
+import '../providers/character_provider.dart';
+import '../providers/coin_provider.dart';
 import '../providers/favorites_provider.dart';
+import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
+import '../providers/wrong_answers_provider.dart';
+import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
-import 'quiz_result_screen.dart';
-import 'badge_unlock_screen.dart';
+import '../widgets/ai_response_dialog.dart';
+import '../widgets/app_dialog.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
-import '../providers/ai_programming_coach_provider.dart';
-import '../widgets/ai_response_dialog.dart';
-import '../providers/coin_provider.dart';
-import '../widgets/app_dialog.dart';
-import '../providers/bgm_provider.dart';
-import '../providers/character_provider.dart';
+import 'badge_unlock_screen.dart';
+import 'quiz_result_screen.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
   final Stage challenge;

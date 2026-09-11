@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../models/friend_model.dart';
 
 /// フレンド機能の Firestore アクセス層。

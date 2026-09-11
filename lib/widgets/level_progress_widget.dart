@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/level.dart';
 
 /// レベル進捗表示ウィジェット

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/daily_puzzle_provider.dart';
 import '../services/ai_programming_coach_service.dart';
 import '../services/haptic_service.dart';

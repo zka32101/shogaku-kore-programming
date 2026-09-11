@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../config/theme.dart';
 
 /// 汎用スタンダード Card ウィジェット

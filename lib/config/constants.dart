@@ -4,6 +4,10 @@ class AppConstants {
   static const int freeStageLimit = 10;
   static const int totalStages = 60;
 
+  // RevenueCat API Key（Phase 4.2: Subscription Management）
+  static const String revenueCatApiKey = 'YOUR_REVENUE_CAT_API_KEY';
+  static const String premiumEntitlementId = 'premium';
+
   // Python言語について
   static const String pythonDescription = 'Python（パイソン）は、世界中のプロが使う人気No.1のことば！';
   static const String pythonFeatures = '''

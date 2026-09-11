@@ -2,9 +2,12 @@
 // Phase 4.2: Subscription & In-App Purchase Management
 
 import 'dart:async';
-import 'package:purchases_flutter/purchases_flutter.dart';
+
 import 'package:flutter/foundation.dart';
-import '../utils/constants.dart';
+import 'package:flutter/services.dart' show PlatformException;
+import 'package:purchases_flutter/purchases_flutter.dart';
+
+import '../config/constants.dart';
 
 class RevenueCatService {
   static final RevenueCatService _instance = RevenueCatService._internal();
@@ -61,7 +64,7 @@ class RevenueCatService {
       return isActive;
     } catch (e) {
       if (kDebugMode) {
-        print('[RevatureCat] Error checking subscription: $e');
+        print('[RevenueCat] Error checking subscription: $e');
       }
       return false;
     }
@@ -85,8 +88,8 @@ class RevenueCatService {
     required Package package,
   }) async {
     try {
-      final customerInfo = await Purchases.purchasePackage(package);
-      final isActive = customerInfo.entitlements.active
+      final result = await Purchases.purchasePackage(package);
+      final isActive = result.entitlements.active
           .containsKey(AppConstants.premiumEntitlementId);
 
       if (kDebugMode) {
@@ -95,9 +98,10 @@ class RevenueCatService {
 
       _subscriptionStatusController.add(isActive);
       return isActive;
-    } catch (e) {
+    } on PlatformException catch (e) {
       if (kDebugMode) {
-        print('[RevenueCat] Purchase error: $e');
+        final errorCode = PurchasesErrorHelper.getErrorCode(e);
+        print('[RevenueCat] Purchase error: $errorCode (${e.message})');
       }
       return false;
     }
@@ -128,12 +132,13 @@ class RevenueCatService {
   Future<DateTime?> getSubscriptionExpirationDate() async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      final expirationDateStr = customerInfo.entitlements.active
+      final expirationDateString = customerInfo.entitlements.active
           .values
           .firstOrNull
           ?.expirationDate;
-      if (expirationDateStr == null) return null;
-      return DateTime.tryParse(expirationDateStr.toString());
+      return expirationDateString != null
+          ? DateTime.tryParse(expirationDateString)
+          : null;
     } catch (e) {
       if (kDebugMode) {
         print('[RevenueCat] Error fetching expiration date: $e');

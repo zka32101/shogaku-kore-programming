@@ -1,33 +1,35 @@
+import 'dart:math' as math;
+
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:confetti/confetti.dart';
-import 'dart:math' as math;
+
 import '../config/constants.dart' as constants;
 import '../config/theme.dart';
-import '../models/stage.dart';
-import '../providers/gallery_provider.dart';
 import '../models/block_model.dart';
-import '../providers/editor_provider.dart';
-import '../providers/progress_provider.dart';
+import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
-import '../providers/profile_provider.dart';
-import '../providers/favorites_provider.dart';
-import '../widgets/robot_canvas.dart';
-import '../services/sound_service.dart';
-import 'badge_unlock_screen.dart';
-import '../widgets/shortcut_help.dart';
-import '../widgets/app_dialog.dart';
-import '../providers/coin_provider.dart';
 import '../providers/character_provider.dart';
-import '../widgets/character_reaction_widget.dart';
+import '../providers/coin_provider.dart';
+import '../providers/editor_provider.dart';
+import '../providers/favorites_provider.dart';
+import '../providers/gallery_provider.dart';
+import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
 import '../providers/step_executor_provider.dart';
+import '../services/haptic_service.dart';
+import '../services/sound_service.dart';
+import '../widgets/app_dialog.dart';
+import '../widgets/character_reaction_widget.dart';
+import '../widgets/execution_timeline.dart';
+import '../widgets/robot_canvas.dart';
+import '../widgets/scoring_result_widget.dart';
+import '../widgets/shortcut_help.dart';
 import '../widgets/step_execution_controls.dart';
 import '../widgets/variable_viewer.dart';
-import '../widgets/scoring_result_widget.dart';
-import '../widgets/execution_timeline.dart';
+import 'badge_unlock_screen.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Stage challenge;

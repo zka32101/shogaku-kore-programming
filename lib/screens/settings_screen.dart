@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
-    show requireParentalGate;
+
+    show FeedbackFormPage, requireParentalGate, ScreenTimeSettingsWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -340,6 +341,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         MaterialPageRoute(
                             builder: (_) => const ParentDashboardScreen()),
                       ),
+                    ),
+                    _SettingsTile(
+                      icon: '⏱️',
+                      iconBg: const Color(0xFFFFF3E0),
+                      title: 'スクリーンタイム制限',
+                      subtitle: '1日の学習時間を制限・管理',
+                      onTap: () => _goToScreenTimeSettings(context),
                     ),
                     const _Divider(),
                   ],
@@ -779,6 +787,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const PaywallScreen()),
+    );
+  }
+
+  /// スクリーンタイム設定画面へ移動する前に、保護者ゲートを通す。
+  /// ゲートを通過（正解）した場合のみ [ScreenTimeSettingsWidget] へ遷移する。
+  Future<void> _goToScreenTimeSettings(BuildContext context) async {
+    final passedGate = await requireParentalGate(context);
+    if (!passedGate || !context.mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('スクリーンタイム制限'),
+            backgroundColor: kPrimaryColor,
+          ),
+          body: const ScreenTimeSettingsWidget(primaryColor: kPrimaryColor),
+        ),
+      ),
     );
   }
 

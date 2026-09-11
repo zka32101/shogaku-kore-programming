@@ -1,54 +1,60 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
-import '../services/sound_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../config/theme.dart';
+import 'package:shared_core/shared_core.dart'
+    show
+        FriendsListPage,
+        DailyMissionPage;
+
 import '../config/constants.dart';
+import '../config/theme.dart';
+import '../models/character_model.dart';
 import '../models/stage.dart';
-import '../providers/progress_provider.dart';
 import '../providers/challenges_provider.dart';
-import '../providers/profile_provider.dart';
-import 'achievements_screen.dart';
-import 'badge_unlock_screen.dart';
-import 'stage_list_screen.dart';
-import 'editor_screen.dart';
-import 'quiz_screen.dart';
-import 'paywall_screen.dart';
-import '../widgets/app_dialog.dart';
-import 'daily_review_screen.dart';
-import 'time_attack_screen.dart';
-import 'ranking_screen.dart';
-import 'quiz_review_screen.dart';
-import 'wrong_answers_list_screen.dart';
-import 'quiz_result_screen.dart' show QuizAnswer;
-import 'flashcard_screen.dart';
-import 'profile_screen.dart';
-import 'friends_list_screen.dart';
-import '../providers/friends_provider.dart';
+import '../providers/character_provider.dart';
+import '../providers/coin_provider.dart';
 import '../providers/daily_review_provider.dart';
-import '../providers/wrong_answers_provider.dart';
 import '../providers/favorites_provider.dart';
-import '../providers/time_attack_provider.dart';
 import '../providers/flashcard_provider.dart';
-import '../widgets/shortcut_help.dart';
+import '../providers/friends_provider.dart';
+import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
+import '../providers/time_attack_provider.dart';
+import '../providers/wrong_answers_provider.dart';
+import '../services/haptic_service.dart';
+import '../services/sound_service.dart';
+import '../utils/page_transitions.dart';
+import '../widgets/app_dialog.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/daily_puzzle_card.dart';
+import '../widgets/shortcut_help.dart';
 import '../widgets/tap_scale.dart';
-import 'why_programming_screen.dart';
-import 'programming_basics_screen.dart';
-import 'lesson_screen.dart';
-import 'shop_screen.dart';
-import 'reverse_teaching_screen.dart';
-import 'gallery_screen.dart';
-import 'weekly_report_screen.dart';
+import 'achievements_screen.dart';
+import 'badge_unlock_screen.dart';
 import 'character_screen.dart';
-import '../providers/coin_provider.dart';
-import '../providers/character_provider.dart';
-import '../models/character_model.dart';
-import '../utils/page_transitions.dart';
+import 'daily_review_screen.dart';
+import 'editor_screen.dart';
+import 'flashcard_screen.dart';
+import 'friends_list_screen.dart';
+import 'gallery_screen.dart';
+import 'lesson_screen.dart';
+import 'paywall_screen.dart';
+import 'profile_screen.dart';
+import 'programming_basics_screen.dart';
+import 'quiz_result_screen.dart' show QuizAnswer;
+import 'quiz_review_screen.dart';
+import 'quiz_screen.dart';
+import 'ranking_screen.dart';
+import 'reverse_teaching_screen.dart';
+import 'shop_screen.dart';
+import 'stage_list_screen.dart';
+import 'time_attack_screen.dart';
+import 'weekly_report_screen.dart';
+import 'why_programming_screen.dart';
+import 'wrong_answers_list_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -480,6 +486,224 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
         ),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        MediaQuery.of(context).padding.top + 16,
+        16,
+        20,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ヘッダー top row: 科目ラベル + アクションボタン
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 科目ラベル
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  'プログラミング',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              // デイリーミッションボタン
+              IconButton(
+                onPressed: () {
+                  HapticService.lightImpact();
+                  SoundService().playTap();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => DailyMissionPage(
+                        primaryColor: kPrimaryColor,
+                        appTitle: '小学コレ！プログラミング',
+                        filterSubject: 'programming',
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.assignment, color: Colors.white, size: 18),
+                tooltip: 'デイリーミッション',
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  shape: const CircleBorder(),
+                  minimumSize: const Size(40, 40),
+                ),
+              ),
+              // アクションボタン（フレンド）
+              IconButton(
+                onPressed: () {
+                  HapticService.lightImpact();
+                  SoundService().playTap();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const FriendsListPage()),
+                  );
+                },
+                icon: const Icon(Icons.people, color: Colors.white, size: 20),
+                tooltip: 'フレンド',
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  shape: const CircleBorder(),
+                  minimumSize: const Size(40, 40),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _buildGreeting(profile.nickname),
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 10),
+          // ユーザー情報行
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(profile.avatarEmoji, style: const TextStyle(fontSize: 16)),
+                  const SizedBox(width: 6),
+                  Text(
+                    'レベル $level',
+                    style: const TextStyle(fontSize: 13, color: Colors.white),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  if (streakDays >= 2) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.orange.withValues(alpha: 0.6), width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('🔥', style: TextStyle(fontSize: 11)),
+                          const SizedBox(width: 3),
+                          Text(
+                            '$streakDays日',
+                            style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    '$totalStars pt',
+                    style: const TextStyle(fontSize: 13, color: Colors.white),
+                  ),
+                  const SizedBox(width: 8),
+                  // コイン残高バッジ（タップでショップ）
+                  GestureDetector(
+                    onTap: () {
+                      HapticService.lightImpact();
+                      SoundService().playTap();
+                      Navigator.of(context).push(
+                        smoothPageRoute(const ShopScreen()),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFD700).withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFFFD700).withValues(alpha: 0.6),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('🪙', style: TextStyle(fontSize: 11)),
+                          const SizedBox(width: 3),
+                          Text(
+                            '$coinBalance',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // レベルXPバー
+          Row(
+            children: [
+              Text(
+                'Lv.$level',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white70,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: levelProgress),
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOut,
+                    builder: (context, value, child) => LinearProgressIndicator(
+                      value: value,
+                      backgroundColor: Colors.white30,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                      minHeight: 6,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                starsToNext > 0 ? 'Lv.${level + 1}' : 'MAX',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '$completedCount / ${AppConstants.totalStages} ステージ完了',
+                style: const TextStyle(fontSize: 11, color: Colors.white70),
+              ),
+              // 今日の目標インジケーター
+              _DailyGoalDots(todayCleared: todayCleared, dailyGoal: dailyGoal),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -1264,6 +1488,46 @@ class _LevelUpOverlay extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// プログラミングの能力を示すバッジ
+class _CapabilityBadge extends StatelessWidget {
+  final String emoji;
+  final String label;
+
+  const _CapabilityBadge({
+    required this.emoji,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: const Color(0xFF667EEA).withValues(alpha: 0.15),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 14)),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF667EEA),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../models/level.dart';
 import '../providers/level_provider.dart';
 import '../widgets/level_progress_widget.dart';

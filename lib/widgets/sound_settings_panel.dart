@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/bgm_provider.dart';
-import '../services/sound_service.dart';
 import '../services/haptic_service.dart';
+import '../services/sound_service.dart';
 
 class SoundSettingsPanel extends ConsumerWidget {
   const SoundSettingsPanel({super.key});
