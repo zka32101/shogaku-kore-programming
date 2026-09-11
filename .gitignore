@@ -68,3 +68,4 @@ build/
 DerivedData/
 *.xcarchive
 *.backup.dart
+lib/screens/home_screen_original.dart
