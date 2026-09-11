@@ -9,7 +9,7 @@ import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider;
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -46,6 +46,8 @@ Future<void> main() async {
       lessonProvider.overrideWith(LessonNotifier.new),
       // 統一バッジシステム（Phase 4.1）: プログラミングコレ用バッジ
       badgeProvider.overrideWith(() => BadgeNotifier()),
+      // Phase 4.7: 統一サブスクリプション管理（PremiumProvider）
+      premiumProvider.overrideWith(PremiumNotifier.new),
     ],
   );
 
@@ -69,6 +71,14 @@ Future<void> main() async {
   final currentUserId = missionService.getCurrentUserId();
   if (currentUserId != null) {
     unawaited(container.read(missionProvider.notifier).initializeMissions(currentUserId));
+  }
+
+  // Phase 4.7: 統一サブスクリプション初期化
+  if (currentUserId != null) {
+    container.read(premiumProvider.notifier)
+      ..setCheckHandler((userId) => revenueCatService.isSubscribed(userId))
+      ..setExpiryHandler((userId) => revenueCatService.getSubscriptionExpirationDate(userId));
+    unawaited(container.read(premiumProvider.notifier).checkSubscription(currentUserId));
   }
 
   runApp(
@@ -110,8 +120,9 @@ class _ShogakuKoreProgrammingAppState
         // Firebase initialization failed, continue anyway
       }
       // RevenueCat初期化（サブスクリプション管理）
+      final revenueCatService = RevenueCatService();
       try {
-        await RevenueCatService().initialize();
+        await revenueCatService.initialize();
       } catch (_) {
         // RevenueCat initialization failed, continue anyway
       }
