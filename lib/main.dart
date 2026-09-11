@@ -7,7 +7,7 @@ import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, feedbackProvider, rankingProvider, friendProvider;
+    show badgeProvider, BadgeNotifier, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -30,6 +30,7 @@ import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/mission/mission_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
