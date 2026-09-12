@@ -9,7 +9,9 @@ import 'package:shared_core/shared_core.dart'
         FriendsListPage,
         DailyMissionPage,
         WeeklyBonusWidget,
-        coinProvider;
+        coinProvider,
+        NotificationBadge,
+        notificationProvider;
 
 import '../config/constants.dart';
 import '../config/theme.dart';
@@ -428,6 +430,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
+              // Phase 4.23: ローカル通知・リマインダーシステム
+              actions: [
+                Builder(
+                  builder: (context) {
+                    final notifications = ref.watch(notificationProvider);
+                    return NotificationBadge(
+                      notificationCount: notifications.length,
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('通知: ${notifications.length}件'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
             // Main content
             SliverPadding(
