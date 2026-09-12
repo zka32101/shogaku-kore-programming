@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
     show
         FriendsListPage,
-        DailyMissionPage;
+        DailyMissionPage,
+        WeeklyBonusWidget,
+        coinProvider;
 
 import '../config/constants.dart';
 import '../config/theme.dart';
@@ -449,6 +451,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     todayCleared,
                   ),
                   const SizedBox(height: 20),
+
+                  // Phase 4.20: 週次ボーナスウィジェット
+                  WeeklyBonusWidget(
+                    onBonusClaimed: (coins) {
+                      ref.read(coinProvider.notifier).addCoins(coins);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('週次ボーナス獲得！ $coins コイン'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
 
                   // Daily mission card
                   _buildDailyMissionCard(context, profile, todayCleared),

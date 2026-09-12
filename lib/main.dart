@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,7 +12,7 @@ import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider;
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -82,6 +83,26 @@ Future<void> main() async {
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
   if (currentUserId != null) {
     unawaited(container.read(missionProvider.notifier).initializeDailyMissions(currentUserId, 'programming'));
+  }
+
+  // Phase 4.20: 週次ボーナスシステム Firestore 永続化
+  if (currentUserId != null) {
+    final weeklyBonusRef = FirebaseFirestore.instance.collection('users').doc(currentUserId).collection('bonuses').doc('weekly');
+    container.read(weeklyBonusProvider.notifier).setPersistHandler(
+      (userId, bonusState) async {
+        try {
+          await weeklyBonusRef.set({
+            'consecutiveDays': bonusState.consecutiveDays,
+            'lastClaimedDate': bonusState.lastClaimedDate?.toIso8601String(),
+            'weeklyResetDate': bonusState.weeklyResetDate?.toIso8601String(),
+            'totalCoinsEarned': bonusState.totalCoinsEarned,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+        } catch (e) {
+          debugPrint('Error persisting weekly bonus: $e');
+        }
+      },
+    );
   }
 
   // Phase 4.7: 統一サブスクリプション初期化
