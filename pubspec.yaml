@@ -1,6 +1,6 @@
 name: shogaku_kore_programming
 description: "小学コレ！プログラミング - コード探険でプログラミングを楽しく学ぼう！"
-# Re-trigger CI
+# Re-trigger CI - Force cache refresh (2026-09-12)
 publish_to: 'none'
 
 version: 0.1.0+1
