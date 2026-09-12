@@ -37,6 +37,8 @@ import '../widgets/tap_scale.dart';
 import 'achievements_screen.dart';
 import 'badge_unlock_screen.dart';
 import 'character_screen.dart';
+import 'coaching/views/ai_coaching_dashboard_screen.dart';
+import 'coaching/widgets/ai_coaching_card.dart';
 import 'daily_review_screen.dart';
 import 'editor_screen.dart';
 import 'flashcard_screen.dart';
@@ -463,6 +465,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       );
                     },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Phase 4.24: AI コーチング
+                  AiCoachingCard(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const AiCoachingDashboardScreen(),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
 
