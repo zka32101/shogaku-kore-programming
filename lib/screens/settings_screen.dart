@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_core/shared_core.dart'
 
-    show FeedbackFormPage, requireParentalGate, ScreenTimeSettingsWidget;
+    show FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -352,6 +353,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const _Divider(),
                   ],
                 ).animate(delay: 240.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+
+                // ─── 分析 ────────────────────────────────────
+                Column(
+                  children: [
+                    const _SectionHeader(title: '分析'),
+                    _SettingsTile(
+                      icon: '📊',
+                      iconBg: const Color(0xFFE8F5E9),
+                      title: 'ユーザーリテンション分析',
+                      subtitle: 'あなたの活動パターンと継続性を分析',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const RetentionDashboard(),
+                        ),
+                      ),
+                    ),
+                    const _Divider(),
+                  ],
+                ).animate(delay: 270.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
                 // ─── アプリについて ──────────────────────────
                 Column(
