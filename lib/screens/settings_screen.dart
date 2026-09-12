@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_core/shared_core.dart'
 
-    show FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget;
+    show FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -354,6 +354,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ],
                 ).animate(delay: 240.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
+                // ─── ソーシャル ──────────────────────────────
+                Column(
+                  children: [
+                    const _SectionHeader(title: 'ソーシャル'),
+                    _SettingsTile(
+                      icon: '👥',
+                      iconBg: const Color(0xFF6C63FF),
+                      title: 'フレンドを探す',
+                      subtitle: 'ユーザーを検索してフレンド申請する',
+                      onTap: () => _openAddFriendDialog(context),
+                    ),
+                    const _Divider(),
+                  ],
+                ).animate(delay: 270.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+
                 // ─── 分析 ────────────────────────────────────
                 Column(
                   children: [
@@ -371,7 +386,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const _Divider(),
                   ],
-                ).animate(delay: 270.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+                ).animate(delay: 300.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
                 // ─── アプリについて ──────────────────────────
                 Column(
@@ -395,7 +410,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const _Divider(),
                   ],
-                ).animate(delay: 300.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+                ).animate(delay: 330.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
                 // ─── データ ─────────────────────────────────
                 Column(
@@ -826,6 +841,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           body: const ScreenTimeSettingsWidget(primaryColor: kPrimaryColor),
         ),
       ),
+    );
+  }
+
+  /// フレンド検索ダイアログを開く
+  void _openAddFriendDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const AddFriendDialog(),
     );
   }
 
