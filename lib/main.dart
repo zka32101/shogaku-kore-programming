@@ -12,7 +12,7 @@ import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider;
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -399,14 +399,13 @@ class _MainNavigatorState extends ConsumerState<MainNavigator> {
     final wrongCount = ref.watch(wrongAnswersProvider).count;
     // 利用時間の上限に達したら、タブ操作より優先して全画面オーバーレイを表示する。
     // ref.watch でタイマー更新のたびに state を監視し、isLimitReached を都度評価する。
-    // TODO: Re-enable ScreenTimeLimitReachedWidget once analyzer issues are resolved
-    // ref.watch(screenTimeProvider);
-    // final isScreenTimeLimitReached =
-    //     ref.read(screenTimeProvider.notifier).isLimitReached;
-    //
-    // if (isScreenTimeLimitReached) {
-    //   return const ScreenTimeLimitReachedWidget(primaryColor: kPrimaryColor);
-    // }
+    ref.watch(screenTimeProvider);
+    final isScreenTimeLimitReached =
+        ref.read(screenTimeProvider.notifier).isLimitReached;
+
+    if (isScreenTimeLimitReached) {
+      return const ScreenTimeLimitReachedWidget(primaryColor: kPrimaryColor);
+    }
 
     return Focus(
       focusNode: _focusNode,
