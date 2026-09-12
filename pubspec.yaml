@@ -47,6 +47,9 @@ dependencies:
   # Date formatting
   intl: ^0.19.0
 
+  # Google Fonts (Material Design 3 テーマで使用)
+  google_fonts: ^6.2.1
+
   # PDF generation
   pdf: ^3.10.0
 
