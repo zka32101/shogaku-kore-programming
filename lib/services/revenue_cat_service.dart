@@ -52,8 +52,9 @@ class RevenueCatService {
   /// Check if user has active premium subscription
   ///
   /// Phase 4.7: shared_core の [premiumProvider] ハンドラー注入用メソッド
-  /// userId パラメータは shared_core との連携のため。実装では現在のユーザー情報を使用。
-  Future<bool> isSubscribed(String userId) async {
+  /// userId パラメータはオプショナル（デフォルト ''）。
+  /// shared_core handler injection では userId を指定、内部用途では省略可能。
+  Future<bool> isSubscribed([String userId = '']) async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
       final isActive = customerInfo.entitlements.active
@@ -133,8 +134,9 @@ class RevenueCatService {
   /// Get subscription expiration date
   ///
   /// Phase 4.7: shared_core の [premiumProvider] ハンドラー注入用メソッド
-  /// userId パラメータは shared_core との連携のため。実装では現在のユーザー情報を使用。
-  Future<DateTime?> getSubscriptionExpirationDate(String userId) async {
+  /// userId パラメータはオプショナル（デフォルト ''）。
+  /// shared_core handler injection では userId を指定、内部用途では省略可能。
+  Future<DateTime?> getSubscriptionExpirationDate([String userId = '']) async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
       final expirationDateString = customerInfo.entitlements.active

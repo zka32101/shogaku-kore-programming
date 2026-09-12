@@ -45,13 +45,10 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   Future<void> refreshSubscriptionStatus() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      // Phase 4.7: userId パラメータは shared_core 連携用。
-      // RevenueCatService では現在のユーザー情報を自動取得するため、
-      // 空文字列を渡しても実装では無視される。
-      final isSubscribed = await _revenueCatService.isSubscribed('');
+      final isSubscribed = await _revenueCatService.isSubscribed();
       final offerings = await _revenueCatService.getOfferings();
       final expirationDate =
-          await _revenueCatService.getSubscriptionExpirationDate('');
+          await _revenueCatService.getSubscriptionExpirationDate();
 
       state = state.copyWith(
         isSubscribed: isSubscribed,
