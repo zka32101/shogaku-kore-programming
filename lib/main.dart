@@ -11,7 +11,7 @@ import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider;
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -21,6 +21,7 @@ import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
 import 'providers/friends_provider.dart';
 import 'providers/lesson_provider.dart' show LessonNotifier, lessonProvider;
+import 'providers/screen_time_provider.dart';
 import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
@@ -48,6 +49,8 @@ Future<void> main() async {
       lessonProvider.overrideWith(LessonNotifier.new),
       // 統一バッジシステム（Phase 4.1）: プログラミングコレ用バッジ
       badgeProvider.overrideWith(() => BadgeNotifier()),
+      // Phase 4.6: スクリーンタイム制限（ScreenTimeNotifier）
+      screenTimeProvider.overrideWith(ScreenTimeNotifier.new),
       // Phase 4.7: 統一サブスクリプション管理（PremiumProvider）
       premiumProvider.overrideWith(PremiumNotifier.new),
     ],
