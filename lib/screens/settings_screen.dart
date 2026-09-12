@@ -25,6 +25,7 @@ import 'flashcard_screen.dart' show kFlashcards;
 import '../widgets/shortcut_help.dart';
 import '../widgets/app_dialog.dart';
 
+/// Settings screen with integrated shared_core components (Phase 4.19)
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
