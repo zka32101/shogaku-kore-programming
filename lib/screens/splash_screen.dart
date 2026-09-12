@@ -1,13 +1,13 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:math' as math;
+
 import '../config/theme.dart';
-import '../providers/profile_provider.dart';
-import '../providers/auth_provider.dart';
 import '../main.dart';
+import '../providers/profile_provider.dart';
 import 'onboarding_screen.dart';
-import 'login_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -53,12 +53,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   void _navigate() {
-    final currentUser = ref.read(currentUserProvider);
-
     // ─────────────────────────────────────────────────────────
-    // 認証状態に基づいてナビゲーション先を決定
+    // 認証は起動時に自動で匿名ログインされるため、設定のみで
+    // ナビゲーション先を決定する
     // ─────────────────────────────────────────────────────────
-    final destination = _getNextScreen(currentUser);
+    final destination = _getNextScreen();
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -70,14 +69,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
   }
 
-  /// 現在の認証状態と設定に基づいて、次のスクリーンを決定
-  Widget _getNextScreen(dynamic currentUser) {
-    // ログインしていない → LoginScreen
-    if (currentUser == null) {
-      return const LoginScreen();
-    }
-
-    // ログイン済み
+  /// 設定に基づいて、次のスクリーンを決定
+  Widget _getNextScreen() {
     final profile = ref.read(profileProvider);
 
     // オンボーディング完了 → MainNavigator

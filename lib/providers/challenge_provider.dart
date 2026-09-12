@@ -1,8 +1,9 @@
 import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/challenge.dart';
-import '../models/learning_analytics.dart';
 
 class ChallengeState {
   final ChallengeData? challengeData;
@@ -59,9 +60,9 @@ class ChallengeNotifier extends StateNotifier<ChallengeState> {
           description: 'Complete ${10 + (i * 5)} quiz questions',
           type: ChallengeType.daily,
           difficulty: [
-            ChallengeDifficulty.easy,
-            ChallengeDifficulty.medium,
-            ChallengeDifficulty.hard,
+            CoreChallengeDifficulty.easy,
+            CoreChallengeDifficulty.medium,
+            CoreChallengeDifficulty.hard,
           ][i % 3],
           condition: ChallengeCondition(
             conditionId: _generateId('condition'),
@@ -79,6 +80,7 @@ class ChallengeNotifier extends StateNotifier<ChallengeState> {
           startedAt: now,
           expiresAt: tomorrow,
           isActive: true,
+          isFree: i % 2 == 0,
         ));
       }
 

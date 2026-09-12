@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../config/theme.dart';
+
 import '../config/constants.dart';
-import '../providers/progress_provider.dart';
-import '../providers/profile_provider.dart';
-import '../providers/challenges_provider.dart';
-import '../models/challenge.dart';
+import '../config/theme.dart';
 import '../models/stage.dart';
-import '../widgets/weekly_chart.dart';
-import '../widgets/learning_calendar.dart';
-import '../providers/wrong_answers_provider.dart';
-import '../providers/flashcard_provider.dart';
-import '../providers/time_attack_provider.dart';
+import '../providers/challenges_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../providers/favorites_provider.dart';
+import '../providers/flashcard_provider.dart';
+import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
+import '../providers/time_attack_provider.dart';
+import '../providers/wrong_answers_provider.dart';
+import '../services/haptic_service.dart';
+import '../widgets/learning_calendar.dart';
 import '../widgets/shortcut_help.dart';
+import '../widgets/weekly_chart.dart';
 import 'flashcard_screen.dart' show kFlashcards;
 
 class ParentDashboardScreen extends ConsumerStatefulWidget {

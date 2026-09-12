@@ -1,8 +1,9 @@
 import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/social.dart';
-import '../models/learning_analytics.dart';
 
 class SocialState {
   final List<Friend> friends;
@@ -61,13 +62,6 @@ class SocialNotifier extends StateNotifier<SocialState> {
   Future<void> loadFriendsData(String userId) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final friendsJson = prefs.getStringList('friends_$userId') ?? [];
-      final requestsJson = prefs.getStringList('friend_requests_$userId') ?? [];
-      final challengesJson =
-          prefs.getStringList('friend_challenges_$userId') ?? [];
-      final activityJson = prefs.getStringList('activity_feed_$userId') ?? [];
-
       // Parse stored data (simplified - in production use proper JSON parsing)
       final friends = <Friend>[];
       final friendsMap = <String, Friend>{};
@@ -85,7 +79,7 @@ class SocialNotifier extends StateNotifier<SocialState> {
           onlineStatus: i % 2 == 0
               ? UserOnlineStatus.online
               : UserOnlineStatus.offline,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: DateTime.now().subtract(Duration(days: 30 + i)),
         );
         friends.add(friend);
@@ -205,7 +199,7 @@ class SocialNotifier extends StateNotifier<SocialState> {
         totalXp: 0,
         lastSeenAt: DateTime.now(),
         onlineStatus: UserOnlineStatus.offline,
-        status: FriendshipStatus.accepted,
+        status: SocialFriendshipStatus.accepted,
         connectedAt: DateTime.now(),
       );
 
@@ -257,7 +251,7 @@ class SocialNotifier extends StateNotifier<SocialState> {
           totalXp: friend.totalXp,
           lastSeenAt: friend.lastSeenAt,
           onlineStatus: friend.onlineStatus,
-          status: FriendshipStatus.blocked,
+          status: SocialFriendshipStatus.blocked,
           connectedAt: friend.connectedAt,
           blockedAt: DateTime.now(),
         );
@@ -290,7 +284,7 @@ class SocialNotifier extends StateNotifier<SocialState> {
           totalXp: friend.totalXp,
           lastSeenAt: friend.lastSeenAt,
           onlineStatus: friend.onlineStatus,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: friend.connectedAt,
         );
 
@@ -531,9 +525,11 @@ final friendActivityProvider =
 final socialDataProvider = Provider.autoDispose<SocialData>((ref) {
   final state = ref.watch(socialProvider);
   return SocialData(
+    userId: 'current_user',
     friends: state.friends,
-    friendRequests: state.pendingRequests,
-    activeChallenges: state.activeChallenges,
+    incomingRequests: state.pendingRequests,
+    outgoingRequests: const [],
+    friendChallenges: state.activeChallenges,
     activityFeed: state.activityFeed,
     generatedAt: state.lastUpdatedAt ?? DateTime.now(),
   );

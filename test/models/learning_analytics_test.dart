@@ -66,7 +66,7 @@ void main() {
 
   group('WeeklyLearningStats Tests', () {
     test('WeeklyLearningStats calculation', () {
-      final monday = DateTime(2026, 9, 1); // Tuesday actually
+      final monday = DateTime.now(); // Tuesday actually
       final dailyStats = [
         DailyLearningStats(
           date: monday,
@@ -92,7 +92,7 @@ void main() {
     });
 
     test('WeeklyLearningStats consecutiveDays calculation', () {
-      final monday = DateTime(2026, 9, 1);
+      final monday = DateTime.now();
       final dailyStats = [
         DailyLearningStats(
           date: monday,
@@ -121,7 +121,7 @@ void main() {
     });
 
     test('WeeklyLearningStats JSON serialization', () {
-      final monday = DateTime(2026, 9, 1);
+      final monday = DateTime.now();
       final dailyStats = [
         DailyLearningStats(
           date: monday,
@@ -146,10 +146,10 @@ void main() {
   group('MonthlyLearningStats Tests', () {
     test('MonthlyLearningStats calculation', () {
       final week1 = WeeklyLearningStats(
-        startDate: DateTime(2026, 9, 1),
+        startDate: DateTime.now(),
         dailyStats: [
           DailyLearningStats(
-            date: DateTime(2026, 9, 1),
+            date: DateTime.now(),
             quizzesCompleted: 10,
             quizzesCorrect: 8,
           ),
@@ -157,10 +157,10 @@ void main() {
       );
 
       final week2 = WeeklyLearningStats(
-        startDate: DateTime(2026, 9, 8),
+        startDate: DateTime.now().add(const Duration(days: 1)),
         dailyStats: [
           DailyLearningStats(
-            date: DateTime(2026, 9, 8),
+            date: DateTime.now().add(const Duration(days: 1)),
             quizzesCompleted: 5,
             quizzesCorrect: 5,
           ),
@@ -180,7 +180,7 @@ void main() {
     test('MonthlyLearningStats average accuracy calculation', () {
       final dailyStats1 = [
         DailyLearningStats(
-          date: DateTime(2026, 9, 1),
+          date: DateTime.now(),
           quizzesCompleted: 10,
           quizzesCorrect: 10,
         ),
@@ -188,22 +188,23 @@ void main() {
 
       final dailyStats2 = [
         DailyLearningStats(
-          date: DateTime(2026, 9, 8),
+          date: DateTime.now().add(const Duration(days: 1)),
           quizzesCompleted: 10,
           quizzesCorrect: 8,
         ),
       ];
 
+      final today = DateTime.now();
       final monthly = MonthlyLearningStats(
-        year: 2026,
-        month: 9,
+        year: today.year,
+        month: today.month,
         weeklyStats: [
           WeeklyLearningStats(
-            startDate: DateTime(2026, 9, 1),
+            startDate: DateTime.now(),
             dailyStats: dailyStats1,
           ),
           WeeklyLearningStats(
-            startDate: DateTime(2026, 9, 8),
+            startDate: DateTime.now().add(const Duration(days: 1)),
             dailyStats: dailyStats2,
           ),
         ],
@@ -218,10 +219,10 @@ void main() {
         month: 9,
         weeklyStats: [
           WeeklyLearningStats(
-            startDate: DateTime(2026, 9, 1),
+            startDate: DateTime.now(),
             dailyStats: [
               DailyLearningStats(
-                date: DateTime(2026, 9, 1),
+                date: DateTime.now(),
                 quizzesCompleted: 10,
               ),
             ],

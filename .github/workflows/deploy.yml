@@ -44,6 +44,21 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Ensure Gradle wrapper JAR
+        working-directory: android
+        run: |
+          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+            GRADLE_VERSION=$(sed -n 's|.*/gradle-\(.*\)-all\.zip|\1|p' gradle/wrapper/gradle-wrapper.properties)
+            TMP=$(mktemp -d)
+            touch "$TMP/settings.gradle"
+            (cd "$TMP" && gradle wrapper --gradle-version "$GRADLE_VERSION" --distribution-type all -q)
+            cp "$TMP/gradle/wrapper/gradle-wrapper.jar" gradle/wrapper/gradle-wrapper.jar
+            rm -rf "$TMP"
+            echo "✅ Generated gradle-wrapper.jar for Gradle $GRADLE_VERSION"
+          else
+            echo "✅ gradle-wrapper.jar already exists"
+          fi
+
       - name: Analyze code
         run: flutter analyze
 
@@ -168,3 +183,11 @@ jobs:
 # - Permissions limited to minimum required (contents write, checks write)
 # - No checkout of untrusted code; uses official Flutter action
 # - Artifacts uploaded for testing and distribution
+
+  emulator-test:
+    needs: build-android
+    if: success()
+    uses: zka32101/yourwish/.github/workflows/android-emulator-test.yml@main
+    with:
+      app-path: '.'
+      test-command: 'flutter test'

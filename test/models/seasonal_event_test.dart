@@ -161,7 +161,7 @@ void main() {
         type: EventType.competition,
         status: EventStatus.upcoming,
         maxParticipants: 100,
-        startDate: now.add(const Duration(days: 1)),
+        startDate: now.subtract(const Duration(minutes: 30)),
         endDate: now.add(const Duration(days: 8)),
         registrationDeadline: now.add(const Duration(days: 3)),
         rewardTiers: [],
@@ -295,6 +295,7 @@ void main() {
         'startDate': now.toIso8601String(),
         'endDate': now.add(const Duration(days: 7)).toIso8601String(),
         'rewardTiers': [],
+        'createdAt': now.toIso8601String(),
       };
 
       final event = SeasonalEvent.fromJson(json);
@@ -673,11 +674,11 @@ void main() {
       );
       expect(experiencedStats.getCompetitionLevel(), '経験者');
 
-      const veteranStats = EventStatistics(
+      final veteranStats = EventStatistics(
         userId: 'user3',
         totalEventsParticipated: 30,
-        lastEventParticipationAt: DateTime(2024),
-        lastUpdatedAt: DateTime(2024),
+        lastEventParticipationAt: DateTime.utc(2024, 1, 1),
+        lastUpdatedAt: DateTime.utc(2024, 1, 1),
       );
       expect(veteranStats.getCompetitionLevel(), 'ベテラン');
     });

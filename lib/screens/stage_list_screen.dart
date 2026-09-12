@@ -1,24 +1,26 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
-import '../services/sound_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../config/theme.dart';
+
 import '../config/constants.dart';
+import '../config/theme.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
-import '../providers/progress_provider.dart';
 import '../providers/favorites_provider.dart';
+import '../providers/progress_provider.dart';
 import '../providers/wrong_answers_provider.dart';
-import 'quiz_screen.dart';
-import 'editor_screen.dart';
-import 'paywall_screen.dart';
-import 'flashcard_screen.dart';
-import 'badge_unlock_screen.dart';
+import '../services/haptic_service.dart';
+import '../services/sound_service.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/tap_scale.dart';
+import 'badge_unlock_screen.dart';
+import 'editor_screen.dart';
+import 'flashcard_screen.dart';
+import 'paywall_screen.dart';
+import 'quiz_screen.dart';
 
 class StageListScreen extends ConsumerStatefulWidget {
   final String? initialLevel;
@@ -2554,4 +2556,3 @@ class _StageSearchDelegate extends SearchDelegate<Stage?> {
     );
   }
 }
-

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../services/ai_programming_coach_service.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
-import '../services/ai_programming_coach_service.dart';
 
 class ReverseTeachingScreen extends ConsumerStatefulWidget {
   const ReverseTeachingScreen({super.key});

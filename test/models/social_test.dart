@@ -2,12 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shogaku_kore_programming/models/social.dart';
 
 void main() {
-  group('FriendshipStatus enum', () {
+  group('SocialFriendshipStatus enum', () {
     test('should have all required values', () {
-      expect(FriendshipStatus.pending, isNotNull);
-      expect(FriendshipStatus.accepted, isNotNull);
-      expect(FriendshipStatus.blocked, isNotNull);
-      expect(FriendshipStatus.rejected, isNotNull);
+      expect(SocialFriendshipStatus.pending, isNotNull);
+      expect(SocialFriendshipStatus.accepted, isNotNull);
+      expect(SocialFriendshipStatus.blocked, isNotNull);
+      expect(SocialFriendshipStatus.rejected, isNotNull);
     });
   });
 
@@ -32,7 +32,7 @@ void main() {
         totalXp: 2500,
         lastSeenAt: DateTime.now(),
         onlineStatus: UserOnlineStatus.online,
-        status: FriendshipStatus.accepted,
+        status: SocialFriendshipStatus.accepted,
         connectedAt: DateTime.now().subtract(Duration(days: 30)),
       );
     });
@@ -42,7 +42,7 @@ void main() {
       expect(friend.username, 'john_doe');
       expect(friend.level, 5);
       expect(friend.totalXp, 2500);
-      expect(friend.status, FriendshipStatus.accepted);
+      expect(friend.status, SocialFriendshipStatus.accepted);
     });
 
     test('isActive should return true for accepted friend', () {
@@ -59,7 +59,7 @@ void main() {
         totalXp: 1500,
         lastSeenAt: DateTime.now(),
         onlineStatus: UserOnlineStatus.offline,
-        status: FriendshipStatus.blocked,
+        status: SocialFriendshipStatus.blocked,
         connectedAt: DateTime.now(),
         blockedAt: DateTime.now(),
       );
@@ -76,7 +76,7 @@ void main() {
         totalXp: 1500,
         lastSeenAt: DateTime.now(),
         onlineStatus: UserOnlineStatus.offline,
-        status: FriendshipStatus.blocked,
+        status: SocialFriendshipStatus.blocked,
         connectedAt: DateTime.now(),
         blockedAt: DateTime.now(),
       );
@@ -242,15 +242,17 @@ void main() {
           totalXp: 2500,
           lastSeenAt: DateTime.now(),
           onlineStatus: UserOnlineStatus.online,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: DateTime.now(),
         ),
       ];
 
       final data = SocialData(
+        userId: 'user1',
         friends: friends,
-        friendRequests: [],
-        activeChallenges: [],
+        incomingRequests: [],
+        outgoingRequests: [],
+        friendChallenges: [],
         activityFeed: [],
         generatedAt: DateTime.now(),
       );
@@ -270,7 +272,7 @@ void main() {
           totalXp: 2500,
           lastSeenAt: DateTime.now(),
           onlineStatus: UserOnlineStatus.online,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: DateTime.now(),
         ),
         Friend(
@@ -282,15 +284,17 @@ void main() {
           totalXp: 1500,
           lastSeenAt: DateTime.now(),
           onlineStatus: UserOnlineStatus.offline,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: DateTime.now(),
         ),
       ];
 
       final data = SocialData(
+        userId: 'user1',
         friends: friends,
-        friendRequests: [],
-        activeChallenges: [],
+        incomingRequests: [],
+        outgoingRequests: [],
+        friendChallenges: [],
         activityFeed: [],
         generatedAt: DateTime.now(),
       );

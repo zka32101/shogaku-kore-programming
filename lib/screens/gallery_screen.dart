@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/gallery_provider.dart';
+
 import '../models/user_work.dart';
+import '../providers/gallery_provider.dart';
 import '../services/haptic_service.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {

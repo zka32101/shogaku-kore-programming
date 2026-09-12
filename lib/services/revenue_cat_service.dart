@@ -1,0 +1,172 @@
+// RevenueCat Integration Service
+// Phase 4.2: Subscription & In-App Purchase Management
+
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show PlatformException;
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:shared_core/shared_core.dart' show SubscriptionConfig;
+
+class RevenueCatService {
+  static final RevenueCatService _instance = RevenueCatService._internal();
+
+  factory RevenueCatService() {
+    return _instance;
+  }
+
+  RevenueCatService._internal();
+
+  bool _isInitialized = false;
+  final _subscriptionStatusController = StreamController<bool>.broadcast();
+
+  /// Stream of subscription status changes
+  Stream<bool> get subscriptionStatusStream => _subscriptionStatusController.stream;
+
+  /// Initialize RevenueCat SDK
+  Future<void> initialize() async {
+    if (_isInitialized) return;
+
+    try {
+      // Set API key (Phase 4.7: Unified via SubscriptionConfig)
+      await Purchases.configure(
+        PurchasesConfiguration(SubscriptionConfig.apiKey),
+      );
+
+      _isInitialized = true;
+
+      // Listen to subscription changes
+      Purchases.addCustomerInfoUpdateListener(_onCustomerInfoUpdate);
+
+      if (kDebugMode) {
+        print('[RevenueCat] SDK initialized successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('[RevenueCat] Initialization error: $e');
+      }
+      rethrow;
+    }
+  }
+
+  /// Check if user has active premium subscription
+  ///
+  /// Phase 4.7: shared_core の [premiumProvider] ハンドラー注入用メソッド
+  /// userId パラメータはオプショナル（デフォルト ''）。
+  /// shared_core handler injection では userId を指定、内部用途では省略可能。
+  Future<bool> isSubscribed([String userId = '']) async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      final isActive = customerInfo.entitlements.active
+          .containsKey(SubscriptionConfig.premiumEntitlementId);
+
+      if (kDebugMode) {
+        print('[RevenueCat] Subscription check: $isActive');
+      }
+
+      return isActive;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[RevenueCat] Error checking subscription: $e');
+      }
+      return false;
+    }
+  }
+
+  /// Get available offerings (subscription plans)
+  Future<List<Package>?> getOfferings() async {
+    try {
+      final offerings = await Purchases.getOfferings();
+      return offerings.current?.availablePackages;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[RevenueCat] Error fetching offerings: $e');
+      }
+      return null;
+    }
+  }
+
+  /// Purchase subscription
+  Future<bool> purchaseSubscription({
+    required Package package,
+  }) async {
+    try {
+      final result = await Purchases.purchasePackage(package);
+      final isActive = result.entitlements.active
+          .containsKey(SubscriptionConfig.premiumEntitlementId);
+
+      if (kDebugMode) {
+        print('[RevenueCat] Purchase successful. Active: $isActive');
+      }
+
+      _subscriptionStatusController.add(isActive);
+      return isActive;
+    } on PlatformException catch (e) {
+      if (kDebugMode) {
+        final errorCode = PurchasesErrorHelper.getErrorCode(e);
+        print('[RevenueCat] Purchase error: $errorCode (${e.message})');
+      }
+      return false;
+    }
+  }
+
+  /// Restore previous purchases
+  Future<bool> restorePurchases() async {
+    try {
+      final customerInfo = await Purchases.restorePurchases();
+      final isActive = customerInfo.entitlements.active
+          .containsKey(SubscriptionConfig.premiumEntitlementId);
+
+      if (kDebugMode) {
+        print('[RevenueCat] Restore successful. Active: $isActive');
+      }
+
+      _subscriptionStatusController.add(isActive);
+      return isActive;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[RevenueCat] Restore error: $e');
+      }
+      return false;
+    }
+  }
+
+  /// Get subscription expiration date
+  ///
+  /// Phase 4.7: shared_core の [premiumProvider] ハンドラー注入用メソッド
+  /// userId パラメータはオプショナル（デフォルト ''）。
+  /// shared_core handler injection では userId を指定、内部用途では省略可能。
+  Future<DateTime?> getSubscriptionExpirationDate([String userId = '']) async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      final expirationDateString = customerInfo.entitlements.active
+          .values
+          .firstOrNull
+          ?.expirationDate;
+      return expirationDateString != null
+          ? DateTime.tryParse(expirationDateString)
+          : null;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[RevenueCat] Error fetching expiration date: $e');
+      }
+      return null;
+    }
+  }
+
+  /// Listen to customer info updates (subscription changes, etc.)
+  void _onCustomerInfoUpdate(CustomerInfo customerInfo) {
+    final isActive = customerInfo.entitlements.active
+        .containsKey(SubscriptionConfig.premiumEntitlementId);
+    _subscriptionStatusController.add(isActive);
+
+    if (kDebugMode) {
+      print('[RevenueCat] Customer info updated. Active: $isActive');
+    }
+  }
+
+  /// Clean up resources
+  void dispose() {
+    _subscriptionStatusController.close();
+  }
+}

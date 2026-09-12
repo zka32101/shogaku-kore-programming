@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 const Color kPrimaryColor = Color(0xFF1ABC9C);
 const Color kPrimaryDark = Color(0xFF16A085);
@@ -47,12 +48,16 @@ final ThemeData appTheme = ThemeData(
     surface: kCardBackground,
   ),
   scaffoldBackgroundColor: kBackground,
-  fontFamily: 'NotoSansJP',
-  appBarTheme: const AppBarTheme(
+  appBarTheme: AppBarTheme(
     backgroundColor: kPrimaryColor,
     foregroundColor: Colors.white,
     elevation: 0,
     centerTitle: false,
+    titleTextStyle: GoogleFonts.notoSansJp(
+      color: Colors.white,
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+    ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
@@ -62,7 +67,7 @@ final ThemeData appTheme = ThemeData(
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-      textStyle: const TextStyle(
+      textStyle: GoogleFonts.notoSansJp(
         fontSize: 16,
         fontWeight: FontWeight.bold,
       ),
@@ -87,6 +92,80 @@ final ThemeData appTheme = ThemeData(
     unselectedLabelColor: kTextSecondary,
     indicatorColor: kPrimaryColor,
   ),
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: const Color(0xFFF9F9F9),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: kPrimaryColor, width: 2),
+    ),
+    hintStyle: const TextStyle(color: Color(0xFFBDBDBD)),
+  ),
+  textTheme: TextTheme(
+    displayLarge: GoogleFonts.notoSansJp(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      color: kTextPrimary,
+    ),
+    displayMedium: GoogleFonts.notoSansJp(
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+      color: kTextPrimary,
+    ),
+    displaySmall: GoogleFonts.notoSansJp(
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+      color: kTextPrimary,
+    ),
+    headlineMedium: GoogleFonts.notoSansJp(
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      color: kTextPrimary,
+    ),
+    headlineSmall: GoogleFonts.notoSansJp(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+      color: kTextPrimary,
+    ),
+    titleLarge: GoogleFonts.notoSansJp(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      color: kTextPrimary,
+    ),
+    titleMedium: GoogleFonts.notoSansJp(
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      color: kTextPrimary,
+    ),
+    bodyLarge: GoogleFonts.notoSansJp(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      color: kTextPrimary,
+    ),
+    bodyMedium: GoogleFonts.notoSansJp(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      color: kTextPrimary,
+    ),
+    bodySmall: GoogleFonts.notoSansJp(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      color: kTextSecondary,
+    ),
+    labelLarge: GoogleFonts.notoSansJp(
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      color: kPrimaryColor,
+    ),
+  ),
 );
 
 // ─── ダークテーマ ────────────────────────────────────────────────────────────
@@ -101,12 +180,16 @@ final ThemeData darkAppTheme = ThemeData(
     brightness: Brightness.dark,
   ),
   scaffoldBackgroundColor: kDarkBackground,
-  fontFamily: 'NotoSansJP',
-  appBarTheme: const AppBarTheme(
+  appBarTheme: AppBarTheme(
     backgroundColor: kPrimaryColor,
     foregroundColor: Colors.white,
     elevation: 0,
     centerTitle: false,
+    titleTextStyle: GoogleFonts.notoSansJp(
+      color: Colors.white,
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+    ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
@@ -116,7 +199,7 @@ final ThemeData darkAppTheme = ThemeData(
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-      textStyle: const TextStyle(
+      textStyle: GoogleFonts.notoSansJp(
         fontSize: 16,
         fontWeight: FontWeight.bold,
       ),
@@ -155,7 +238,73 @@ final ThemeData darkAppTheme = ThemeData(
     fillColor: kDarkSurface2,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide.none,
+      borderSide: const BorderSide(color: Color(0xFF424242)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: Color(0xFF424242)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: const BorderSide(color: kPrimaryColor, width: 2),
+    ),
+    hintStyle: const TextStyle(color: Color(0xFF757575)),
+  ),
+  textTheme: TextTheme(
+    displayLarge: GoogleFonts.notoSansJp(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      color: kDarkTextPrimary,
+    ),
+    displayMedium: GoogleFonts.notoSansJp(
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+      color: kDarkTextPrimary,
+    ),
+    displaySmall: GoogleFonts.notoSansJp(
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+      color: kDarkTextPrimary,
+    ),
+    headlineMedium: GoogleFonts.notoSansJp(
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      color: kDarkTextPrimary,
+    ),
+    headlineSmall: GoogleFonts.notoSansJp(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+      color: kDarkTextPrimary,
+    ),
+    titleLarge: GoogleFonts.notoSansJp(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      color: kDarkTextPrimary,
+    ),
+    titleMedium: GoogleFonts.notoSansJp(
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      color: kDarkTextPrimary,
+    ),
+    bodyLarge: GoogleFonts.notoSansJp(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      color: kDarkTextPrimary,
+    ),
+    bodyMedium: GoogleFonts.notoSansJp(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      color: kDarkTextPrimary,
+    ),
+    bodySmall: GoogleFonts.notoSansJp(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      color: kDarkTextSecondary,
+    ),
+    labelLarge: GoogleFonts.notoSansJp(
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      color: kPrimaryColor,
     ),
   ),
 );

@@ -228,9 +228,9 @@ class EventParticipation {
     if (currentRank == 1) return EventRank.gold;
     if (currentRank == 2) return EventRank.silver;
     if (currentRank == 3) return EventRank.bronze;
-    if (currentRank <= 10) return EventRank.top10;
-    if (currentRank <= 50) return EventRank.top50;
-    if (currentRank <= 100) return EventRank.top100;
+    if (currentRank > 3 && currentRank <= 10) return EventRank.top10;
+    if (currentRank > 10 && currentRank <= 50) return EventRank.top50;
+    if (currentRank > 50 && currentRank <= 100) return EventRank.top100;
     return EventRank.participant;
   }
 

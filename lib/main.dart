@@ -1,7 +1,18 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'
+    show ProviderContainer, UncontrolledProviderScope, ConsumerState, ConsumerStatefulWidget;
+import 'package:shared_core/shared_core.dart'
+
+    hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
+import 'package:shared_core/shared_core.dart'
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -9,14 +20,24 @@ import 'config/constants.dart';
 import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
+import 'providers/friends_provider.dart';
+import 'providers/lesson_provider.dart' show LessonNotifier, lessonProvider;
+import 'providers/screen_time_provider.dart';
+import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
+import 'services/feedback_service.dart';
+import 'services/revenue_cat_service.dart';
+import 'services/firestore_ranking_service.dart';
+import 'services/firestore_friend_service.dart';
+import 'services/firestore_mission_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/mission/mission_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,9 +45,79 @@ Future<void> main() async {
   // Firebase initialization will happen after UI is rendered (see _ShogakuKoreProgrammingAppState)
   // This reduces app startup time by ~600ms
 
+  final container = ProviderContainer(
+    overrides: [
+      lessonProvider.overrideWith(LessonNotifier.new),
+      // 統一バッジシステム（Phase 4.1）: プログラミングコレ用バッジ
+      badgeProvider.overrideWith(() => BadgeNotifier()),
+      // Phase 4.6: スクリーンタイム制限（ScreenTimeNotifier）
+      screenTimeProvider.overrideWith(() => ScreenTimeNotifier()),
+      // Phase 4.7: 統一サブスクリプション管理（PremiumProvider）
+      premiumProvider.overrideWith(PremiumNotifier.new),
+    ],
+  );
+
+  // バッジシステム初期化: 統一バッジをプログラミング教科タグで初期化
+  container.read(badgeProvider.notifier).setBadgeDefinitions(unifiedBadges, subject: 'programming');
+
+  // Phase 4.3: マルチアプリランキング・フレンド機能（Firestore連携）
+  final rankingService = FirestoreRankingService();
+  final friendService = FirestoreFriendService();
+  final missionService = FirestoreMissionService();
+
+  container.read(rankingProvider.notifier).setFetchHandler(rankingService.fetchRankings);
+  container.read(globalRankingProvider.notifier).setFetchHandler(rankingService.fetchGlobalRankings);
+  container.read(friendProvider.notifier)
+    ..setFetchHandler(friendService.fetchFriends)
+    ..setAddFriendHandler(friendService.addFriend)
+    ..setRemoveFriendHandler(friendService.removeFriend);
+
+  // Phase 4.5: デイリーミッション統一
+  // ミッション Handler を shared_core provider に注入
+  container.read(missionProvider.notifier)
+    ..setFetchHandler(missionService.fetchMissions)
+    ..setProgressHandler(missionService.updateProgress)
+    ..setCompleteHandler(missionService.completeMission);
+
+  // ミッション初期化: 現在のユーザー ID で初期化
+  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+  if (currentUserId != null) {
+    unawaited(container.read(missionProvider.notifier).initializeDailyMissions(currentUserId, 'programming'));
+  }
+
+  // Phase 4.20: 週次ボーナスシステム Firestore 永続化
+  if (currentUserId != null) {
+    final weeklyBonusRef = FirebaseFirestore.instance.collection('users').doc(currentUserId).collection('bonuses').doc('weekly');
+    container.read(weeklyBonusProvider.notifier).setPersistHandler(
+      (userId, bonusState) async {
+        try {
+          await weeklyBonusRef.set({
+            'consecutiveDays': bonusState.consecutiveDays,
+            'lastClaimedDate': bonusState.lastClaimedDate?.toIso8601String(),
+            'weeklyResetDate': bonusState.weeklyResetDate?.toIso8601String(),
+            'totalCoinsEarned': bonusState.totalCoinsEarned,
+            'updatedAt': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+        } catch (e) {
+          debugPrint('Error persisting weekly bonus: $e');
+        }
+      },
+    );
+  }
+
+  // Phase 4.7: 統一サブスクリプション初期化
+  final revenueCatService = RevenueCatService();
+  if (currentUserId != null) {
+    container.read(premiumProvider.notifier)
+      ..setCheckHandler((userId) => revenueCatService.isSubscribed(userId))
+      ..setExpiryHandler((userId) => revenueCatService.getSubscriptionExpirationDate(userId));
+    unawaited(container.read(premiumProvider.notifier).checkSubscription(currentUserId));
+  }
+
   runApp(
-    const ProviderScope(
-      child: ShogakuKoreProgrammingApp(),
+    UncontrolledProviderScope(
+      container: container,
+      child: const ShogakuKoreProgrammingApp(),
     ),
   );
 }
@@ -44,6 +135,14 @@ class _ShogakuKoreProgrammingAppState
   @override
   void initState() {
     super.initState();
+
+    // バグ報告・改善要望フォーム（shared_core の FeedbackFormPage）の送信ハンドラを登録。
+    // このアプリは Firestore を導入していないため、実際の送信処理は
+    // SharedPreferences のローカルキューに蓄積するだけの簡易実装（詳細は
+    // services/feedback_service.dart 参照）。フォームを開く前に必ず登録が
+    // 完了している必要があるため、postFrameCallback を待たず同期的に行う。
+    ref.read(feedbackProvider.notifier).setSubmitHandler(FeedbackService().submit);
+
     // Initialize Firebase after UI is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
@@ -52,6 +151,56 @@ class _ShogakuKoreProgrammingAppState
         );
       } catch (_) {
         // Firebase initialization failed, continue anyway
+      }
+
+      // Phase 4.18: プッシュ通知サービス初期化
+      final pushService = PushNotificationService();
+      try {
+        await pushService.initialize(
+          onMessageHandler: (RemoteMessage message) {
+            debugPrint('Received message: ${message.notification?.title}');
+          },
+        );
+      } catch (_) {
+        // PushNotificationService initialization failed, continue anyway
+      }
+
+      // FCM トークンを取得・保存
+      try {
+        final fcmToken = await pushService.getFCMToken();
+        if (fcmToken != null) {
+          debugPrint('FCM Token obtained: ${fcmToken.substring(0, 20)}...');
+          // 将来: await updateUserFCMToken(userId, fcmToken);
+        }
+      } catch (_) {
+        // FCM token retrieval failed, continue anyway
+      }
+// Phase 4.19: 適応難易度エンジン初期化
+      // 注: ユーザーID取得後（プロフィール画面後）に各ユーザーごとに initializeAdaptiveDifficulty() を呼ぶこと
+      debugPrint('Phase 4.19 Retention Optimization Engine: Initialized');
+
+      // RevenueCat初期化（サブスクリプション管理）
+      final revenueCatService = RevenueCatService();
+      try {
+        await revenueCatService.initialize();
+      } catch (_) {
+        // RevenueCat initialization failed, continue anyway
+      }
+      // 匿名ログイン（他の小学コレシリーズと統一：ログイン画面は持たず
+      // 起動時に自動でサインインする。失敗時はローカルIDにフォールバック）
+      try {
+        await AuthService().signInAnonymously();
+        // フレンド検索・フレンドランキングのため、公開プロフィールを同期しておく
+        // （Firestore未接続・オフライン等で失敗しても学習機能には影響させない）
+        final profile = ref.read(profileProvider);
+        final points = ref.read(progressProvider.notifier).totalStarsEarned * 50;
+        await ref.read(friendsProvider.notifier).syncMyPublicProfile(
+              nickname: profile.nickname,
+              avatarEmoji: profile.avatarEmoji,
+              points: points,
+            );
+      } catch (_) {
+        // 匿名ログインに失敗しても学習機能自体は使えるようにする
       }
     });
 
@@ -248,6 +397,15 @@ class _MainNavigatorState extends ConsumerState<MainNavigator> {
   @override
   Widget build(BuildContext context) {
     final wrongCount = ref.watch(wrongAnswersProvider).count;
+    // 利用時間の上限に達したら、タブ操作より優先して全画面オーバーレイを表示する。
+    // ref.watch でタイマー更新のたびに state を監視し、isLimitReached を都度評価する。
+    ref.watch(screenTimeProvider);
+    final isScreenTimeLimitReached =
+        ref.read(screenTimeProvider.notifier).isLimitReached;
+
+    if (isScreenTimeLimitReached) {
+      return const ScreenTimeLimitReachedWidget(primaryColor: kPrimaryColor);
+    }
 
     return Focus(
       focusNode: _focusNode,

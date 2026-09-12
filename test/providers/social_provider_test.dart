@@ -40,7 +40,7 @@ void main() {
           totalXp: 2500,
           lastSeenAt: DateTime.now(),
           onlineStatus: UserOnlineStatus.online,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: DateTime.now(),
         ),
         Friend(
@@ -52,7 +52,7 @@ void main() {
           totalXp: 1500,
           lastSeenAt: DateTime.now(),
           onlineStatus: UserOnlineStatus.offline,
-          status: FriendshipStatus.blocked,
+          status: SocialFriendshipStatus.blocked,
           connectedAt: DateTime.now(),
           blockedAt: DateTime.now(),
         ),
@@ -73,7 +73,7 @@ void main() {
           totalXp: 2500,
           lastSeenAt: DateTime.now(),
           onlineStatus: UserOnlineStatus.online,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: DateTime.now(),
         ),
         Friend(
@@ -85,7 +85,7 @@ void main() {
           totalXp: 1500,
           lastSeenAt: DateTime.now(),
           onlineStatus: UserOnlineStatus.offline,
-          status: FriendshipStatus.accepted,
+          status: SocialFriendshipStatus.accepted,
           connectedAt: DateTime.now(),
         ),
       ];

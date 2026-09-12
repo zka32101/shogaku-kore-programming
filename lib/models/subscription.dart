@@ -10,9 +10,6 @@ class SubscriptionState {
   final bool isPremiumSubscriber;      // プレミアム購読者かどうか
   final DateTime? premiumExpiryDate;   // プレミアム購読終了日
 
-  // 広告関連
-  final bool shouldShowAds;            // 広告を表示するかどうか
-
   const SubscriptionState({
     this.trialStartDate,
     this.isTrialActive = false,
@@ -20,7 +17,6 @@ class SubscriptionState {
     this.hasUsedTrial = false,
     this.isPremiumSubscriber = false,
     this.premiumExpiryDate,
-    this.shouldShowAds = true,
   });
 
   /// ユーザーが有料コンテンツにアクセス可能かどうかを判定
@@ -49,7 +45,6 @@ class SubscriptionState {
     bool? hasUsedTrial,
     bool? isPremiumSubscriber,
     DateTime? premiumExpiryDate,
-    bool? shouldShowAds,
   }) {
     return SubscriptionState(
       trialStartDate: trialStartDate ?? this.trialStartDate,
@@ -58,7 +53,6 @@ class SubscriptionState {
       hasUsedTrial: hasUsedTrial ?? this.hasUsedTrial,
       isPremiumSubscriber: isPremiumSubscriber ?? this.isPremiumSubscriber,
       premiumExpiryDate: premiumExpiryDate ?? this.premiumExpiryDate,
-      shouldShowAds: shouldShowAds ?? this.shouldShowAds,
     );
   }
 
@@ -71,7 +65,6 @@ class SubscriptionState {
       hasUsedTrial: $hasUsedTrial,
       isPremiumSubscriber: $isPremiumSubscriber,
       premiumExpiryDate: $premiumExpiryDate,
-      shouldShowAds: $shouldShowAds,
       canAccessPremium: ${canAccessPremiumContent()},
       isTrialExpired: ${isTrialExpired()}
     )''';

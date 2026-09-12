@@ -291,7 +291,7 @@ void main() {
       final notifier = container.read(userProfileProvider.notifier);
       await notifier.initializeProfile('test_user', 'testuser');
 
-      expect(notifier.getUserRank(), UserRank.beginner);
+      expect(notifier.getUserRank(), ProfileUserRank.beginner);
     });
 
     test('getEngagementScore calculates correctly', () async {
@@ -398,7 +398,7 @@ void main() {
       await notifier.initializeProfile('test_user', 'testuser');
 
       final rank = container.read(userRankProvider);
-      expect(rank, UserRank.beginner);
+      expect(rank, ProfileUserRank.beginner);
     });
 
     test('userRankTitleProvider provides rank title', () async {

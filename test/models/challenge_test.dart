@@ -12,12 +12,12 @@ void main() {
     });
   });
 
-  group('ChallengeDifficulty enum', () {
+  group('CoreChallengeDifficulty enum', () {
     test('should have correct ordering', () {
-      expect(ChallengeDifficulty.easy.index, 0);
-      expect(ChallengeDifficulty.medium.index, 1);
-      expect(ChallengeDifficulty.hard.index, 2);
-      expect(ChallengeDifficulty.expert.index, 3);
+      expect(CoreChallengeDifficulty.easy.index, 0);
+      expect(CoreChallengeDifficulty.medium.index, 1);
+      expect(CoreChallengeDifficulty.hard.index, 2);
+      expect(CoreChallengeDifficulty.expert.index, 3);
     });
   });
 
@@ -61,7 +61,7 @@ void main() {
         xpAmount: 100,
         coinAmount: 50,
         badgeId: 'badge-daily-1',
-        categoryBonusXp: {'variables': 25},
+        categoryBonusXp: {'programming': 25},
       );
     });
 
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('should include category bonuses', () {
-      expect(reward.categoryBonusXp['variables'], 25);
+      expect(reward.categoryBonusXp['programming'], 25);
     });
   });
 
@@ -85,15 +85,15 @@ void main() {
         title: 'Daily Challenge',
         description: 'Complete 10 quizzes today',
         type: ChallengeType.daily,
-        difficulty: ChallengeDifficulty.medium,
+        difficulty: CoreChallengeDifficulty.medium,
         condition: ChallengeCondition(
           conditionId: 'cond-1',
           description: 'Quiz completions',
           requiredAmount: 10,
         ),
         reward: ChallengeReward(xpAmount: 100, coinAmount: 50),
-        startedAt: DateTime(2026, 9, 1),
-        expiresAt: DateTime(2026, 9, 2),
+        startedAt: DateTime.now().subtract(const Duration(days: 1)),
+        expiresAt: DateTime.now().add(const Duration(days: 1)),
         isActive: true,
         isFree: true,
       );
@@ -109,15 +109,15 @@ void main() {
         title: 'Old Challenge',
         description: 'Old',
         type: ChallengeType.daily,
-        difficulty: ChallengeDifficulty.easy,
+        difficulty: CoreChallengeDifficulty.easy,
         condition: ChallengeCondition(
           conditionId: 'cond-2',
           description: 'Test',
           requiredAmount: 5,
         ),
         reward: ChallengeReward(xpAmount: 50, coinAmount: 25),
-        startedAt: DateTime(2026, 8, 1),
-        expiresAt: DateTime(2026, 8, 31),
+        startedAt: DateTime.now().subtract(const Duration(days: 2)),
+        expiresAt: DateTime.now().subtract(const Duration(days: 1)),
         isActive: true,
         isFree: false,
       );
@@ -142,7 +142,7 @@ void main() {
         challengeId: 'ch-1',
         status: ChallengeStatus.inProgress,
         currentProgress: 5,
-        startedAt: DateTime(2026, 9, 1),
+        startedAt: DateTime.now(),
         attemptCount: 1,
       );
     });
@@ -163,8 +163,8 @@ void main() {
         challengeId: 'ch-1',
         status: ChallengeStatus.completed,
         currentProgress: 10,
-        startedAt: DateTime(2026, 9, 1),
-        completedAt: DateTime(2026, 9, 1, 12),
+        startedAt: DateTime.now(),
+        completedAt: DateTime.now(),
         attemptCount: 1,
       );
       expect(completed.isCompleted, true);

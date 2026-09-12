@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../models/ranking_entry.dart';
 import 'profile_provider.dart';
 

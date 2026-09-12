@@ -1,8 +1,10 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/shared_core.dart'
+
+    show FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -23,6 +25,7 @@ import 'flashcard_screen.dart' show kFlashcards;
 import '../widgets/shortcut_help.dart';
 import '../widgets/app_dialog.dart';
 
+/// Settings screen with integrated shared_core components (Phase 4.19)
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -122,7 +125,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       icon: '⭐',
                       iconBg: const Color(0xFFFFF8E1),
                       title: 'プレミアムプラン',
-                      subtitle: '月額 ¥999 / 年額 ¥5,980 — 全ステージ解放',
+                      subtitle: '月額 ¥300 / 年額 ¥2,400 — 全ステージ解放',
                       onTap: () => _navigateToPaywall(context),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(
@@ -269,7 +272,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       _SwitchTile(
                         icon: '🌙',
                         iconBg: const Color(0xFFEDE7F6),
-                        title: '夕方ナッジ',
+                        title: '夜間ナッジ',
                         subtitle: '学習を忘れそうな夜に追加リマインダー',
                         value: profile.eveningNudgeEnabled,
                         onChanged: (v) async {
@@ -340,9 +343,50 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             builder: (_) => const ParentDashboardScreen()),
                       ),
                     ),
+                    _SettingsTile(
+                      icon: '⏱️',
+                      iconBg: const Color(0xFFFFF3E0),
+                      title: 'スクリーンタイム制限',
+                      subtitle: '1日の学習時間を制限・管理',
+                      onTap: () => _goToScreenTimeSettings(context),
+                    ),
                     const _Divider(),
                   ],
                 ).animate(delay: 240.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+
+                // ─── ソーシャル ──────────────────────────────
+                Column(
+                  children: [
+                    const _SectionHeader(title: 'ソーシャル'),
+                    _SettingsTile(
+                      icon: '👥',
+                      iconBg: const Color(0xFF6C63FF),
+                      title: 'フレンドを探す',
+                      subtitle: 'ユーザーを検索してフレンド申請する',
+                      onTap: () => _openAddFriendDialog(context),
+                    ),
+                    const _Divider(),
+                  ],
+                ).animate(delay: 270.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+
+                // ─── 分析 ────────────────────────────────────
+                Column(
+                  children: [
+                    const _SectionHeader(title: '分析'),
+                    _SettingsTile(
+                      icon: '📊',
+                      iconBg: const Color(0xFFE8F5E9),
+                      title: 'ユーザーリテンション分析',
+                      subtitle: 'あなたの活動パターンと継続性を分析',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const RetentionDashboard(),
+                        ),
+                      ),
+                    ),
+                    const _Divider(),
+                  ],
+                ).animate(delay: 300.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
                 // ─── アプリについて ──────────────────────────
                 Column(
@@ -364,14 +408,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       title: '利用規約',
                       onTap: () => _showTermsOfService(context),
                     ),
-                    _SettingsTile(
-                      icon: '💬',
-                      title: 'お問い合わせ',
-                      onTap: () => _showContact(context),
-                    ),
                     const _Divider(),
                   ],
-                ).animate(delay: 300.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+                ).animate(delay: 330.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
                 // ─── データ ─────────────────────────────────
                 Column(
@@ -684,26 +723,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ]);
   }
 
-  void _showContact(BuildContext context) {
-    _showInfoSheet(context, '💬 お問い合わせ', [
-      _InfoSection(
-        heading: 'バグ報告・機能リクエスト',
-        body: 'アプリのバグや改善要望は、App Store / Google Playのレビュー欄、またはメール（support@petit-studio.jp）にてお知らせください。',
-      ),
-      _InfoSection(
-        heading: '学習内容について',
-        body: 'クイズの問題や解説の誤りを発見した場合は、ぜひご連絡ください。内容改善に役立てます。',
-      ),
-      _InfoSection(
-        heading: '保護者の方へ',
-        body: 'お子様の利用に関するご心配やご不明点がございましたら、お気軽にお問い合わせください。お子様が安全・安心に学習できる環境づくりを大切にしています。',
-      ),
-      _InfoSection(
-        heading: '返信について',
-        body: 'お問い合わせへの返信には数日いただく場合があります。あらかじめご了承ください。',
-      ),
-    ]);
-  }
 
   Future<void> _confirmWrongAnswersClear(BuildContext context) async {
     final wrongCount = ref.read(wrongAnswersProvider).count;
@@ -766,7 +785,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _confirmReset(BuildContext context) async {
-    final passedGate = await _showParentalGate(context);
+    final passedGate = await requireParentalGate(context);
     if (!passedGate || !context.mounted) return;
     final confirmed = await AppDialog.danger(
       context,
@@ -798,7 +817,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   /// プレミアムプラン画面へ移動する前に、保護者ゲートを通す。
   /// ゲートを通過（正解）した場合のみ [PaywallScreen] へ遷移する。
   Future<void> _navigateToPaywall(BuildContext context) async {
-    final passedGate = await _showParentalGate(context);
+    final passedGate = await requireParentalGate(context);
     if (!passedGate || !context.mounted) return;
     Navigator.push(
       context,
@@ -806,137 +825,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  /// 保護者ゲート: 簡単な足し算に正解した場合のみ true を返す。
-  /// 子どもが誤って課金・データ全削除などの重要操作に進まないようにするための
-  /// 軽量チェック。キャンセル・不正解の場合は false（何もしない）。
-  Future<bool> _showParentalGate(BuildContext context) async {
-    final random = math.Random();
-    final a = 10 + random.nextInt(21); // 10〜30
-    final b = 10 + random.nextInt(21); // 10〜30
-    final correctAnswer = a + b;
-    final controller = TextEditingController();
-    bool showError = false;
-
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F5F5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Text('🔒', style: TextStyle(fontSize: 36)),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '保護者の方へ確認',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'これは大人の方が行う操作です。\n下の計算の答えを入力してください。',
-                      style: TextStyle(fontSize: 14, height: 1.6, color: Color(0xFF666666)),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      '$a + $b = ?',
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: controller,
-                      autofocus: true,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: InputDecoration(
-                        hintText: '答えを入力',
-                        errorText: showError ? '答えが違います' : null,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onSubmitted: (_) {
-                        final input = int.tryParse(controller.text.trim());
-                        if (input == correctAnswer) {
-                          Navigator.pop(ctx, true);
-                        } else {
-                          setState(() => showError = true);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 13),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'やめる',
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              final input = int.tryParse(controller.text.trim());
-                              if (input == correctAnswer) {
-                                Navigator.pop(ctx, true);
-                              } else {
-                                setState(() => showError = true);
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: kPrimaryColor,
-                              padding: const EdgeInsets.symmetric(vertical: 13),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              'つぎへ',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
+  /// スクリーンタイム設定画面へ移動する前に、保護者ゲートを通す。
+  /// ゲートを通過（正解）した場合のみ [ScreenTimeSettingsWidget] へ遷移する。
+  Future<void> _goToScreenTimeSettings(BuildContext context) async {
+    final passedGate = await requireParentalGate(context);
+    if (!passedGate || !context.mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('スクリーンタイム制限'),
+            backgroundColor: kPrimaryColor,
+          ),
+          body: const ScreenTimeSettingsWidget(primaryColor: kPrimaryColor),
+        ),
+      ),
     );
-    controller.dispose();
-    return result ?? false;
   }
+
+  /// フレンド検索ダイアログを開く
+  void _openAddFriendDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const AddFriendDialog(),
+    );
+  }
+
 }
 
 // ─── 共通ウィジェット ──────────────────────────────────────────────────────────

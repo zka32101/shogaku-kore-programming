@@ -216,7 +216,7 @@ void main() {
       final notifier = container.read(activityProvider.notifier);
       await notifier.initializeActivities('test_user');
 
-      final memory = container.read(activitiesByTypeProvider(ActivityType.memoryGame));
+      final memory = container.read(activitiesByTypeProvider(MiniGameType.memoryGame));
       expect(memory.isNotEmpty || memory.isEmpty, true);
     });
 
