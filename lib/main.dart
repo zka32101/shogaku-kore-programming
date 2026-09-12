@@ -50,7 +50,7 @@ Future<void> main() async {
       // 統一バッジシステム（Phase 4.1）: プログラミングコレ用バッジ
       badgeProvider.overrideWith(() => BadgeNotifier()),
       // Phase 4.6: スクリーンタイム制限（ScreenTimeNotifier）
-      screenTimeProvider.overrideWith(ScreenTimeNotifier.new),
+      screenTimeProvider.overrideWith(() => ScreenTimeNotifier()),
       // Phase 4.7: 統一サブスクリプション管理（PremiumProvider）
       premiumProvider.overrideWith(PremiumNotifier.new),
     ],
