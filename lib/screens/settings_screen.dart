@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
 
-    show FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
+    show AnalyticsDashboardWidget, DailyActivityData, AccuracyTrendData, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -33,17 +33,20 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -100,7 +103,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       focusNode: _focusNode,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
-      body: Column(
+      appBar: AppBar(
+        title: const Text('設定'),
+        backgroundColor: kPrimaryColor,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: '設定'),
+            Tab(text: '学習分析'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          Column(
         children: [
           // ヘッダー
           _buildHeader(context, profile, progressNotifier),
@@ -508,8 +525,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ],
       ),
+          // Tab 2: 学習分析
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: AnalyticsDashboardWidget(
+              userName: profile.nickname ?? 'ユーザー',
+              totalQuestions: progressNotifier.totalQuestionsAnswered,
+              averageAccuracy: progressNotifier.averageAccuracy,
+              totalTimeSpent: progressNotifier.totalLearningSeconds,
+              dailyActivity: _generateDailyActivity(progressNotifier),
+              accuracyTrend: _generateAccuracyTrend(progressNotifier),
+            ),
+          ),
+        ],
+      ),
     ),   // closes Scaffold (child of Focus)
   );     // closes Focus return
+  }
+
+  List<DailyActivityData> _generateDailyActivity(ProgressNotifier notifier) {
+    return [
+      DailyActivityData(day: '月', count: 0),
+      DailyActivityData(day: '火', count: 0),
+      DailyActivityData(day: '水', count: 0),
+      DailyActivityData(day: '木', count: 0),
+      DailyActivityData(day: '金', count: 0),
+      DailyActivityData(day: '土', count: 0),
+      DailyActivityData(day: '日', count: 0),
+    ];
+  }
+
+  List<AccuracyTrendData> _generateAccuracyTrend(ProgressNotifier notifier) {
+    return [
+      AccuracyTrendData(week: 'W1', accuracy: 0.0),
+      AccuracyTrendData(week: 'W2', accuracy: 0.0),
+      AccuracyTrendData(week: 'W3', accuracy: 0.0),
+      AccuracyTrendData(week: 'W4', accuracy: 0.0),
+    ];
   }
 
   Widget _buildHeader(
