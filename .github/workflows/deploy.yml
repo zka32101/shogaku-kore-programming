@@ -2,6 +2,9 @@
 
 on:
   push:
+    branches:
+      - claude/**
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -40,6 +43,12 @@ jobs:
         with:
           flutter-version: '3.x'
           cache: true
+
+      - name: Clean dependencies and cache
+        run: |
+          flutter clean
+          rm -f pubspec.lock
+          rm -rf .dart_tool/
 
       - name: Get dependencies
         run: flutter pub get
