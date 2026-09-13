@@ -784,7 +784,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String subtitle,
     String emoji,
     Color color,
-    {required VoidCallback onTap},
+    {required VoidCallback onTap}
   ) {
     return TapScale(
       onTap: onTap,
