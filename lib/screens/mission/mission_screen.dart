@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_core/shared_core.dart' show missionProvider, coinProvider, weeklyBonusProvider;
+import 'package:shared_core/shared_core.dart' show missionProvider, weeklyBonusProvider;
 import 'package:shared_core/models/mission_model.dart' show RewardType;
+import '../../../providers/coin_provider.dart';
 
 /// デイリーミッション一覧画面（Phase 4.5）
 ///
