@@ -3,8 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
-
-    show AnalyticsDashboardWidget, DailyActivityData, AccuracyTrendData, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
+    show AnalyticsDashboard, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -24,6 +23,21 @@ import 'parent_dashboard_screen.dart';
 import 'flashcard_screen.dart' show kFlashcards;
 import '../widgets/shortcut_help.dart';
 import '../widgets/app_dialog.dart';
+
+/// Data models for analytics dashboard
+class DailyActivityData {
+  final String day;
+  final int count;
+
+  DailyActivityData({required this.day, required this.count});
+}
+
+class AccuracyTrendData {
+  final String week;
+  final double accuracy;
+
+  AccuracyTrendData({required this.week, required this.accuracy});
+}
 
 /// Settings screen with integrated shared_core components (Phase 4.19)
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -528,40 +542,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
           // Tab 2: 学習分析
           SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: AnalyticsDashboardWidget(
-              userName: profile.nickname ?? 'ユーザー',
-              totalQuestions: progressNotifier.totalQuestionsAnswered,
-              averageAccuracy: progressNotifier.averageAccuracy,
-              totalTimeSpent: progressNotifier.totalLearningSeconds,
-              dailyActivity: _generateDailyActivity(progressNotifier),
-              accuracyTrend: _generateAccuracyTrend(progressNotifier),
-            ),
+            // Analytics dashboard from shared_core (Phase 4.16)
+            // Note: Uses Firebase userId - ensure user is authenticated
+            child: profile.uid != null
+                ? AnalyticsDashboard(
+                    userId: profile.uid!,
+                    primaryColor: Theme.of(context).primaryColor,
+                  )
+                : const Center(
+                    child: Text('ユーザーデータを読み込んでいます...'),
+                  ),
           ),
         ],
       ),
     ),   // closes Scaffold (child of Focus)
   );     // closes Focus return
-  }
-
-  List<DailyActivityData> _generateDailyActivity(ProgressNotifier notifier) {
-    return [
-      DailyActivityData(day: '月', count: 0),
-      DailyActivityData(day: '火', count: 0),
-      DailyActivityData(day: '水', count: 0),
-      DailyActivityData(day: '木', count: 0),
-      DailyActivityData(day: '金', count: 0),
-      DailyActivityData(day: '土', count: 0),
-      DailyActivityData(day: '日', count: 0),
-    ];
-  }
-
-  List<AccuracyTrendData> _generateAccuracyTrend(ProgressNotifier notifier) {
-    return [
-      AccuracyTrendData(week: 'W1', accuracy: 0.0),
-      AccuracyTrendData(week: 'W2', accuracy: 0.0),
-      AccuracyTrendData(week: 'W3', accuracy: 0.0),
-      AccuracyTrendData(week: 'W4', accuracy: 0.0),
-    ];
   }
 
   Widget _buildHeader(

@@ -9,7 +9,7 @@ import 'package:shared_core/shared_core.dart'
         FriendsListPage,
         DailyMissionPage,
         WeeklyBonusWidget,
-        coinProvider;
+        coinProvider as sharedCoreCoinProvider;
 
 import '../config/constants.dart';
 import '../config/theme.dart';
@@ -457,7 +457,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // Phase 4.20: 週次ボーナスウィジェット
                   WeeklyBonusWidget(
                     onBonusClaimed: (coins) {
-                      ref.read(coinProvider.notifier).addCoins(coins);
+                      // Use local coinProvider (imported from coin_provider.dart)
+                      // to avoid ambiguity with shared_core's coinProvider
+                      final localCoinProvider = coinProvider;
+                      ref.read(localCoinProvider.notifier).addCoins(coins);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('週次ボーナス獲得！ $coins コイン'),

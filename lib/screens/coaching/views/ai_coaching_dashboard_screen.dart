@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_core/shared_core.dart'
-    show CoachingDashboard;
+import 'package:shared_core/widgets/coaching_dashboard.dart';
 
 import '../../../config/theme.dart';
 import '../../../providers/profile_provider.dart';
