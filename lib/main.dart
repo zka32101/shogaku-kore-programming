@@ -158,10 +158,11 @@ class _ShogakuKoreProgrammingAppState
       // Phase 4.18: プッシュ通知サービス初期化
       final pushService = PushNotificationService();
       try {
+        // TODO: onMessageHandler parameter not available in shared_core PushNotificationService.initialize()
         await pushService.initialize(
-          onMessageHandler: (RemoteMessage message) {
-            debugPrint('Received message: ${message.notification?.title}');
-          },
+          // onMessageHandler: (RemoteMessage message) {
+          //   debugPrint('Received message: ${message.notification?.title}');
+          // },
         );
       } catch (_) {
         // PushNotificationService initialization failed, continue anyway

@@ -33,13 +33,19 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
   @override
   Widget build(BuildContext context) {
     final charState = ref.watch(characterProvider);
-    final character = charState.character;
+    // TODO: CharacterProfileMap API in shared_core has different structure
+    // const character = charState.character;
 
-    if (charState.isLoading || character == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    // if (charState.isLoading || character == null) {
+    //   return const Scaffold(
+    //     body: Center(child: CircularProgressIndicator()),
+    //   );
+    // }
+
+    // Placeholder while character system is being integrated
+    return const Scaffold(
+      body: Center(child: Text('キャラクターシステム: 準備中')),
+    );
 
     final charDef = kAvailableCharacters.firstWhere(
       (c) => c.id == character.characterId,
