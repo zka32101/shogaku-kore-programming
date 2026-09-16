@@ -1510,42 +1510,42 @@ class _LevelUpOverlay extends StatelessWidget {
   }
 }
 
-/// プログラミングの能力を示すバッジ
-class _CapabilityBadge extends StatelessWidget {
-  final String emoji;
-  final String label;
-
-  const _CapabilityBadge({
-    required this.emoji,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFF667EEA).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: const Color(0xFF667EEA).withValues(alpha: 0.15),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF667EEA),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// TODO: _CapabilityBadge is defined but not used in the current implementation
+// class _CapabilityBadge extends StatelessWidget {
+//   final String emoji;
+//   final String label;
+//
+//   const _CapabilityBadge({
+//     required this.emoji,
+//     required this.label,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+//       decoration: BoxDecoration(
+//         color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+//         borderRadius: BorderRadius.circular(8),
+//         border: Border.all(
+//           color: const Color(0xFF667EEA).withValues(alpha: 0.15),
+//         ),
+//       ),
+//       child: Row(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Text(emoji, style: const TextStyle(fontSize: 14)),
+//           const SizedBox(width: 4),
+//           Text(
+//             label,
+//             style: const TextStyle(
+//               fontSize: 11,
+//               fontWeight: FontWeight.w600,
+//               color: Color(0xFF667EEA),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
