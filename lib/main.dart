@@ -9,9 +9,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
     show ProviderContainer, UncontrolledProviderScope, ConsumerState, ConsumerStatefulWidget;
 import 'package:shared_core/shared_core.dart'
-    hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier, coinProvider, avatarProvider;
+
+    hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
