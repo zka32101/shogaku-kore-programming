@@ -12,6 +12,7 @@ import '../providers/ai_programming_coach_provider.dart';
 import '../providers/bgm_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/character_provider.dart';
+import '../providers/coin_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
@@ -344,11 +345,12 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
         ref.read(progressProvider.notifier).addBonusPoints(5);
         _resolvedWrongCount++;
       }
+      // TODO: growFromCorrectAnswer not available in shared_core's CharacterNotifier
       // キャラクター成長トリガー
-      ref.read(characterProvider.notifier).growFromCorrectAnswer(
-        challengeType: _getStageType(widget.challenge),
-        difficulty: widget.challenge.level,
-      );
+      // ref.read(characterProvider.notifier).growFromCorrectAnswer(
+      //   challengeType: _getStageType(widget.challenge),
+      //   difficulty: widget.challenge.level,
+      // );
     }
 
     // スピードボーナス: タイマー有効かつ残り時間が元の75%以上（素早く回答）
