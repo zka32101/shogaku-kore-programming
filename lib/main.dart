@@ -14,7 +14,7 @@ import 'package:shared_core/shared_core.dart'
     show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-// Theme unified from shared_core
+import 'config/theme.dart';
 import 'config/constants.dart';
 import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
@@ -318,8 +318,8 @@ class _ShogakuKoreProgrammingAppState
 
     return MaterialApp(
       title: AppConstants.appName,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: appTheme,
+      darkTheme: darkAppTheme,
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(),
