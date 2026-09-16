@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../models/friend_model.dart';
 import '../services/auth_service.dart';
 import '../services/friend_service.dart';

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../services/ai_programming_coach_service.dart';
 
 class AIProgrammingCoachResponse {

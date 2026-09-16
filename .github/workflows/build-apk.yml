@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'claude/**'
     tags:
       - 'v*'
   pull_request:
@@ -32,7 +33,10 @@ jobs:
           channel: 'stable'
 
       - name: Get dependencies
-        run: flutter pub get
+        run: |
+          rm -rf .dart_tool pubspec.lock
+          flutter clean
+          flutter pub get
 
       - name: Ensure Gradle wrapper JAR
         working-directory: android
@@ -48,6 +52,9 @@ jobs:
           else
             echo "✅ gradle-wrapper.jar already exists"
           fi
+
+      - name: Generate code with build_runner
+        run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Build APK
         run: flutter build apk --release

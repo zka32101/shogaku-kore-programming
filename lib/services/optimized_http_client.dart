@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+
 import 'battery_service.dart';
 
 /// Optimized HTTP client with battery-aware request throttling

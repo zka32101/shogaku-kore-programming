@@ -1,10 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:math' as math;
+
 import '../config/theme.dart';
-import '../providers/profile_provider.dart';
 import '../main.dart';
+import '../providers/profile_provider.dart';
 import 'onboarding_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {

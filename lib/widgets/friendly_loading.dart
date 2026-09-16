@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
 import '../config/theme.dart';
 
 /// 汎用のローディング表示。単なるスピナーではなく、絵文字が

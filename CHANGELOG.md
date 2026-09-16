@@ -1,13 +1,41 @@
+# Changelog
 
-## 최근 개선사항 (2026-09-08)
+All notable changes to this project will be documented in this file.
 
-### DateTime 생성자 수정
-- 모든 테스트 파일의 DateTime 생성자를 DateTime.utc() 형식으로 일관되게 수정
-- 총 51개 인스턴스 수정: DateTime(YYYY, MM, DD) → DateTime.utc(YYYY, MM, DD)
-- Dart null-safety 컴파일 요구사항을 충족하기 위해 const 컨텍스트에서 DateTime 객체 사용 정규화
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-수정된 파일:
-- test/models/: challenge_test.dart, daily_login_reward_test.dart, leaderboards_rankings_test.dart, learning_analytics_test.dart, character_customization_test.dart, activities_minigames_test.dart, shop_store_test.dart, streaks_daily_rewards_test.dart, user_profile_test.dart
-- test/providers/: leaderboard_provider_test.dart
-- test/widgets/: extracted_widgets_test.dart
+## [0.2.0] - 2026-09-12
 
+### 📱 Phase 4.23 ローカル通知・リマインダーシステム統合
+
+#### 新機能
+- **ローカル通知・リマインダー** 🔔
+  - ReminderService による毎日のリマインダー機能
+  - NotificationBadge ウィジェット（未読通知数表示）
+  - Firebase Cloud Messaging 連携
+  - 学習リマインダー・週次ボーナス通知
+
+- **shared_core 統一ゲーミフィケーション** 🎮
+  - 全7アプリでバッジシステム統一（60+個の共通バッジ）
+  - キャラクターシステム統一（16体キャラクター）
+  - マルチアプリランキング・フレンド機能対応
+  - 週次ボーナスシステム（7日連続達成で500コイン）
+  - グローバルランキング機能（複数タブ表示対応）
+
+#### 改善
+- 通知システムの安定化・最適化
+- shared_core との依存関係統合
+- 全ブランチでのテスト検証完了
+
+### 既知の問題
+- なし
+
+## [0.1.0] - 2026-09-01
+
+### 初期リリース
+- 基本的なプログラミング学習クイズ機能
+- ビジュアルプログラミングエディタ
+- ゲーミフィケーション統合
+- RevenueCat サブスク対応
+- AdMob 広告システム統合

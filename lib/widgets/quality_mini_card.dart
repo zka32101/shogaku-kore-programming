@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../config/theme.dart';
 
 /// 進捗バー付きの統計ミニカード

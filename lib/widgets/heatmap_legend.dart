@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../config/theme.dart';
 
 /// Legend widget for heatmap showing color intensity from min to max

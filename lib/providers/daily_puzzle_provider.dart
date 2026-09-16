@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../services/ai_programming_coach_service.dart';
 
 const _kPuzzleKey = 'daily_puzzle_date';

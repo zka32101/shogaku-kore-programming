@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 /// フラッシュカード習得状態プロバイダー
 /// 習得済みカード ID の Set と個人メモを SharedPreferences に永続化する

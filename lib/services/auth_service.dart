@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/app_user.dart';
 
 const _localUserIdKey = 'local_user_id';

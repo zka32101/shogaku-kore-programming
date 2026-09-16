@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../config/constants.dart';
-import '../providers/weekly_report_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
-import '../services/sound_service.dart';
+import '../providers/weekly_report_provider.dart';
 import '../services/haptic_service.dart';
+import '../services/sound_service.dart';
 
 class WeeklyReportScreen extends ConsumerStatefulWidget {
   const WeeklyReportScreen({super.key});

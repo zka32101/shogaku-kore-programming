@@ -1,5 +1,7 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import '../config/theme.dart';
 
 /// ロボットの動きを可視化するキャンバスウィジェット

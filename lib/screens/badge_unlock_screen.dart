@@ -1,8 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
-import 'dart:math' as math;
+
 import '../config/theme.dart';
+import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 
 class BadgeUnlockScreen extends StatefulWidget {

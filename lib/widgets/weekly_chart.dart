@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+
 import '../config/theme.dart';
 
 /// 過去N週間のクリア数を棒グラフで表示するウィジェット

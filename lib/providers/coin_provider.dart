@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 /// コイン残高・購入済みアイテムを管理するステート
 class CoinState {

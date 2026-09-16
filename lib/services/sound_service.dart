@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
+
 import 'package:audioplayers/audioplayers.dart';
 
 /// WAV波形をDart内で生成して再生するサウンドサービス

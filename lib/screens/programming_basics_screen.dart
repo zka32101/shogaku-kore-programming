@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
 import '../config/theme.dart';
 
 /// プログラミング基礎説明画面 (#12)

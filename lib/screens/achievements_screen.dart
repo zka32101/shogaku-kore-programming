@@ -1,38 +1,40 @@
 import 'dart:math' as math;
+
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:flutter/services.dart';
-import '../services/haptic_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fl_chart/fl_chart.dart';
-import '../config/theme.dart';
+
 import '../config/constants.dart';
-import '../providers/progress_provider.dart';
-import '../providers/profile_provider.dart';
-import '../providers/challenges_provider.dart';
-import '../models/stage.dart';
+import '../config/theme.dart';
 import '../models/badge.dart';
-import '../providers/time_attack_provider.dart';
-import '../providers/flashcard_provider.dart';
-import '../providers/wrong_answers_provider.dart';
+import '../models/stage.dart';
+import '../providers/challenges_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../providers/favorites_provider.dart';
+import '../providers/flashcard_provider.dart';
+import '../providers/profile_provider.dart';
+import '../providers/progress_provider.dart';
+import '../providers/time_attack_provider.dart';
+import '../providers/wrong_answers_provider.dart';
+import '../services/haptic_service.dart';
+import '../widgets/badge_card.dart';
+import '../widgets/completed_stage_card.dart';
+import '../widgets/completed_stats_bar.dart';
+import '../widgets/filter_chip.dart';
+import '../widgets/header_stat.dart';
+import '../widgets/heatmap_legend.dart';
+import '../widgets/next_badge_card.dart';
+import '../widgets/quality_stat_tile.dart';
+import '../widgets/shortcut_help.dart';
+import '../widgets/sort_button.dart';
+import '../widgets/stat_card.dart';
+import '../widgets/summary_tile.dart';
+import '../widgets/unit_progress_row.dart';
 import 'flashcard_screen.dart' show kFlashcards;
 import 'quiz_review_screen.dart';
 import 'wrong_answers_list_screen.dart';
-import '../widgets/shortcut_help.dart';
-import '../widgets/next_badge_card.dart';
-import '../widgets/badge_card.dart';
-import '../widgets/completed_stage_card.dart';
-import '../widgets/quality_stat_tile.dart';
-import '../widgets/stat_card.dart';
-import '../widgets/heatmap_legend.dart';
-import '../widgets/unit_progress_row.dart';
-import '../widgets/summary_tile.dart';
-import '../widgets/completed_stats_bar.dart';
-import '../widgets/sort_button.dart';
-import '../widgets/filter_chip.dart';
-import '../widgets/header_stat.dart';
 
 class AchievementsScreen extends ConsumerStatefulWidget {
   const AchievementsScreen({super.key});
@@ -2673,6 +2675,3 @@ class _StatsTab extends ConsumerWidget {
 
 
 /// ヒートマップの凡例（薄い→濃いの色見本）
-
-
-

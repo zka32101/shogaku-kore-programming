@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/level.dart';
 
 /// レベルアップ通知ウィジェット（アニメーション付き）

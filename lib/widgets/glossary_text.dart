@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
 import '../config/theme.dart';
 import '../data/glossary_data.dart';
 import '../models/glossary_term.dart';

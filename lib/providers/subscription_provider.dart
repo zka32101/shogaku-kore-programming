@@ -1,171 +1,124 @@
-// Subscription Provider
-// Phase 4.2: RevenueCat-based subscription state management
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+
 import '../services/revenue_cat_service.dart';
-import '../utils/constants.dart';
 
-// ─── Subscription Status Provider ───────────────────────────────────────────
-// Notifier for subscription state
-
-class SubscriptionNotifier extends StateNotifier<AsyncValue<bool>> {
-  final RevenueCatService _revenueCat;
-
-  SubscriptionNotifier(this._revenueCat) : super(const AsyncValue.loading()) {
-    _initialize();
-  }
-
-  Future<void> _initialize() async {
-    try {
-      await _revenueCat.initialize();
-      final isSubscribed = await _revenueCat.isSubscribed();
-      state = AsyncValue.data(isSubscribed);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-
-  /// Purchase subscription
-  Future<void> purchaseSubscription() async {
-    try {
-      final offerings = await _revenueCat.getOfferings();
-      if (offerings == null || offerings.isEmpty) {
-        throw Exception('No offerings available');
-      }
-
-      // Get the monthly package (adjust logic if multiple packages)
-      final monthlyPackage = offerings.firstWhere(
-        (pkg) =>
-            pkg.identifier.contains(AppConstants.subscriptionProductId) ||
-            pkg.packageType == PackageType.monthly,
-        orElse: () => offerings.first,
-      );
-
-      state = const AsyncValue.loading();
-      final success = await _revenueCat.purchaseSubscription(
-        package: monthlyPackage,
-      );
-
-      if (success) {
-        state = const AsyncValue.data(true);
-      } else {
-        throw Exception('Purchase failed');
-      }
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-      rethrow;
-    }
-  }
-
-  /// Restore previous purchases
-  Future<void> restorePurchases() async {
-    try {
-      state = const AsyncValue.loading();
-      final success = await _revenueCat.restorePurchases();
-      state = AsyncValue.data(success);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-      rethrow;
-    }
-  }
-
-  /// Refresh subscription status
-  Future<void> refreshSubscriptionStatus() async {
-    try {
-      final isSubscribed = await _revenueCat.isSubscribed();
-      state = AsyncValue.data(isSubscribed);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-}
-
-/// Subscription status provider (watch this in UI)
-final subscriptionProvider =
-    StateNotifierProvider<SubscriptionNotifier, AsyncValue<bool>>((ref) {
-  final revenueCat = RevenueCatService();
-  return SubscriptionNotifier(revenueCat);
-});
-
-// ─── Subscription Details Provider ─────────────────────────────────────────
-
-class SubscriptionDetailsNotifier
-    extends StateNotifier<AsyncValue<SubscriptionDetails>> {
-  final RevenueCatService _revenueCat;
-
-  SubscriptionDetailsNotifier(this._revenueCat)
-      : super(const AsyncValue.loading()) {
-    _loadDetails();
-  }
-
-  Future<void> _loadDetails() async {
-    try {
-      final offerings = await _revenueCat.getOfferings();
-      if (offerings == null || offerings.isEmpty) {
-        throw Exception('No offerings available');
-      }
-
-      final monthlyPackage = offerings.firstWhere(
-        (pkg) => pkg.packageType == PackageType.monthly,
-        orElse: () => offerings.first,
-      );
-
-      final expirationDate = await _revenueCat.getSubscriptionExpirationDate();
-      final isSubscribed = await _revenueCat.isSubscribed();
-
-      state = AsyncValue.data(
-        SubscriptionDetails(
-          packageId: monthlyPackage.identifier,
-          price: monthlyPackage.storeProduct.priceString,
-          localizedPrice: monthlyPackage.storeProduct.priceString,
-          currencyCode: monthlyPackage.storeProduct.currencyCode,
-          expirationDate: expirationDate,
-          isActive: isSubscribed,
-        ),
-      );
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
-  }
-
-  Future<void> refresh() => _loadDetails();
-}
-
-/// Subscription details provider
-final subscriptionDetailsProvider = StateNotifierProvider<
-    SubscriptionDetailsNotifier,
-    AsyncValue<SubscriptionDetails>>((ref) {
-  final revenueCat = RevenueCatService();
-  return SubscriptionDetailsNotifier(revenueCat);
-});
-
-// ─── Models ────────────────────────────────────────────────────────────────
-
-class SubscriptionDetails {
-  final String packageId;
-  final String price;
-  final String localizedPrice;
-  final String currencyCode;
+// 購読状態を表すモデル
+class SubscriptionState {
+  final bool isSubscribed;
+  final List<Package>? availableOfferings;
   final DateTime? expirationDate;
-  final bool isActive;
+  final bool isLoading;
+  final String? errorMessage;
 
-  SubscriptionDetails({
-    required this.packageId,
-    required this.price,
-    required this.localizedPrice,
-    required this.currencyCode,
-    required this.expirationDate,
-    required this.isActive,
+  const SubscriptionState({
+    required this.isSubscribed,
+    this.availableOfferings,
+    this.expirationDate,
+    this.isLoading = false,
+    this.errorMessage,
   });
 
-  bool get isExpired {
-    if (expirationDate == null) return false;
-    return DateTime.now().isAfter(expirationDate!);
+  SubscriptionState copyWith({
+    bool? isSubscribed,
+    List<Package>? availableOfferings,
+    DateTime? expirationDate,
+    bool? isLoading,
+    String? errorMessage,
+  }) =>
+      SubscriptionState(
+        isSubscribed: isSubscribed ?? this.isSubscribed,
+        availableOfferings: availableOfferings ?? this.availableOfferings,
+        expirationDate: expirationDate ?? this.expirationDate,
+        isLoading: isLoading ?? this.isLoading,
+        errorMessage: errorMessage ?? this.errorMessage,
+      );
+}
+
+// 購読状態管理 NotifierProvider
+class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
+  final RevenueCatService _revenueCatService = RevenueCatService();
+
+  SubscriptionNotifier() : super(const SubscriptionState(isSubscribed: false));
+
+  /// 購読状態を更新
+  Future<void> refreshSubscriptionStatus() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final isSubscribed = await _revenueCatService.isSubscribed();
+      final offerings = await _revenueCatService.getOfferings();
+      final expirationDate =
+          await _revenueCatService.getSubscriptionExpirationDate();
+
+      state = state.copyWith(
+        isSubscribed: isSubscribed,
+        availableOfferings: offerings,
+        expirationDate: expirationDate,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to refresh subscription: $e',
+      );
+    }
   }
 
-  String get expirationText {
-    if (expirationDate == null) return '未取得';
-    return '${expirationDate!.year}年${expirationDate!.month}月${expirationDate!.day}日';
+  /// サブスク購入
+  Future<bool> purchaseSubscription(Package package) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final success = await _revenueCatService.purchaseSubscription(
+        package: package,
+      );
+      if (success) {
+        await refreshSubscriptionStatus();
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Purchase failed',
+        );
+      }
+      return success;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Purchase error: $e',
+      );
+      return false;
+    }
+  }
+
+  /// 購入を復元
+  Future<bool> restorePurchases() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final success = await _revenueCatService.restorePurchases();
+      if (success) {
+        await refreshSubscriptionStatus();
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Restore failed',
+        );
+      }
+      return success;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Restore error: $e',
+      );
+      return false;
+    }
   }
 }
+
+final subscriptionProvider =
+    StateNotifierProvider<SubscriptionNotifier, SubscriptionState>(
+  (ref) => SubscriptionNotifier(),
+);
+
+// 購読ステータスストリーム（リアルタイム更新）
+final subscriptionStatusStreamProvider = StreamProvider<bool>((ref) {
+  return RevenueCatService().subscriptionStatusStream;
+});

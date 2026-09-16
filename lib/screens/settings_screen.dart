@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
-    show requireParentalGate;
+
+    show AnalyticsDashboardWidget, DailyActivityData, AccuracyTrendData, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -24,6 +25,7 @@ import 'flashcard_screen.dart' show kFlashcards;
 import '../widgets/shortcut_help.dart';
 import '../widgets/app_dialog.dart';
 
+/// Settings screen with integrated shared_core components (Phase 4.19)
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -31,17 +33,20 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -98,7 +103,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       focusNode: _focusNode,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
-      body: Column(
+      appBar: AppBar(
+        title: const Text('設定'),
+        backgroundColor: kPrimaryColor,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: '設定'),
+            Tab(text: '学習分析'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          Column(
         children: [
           // ヘッダー
           _buildHeader(context, profile, progressNotifier),
@@ -341,9 +360,50 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             builder: (_) => const ParentDashboardScreen()),
                       ),
                     ),
+                    _SettingsTile(
+                      icon: '⏱️',
+                      iconBg: const Color(0xFFFFF3E0),
+                      title: 'スクリーンタイム制限',
+                      subtitle: '1日の学習時間を制限・管理',
+                      onTap: () => _goToScreenTimeSettings(context),
+                    ),
                     const _Divider(),
                   ],
                 ).animate(delay: 240.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+
+                // ─── ソーシャル ──────────────────────────────
+                Column(
+                  children: [
+                    const _SectionHeader(title: 'ソーシャル'),
+                    _SettingsTile(
+                      icon: '👥',
+                      iconBg: const Color(0xFF6C63FF),
+                      title: 'フレンドを探す',
+                      subtitle: 'ユーザーを検索してフレンド申請する',
+                      onTap: () => _openAddFriendDialog(context),
+                    ),
+                    const _Divider(),
+                  ],
+                ).animate(delay: 270.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+
+                // ─── 分析 ────────────────────────────────────
+                Column(
+                  children: [
+                    const _SectionHeader(title: '分析'),
+                    _SettingsTile(
+                      icon: '📊',
+                      iconBg: const Color(0xFFE8F5E9),
+                      title: 'ユーザーリテンション分析',
+                      subtitle: 'あなたの活動パターンと継続性を分析',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const RetentionDashboard(),
+                        ),
+                      ),
+                    ),
+                    const _Divider(),
+                  ],
+                ).animate(delay: 300.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
                 // ─── アプリについて ──────────────────────────
                 Column(
@@ -367,7 +427,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const _Divider(),
                   ],
-                ).animate(delay: 300.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+                ).animate(delay: 330.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
                 // ─── データ ─────────────────────────────────
                 Column(
@@ -465,8 +525,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ],
       ),
+          // Tab 2: 学習分析
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: AnalyticsDashboardWidget(
+              userName: profile.nickname ?? 'ユーザー',
+              totalQuestions: progressNotifier.totalQuestionsAnswered,
+              averageAccuracy: progressNotifier.averageAccuracy,
+              totalTimeSpent: progressNotifier.totalLearningSeconds,
+              dailyActivity: _generateDailyActivity(progressNotifier),
+              accuracyTrend: _generateAccuracyTrend(progressNotifier),
+            ),
+          ),
+        ],
+      ),
     ),   // closes Scaffold (child of Focus)
   );     // closes Focus return
+  }
+
+  List<DailyActivityData> _generateDailyActivity(ProgressNotifier notifier) {
+    return [
+      DailyActivityData(day: '月', count: 0),
+      DailyActivityData(day: '火', count: 0),
+      DailyActivityData(day: '水', count: 0),
+      DailyActivityData(day: '木', count: 0),
+      DailyActivityData(day: '金', count: 0),
+      DailyActivityData(day: '土', count: 0),
+      DailyActivityData(day: '日', count: 0),
+    ];
+  }
+
+  List<AccuracyTrendData> _generateAccuracyTrend(ProgressNotifier notifier) {
+    return [
+      AccuracyTrendData(week: 'W1', accuracy: 0.0),
+      AccuracyTrendData(week: 'W2', accuracy: 0.0),
+      AccuracyTrendData(week: 'W3', accuracy: 0.0),
+      AccuracyTrendData(week: 'W4', accuracy: 0.0),
+    ];
   }
 
   Widget _buildHeader(
@@ -779,6 +874,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const PaywallScreen()),
+    );
+  }
+
+  /// スクリーンタイム設定画面へ移動する前に、保護者ゲートを通す。
+  /// ゲートを通過（正解）した場合のみ [ScreenTimeSettingsWidget] へ遷移する。
+  Future<void> _goToScreenTimeSettings(BuildContext context) async {
+    final passedGate = await requireParentalGate(context);
+    if (!passedGate || !context.mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            title: const Text('スクリーンタイム制限'),
+            backgroundColor: kPrimaryColor,
+          ),
+          body: const ScreenTimeSettingsWidget(primaryColor: kPrimaryColor),
+        ),
+      ),
+    );
+  }
+
+  /// フレンド検索ダイアログを開く
+  void _openAddFriendDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const AddFriendDialog(),
     );
   }
 
