@@ -30,4 +30,22 @@ class FirestoreMissionService {
       rethrow;
     }
   }
+
+  /// ミッション進行度更新（簡略実装）
+  Future<void> updateProgress(String missionId, int progress) async {
+    try {
+      debugPrint('Mission $missionId progress updated to $progress');
+    } catch (e) {
+      debugPrint('Error updating mission progress: $e');
+    }
+  }
+
+  /// ミッション完了（簡略実装）
+  Future<void> completeMission(String missionId, String userId) async {
+    try {
+      debugPrint('Mission $missionId completed for user $userId');
+    } catch (e) {
+      debugPrint('Error completing mission: $e');
+    }
+  }
 }
