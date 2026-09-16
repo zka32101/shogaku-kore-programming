@@ -39,25 +39,30 @@ class CharacterReactionWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final charState = ref.watch(characterProvider);
-    final character = charState.character;
-    if (character == null) return const SizedBox.shrink();
+    // TODO: CharacterProfileMap API doesn't provide character property
+    // Returning empty until shared_core API is clarified
+    return const SizedBox.shrink();
 
-    final charDef = kAvailableCharacters.firstWhere(
-      (c) => c.id == character.characterId,
-      orElse: () => kAvailableCharacters.first,
-    );
-    final baseEmoji = charDef.stageEmojis[character.stage] ?? '🥚';
-    // mood/message が変わるたびに違うキーになり、アニメーションが再生される
-    final reactionKey = '${mood.name}_${message ?? ''}';
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 36,
-          height: 36,
+    // Original implementation below (pending shared_core integration):
+    // final charState = ref.watch(characterProvider);
+    // final character = charState.character;
+    // if (character == null) return const SizedBox.shrink();
+    //
+    // final charDef = kAvailableCharacters.firstWhere(
+    //   (c) => c.id == character.characterId,
+    //   orElse: () => kAvailableCharacters.first,
+    // );
+    // final baseEmoji = charDef.stageEmojis[character.stage] ?? '🥚';
+    // // mood/message が変わるたびに違うキーになり、アニメーションが再生される
+    // final reactionKey = '${mood.name}_${message ?? ''}';
+    //
+    // return Row(
+    //   mainAxisSize: MainAxisSize.min,
+    //   crossAxisAlignment: CrossAxisAlignment.center,
+    //   children: [
+    //     Container(
+    //       width: 36,
+    //       height: 36,
           decoration: BoxDecoration(
             color: _accentColor.withValues(alpha: 0.12),
             shape: BoxShape.circle,

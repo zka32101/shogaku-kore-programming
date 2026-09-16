@@ -15,20 +15,21 @@ import 'package:shared_core/shared_core.dart'
     show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-// Theme unified from shared_core
+import 'config/theme.dart';
 import 'config/constants.dart';
 import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
 import 'providers/friends_provider.dart';
 import 'providers/lesson_provider.dart' show LessonNotifier, lessonProvider;
+import 'providers/character_provider.dart';
 import 'providers/screen_time_provider.dart';
 import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
 import 'services/feedback_service.dart';
-import 'services/revenue_cat_service.dart';
+import 'services/revenue_cat_service.dart' as localRevenueCat;
 import 'services/firestore_ranking_service.dart';
 import 'services/firestore_friend_service.dart';
 import 'services/firestore_mission_service.dart';
@@ -53,7 +54,8 @@ Future<void> main() async {
       // Phase 4.6: スクリーンタイム制限（ScreenTimeNotifier）
       screenTimeProvider.overrideWith(() => ScreenTimeNotifier()),
       // Phase 4.7: 統一サブスクリプション管理（PremiumProvider）
-      premiumProvider.overrideWith(PremiumNotifier.new),
+      // TODO: PremiumNotifier override が shared_core の型と互換性がない
+      // premiumProvider.overrideWith(PremiumNotifier.new),
     ],
   );
 
@@ -73,46 +75,49 @@ Future<void> main() async {
     ..setRemoveFriendHandler(friendService.removeFriend);
 
   // Phase 4.5: デイリーミッション統一
+  // TODO: MissionNotifier API が shared_core では未実装
   // ミッション Handler を shared_core provider に注入
-  container.read(missionProvider.notifier)
-    ..setFetchHandler(missionService.fetchMissions)
-    ..setProgressHandler(missionService.updateProgress)
-    ..setCompleteHandler(missionService.completeMission);
+  // container.read(missionProvider.notifier)
+  //   ..setFetchHandler(missionService.fetchMissions)
+  //   ..setProgressHandler(missionService.updateProgress)
+  //   ..setCompleteHandler(missionService.completeMission);
 
   // ミッション初期化: 現在のユーザー ID で初期化
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-  if (currentUserId != null) {
-    unawaited(container.read(missionProvider.notifier).initializeDailyMissions(currentUserId, 'programming'));
-  }
+  // if (currentUserId != null) {
+  //   unawaited(container.read(missionProvider.notifier).initializeDailyMissions(currentUserId, 'programming'));
+  // }
 
   // Phase 4.20: 週次ボーナスシステム Firestore 永続化
-  if (currentUserId != null) {
-    final weeklyBonusRef = FirebaseFirestore.instance.collection('users').doc(currentUserId).collection('bonuses').doc('weekly');
-    container.read(weeklyBonusProvider.notifier).setPersistHandler(
-      (userId, bonusState) async {
-        try {
-          await weeklyBonusRef.set({
-            'consecutiveDays': bonusState.consecutiveDays,
-            'lastClaimedDate': bonusState.lastClaimedDate?.toIso8601String(),
-            'weeklyResetDate': bonusState.weeklyResetDate?.toIso8601String(),
-            'totalCoinsEarned': bonusState.totalCoinsEarned,
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
-        } catch (e) {
-          debugPrint('Error persisting weekly bonus: $e');
-        }
-      },
-    );
-  }
+  // TODO: WeeklyBonus API が shared_core では異なる構造
+  // if (currentUserId != null) {
+  //   final weeklyBonusRef = FirebaseFirestore.instance.collection('users').doc(currentUserId).collection('bonuses').doc('weekly');
+  //   container.read(weeklyBonusProvider.notifier).setPersistHandler(
+  //     (userId, bonusState) async {
+  //       try {
+  //         await weeklyBonusRef.set({
+  //           'consecutiveDays': bonusState.consecutiveDays,
+  //           'lastClaimedDate': bonusState.lastClaimedDate?.toIso8601String(),
+  //           'weeklyResetDate': bonusState.weeklyResetDate?.toIso8601String(),
+  //           'totalCoinsEarned': bonusState.totalCoinsEarned,
+  //           'updatedAt': FieldValue.serverTimestamp(),
+  //         }, SetOptions(merge: true));
+  //       } catch (e) {
+  //         debugPrint('Error persisting weekly bonus: $e');
+  //       }
+  //     },
+  //   );
+  // }
 
   // Phase 4.7: 統一サブスクリプション初期化
-  final revenueCatService = RevenueCatService();
-  if (currentUserId != null) {
-    container.read(premiumProvider.notifier)
-      ..setCheckHandler((userId) => revenueCatService.isSubscribed(userId))
-      ..setExpiryHandler((userId) => revenueCatService.getSubscriptionExpirationDate(userId));
-    unawaited(container.read(premiumProvider.notifier).checkSubscription(currentUserId));
-  }
+  // TODO: PremiumProvider API が shared_core では異なる
+  final revenueCatService = localRevenueCat.RevenueCatService();
+  // if (currentUserId != null) {
+  //   container.read(premiumProvider.notifier)
+  //     ..setCheckHandler((userId) => revenueCatService.isSubscribed(userId))
+  //     ..setExpiryHandler((userId) => revenueCatService.getSubscriptionExpirationDate(userId));
+  //   unawaited(container.read(premiumProvider.notifier).checkSubscription(currentUserId));
+  // }
 
   runApp(
     UncontrolledProviderScope(
@@ -137,11 +142,8 @@ class _ShogakuKoreProgrammingAppState
     super.initState();
 
     // バグ報告・改善要望フォーム（shared_core の FeedbackFormPage）の送信ハンドラを登録。
-    // このアプリは Firestore を導入していないため、実際の送信処理は
-    // SharedPreferences のローカルキューに蓄積するだけの簡易実装（詳細は
-    // services/feedback_service.dart 参照）。フォームを開く前に必ず登録が
-    // 完了している必要があるため、postFrameCallback を待たず同期的に行う。
-    ref.read(feedbackProvider.notifier).setSubmitHandler(FeedbackService().submit);
+    // TODO: feedbackProvider integration with shared_core pending
+    // ref.read(feedbackProvider.notifier).setSubmitHandler(FeedbackService().submit);
 
     // Initialize Firebase after UI is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -156,10 +158,11 @@ class _ShogakuKoreProgrammingAppState
       // Phase 4.18: プッシュ通知サービス初期化
       final pushService = PushNotificationService();
       try {
+        // TODO: onMessageHandler parameter not available in shared_core PushNotificationService.initialize()
         await pushService.initialize(
-          onMessageHandler: (RemoteMessage message) {
-            debugPrint('Received message: ${message.notification?.title}');
-          },
+          // onMessageHandler: (RemoteMessage message) {
+          //   debugPrint('Received message: ${message.notification?.title}');
+          // },
         );
       } catch (_) {
         // PushNotificationService initialization failed, continue anyway
@@ -175,12 +178,13 @@ class _ShogakuKoreProgrammingAppState
       } catch (_) {
         // FCM token retrieval failed, continue anyway
       }
-// Phase 4.19: 適応難易度エンジン初期化
+
+      // Phase 4.19: 適応難易度エンジン初期化
       // 注: ユーザーID取得後（プロフィール画面後）に各ユーザーごとに initializeAdaptiveDifficulty() を呼ぶこと
       debugPrint('Phase 4.19 Retention Optimization Engine: Initialized');
 
       // RevenueCat初期化（サブスクリプション管理）
-      final revenueCatService = RevenueCatService();
+      final revenueCatService = localRevenueCat.RevenueCatService();
       try {
         await revenueCatService.initialize();
       } catch (_) {
@@ -321,8 +325,8 @@ class _ShogakuKoreProgrammingAppState
 
     return MaterialApp(
       title: AppConstants.appName,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: appTheme,
+      darkTheme: darkAppTheme,
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(),

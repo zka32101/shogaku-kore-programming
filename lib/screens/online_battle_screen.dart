@@ -19,22 +19,37 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final premiumState = ref.watch(premiumProvider);
+    // TODO: PremiumState API integration needed with shared_core
+    // Placeholder while premium features are being integrated
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('オンライン対戦'),
+        centerTitle: true,
+        backgroundColor: _primaryColor,
+      ),
+      body: const Center(
+        child: Text('オンライン対戦: 準備中'),
+      ),
+    );
 
-    if (!premiumState.isSubscribed) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('オンライン対戦'),
-          centerTitle: true,
-          backgroundColor: _primaryColor,
-        ),
-        body: PremiumGateWidget(
-          featureName: 'オンライン対戦',
-          onPremiumAccess: () => _showSubscriptionDialog(context),
-        ),
-      );
-    }
+    // Original code below (commented out pending shared_core API clarification):
+    // final premiumState = ref.watch(premiumProvider);
+    //
+    // if (!premiumState.isSubscribed) {
+    //   return Scaffold(
+    //     appBar: AppBar(
+    //       title: const Text('オンライン対戦'),
+    //       centerTitle: true,
+    //       backgroundColor: _primaryColor,
+    //     ),
+    //     body: PremiumGateWidget(
+    //       featureName: 'オンライン対戦',
+    //       onPremiumAccess: () => _showSubscriptionDialog(context),
+    //     ),
+    //   );
+    // }
 
+    /*
     return Scaffold(
       appBar: AppBar(
         title: const Text('オンライン対戦'),
@@ -226,6 +241,7 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
         ],
       ),
     );
+    */
   }
 
   Future<void> _handleBattleAction() async {

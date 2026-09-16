@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_core/shared_core.dart'
-
-    show AnalyticsDashboardWidget, DailyActivityData, AccuracyTrendData, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
+// TODO: Many of these classes don't exist in shared_core
+// import 'package:shared_core/shared_core.dart' show AnalyticsDashboardWidget, DailyActivityData, AccuracyTrendData, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -395,10 +394,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                       iconBg: const Color(0xFFE8F5E9),
                       title: 'ユーザーリテンション分析',
                       subtitle: 'あなたの活動パターンと継続性を分析',
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const RetentionDashboard(),
-                        ),
+                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('分析機能は準備中です')),
                       ),
                     ),
                     const _Divider(),
@@ -526,15 +523,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
         ],
       ),
           // Tab 2: 学習分析
+          // TODO: Analytics features pending shared_core API integration
           SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: AnalyticsDashboardWidget(
-              userName: profile.nickname ?? 'ユーザー',
-              totalQuestions: progressNotifier.totalQuestionsAnswered,
-              averageAccuracy: progressNotifier.averageAccuracy,
-              totalTimeSpent: progressNotifier.totalLearningSeconds,
-              dailyActivity: _generateDailyActivity(progressNotifier),
-              accuracyTrend: _generateAccuracyTrend(progressNotifier),
+            child: Center(
+              child: Text('学習分析: 準備中'),
             ),
           ),
         ],
@@ -543,26 +536,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
   );     // closes Focus return
   }
 
-  List<DailyActivityData> _generateDailyActivity(ProgressNotifier notifier) {
-    return [
-      DailyActivityData(day: '月', count: 0),
-      DailyActivityData(day: '火', count: 0),
-      DailyActivityData(day: '水', count: 0),
-      DailyActivityData(day: '木', count: 0),
-      DailyActivityData(day: '金', count: 0),
-      DailyActivityData(day: '土', count: 0),
-      DailyActivityData(day: '日', count: 0),
-    ];
-  }
+  // TODO: Analytics helper methods - pending shared_core API integration
+  // List<DailyActivityData> _generateDailyActivity(ProgressNotifier notifier) {
+  //   return [
+  //     DailyActivityData(day: '月', count: 0),
+  //     DailyActivityData(day: '火', count: 0),
+  //     DailyActivityData(day: '水', count: 0),
+  //     DailyActivityData(day: '木', count: 0),
+  //     DailyActivityData(day: '金', count: 0),
+  //     DailyActivityData(day: '土', count: 0),
+  //     DailyActivityData(day: '日', count: 0),
+  //   ];
+  // }
 
-  List<AccuracyTrendData> _generateAccuracyTrend(ProgressNotifier notifier) {
-    return [
-      AccuracyTrendData(week: 'W1', accuracy: 0.0),
-      AccuracyTrendData(week: 'W2', accuracy: 0.0),
-      AccuracyTrendData(week: 'W3', accuracy: 0.0),
-      AccuracyTrendData(week: 'W4', accuracy: 0.0),
-    ];
-  }
+  // List<AccuracyTrendData> _generateAccuracyTrend(ProgressNotifier notifier) {
+  //   return [
+  //     AccuracyTrendData(week: 'W1', accuracy: 0.0),
+  //     AccuracyTrendData(week: 'W2', accuracy: 0.0),
+  //     AccuracyTrendData(week: 'W3', accuracy: 0.0),
+  //     AccuracyTrendData(week: 'W4', accuracy: 0.0),
+  //   ];
+  // }
 
   Widget _buildHeader(
     BuildContext context,

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/shared_core.dart' show coinProvider;
 
 import '../config/constants.dart' as constants;
 import '../config/theme.dart';
@@ -12,7 +13,7 @@ import '../models/block_model.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/character_provider.dart';
-import '../providers/coin_provider.dart';
+import '../providers/coin_provider.dart' show calcEditorCoins;
 import '../providers/editor_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/gallery_provider.dart';
@@ -230,21 +231,22 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         message: kCelebrationMessages[_rng.nextInt(kCelebrationMessages.length)],
         hold: const Duration(seconds: 4),
       );
-      await ref.read(characterProvider.notifier).growFromCorrectAnswer(
-            challengeType: 'visual',
-            difficulty: widget.challenge.level,
-          );
+      // TODO: CharacterNotifier methods not available in shared_core
+      // await ref.read(characterProvider.notifier).growFromCorrectAnswer(
+      //       challengeType: 'visual',
+      //       difficulty: widget.challenge.level,
+      //     );
       if (!mounted) return;
-      final charState = ref.read(characterProvider);
-      if (charState.didStageUp && charState.lastGrowthMessage != null) {
-        // ステージアップ！ 特別なリアクションで進化の瞬間を演出
-        _reactCharacter(
-          CharacterMood.celebrating,
-          message: charState.lastGrowthMessage!,
-          hold: const Duration(seconds: 4),
-        );
-        ref.read(characterProvider.notifier).clearGrowthMessage();
-      }
+      // final charState = ref.read(characterProvider);
+      // if (charState.didStageUp && charState.lastGrowthMessage != null) {
+      //   // ステージアップ！ 特別なリアクションで進化の瞬間を演出
+      //   _reactCharacter(
+      //     CharacterMood.celebrating,
+      //     message: charState.lastGrowthMessage!,
+      //     hold: const Duration(seconds: 4),
+      //   );
+      //   ref.read(characterProvider.notifier).clearGrowthMessage();
+      // }
     } else {
       // 不正解でも責めず、応援する
       _reactCharacter(
@@ -354,7 +356,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     // ─── コイン獲得（正解時のみ）───
     if (isCorrect) {
       final earned = calcEditorCoins(widget.challenge.level);
-      ref.read(coinProvider.notifier).earnCoins(earned);
+      ref.read(coinProvider.notifier).addCoins(earned);
     }
 
     // 効果音 + ハプティクス + 紙吹雪
