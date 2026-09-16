@@ -17,7 +17,6 @@ import '../models/character_model.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/character_provider.dart';
-import '../providers/coin_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/flashcard_provider.dart';

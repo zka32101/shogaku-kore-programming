@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/shared_core.dart' show coinProvider;
 
 import '../config/constants.dart' as constants;
 import '../config/theme.dart';
@@ -12,7 +13,6 @@ import '../models/block_model.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/character_provider.dart';
-import '../providers/coin_provider.dart';
 import '../providers/editor_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/gallery_provider.dart';
@@ -354,7 +354,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     // ─── コイン獲得（正解時のみ）───
     if (isCorrect) {
       final earned = calcEditorCoins(widget.challenge.level);
-      ref.read(coinProvider.notifier).earnCoins(earned);
+      ref.read(coinProvider.notifier).addCoins(earned);
     }
 
     // 効果音 + ハプティクス + 紙吹雪

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/shared_core.dart' show coinProvider;
 
 import '../config/theme.dart';
 import '../models/stage.dart';
@@ -11,7 +12,6 @@ import '../providers/ai_programming_coach_provider.dart';
 import '../providers/bgm_provider.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/character_provider.dart';
-import '../providers/coin_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
@@ -504,7 +504,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       maxCombo: _maxCombo,
     );
     if (coinTotal > 0) {
-      ref.read(coinProvider.notifier).earnCoins(coinTotal);
+      ref.read(coinProvider.notifier).addCoins(coinTotal);
     }
 
     // 間違い問題を永続保存
