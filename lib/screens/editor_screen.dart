@@ -13,6 +13,7 @@ import '../models/block_model.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/character_provider.dart';
+import '../providers/coin_provider.dart' show calcEditorCoins;
 import '../providers/editor_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/gallery_provider.dart';
@@ -230,21 +231,22 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         message: kCelebrationMessages[_rng.nextInt(kCelebrationMessages.length)],
         hold: const Duration(seconds: 4),
       );
-      await ref.read(characterProvider.notifier).growFromCorrectAnswer(
-            challengeType: 'visual',
-            difficulty: widget.challenge.level,
-          );
+      // TODO: CharacterNotifier methods not available in shared_core
+      // await ref.read(characterProvider.notifier).growFromCorrectAnswer(
+      //       challengeType: 'visual',
+      //       difficulty: widget.challenge.level,
+      //     );
       if (!mounted) return;
-      final charState = ref.read(characterProvider);
-      if (charState.didStageUp && charState.lastGrowthMessage != null) {
-        // ステージアップ！ 特別なリアクションで進化の瞬間を演出
-        _reactCharacter(
-          CharacterMood.celebrating,
-          message: charState.lastGrowthMessage!,
-          hold: const Duration(seconds: 4),
-        );
-        ref.read(characterProvider.notifier).clearGrowthMessage();
-      }
+      // final charState = ref.read(characterProvider);
+      // if (charState.didStageUp && charState.lastGrowthMessage != null) {
+      //   // ステージアップ！ 特別なリアクションで進化の瞬間を演出
+      //   _reactCharacter(
+      //     CharacterMood.celebrating,
+      //     message: charState.lastGrowthMessage!,
+      //     hold: const Duration(seconds: 4),
+      //   );
+      //   ref.read(characterProvider.notifier).clearGrowthMessage();
+      // }
     } else {
       // 不正解でも責めず、応援する
       _reactCharacter(
