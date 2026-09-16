@@ -166,7 +166,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final progressNotifier = ref.read(progressProvider.notifier);
     final allChallenges = ref.watch(allChallengesProvider);
     final profile = ref.watch(profileProvider);
-    final coinBalance = ref.watch(coinProvider.select((s) => s.balance));
+    // TODO: shared_core's CoinState doesn't expose .balance property
+    // For now, default to 0 - this needs proper integration with shared_core API
+    final coinBalance = 0; // ref.watch(coinProvider.select((s) => s.balance));
     final reviewState = ref.watch(dailyReviewProvider);
     final reviewDoneToday = reviewState.doneToday;
     final reviewStreak = reviewState.reviewStreak;
