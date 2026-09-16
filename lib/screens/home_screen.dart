@@ -8,8 +8,7 @@ import 'package:shared_core/shared_core.dart'
     show
         FriendsListPage,
         DailyMissionPage,
-        WeeklyBonusWidget,
-        coinProvider;
+        WeeklyBonusWidget;
 
 import '../config/constants.dart';
 import '../config/theme.dart';
@@ -236,6 +235,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
           isCorrect: false,
           selectedAnswer: _currentQuestion.options[_selectedIndex!],
           correctAnswer: _currentQuestion.options[_currentQuestion.correctIndex],
+          isCorrect: false,
         ),
       ]);
     }

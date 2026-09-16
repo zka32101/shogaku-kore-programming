@@ -225,7 +225,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         !(ref.read(progressProvider)[widget.challenge.id]?.isCompleted ?? false);
 
     if (isCorrect) {
-      // キャラクターが喜んでくれる & 育成が進む
+      // キャラクターが喜んでくれる
       _reactCharacter(
         CharacterMood.celebrating,
         message: kCelebrationMessages[_rng.nextInt(kCelebrationMessages.length)],

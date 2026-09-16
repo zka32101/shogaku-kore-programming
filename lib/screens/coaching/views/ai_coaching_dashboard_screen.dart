@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_core/shared_core.dart'
-    show CoachingDashboard;
 
 import '../../../config/theme.dart';
-import '../../../providers/profile_provider.dart';
 
-/// AI コーチング ダッシュボード画面
-///
-/// ユーザーの学習パターンを分析し、個別のコーチングアドバイスを表示します。
-class AiCoachingDashboardScreen extends ConsumerWidget {
+/// AI コーチング ダッシュボード画面（Phase 4: shared_core 側 API 未整備のため準備中）
+class AiCoachingDashboardScreen extends StatelessWidget {
   const AiCoachingDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(profileProvider);
-
-    // Use anonymousId if available, otherwise use nickname as user identifier
-    final userId = profile.anonymousId.isNotEmpty
-        ? profile.anonymousId
-        : profile.nickname;
-
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('🤖 AI コーチング'),
         backgroundColor: kPrimaryColor,
         elevation: 0,
       ),
-      body: CoachingDashboard(
-        userId: userId,
-        primaryColor: kPrimaryColor,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.construction, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              '近日公開予定です',
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -10,9 +10,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'
     show ProviderContainer, UncontrolledProviderScope, ConsumerState, ConsumerStatefulWidget;
 import 'package:shared_core/shared_core.dart'
 
-    hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
+    hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier, RevenueCatService, coinProvider;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
+import 'providers/coin_provider.dart' show coinProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -65,7 +66,6 @@ Future<void> main() async {
   // Phase 4.3: マルチアプリランキング・フレンド機能（Firestore連携）
   final rankingService = FirestoreRankingService();
   final friendService = FirestoreFriendService();
-  final missionService = FirestoreMissionService();
 
   container.read(rankingProvider.notifier).setFetchHandler(rankingService.fetchRankings);
   container.read(globalRankingProvider.notifier).setFetchHandler(rankingService.fetchGlobalRankings);

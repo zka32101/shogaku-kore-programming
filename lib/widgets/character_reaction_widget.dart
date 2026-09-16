@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../models/character_model.dart';
-import '../providers/character_provider.dart';
 
 /// 育成中キャラクターの「気持ち」。エディタ・クイズ画面で状況に応じて切り替える。
 enum CharacterMood { idle, thinking, excited, celebrating, encouraging }
 
 /// 育成中のキャラクターが状況に応じてリアクションする小さなウィジェット。
 ///
-/// [mood] や [message] が変わるたびに新しいアニメーションで再登場する。
-/// キャラクター未読み込み時は何も表示しない（レイアウトを崩さないよう SizedBox.shrink）。
-class CharacterReactionWidget extends ConsumerWidget {
+/// キャラクター育成機能は準備中のため、現在は常に何も表示しない
+/// （レイアウトを崩さないよう SizedBox.shrink）。
+class CharacterReactionWidget extends StatelessWidget {
   final CharacterMood mood;
   final String? message;
 
@@ -21,21 +16,6 @@ class CharacterReactionWidget extends ConsumerWidget {
     this.mood = CharacterMood.idle,
     this.message,
   });
-
-  String get _badgeEmoji => switch (mood) {
-        CharacterMood.thinking => '🤔',
-        CharacterMood.excited => '👀',
-        CharacterMood.celebrating => '🎉',
-        CharacterMood.encouraging => '💪',
-        CharacterMood.idle => '',
-      };
-
-  Color get _accentColor => switch (mood) {
-        CharacterMood.celebrating => const Color(0xFF1ABC9C),
-        CharacterMood.encouraging => const Color(0xFFE67E22),
-        CharacterMood.excited => const Color(0xFF3498DB),
-        _ => const Color(0xFF8E44AD),
-      };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
