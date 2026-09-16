@@ -224,27 +224,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         !(ref.read(progressProvider)[widget.challenge.id]?.isCompleted ?? false);
 
     if (isCorrect) {
-      // キャラクターが喜んでくれる & 育成が進む
+      // キャラクターが喜んでくれる
       _reactCharacter(
         CharacterMood.celebrating,
         message: kCelebrationMessages[_rng.nextInt(kCelebrationMessages.length)],
         hold: const Duration(seconds: 4),
       );
-      await ref.read(characterProvider.notifier).growFromCorrectAnswer(
-            challengeType: 'visual',
-            difficulty: widget.challenge.level,
-          );
-      if (!mounted) return;
-      final charState = ref.read(characterProvider);
-      if (charState.didStageUp && charState.lastGrowthMessage != null) {
-        // ステージアップ！ 特別なリアクションで進化の瞬間を演出
-        _reactCharacter(
-          CharacterMood.celebrating,
-          message: charState.lastGrowthMessage!,
-          hold: const Duration(seconds: 4),
-        );
-        ref.read(characterProvider.notifier).clearGrowthMessage();
-      }
     } else {
       // 不正解でも責めず、応援する
       _reactCharacter(

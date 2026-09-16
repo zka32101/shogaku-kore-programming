@@ -8,8 +8,7 @@ import 'package:shared_core/shared_core.dart'
     show
         FriendsListPage,
         DailyMissionPage,
-        WeeklyBonusWidget,
-        coinProvider;
+        WeeklyBonusWidget;
 
 import '../config/constants.dart';
 import '../config/theme.dart';
@@ -135,12 +134,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       HapticService.lightImpact();
       SoundService().playTap();
       Navigator.of(context).push(smoothPageRoute(const ProfileScreen()));
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.keyH) {
-      HapticService.lightImpact();
-      SoundService().playTap();
-      showDialog(context: context, builder: (c) => const ShortcutHelp());
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -457,7 +450,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // Phase 4.20: 週次ボーナスウィジェット
                   WeeklyBonusWidget(
                     onBonusClaimed: (coins) {
-                      ref.read(coinProvider.notifier).addCoins(coins);
+                      ref.read(coinProvider.notifier).earnCoins(coins);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('週次ボーナス獲得！ $coins コイン'),
@@ -514,224 +507,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
         ),
-      ),
-      padding: EdgeInsets.fromLTRB(
-        16,
-        MediaQuery.of(context).padding.top + 16,
-        16,
-        20,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ヘッダー top row: 科目ラベル + アクションボタン
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // 科目ラベル
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'プログラミング',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              // デイリーミッションボタン
-              IconButton(
-                onPressed: () {
-                  HapticService.lightImpact();
-                  SoundService().playTap();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => DailyMissionPage(
-                        primaryColor: kPrimaryColor,
-                        appTitle: '小学コレ！プログラミング',
-                        filterSubject: 'programming',
-                      ),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.assignment, color: Colors.white, size: 18),
-                tooltip: 'デイリーミッション',
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withValues(alpha: 0.2),
-                  shape: const CircleBorder(),
-                  minimumSize: const Size(40, 40),
-                ),
-              ),
-              // アクションボタン（フレンド）
-              IconButton(
-                onPressed: () {
-                  HapticService.lightImpact();
-                  SoundService().playTap();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const FriendsListPage()),
-                  );
-                },
-                icon: const Icon(Icons.people, color: Colors.white, size: 20),
-                tooltip: 'フレンド',
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withValues(alpha: 0.2),
-                  shape: const CircleBorder(),
-                  minimumSize: const Size(40, 40),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _buildGreeting(profile.nickname),
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 10),
-          // ユーザー情報行
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(profile.avatarEmoji, style: const TextStyle(fontSize: 16)),
-                  const SizedBox(width: 6),
-                  Text(
-                    'レベル $level',
-                    style: const TextStyle(fontSize: 13, color: Colors.white),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  if (streakDays >= 2) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.orange.withValues(alpha: 0.6), width: 1),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text('🔥', style: TextStyle(fontSize: 11)),
-                          const SizedBox(width: 3),
-                          Text(
-                            '$streakDays日',
-                            style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    '$totalStars pt',
-                    style: const TextStyle(fontSize: 13, color: Colors.white),
-                  ),
-                  const SizedBox(width: 8),
-                  // コイン残高バッジ（タップでショップ）
-                  GestureDetector(
-                    onTap: () {
-                      HapticService.lightImpact();
-                      SoundService().playTap();
-                      Navigator.of(context).push(
-                        smoothPageRoute(const ShopScreen()),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFD700).withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFFFFD700).withValues(alpha: 0.6),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text('🪙', style: TextStyle(fontSize: 11)),
-                          const SizedBox(width: 3),
-                          Text(
-                            '$coinBalance',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // レベルXPバー
-          Row(
-            children: [
-              Text(
-                'Lv.$level',
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0.0, end: levelProgress),
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOut,
-                    builder: (context, value, child) => LinearProgressIndicator(
-                      value: value,
-                      backgroundColor: Colors.white30,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                      minHeight: 6,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                starsToNext > 0 ? 'Lv.${level + 1}' : 'MAX',
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '$completedCount / ${AppConstants.totalStages} ステージ完了',
-                style: const TextStyle(fontSize: 11, color: Colors.white70),
-              ),
-              // 今日の目標インジケーター
-              _DailyGoalDots(todayCleared: todayCleared, dailyGoal: dailyGoal),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -1349,6 +1124,7 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
           questionText: _currentQuestion.text,
           selectedAnswer: _currentQuestion.options[_selectedIndex!],
           correctAnswer: _currentQuestion.options[_currentQuestion.correctIndex],
+          isCorrect: false,
         ),
       ]);
     }

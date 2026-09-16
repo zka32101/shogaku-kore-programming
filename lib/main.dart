@@ -10,12 +10,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'
     show ProviderContainer, UncontrolledProviderScope, ConsumerState, ConsumerStatefulWidget;
 import 'package:shared_core/shared_core.dart'
 
-    hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier;
+    hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier, RevenueCatService, coinProvider;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, missionProvider, coinProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
+    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
+import 'providers/coin_provider.dart' show coinProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-// Theme unified from shared_core
+import 'config/theme.dart';
 import 'config/constants.dart';
 import 'providers/profile_provider.dart';
 import 'providers/progress_provider.dart';
@@ -53,7 +54,6 @@ Future<void> main() async {
       // Phase 4.6: スクリーンタイム制限（ScreenTimeNotifier）
       screenTimeProvider.overrideWith(() => ScreenTimeNotifier()),
       // Phase 4.7: 統一サブスクリプション管理（PremiumProvider）
-      premiumProvider.overrideWith(PremiumNotifier.new),
     ],
   );
 
@@ -63,7 +63,6 @@ Future<void> main() async {
   // Phase 4.3: マルチアプリランキング・フレンド機能（Firestore連携）
   final rankingService = FirestoreRankingService();
   final friendService = FirestoreFriendService();
-  final missionService = FirestoreMissionService();
 
   container.read(rankingProvider.notifier).setFetchHandler(rankingService.fetchRankings);
   container.read(globalRankingProvider.notifier).setFetchHandler(rankingService.fetchGlobalRankings);
@@ -72,18 +71,7 @@ Future<void> main() async {
     ..setAddFriendHandler(friendService.addFriend)
     ..setRemoveFriendHandler(friendService.removeFriend);
 
-  // Phase 4.5: デイリーミッション統一
-  // ミッション Handler を shared_core provider に注入
-  container.read(missionProvider.notifier)
-    ..setFetchHandler(missionService.fetchMissions)
-    ..setProgressHandler(missionService.updateProgress)
-    ..setCompleteHandler(missionService.completeMission);
-
-  // ミッション初期化: 現在のユーザー ID で初期化
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-  if (currentUserId != null) {
-    unawaited(container.read(missionProvider.notifier).initializeDailyMissions(currentUserId, 'programming'));
-  }
 
   // Phase 4.20: 週次ボーナスシステム Firestore 永続化
   if (currentUserId != null) {
@@ -93,9 +81,9 @@ Future<void> main() async {
         try {
           await weeklyBonusRef.set({
             'consecutiveDays': bonusState.consecutiveDays,
-            'lastClaimedDate': bonusState.lastClaimedDate?.toIso8601String(),
-            'weeklyResetDate': bonusState.weeklyResetDate?.toIso8601String(),
-            'totalCoinsEarned': bonusState.totalCoinsEarned,
+            'lastCompletionDate': bonusState.lastCompletionDate.toIso8601String(),
+            'resetDate': bonusState.resetDate.toIso8601String(),
+            'totalWeeklyBonus': bonusState.totalWeeklyBonus,
             'updatedAt': FieldValue.serverTimestamp(),
           }, SetOptions(merge: true));
         } catch (e) {
@@ -156,11 +144,7 @@ class _ShogakuKoreProgrammingAppState
       // Phase 4.18: プッシュ通知サービス初期化
       final pushService = PushNotificationService();
       try {
-        await pushService.initialize(
-          onMessageHandler: (RemoteMessage message) {
-            debugPrint('Received message: ${message.notification?.title}');
-          },
-        );
+        await pushService.initialize();
       } catch (_) {
         // PushNotificationService initialization failed, continue anyway
       }
@@ -321,8 +305,8 @@ class _ShogakuKoreProgrammingAppState
 
     return MaterialApp(
       title: AppConstants.appName,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: appTheme,
+      darkTheme: darkAppTheme,
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(),

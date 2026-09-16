@@ -344,11 +344,6 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
         ref.read(progressProvider.notifier).addBonusPoints(5);
         _resolvedWrongCount++;
       }
-      // キャラクター成長トリガー
-      ref.read(characterProvider.notifier).growFromCorrectAnswer(
-        challengeType: _getStageType(widget.challenge),
-        difficulty: widget.challenge.level,
-      );
     }
 
     // スピードボーナス: タイマー有効かつ残り時間が元の75%以上（素早く回答）

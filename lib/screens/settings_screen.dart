@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_core/shared_core.dart'
 
-    show AnalyticsDashboardWidget, DailyActivityData, AccuracyTrendData, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
+    show FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -395,11 +396,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                       iconBg: const Color(0xFFE8F5E9),
                       title: 'ユーザーリテンション分析',
                       subtitle: 'あなたの活動パターンと継続性を分析',
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const RetentionDashboard(),
-                        ),
-                      ),
+                      onTap: () {
+                        final userId = FirebaseAuth.instance.currentUser?.uid;
+                        if (userId == null) return;
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => RetentionDashboard(userId: userId),
+                          ),
+                        );
+                      },
                     ),
                     const _Divider(),
                   ],
@@ -525,43 +530,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
           ),
         ],
       ),
-          // Tab 2: 学習分析
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: AnalyticsDashboardWidget(
-              userName: profile.nickname ?? 'ユーザー',
-              totalQuestions: progressNotifier.totalQuestionsAnswered,
-              averageAccuracy: progressNotifier.averageAccuracy,
-              totalTimeSpent: progressNotifier.totalLearningSeconds,
-              dailyActivity: _generateDailyActivity(progressNotifier),
-              accuracyTrend: _generateAccuracyTrend(progressNotifier),
+          // Tab 2: 学習分析（準備中）
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.bar_chart, size: 64, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                Text(
+                  '学習分析は近日公開予定です',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                ),
+              ],
             ),
           ),
         ],
       ),
     ),   // closes Scaffold (child of Focus)
   );     // closes Focus return
-  }
-
-  List<DailyActivityData> _generateDailyActivity(ProgressNotifier notifier) {
-    return [
-      DailyActivityData(day: '月', count: 0),
-      DailyActivityData(day: '火', count: 0),
-      DailyActivityData(day: '水', count: 0),
-      DailyActivityData(day: '木', count: 0),
-      DailyActivityData(day: '金', count: 0),
-      DailyActivityData(day: '土', count: 0),
-      DailyActivityData(day: '日', count: 0),
-    ];
-  }
-
-  List<AccuracyTrendData> _generateAccuracyTrend(ProgressNotifier notifier) {
-    return [
-      AccuracyTrendData(week: 'W1', accuracy: 0.0),
-      AccuracyTrendData(week: 'W2', accuracy: 0.0),
-      AccuracyTrendData(week: 'W3', accuracy: 0.0),
-      AccuracyTrendData(week: 'W4', accuracy: 0.0),
-    ];
   }
 
   Widget _buildHeader(
