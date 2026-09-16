@@ -12,6 +12,7 @@ analyzer:
     - build/**
     - android/**
     - ios/**
+    - lib/screens/home_screen_original.dart  # Backup file with outdated API assumptions
 include: package:flutter_lints/flutter.yaml
 
 linter:
