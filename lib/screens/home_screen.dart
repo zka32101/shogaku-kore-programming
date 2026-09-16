@@ -8,8 +8,7 @@ import 'package:shared_core/shared_core.dart'
     show
         FriendsListPage,
         DailyMissionPage,
-        WeeklyBonusWidget,
-        coinProvider;
+        WeeklyBonusWidget;
 
 import '../config/constants.dart';
 import '../config/theme.dart';
