@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/shared_core.dart' show coinProvider;
 
 import '../config/theme.dart';
 import '../models/stage.dart';
@@ -344,6 +345,12 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
         ref.read(progressProvider.notifier).addBonusPoints(5);
         _resolvedWrongCount++;
       }
+      // TODO: growFromCorrectAnswer not available in shared_core's CharacterNotifier
+      // キャラクター成長トリガー
+      // ref.read(characterProvider.notifier).growFromCorrectAnswer(
+      //   challengeType: _getStageType(widget.challenge),
+      //   difficulty: widget.challenge.level,
+      // );
     }
 
     // スピードボーナス: タイマー有効かつ残り時間が元の75%以上（素早く回答）
@@ -499,7 +506,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       maxCombo: _maxCombo,
     );
     if (coinTotal > 0) {
-      ref.read(coinProvider.notifier).earnCoins(coinTotal);
+      ref.read(coinProvider.notifier).addCoins(coinTotal);
     }
 
     // 間違い問題を永続保存

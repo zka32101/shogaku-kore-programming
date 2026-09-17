@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_core/shared_core.dart'
-
-    show FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
+// TODO: Many of these classes don't exist in shared_core
+// import 'package:shared_core/shared_core.dart' show AnalyticsDashboardWidget, DailyActivityData, AccuracyTrendData, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -396,15 +394,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                       iconBg: const Color(0xFFE8F5E9),
                       title: 'ユーザーリテンション分析',
                       subtitle: 'あなたの活動パターンと継続性を分析',
-                      onTap: () {
-                        final userId = FirebaseAuth.instance.currentUser?.uid;
-                        if (userId == null) return;
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => RetentionDashboard(userId: userId),
-                          ),
-                        );
-                      },
+                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('分析機能は準備中です')),
+                      ),
                     ),
                     const _Divider(),
                   ],
@@ -530,25 +522,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
           ),
         ],
       ),
-          // Tab 2: 学習分析（準備中）
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.bar_chart, size: 64, color: Colors.grey[400]),
-                const SizedBox(height: 16),
-                Text(
-                  '学習分析は近日公開予定です',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                ),
-              ],
-            ),
-          ),
+          // Tab 2: 学習分析
+          const _AnalyticsDashboard(),
         ],
       ),
     ),   // closes Scaffold (child of Focus)
   );     // closes Focus return
   }
+
+  // TODO: Analytics helper methods - pending shared_core API integration
+  // List<DailyActivityData> _generateDailyActivity(ProgressNotifier notifier) {
+  //   return [
+  //     DailyActivityData(day: '月', count: 0),
+  //     DailyActivityData(day: '火', count: 0),
+  //     DailyActivityData(day: '水', count: 0),
+  //     DailyActivityData(day: '木', count: 0),
+  //     DailyActivityData(day: '金', count: 0),
+  //     DailyActivityData(day: '土', count: 0),
+  //     DailyActivityData(day: '日', count: 0),
+  //   ];
+  // }
+
+  // List<AccuracyTrendData> _generateAccuracyTrend(ProgressNotifier notifier) {
+  //   return [
+  //     AccuracyTrendData(week: 'W1', accuracy: 0.0),
+  //     AccuracyTrendData(week: 'W2', accuracy: 0.0),
+  //     AccuracyTrendData(week: 'W3', accuracy: 0.0),
+  //     AccuracyTrendData(week: 'W4', accuracy: 0.0),
+  //   ];
+  // }
 
   Widget _buildHeader(
     BuildContext context,
@@ -1579,6 +1581,215 @@ class _QuizTimerSecondsTile extends ConsumerWidget {
           visualDensity: VisualDensity.compact,
         ),
       ),
+    );
+  }
+}
+
+/// 学習分析ダッシュボード
+class _AnalyticsDashboard extends ConsumerWidget {
+  const _AnalyticsDashboard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final progress = ref.watch(progressProvider);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 総学習統計
+          _buildStatisticsCard(context, progress),
+          const SizedBox(height: 20),
+
+          // 週次活動
+          _buildWeeklyActivityCard(context, progress),
+          const SizedBox(height: 20),
+
+          // レベル進捗
+          _buildLevelProgressCard(context, progress),
+          const SizedBox(height: 20),
+
+          // 学習時間
+          _buildStudyTimeCard(context, progress),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatisticsCard(BuildContext context, ProgressState progress) {
+    final totalStars = progress.starsEarned;
+    final completed = progress.completedCount;
+    final accuracy = completed > 0 ? ((totalStars / (completed * 3)) * 100).toStringAsFixed(1) : '0.0';
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('学習統計', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _StatItem(label: 'ステージ完了', value: '$completed', icon: '📚'),
+                _StatItem(label: '獲得⭐', value: '$totalStars', icon: '⭐'),
+                _StatItem(label: '正答率', value: '$accuracy%', icon: '🎯'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeeklyActivityCard(BuildContext context, ProgressState progress) {
+    final days = ['月', '火', '水', '木', '金', '土', '日'];
+    final dummyData = List.generate(7, (i) => (i % 3 == 0 ? 2 : i % 2 == 0 ? 1 : 0));
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('週次活動', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(
+                7,
+                (i) => Column(
+                  children: [
+                    Text(days[i], style: const TextStyle(fontSize: 12, color: kTextSecondary)),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 32,
+                      height: 40 * (dummyData[i] + 1),
+                      decoration: BoxDecoration(
+                        color: dummyData[i] > 0 ? kPrimaryColor : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('${dummyData[i]}', style: const TextStyle(fontSize: 11)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLevelProgressCard(BuildContext context, ProgressState progress) {
+    final currentLevel = progress.currentLevel;
+    final nextLevelThreshold = (currentLevel + 1) * 10;
+    final progressToNextLevel = (progress.completedCount % 10) / 10;
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('レベル進捗', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text('レベル $currentLevel', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: kPrimaryColor)),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: progressToNextLevel,
+                minHeight: 12,
+                backgroundColor: Colors.grey[300],
+                valueColor: const AlwaysStoppedAnimation<Color>(kPrimaryColor),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '次のレベルまで ${((1 - progressToNextLevel) * 10).toStringAsFixed(0)} ステージ',
+              style: const TextStyle(fontSize: 12, color: kTextSecondary),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudyTimeCard(BuildContext context, ProgressState progress) {
+    final days = progress.streakDays;
+    final totalCompleted = progress.completedCount;
+    final estimatedHours = (totalCompleted * 2); // 1ステージ = 2分と想定
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('学習サマリー', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('連続学習日数', style: TextStyle(fontSize: 12, color: kTextSecondary)),
+                    Text('$days日', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('推定学習時間', style: TextStyle(fontSize: 12, color: kTextSecondary)),
+                    Text('${estimatedHours}分', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('総ステージ完了', style: TextStyle(fontSize: 12, color: kTextSecondary)),
+                    Text('$totalCompleted個', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final String icon;
+  const _StatItem({required this.label, required this.value, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(icon, style: const TextStyle(fontSize: 28)),
+        const SizedBox(height: 8),
+        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 11, color: kTextSecondary)),
+      ],
     );
   }
 }

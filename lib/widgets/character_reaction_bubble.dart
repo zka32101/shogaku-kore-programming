@@ -22,16 +22,21 @@ class CharacterReactionBubble extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final charState = ref.watch(characterProvider);
-    final character = charState.character;
-    if (character == null) return const SizedBox.shrink();
+    // TODO: CharacterProfileMap API doesn't provide character property
+    // Returning empty until shared_core API is clarified
+    return const SizedBox.shrink();
 
-    final def = kAvailableCharacters.firstWhere(
-      (c) => c.id == character.characterId,
-      orElse: () => kAvailableCharacters.first,
-    );
-    final emoji = def.stageEmojis[character.stage] ?? '🐱';
-    final bubbleColor = isCorrect ? kPrimaryColor : const Color(0xFFFF9800);
+    // Original implementation below (pending shared_core integration):
+    // final charState = ref.watch(characterProvider);
+    // final character = charState.character;
+    // if (character == null) return const SizedBox.shrink();
+    //
+    // final def = kAvailableCharacters.firstWhere(
+    //   (c) => c.id == character.characterId,
+    //   orElse: () => kAvailableCharacters.first,
+    // );
+    // final emoji = def.stageEmojis[character.stage] ?? '🐱';
+    // final bubbleColor = isCorrect ? kPrimaryColor : const Color(0xFFFF9800);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -5,6 +5,7 @@ publish_to: 'none'
 
 version: 0.2.0+2
 
+# Build trigger for shared_core APK integration - 2026-09-13 10:29
 environment:
   sdk: ^3.11.5
 
@@ -62,6 +63,9 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: 0.13.1
+  build_runner: ^2.4.0
+  freezed: ^2.4.0
+  json_serializable: ^6.7.0
 
 flutter_launcher_icons:
   android: true
