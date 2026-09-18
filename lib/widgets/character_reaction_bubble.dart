@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../config/theme.dart';
-import '../models/character_model.dart';
-import '../providers/character_provider.dart';
 
 /// クイズ回答直後に表示する、キャラクターのふきだし反応。
 /// 正解/不正解どちらでも、責めずに親しみやすいトーンで話しかける。
@@ -37,47 +32,47 @@ class CharacterReactionBubble extends ConsumerWidget {
     // );
     // final emoji = def.stageEmojis[character.stage] ?? '🐱';
     // final bubbleColor = isCorrect ? kPrimaryColor : const Color(0xFFFF9800);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(emoji, style: const TextStyle(fontSize: 32)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: bubbleColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: bubbleColor.withValues(alpha: 0.4)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: context.textPrimary,
-                  ),
-                ),
-                if (growthMessage != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    growthMessage!,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: bubbleColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ],
-    ).animate().fadeIn(duration: 250.ms).slideX(begin: -0.05, curve: Curves.easeOut);
+    //
+    // return Row(
+    //   crossAxisAlignment: CrossAxisAlignment.start,
+    //   children: [
+    //     Text(emoji, style: const TextStyle(fontSize: 32)),
+    //     const SizedBox(width: 8),
+    //     Expanded(
+    //       child: Container(
+    //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    //         decoration: BoxDecoration(
+    //           color: bubbleColor.withValues(alpha: 0.12),
+    //           borderRadius: BorderRadius.circular(12),
+    //           border: Border.all(color: bubbleColor.withValues(alpha: 0.4)),
+    //         ),
+    //         child: Column(
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //           children: [
+    //             Text(
+    //               message,
+    //               style: TextStyle(
+    //                 fontSize: 13,
+    //                 fontWeight: FontWeight.w600,
+    //                 color: context.textPrimary,
+    //               ),
+    //             ),
+    //             if (growthMessage != null) ...[
+    //               const SizedBox(height: 4),
+    //               Text(
+    //                 growthMessage!,
+    //                 style: TextStyle(
+    //                   fontSize: 11,
+    //                   color: bubbleColor,
+    //                   fontWeight: FontWeight.w500,
+    //                 ),
+    //               ),
+    //             ],
+    //           ],
+    //         ),
+    //       ),
+    //     ),
+    //   ],
+    // ).animate().fadeIn(duration: 250.ms).slideX(begin: -0.05, curve: Curves.easeOut);
   }
 }

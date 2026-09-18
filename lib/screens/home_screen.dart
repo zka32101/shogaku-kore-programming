@@ -235,7 +235,6 @@ class _QuickQuizSheetState extends ConsumerState<_QuickQuizSheet> {
           isCorrect: false,
           selectedAnswer: _currentQuestion.options[_selectedIndex!],
           correctAnswer: _currentQuestion.options[_currentQuestion.correctIndex],
-          isCorrect: false,
         ),
       ]);
     }

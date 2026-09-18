@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_core/shared_core.dart' show coinProvider;
 
 import '../config/theme.dart';
 import '../models/stage.dart';
@@ -506,7 +505,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       maxCombo: _maxCombo,
     );
     if (coinTotal > 0) {
-      ref.read(coinProvider.notifier).addCoins(coinTotal);
+      ref.read(coinProvider.notifier).earnCoins(coinTotal);
     }
 
     // 間違い問題を永続保存
