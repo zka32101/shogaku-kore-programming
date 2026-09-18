@@ -32,8 +32,8 @@ class FirestoreMissionService {
   /// ミッションを難易度でソート
   List<Mission> _sortByDifficulty(List<Mission> missions) {
     return missions..sort((a, b) {
-      final aDiff = a.difficulty?.toString().toLowerCase() ?? 'normal';
-      final bDiff = b.difficulty?.toString().toLowerCase() ?? 'normal';
+      final aDiff = a.difficulty.toString().toLowerCase();
+      final bDiff = b.difficulty.toString().toLowerCase();
 
       const order = {'easy': 0, 'normal': 1, 'hard': 2};
       return (order[aDiff] ?? 1).compareTo(order[bDiff] ?? 1);

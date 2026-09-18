@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_core/providers/premium_provider.dart';
-import 'package:shared_core/widgets/premium_gate_widget.dart';
+// TODO: PremiumState API integration needed with shared_core
+// import 'package:shared_core/providers/premium_provider.dart';
+// import 'package:shared_core/widgets/premium_gate_widget.dart';
 
 const _primaryColor = Colors.deepPurple;
 
@@ -20,37 +21,16 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: PremiumState API integration needed with shared_core
-    // Placeholder while premium features are being integrated
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('オンライン対戦'),
-        centerTitle: true,
-        backgroundColor: _primaryColor,
-      ),
-      body: const Center(
-        child: Text('オンライン対戦: 準備中'),
-      ),
-    );
-
-    // Original code below (commented out pending shared_core API clarification):
-    // final premiumState = ref.watch(premiumProvider);
-    //
-    // if (!premiumState.isSubscribed) {
-    //   return Scaffold(
-    //     appBar: AppBar(
-    //       title: const Text('オンライン対戦'),
-    //       centerTitle: true,
-    //       backgroundColor: _primaryColor,
-    //     ),
-    //     body: PremiumGateWidget(
+    // TODO: PremiumState API integration needed with shared_core.
+    // Once shared_core's premiumProvider/PremiumGateWidget API stabilizes,
+    // gate this screen behind a subscription check (see _showSubscriptionDialog below):
+    //   final premiumState = ref.watch(premiumProvider);
+    //   if (!premiumState.isSubscribed) {
+    //     return Scaffold(..., body: PremiumGateWidget(
     //       featureName: 'オンライン対戦',
     //       onPremiumAccess: () => _showSubscriptionDialog(context),
-    //     ),
-    //   );
-    // }
-
-    /*
+    //     ));
+    //   }
     return Scaffold(
       appBar: AppBar(
         title: const Text('オンライン対戦'),
@@ -242,7 +222,6 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
         ],
       ),
     );
-    */
   }
 
   Future<void> _handleBattleAction() async {
@@ -350,9 +329,11 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
         'startedAt': FieldValue.serverTimestamp(),
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_opponent!.name} と対戦開始！')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_opponent!.name} と対戦開始！')),
+        );
+      }
 
       // TODO: battle_screen へナビゲート（画面未実装）
       // context.push('/battle/${_opponent!.id}');
@@ -366,30 +347,31 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
     }
   }
 
-  Future<void> _showSubscriptionDialog(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('プレミアム機能'),
-        content: const Text(
-          'オンライン対戦は月額¥120のプレミアム会員向けです。'
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('キャンセル'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: RevenueCat の購入フロー
-            },
-            child: const Text('今すぐ購読'),
-          ),
-        ],
-      ),
-    );
-  }
+  // TODO: wire back up once the premiumProvider gate above is restored.
+  // Future<void> _showSubscriptionDialog(BuildContext context) async {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('プレミアム機能'),
+  //       content: const Text(
+  //         'オンライン対戦は月額¥120のプレミアム会員向けです。'
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('キャンセル'),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () {
+  //             Navigator.pop(context);
+  //             // TODO: RevenueCat の購入フロー
+  //           },
+  //           child: const Text('今すぐ購読'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
 /// 対戦相手情報モデル

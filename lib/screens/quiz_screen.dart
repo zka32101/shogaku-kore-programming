@@ -10,7 +10,6 @@ import '../models/stage.dart';
 import '../providers/ai_programming_coach_provider.dart';
 import '../providers/bgm_provider.dart';
 import '../providers/challenges_provider.dart';
-import '../providers/character_provider.dart';
 import '../providers/coin_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/profile_provider.dart';
@@ -252,18 +251,20 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     return KeyEventResult.ignored;
   }
 
-  String _getStageType(Stage challenge) {
-    final title = challenge.title.toLowerCase();
-    if (title.contains('if') || title.contains('分岐') || title.contains('条件')) return 'branch';
-    if (title.contains('ループ') || title.contains('for') || title.contains('while')) return 'loop';
-    if (title.contains('配列') || title.contains('リスト')) return 'array';
-    if (title.contains('関数') || title.contains('メソッド')) return 'function';
-    if (title.contains('変数')) return 'variable';
-    if (title.contains('デバッグ')) return 'debug';
-    if (title.contains('アルゴリズム') || title.contains('探索') || title.contains('ソート')) return 'algorithm';
-    if (challenge.type == 'visual') return 'visual';
-    return 'sequence';
-  }
+  // TODO: used only by the commented-out growFromCorrectAnswer call below;
+  // restore alongside it once shared_core's CharacterNotifier supports it.
+  // String _getStageType(Stage challenge) {
+  //   final title = challenge.title.toLowerCase();
+  //   if (title.contains('if') || title.contains('分岐') || title.contains('条件')) return 'branch';
+  //   if (title.contains('ループ') || title.contains('for') || title.contains('while')) return 'loop';
+  //   if (title.contains('配列') || title.contains('リスト')) return 'array';
+  //   if (title.contains('関数') || title.contains('メソッド')) return 'function';
+  //   if (title.contains('変数')) return 'variable';
+  //   if (title.contains('デバッグ')) return 'debug';
+  //   if (title.contains('アルゴリズム') || title.contains('探索') || title.contains('ソート')) return 'algorithm';
+  //   if (challenge.type == 'visual') return 'visual';
+  //   return 'sequence';
+  // }
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {

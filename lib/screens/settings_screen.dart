@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // TODO: AnalyticsDashboardWidget/DailyActivityData/AccuracyTrendData don't exist in shared_core
-import 'package:shared_core/shared_core.dart' show FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
+import 'package:shared_core/shared_core.dart' show requireParentalGate, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -1690,7 +1690,6 @@ class _AnalyticsDashboard extends ConsumerWidget {
 
   Widget _buildLevelProgressCard(BuildContext context, ProgressNotifier progress) {
     final currentLevel = progress.currentLevel;
-    final nextLevelThreshold = (currentLevel + 1) * 10;
     final progressToNextLevel = (progress.completedCount % 10) / 10;
 
     return Card(
@@ -1756,7 +1755,7 @@ class _AnalyticsDashboard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('推定学習時間', style: TextStyle(fontSize: 12, color: kTextSecondary)),
-                    Text('${estimatedHours}分', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('$estimatedHours分', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 Column(
