@@ -106,6 +106,7 @@ class RevenueCatService {
     required Package package,
   }) async {
     try {
+      // ignore: deprecated_member_use
       final result = await Purchases.purchasePackage(package);
       final isActive = result.customerInfo.entitlements.active
           .containsKey(_config.premiumEntitlementId);

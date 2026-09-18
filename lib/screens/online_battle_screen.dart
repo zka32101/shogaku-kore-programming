@@ -108,7 +108,7 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
                       children: [
                         CircleAvatar(
                           radius: 24,
-                          backgroundColor: _primaryColor.withOpacity(0.2),
+                          backgroundColor: _primaryColor.withValues(alpha: 0.2),
                           child: Text(
                             _opponent!.name[0],
                             style: const TextStyle(

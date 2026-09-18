@@ -16,8 +16,8 @@ class QuizAccessGuard extends ConsumerWidget {
   const QuizAccessGuard({
     required this.child,
     this.onPaywallShown,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -58,8 +58,8 @@ class FreeDaysWarning extends ConsumerWidget {
 
   const FreeDaysWarning({
     this.warningDays = 3,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -115,7 +115,7 @@ class FreeDaysWarning extends ConsumerWidget {
         return const SizedBox.shrink();
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }

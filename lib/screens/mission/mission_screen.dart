@@ -7,7 +7,7 @@ import 'package:shared_core/shared_core.dart' show missionProvider, coinProvider
 /// ユーザーが本日達成できるミッションを表示し、
 /// 完了したミッションから報酬（コイン・バッジ）を獲得できる。
 class MissionScreen extends ConsumerWidget {
-  const MissionScreen({Key? key}) : super(key: key);
+  const MissionScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -248,7 +248,7 @@ class _MissionTile extends ConsumerWidget {
               alignment: Alignment.centerRight,
               child: isCompleted
                   ? ElevatedButton.icon(
-                      onPressed: () => _claimReward(ref),
+                      onPressed: () => _claimReward(context, ref),
                       icon: const Icon(Icons.check),
                       label: const Text('達成！'),
                       style: ElevatedButton.styleFrom(
@@ -268,7 +268,7 @@ class _MissionTile extends ConsumerWidget {
     );
   }
 
-  void _claimReward(WidgetRef ref) async {
+  void _claimReward(BuildContext context, WidgetRef ref) async {
     final mission = missionItem.mission;
     final rewards = await ref.read(missionProvider.notifier).awardMissionRewards(
           userId: 'current_user',
@@ -284,12 +284,14 @@ class _MissionTile extends ConsumerWidget {
     await ref.read(weeklyBonusProvider.notifier).recordDailyCompletion();
 
     // ユーザーにフィードバック
-    ScaffoldMessenger.of(ref.context).showSnackBar(
-      SnackBar(
-        content: Text('ミッション達成！${rewards['coins'] ?? 0}コイン獲得しました'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('ミッション達成！${rewards['coins'] ?? 0}コイン獲得しました'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
 
     // ミッション状態を再読み込み
     ref.read(missionProvider.notifier).initializeMissions('current_user');

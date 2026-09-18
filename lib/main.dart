@@ -24,7 +24,7 @@ import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
-import 'services/revenue_cat_service.dart' as localRevenueCat;
+import 'services/revenue_cat_service.dart' as local_revenue_cat;
 import 'services/firestore_ranking_service.dart';
 import 'services/firestore_friend_service.dart';
 import 'screens/home_screen.dart';
@@ -174,7 +174,7 @@ class _ShogakuKoreProgrammingAppState
       debugPrint('Phase 4.19 Retention Optimization Engine: Initialized');
 
       // RevenueCat初期化（サブスクリプション管理）
-      final revenueCatService = localRevenueCat.RevenueCatService();
+      final revenueCatService = local_revenue_cat.RevenueCatService();
       try {
         await revenueCatService.initialize();
       } catch (_) {
