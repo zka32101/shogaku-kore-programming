@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// TODO: Many of these classes don't exist in shared_core
-// import 'package:shared_core/shared_core.dart' show AnalyticsDashboardWidget, DailyActivityData, AccuracyTrendData, FeedbackFormPage, NotificationSettingsPage, requireParentalGate, RetentionDashboard, ScreenTimeSettingsWidget, AddFriendDialog;
+// TODO: AnalyticsDashboardWidget/DailyActivityData/AccuracyTrendData don't exist in shared_core
+import 'package:shared_core/shared_core.dart' show requireParentalGate, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -1591,7 +1591,8 @@ class _AnalyticsDashboard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref.watch(progressProvider);
+    ref.watch(progressProvider);
+    final progress = ref.read(progressProvider.notifier);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -1618,8 +1619,8 @@ class _AnalyticsDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatisticsCard(BuildContext context, ProgressState progress) {
-    final totalStars = progress.starsEarned;
+  Widget _buildStatisticsCard(BuildContext context, ProgressNotifier progress) {
+    final totalStars = progress.totalStarsEarned;
     final completed = progress.completedCount;
     final accuracy = completed > 0 ? ((totalStars / (completed * 3)) * 100).toStringAsFixed(1) : '0.0';
 
@@ -1646,7 +1647,7 @@ class _AnalyticsDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _buildWeeklyActivityCard(BuildContext context, ProgressState progress) {
+  Widget _buildWeeklyActivityCard(BuildContext context, ProgressNotifier progress) {
     final days = ['月', '火', '水', '木', '金', '土', '日'];
     final dummyData = List.generate(7, (i) => (i % 3 == 0 ? 2 : i % 2 == 0 ? 1 : 0));
 
@@ -1687,9 +1688,8 @@ class _AnalyticsDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _buildLevelProgressCard(BuildContext context, ProgressState progress) {
+  Widget _buildLevelProgressCard(BuildContext context, ProgressNotifier progress) {
     final currentLevel = progress.currentLevel;
-    final nextLevelThreshold = (currentLevel + 1) * 10;
     final progressToNextLevel = (progress.completedCount % 10) / 10;
 
     return Card(
@@ -1727,7 +1727,7 @@ class _AnalyticsDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _buildStudyTimeCard(BuildContext context, ProgressState progress) {
+  Widget _buildStudyTimeCard(BuildContext context, ProgressNotifier progress) {
     final days = progress.streakDays;
     final totalCompleted = progress.completedCount;
     final estimatedHours = (totalCompleted * 2); // 1ステージ = 2分と想定
@@ -1755,7 +1755,7 @@ class _AnalyticsDashboard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('推定学習時間', style: TextStyle(fontSize: 12, color: kTextSecondary)),
-                    Text('${estimatedHours}分', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('$estimatedHours分', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 Column(

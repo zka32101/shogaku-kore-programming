@@ -21,15 +21,15 @@ class AiCoachingCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                kPrimaryColor.withOpacity(0.1),
-                kPrimaryColor.withOpacity(0.05),
+                kPrimaryColor.withValues(alpha: 0.1),
+                kPrimaryColor.withValues(alpha: 0.05),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: kPrimaryColor.withOpacity(0.2),
+              color: kPrimaryColor.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -40,7 +40,7 @@ class AiCoachingCard extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: kPrimaryColor.withOpacity(0.15),
+                  color: kPrimaryColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Center(
@@ -79,7 +79,7 @@ class AiCoachingCard extends StatelessWidget {
               const SizedBox(width: 8),
               Icon(
                 Icons.chevron_right,
-                color: kPrimaryColor.withOpacity(0.5),
+                color: kPrimaryColor.withValues(alpha: 0.5),
               ),
             ],
           ),

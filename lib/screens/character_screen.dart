@@ -5,8 +5,8 @@ class CharacterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final charState = ref.watch(characterProvider);
     // TODO: CharacterProfileMap API in shared_core has different structure
+    // final charState = ref.watch(characterProvider);
     // const character = charState.character;
 
     // if (charState.isLoading || character == null) {
@@ -20,26 +20,26 @@ class CharacterScreen extends StatelessWidget {
       body: Center(child: Text('キャラクターシステム: 準備中')),
     );
 
-    final charDef = kAvailableCharacters.firstWhere(
-      (c) => c.id == character.characterId,
-      orElse: () => kAvailableCharacters.first,
-    );
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('キャラクター')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.pets, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              '近日公開予定です',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-          ],
-        ),
-      ),
-    );
+    // final charDef = kAvailableCharacters.firstWhere(
+    //   (c) => c.id == character.characterId,
+    //   orElse: () => kAvailableCharacters.first,
+    // );
+    //
+    // return Scaffold(
+    //   appBar: AppBar(title: const Text('キャラクター')),
+    //   body: Center(
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: [
+    //         Icon(Icons.pets, size: 64, color: Colors.grey[400]),
+    //         const SizedBox(height: 16),
+    //         Text(
+    //           '近日公開予定です',
+    //           style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }

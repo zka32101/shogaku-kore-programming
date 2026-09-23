@@ -12,7 +12,6 @@ import '../config/theme.dart';
 import '../models/block_model.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
-import '../providers/character_provider.dart';
 import '../providers/coin_provider.dart' show calcEditorCoins;
 import '../providers/editor_provider.dart';
 import '../providers/favorites_provider.dart';

@@ -1,9 +1,6 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
@@ -12,8 +9,7 @@ import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier, RevenueCatService, coinProvider;
 import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, feedbackProvider, rankingProvider, friendProvider, globalRankingProvider, premiumProvider, PremiumNotifier, PushNotificationService, adaptiveDifficultyNotifierProvider, screenTimeProvider, weeklyBonusProvider, ScreenTimeLimitReachedWidget;
-import 'providers/coin_provider.dart' show coinProvider;
+    show badgeProvider, BadgeNotifier, unifiedBadges, rankingProvider, friendProvider, globalRankingProvider, PushNotificationService, screenTimeProvider, ScreenTimeLimitReachedWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -23,23 +19,19 @@ import 'providers/progress_provider.dart';
 import 'providers/wrong_answers_provider.dart';
 import 'providers/friends_provider.dart';
 import 'providers/lesson_provider.dart' show LessonNotifier, lessonProvider;
-import 'providers/character_provider.dart';
 import 'providers/screen_time_provider.dart';
 import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
-import 'services/feedback_service.dart';
-import 'services/revenue_cat_service.dart' as localRevenueCat;
+import 'services/revenue_cat_service.dart' as local_revenue_cat;
 import 'services/firestore_ranking_service.dart';
 import 'services/firestore_friend_service.dart';
-import 'services/firestore_mission_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/stage_list_screen.dart';
 import 'screens/achievements_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
-import 'screens/mission/mission_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,7 +75,6 @@ Future<void> main() async {
   //   ..setCompleteHandler(missionService.completeMission);
 
   // ミッション初期化: 現在のユーザー ID で初期化
-  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
   // if (currentUserId != null) {
   //   unawaited(container.read(missionProvider.notifier).initializeDailyMissions(currentUserId, 'programming'));
   // }
@@ -111,7 +102,6 @@ Future<void> main() async {
 
   // Phase 4.7: 統一サブスクリプション初期化
   // TODO: PremiumProvider API が shared_core では異なる
-  final revenueCatService = localRevenueCat.RevenueCatService();
   // if (currentUserId != null) {
   //   container.read(premiumProvider.notifier)
   //     ..setCheckHandler((userId) => revenueCatService.isSubscribed(userId))
@@ -184,7 +174,7 @@ class _ShogakuKoreProgrammingAppState
       debugPrint('Phase 4.19 Retention Optimization Engine: Initialized');
 
       // RevenueCat初期化（サブスクリプション管理）
-      final revenueCatService = localRevenueCat.RevenueCatService();
+      final revenueCatService = local_revenue_cat.RevenueCatService();
       try {
         await revenueCatService.initialize();
       } catch (_) {
