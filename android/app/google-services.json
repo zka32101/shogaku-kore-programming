@@ -270,6 +270,25 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:492221061005:android:2c39d1d22093742bc88fc4",
+        "android_client_info": {
+          "package_name": "com.yourwish.shougakukore.programming"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"
