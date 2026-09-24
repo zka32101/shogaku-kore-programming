@@ -151,7 +151,32 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         .animate(delay: 690.ms).fadeIn(duration: 300.ms).slideY(begin: 0.08, curve: Curves.easeOut, duration: 300.ms),
                   ],
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
+                // 組織アイコン + 組織名
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/logos/company_app_icon.jpg',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Your Wish',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
                 // ローディングインジケーター
                 SizedBox(
                   width: 24,
