@@ -7,10 +7,16 @@ import 'package:shared_core/models/global_ranking_model.dart';
 /// shared_core の [RankingFetchHandler] インターフェースを実装し、
 /// [rankingProvider.notifier.setFetchHandler()] に注入される。
 class FirestoreRankingService {
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore? _injectedFirestore;
+
+  /// main() は Firebase.initializeApp() より前にこのサービスを構築するため、
+  /// コンストラクタで FirebaseFirestore.instance を評価すると
+  /// 「No Firebase App has been created」で main() ごと落ちて白画面になる。
+  /// 実際に使われるタイミング（初期化後）まで遅延評価する。
+  FirebaseFirestore get _firestore => _injectedFirestore ?? FirebaseFirestore.instance;
 
   FirestoreRankingService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _injectedFirestore = firestore;
 
   /// Phase 4.3: グローバルランキング取得（globalRankingProvider用）
   ///
