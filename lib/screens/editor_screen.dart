@@ -25,11 +25,13 @@ import '../widgets/app_dialog.dart';
 import '../widgets/character_reaction_widget.dart';
 import '../widgets/execution_timeline.dart';
 import '../widgets/robot_canvas.dart';
+import '../providers/quiz_access_override_provider.dart';
 import '../widgets/scoring_result_widget.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/step_execution_controls.dart';
 import '../widgets/variable_viewer.dart';
 import 'badge_unlock_screen.dart';
+import 'paywall_screen.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Stage challenge;
@@ -536,6 +538,19 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 無料トライアル（14日間）終了 & 未購読の場合はペイウォールを表示し、
+    // 実際の演習は行わない（トライアル終了後の無制限利用を防止）
+    final accessAsync = ref.watch(canAccessProgrammingChallengesProvider);
+    final canAccess = accessAsync.asData?.value;
+    if (canAccess == false) {
+      return const PaywallScreen();
+    }
+    if (canAccess == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final editorState = ref.watch(editorProvider);
 
     return Focus(
