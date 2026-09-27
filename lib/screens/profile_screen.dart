@@ -17,19 +17,13 @@ import '../providers/time_attack_provider.dart';
 import '../providers/wrong_answers_provider.dart';
 import '../services/haptic_service.dart';
 import '../widgets/learning_calendar.dart';
+import '../widgets/avatar_picker_grid.dart';
 import '../widgets/mini_stat_card.dart';
 import '../widgets/quality_mini_card.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/stat_item.dart';
 import '../widgets/weekly_chart.dart';
 import 'flashcard_screen.dart' show kFlashcards;
-
-// アバターとして使える絵文字
-const _kAvatarEmojis = [
-  '🧑‍💻', '👦', '👧', '🧒', '🧑', '🙋', '🤓', '😎',
-  '🦸', '🧙', '🤖', '🦊', '🐧', '🐱', '🐸', '🦁',
-  '🚀', '⭐', '💎', '🏆', '🎮', '🎯', '🔥', '✨',
-];
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -504,41 +498,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 8,
-              childAspectRatio: 1,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-            ),
-            itemCount: _kAvatarEmojis.length,
-            itemBuilder: (context, index) {
-              final emoji = _kAvatarEmojis[index];
-              final isSelected = emoji == profile.avatarEmoji;
-              return GestureDetector(
-                onTap: () {
-                  HapticService.selectionClick();
-                  ref.read(profileProvider.notifier).setAvatar(emoji);
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isSelected
-                        ? kPrimaryColor.withValues(alpha: 0.15)
-                        : Colors.grey.withValues(alpha: 0.08),
-                    border: isSelected
-                        ? Border.all(color: kPrimaryColor, width: 2)
-                        : null,
-                  ),
-                  child: Center(
-                    child: Text(emoji, style: const TextStyle(fontSize: 20)),
-                  ),
-                ),
-              );
-            },
+          // 国語などと同じ、コインで解放するアバターカタログ
+          AvatarPickerGrid(
+            selectedEmoji: profile.avatarEmoji,
+            crossAxisCount: 8,
+            onSelect: (avatar) =>
+                ref.read(profileProvider.notifier).setAvatar(avatar.emoji),
           ),
         ],
       ),
