@@ -33,6 +33,24 @@ class Block {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'icon': icon,
+        'category': category.name,
+        'params': params,
+        'description': description,
+      };
+
+  factory Block.fromJson(Map<String, dynamic> json) => Block(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        icon: json['icon'] as String,
+        category: BlockCategory.values.byName(json['category'] as String),
+        params: (json['params'] as Map?)?.cast<String, dynamic>(),
+        description: json['description'] as String? ?? '',
+      );
+
   String get _baseId => id.split('@').first;
 
   String get displayText {

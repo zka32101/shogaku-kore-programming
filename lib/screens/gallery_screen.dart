@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_work.dart';
 import '../providers/gallery_provider.dart';
 import '../services/haptic_service.dart';
+import 'free_create_screen.dart';
+import 'play_created_game_screen.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {
   const GalleryScreen({super.key});
@@ -33,6 +35,18 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             tooltip: 'お気に入りのみ表示',
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          HapticService.lightImpact();
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const FreeCreateScreen()),
+          );
+        },
+        backgroundColor: Colors.purple,
+        icon: const Icon(Icons.add),
+        label: const Text('作品を作る'),
       ),
       body: galleryState.error != null
           ? Center(
@@ -147,6 +161,20 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
               ),
             ),
             actions: [
+              if (work.isPlayable)
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PlayCreatedGameScreen(work: work),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('プレイする'),
+                ),
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text('閉じる'),

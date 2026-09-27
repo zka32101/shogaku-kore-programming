@@ -1,14 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/block_model.dart';
-
-// ─── ロボットシミュレーション ──────────────────────────────────────────────────
-
-const double _kGridSize = 7.0;
-const double _kStepsPerCell = 50.0; // steps per grid cell
+import '../utils/robot_simulator.dart' as sim;
 
 // ─── 状態 ─────────────────────────────────────────────────────────────────────
 
@@ -220,86 +214,8 @@ class EditorNotifier extends StateNotifier<EditorState> {
   // ─── ロボットシミュレーション ────────────────────────────────────────────
 
   /// ブロックリストを実行してロボットのパスと最終角度を返す
-  (List<Offset>, double) _simulateRobot(List<Block> blocks) {
-    double x = _kGridSize / 2;
-    double y = _kGridSize / 2;
-    double angle = 0.0; // 0° = right, clockwise positive
-
-    final path = <Offset>[Offset(x, y)];
-
-    // repeat / while_loop ブロックの位置を探す
-    final loopIdx = blocks.indexWhere(
-      (b) {
-        final base = b.id.split('@').first;
-        return base == 'repeat' || base == 'while_loop';
-      },
-    );
-
-    List<Block> execBlocks;
-    List<Block> loopBlocks;
-    int loopTimes = 1;
-
-    if (loopIdx >= 0) {
-      execBlocks = blocks.sublist(0, loopIdx);
-      loopBlocks = blocks.sublist(loopIdx + 1);
-      loopTimes = (blocks[loopIdx].params['times'] as num?)?.toInt() ?? 3;
-    } else {
-      execBlocks = blocks;
-      loopBlocks = [];
-    }
-
-    // ループより前のブロックを実行
-    for (final block in execBlocks) {
-      _executeBlock(block, path, (nx, ny, na) {
-        x = nx; y = ny; angle = na;
-      }, x, y, angle);
-      x = path.last.dx;
-      y = path.last.dy;
-    }
-
-    // ループ内のブロックを n 回実行
-    for (int r = 0; r < loopTimes; r++) {
-      for (final block in loopBlocks) {
-        _executeBlock(block, path, (nx, ny, na) {
-          x = nx; y = ny; angle = na;
-        }, x, y, angle);
-        x = path.last.dx;
-        y = path.last.dy;
-      }
-    }
-
-    return (path, angle);
-  }
-
-  void _executeBlock(
-    Block block,
-    List<Offset> path,
-    void Function(double x, double y, double angle) update,
-    double x,
-    double y,
-    double angle,
-  ) {
-    final baseId = block.id.split('@').first;
-    switch (baseId) {
-      case 'move_forward':
-        final steps = (block.params['steps'] as num?)?.toDouble() ?? 100;
-        final dist = steps / _kStepsPerCell;
-        final rad = angle * math.pi / 180.0;
-        final nx = (x + math.cos(rad) * dist).clamp(0.0, _kGridSize);
-        final ny = (y + math.sin(rad) * dist).clamp(0.0, _kGridSize);
-        path.add(Offset(nx, ny));
-        update(nx, ny, angle);
-      case 'turn_right':
-        final deg = (block.params['degrees'] as num?)?.toDouble() ?? 90;
-        update(x, y, angle + deg);
-      case 'turn_left':
-        final deg = (block.params['degrees'] as num?)?.toDouble() ?? 90;
-        update(x, y, angle - deg);
-      default:
-        // stop, if_wall, set_variable, add_variable, if_condition, print_block — no movement
-        break;
-    }
-  }
+  (List<Offset>, double) _simulateRobot(List<Block> blocks) =>
+      sim.simulateRobot(blocks);
 
   // ─── 採点 ────────────────────────────────────────────────────────────────
 
@@ -327,5 +243,10 @@ class EditorNotifier extends StateNotifier<EditorState> {
 }
 
 final editorProvider =
+    StateNotifierProvider.autoDispose<EditorNotifier, EditorState>(
+        (ref) => EditorNotifier());
+
+/// 「自由に作る」モード用の独立したエディタ状態（ステージ課題とは別インスタンス）
+final freeCreateProvider =
     StateNotifierProvider.autoDispose<EditorNotifier, EditorState>(
         (ref) => EditorNotifier());
