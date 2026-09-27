@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:confetti/confetti.dart';
@@ -30,6 +31,7 @@ import '../widgets/scoring_result_widget.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/step_execution_controls.dart';
 import '../widgets/variable_viewer.dart';
+import '../widgets/glossary_text.dart';
 import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
 
@@ -268,7 +270,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       // ギャラリーに作品を保存
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          _saveWorkToGallery(ref);
+          _saveWorkToGallery(ref, widget.challenge);
         }
       });
       if (levelAfter > levelBefore) {
@@ -580,8 +582,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               width: double.infinity,
               color: kPrimaryColor.withValues(alpha: 0.08),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Text(
-                widget.challenge.description,
+              child: GlossaryText(
+                text: widget.challenge.description,
                 style: TextStyle(
                   fontSize: 13,
                   color: context.textPrimary,
@@ -601,8 +603,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     const Text('💡', style: TextStyle(fontSize: 16)),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        widget.challenge.hints![_hintIndex % widget.challenge.hints!.length],
+                      child: GlossaryText(
+                        text: widget.challenge.hints![_hintIndex % widget.challenge.hints!.length],
                         style: TextStyle(fontSize: 13, color: context.textPrimary),
                       ),
                     ),
@@ -2057,16 +2059,17 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
 
 // ─── ユーティリティ ──────────────────────────────────────────────────────────
 
-void _saveWorkToGallery(WidgetRef ref) async {
+void _saveWorkToGallery(WidgetRef ref, Stage challenge) async {
   // シンプルな実装: プレースホルダー画像をBase64で保存
   final placeholderImage = _generatePlaceholderImage();
+  final blocks = ref.read(editorProvider).scriptBlocks;
 
   ref.read(galleryProvider.notifier).addWork(
-    challengeId: '', // ここでは簡略化
-    challengeTitle: '完成作品',
-    blockCode: 'visual_program',
+    challengeId: challenge.id,
+    challengeTitle: challenge.title,
+    blockCode: jsonEncode(blocks.map((b) => b.toJson()).toList()),
     resultImage: placeholderImage,
-    difficulty: '初級',
+    difficulty: challenge.level,
   );
 }
 

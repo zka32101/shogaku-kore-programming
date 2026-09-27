@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../config/theme.dart';
+import '../widgets/glossary_text.dart';
 
 /// プログラミング基礎説明画面 (#12)
 class ProgrammingBasicsScreen extends StatefulWidget {
@@ -438,8 +439,8 @@ class _InfoCard extends StatelessWidget {
           Text(icon, style: const TextStyle(fontSize: 18)),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              text,
+            child: GlossaryText(
+              text: text,
               style: TextStyle(
                 fontSize: 13,
                 color: context.textPrimary,
