@@ -288,8 +288,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                       _SwitchTile(
                         icon: '🌙',
                         iconBg: const Color(0xFFEDE7F6),
-                        title: '夜間ナッジ',
-                        subtitle: '学習を忘れそうな夜に追加リマインダー',
+                        title: '夜のリマインダー',
+                        subtitle: '夜遅くまだ学習していないときに、もう一度お知らせします',
                         value: profile.eveningNudgeEnabled,
                         onChanged: (v) async {
                           ref.read(profileProvider.notifier).setEveningNudgeEnabled(v);
@@ -1068,6 +1068,83 @@ class _Divider extends StatelessWidget {
   }
 }
 
+/// 「アイコン＋タイトル／サブタイトル」の上段と、幅いっぱいの選択肢ボタンの下段からなる設定行。
+/// SegmentedButton を ListTile の trailing に置くと、選択肢が多い設定では
+/// タイトル/サブタイトルの表示幅が極端に狭くなり、1文字ずつ折り返されて縦書きのように
+/// 見えてしまうため、タイトル行と選択肢行を分けて常に横幅いっぱいを使えるようにしている。
+class _SettingsSelectorTile<T> extends StatelessWidget {
+  final String emoji;
+  final Color iconBg;
+  final String title;
+  final String subtitle;
+  final List<ButtonSegment<T>> segments;
+  final Set<T> selected;
+  final ValueChanged<Set<T>> onSelectionChanged;
+
+  const _SettingsSelectorTile({
+    required this.emoji,
+    required this.iconBg,
+    required this.title,
+    required this.subtitle,
+    required this.segments,
+    required this.selected,
+    required this.onSelectionChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(child: Text(emoji, style: const TextStyle(fontSize: 18))),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
+                    ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 12, color: kTextSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<T>(
+              segments: segments,
+              selected: selected,
+              onSelectionChanged: onSelectionChanged,
+              style: const ButtonStyle(
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ThemeModeTile extends ConsumerWidget {
   final String current;
   const _ThemeModeTile({required this.current});
@@ -1080,46 +1157,24 @@ class _ThemeModeTile extends ConsumerWidget {
       (AppThemeMode.dark, 'ダーク', Icons.dark_mode_outlined),
     ];
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: context.isDark
-              ? const Color(0xFF27AE60).withValues(alpha: 0.15)
-              : const Color(0xFFE8F5E9),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(child: Text('🎨', style: TextStyle(fontSize: 18))),
-      ),
-      title: Text(
-        'テーマ',
-        style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
-      ),
-      subtitle: const Text(
-        '外観モードを選択',
-        style: TextStyle(fontSize: 12, color: kTextSecondary),
-      ),
-      trailing: SegmentedButton<String>(
-        segments: options
-            .map((o) => ButtonSegment<String>(
-                  value: o.$1,
-                  icon: Icon(o.$3, size: 16),
-                  label: Text(o.$2, style: const TextStyle(fontSize: 11)),
-                ))
-            .toList(),
-        selected: {current},
-        onSelectionChanged: (s) {
-          ref.read(profileProvider.notifier).setThemeMode(s.first);
-        },
-        style: ButtonStyle(
-          padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 4)),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
+    return _SettingsSelectorTile<String>(
+      emoji: '🎨',
+      iconBg: context.isDark
+          ? const Color(0xFF27AE60).withValues(alpha: 0.15)
+          : const Color(0xFFE8F5E9),
+      title: 'テーマ',
+      subtitle: '外観モードを選択',
+      segments: options
+          .map((o) => ButtonSegment<String>(
+                value: o.$1,
+                icon: Icon(o.$3, size: 16),
+                label: Text(o.$2, style: const TextStyle(fontSize: 11)),
+              ))
+          .toList(),
+      selected: {current},
+      onSelectionChanged: (s) {
+        ref.read(profileProvider.notifier).setThemeMode(s.first);
+      },
     );
   }
 }
@@ -1137,46 +1192,24 @@ class _CodeFontSizeTile extends ConsumerWidget {
       (16.0, '大'),
     ];
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: context.isDark
-              ? const Color(0xFF2980B9).withValues(alpha: 0.15)
-              : const Color(0xFFE3F2FD),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(child: Text('🔠', style: TextStyle(fontSize: 18))),
-      ),
-      title: Text(
-        'コードの文字サイズ',
-        style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
-      ),
-      subtitle: const Text(
-        'コードスニペットの表示サイズ',
-        style: TextStyle(fontSize: 12, color: kTextSecondary),
-      ),
-      trailing: SegmentedButton<double>(
-        segments: options
-            .map((o) => ButtonSegment<double>(
-                  value: o.$1,
-                  label: Text(o.$2, style: const TextStyle(fontSize: 12)),
-                ))
-            .toList(),
-        selected: {current},
-        onSelectionChanged: (s) {
-          HapticService.selectionClick();
-          ref.read(profileProvider.notifier).setCodeFontSize(s.first);
-        },
-        style: ButtonStyle(
-          padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 8)),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
+    return _SettingsSelectorTile<double>(
+      emoji: '🔠',
+      iconBg: context.isDark
+          ? const Color(0xFF2980B9).withValues(alpha: 0.15)
+          : const Color(0xFFE3F2FD),
+      title: 'コードの文字サイズ',
+      subtitle: 'コードスニペットの表示サイズ',
+      segments: options
+          .map((o) => ButtonSegment<double>(
+                value: o.$1,
+                label: Text(o.$2, style: const TextStyle(fontSize: 12)),
+              ))
+          .toList(),
+      selected: {current},
+      onSelectionChanged: (s) {
+        HapticService.selectionClick();
+        ref.read(profileProvider.notifier).setCodeFontSize(s.first);
+      },
     );
   }
 }
@@ -1280,7 +1313,7 @@ class _EveningNudgeTimeTile extends ConsumerWidget {
         child: const Center(child: Text('🌙', style: TextStyle(fontSize: 18))),
       ),
       title: Text(
-        'ナッジ時刻',
+        '夜のリマインダー時刻',
         style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
       ),
       subtitle: Text(
@@ -1299,7 +1332,7 @@ class _EveningNudgeTimeTile extends ConsumerWidget {
         final picked = await showTimePicker(
           context: context,
           initialTime: TimeOfDay(hour: hour, minute: minute),
-          helpText: 'ナッジ通知の時刻を選んでください',
+          helpText: '夜のリマインダーの時刻を選んでください',
         );
         if (picked != null) {
           ref.read(profileProvider.notifier).setEveningNudgeTime(
@@ -1333,46 +1366,24 @@ class _ReviewQuestionCountTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const counts = [3, 5, 10];
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: context.isDark
-              ? const Color(0xFF1A3A2A)
-              : const Color(0xFFE8F5E9),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(child: Text('📖', style: TextStyle(fontSize: 18))),
-      ),
-      title: Text(
-        '今日の復習の問題数',
-        style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
-      ),
-      subtitle: Text(
-        '1回の復習セッションで $current 問出題',
-        style: const TextStyle(fontSize: 12, color: kTextSecondary),
-      ),
-      trailing: SegmentedButton<int>(
-        segments: counts
-            .map((c) => ButtonSegment<int>(
-                  value: c,
-                  label: Text('$c', style: const TextStyle(fontSize: 13)),
-                ))
-            .toList(),
-        selected: {current},
-        onSelectionChanged: (s) {
-          HapticService.lightImpact();
-          ref.read(profileProvider.notifier).setReviewQuestionCount(s.first);
-        },
-        style: ButtonStyle(
-          padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 6)),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
+    return _SettingsSelectorTile<int>(
+      emoji: '📖',
+      iconBg: context.isDark
+          ? const Color(0xFF1A3A2A)
+          : const Color(0xFFE8F5E9),
+      title: '今日の復習の問題数',
+      subtitle: '1回の復習セッションで $current 問出題',
+      segments: counts
+          .map((c) => ButtonSegment<int>(
+                value: c,
+                label: Text('$c', style: const TextStyle(fontSize: 13)),
+              ))
+          .toList(),
+      selected: {current},
+      onSelectionChanged: (s) {
+        HapticService.lightImpact();
+        ref.read(profileProvider.notifier).setReviewQuestionCount(s.first);
+      },
     );
   }
 }
@@ -1385,46 +1396,24 @@ class _FlashcardSessionSizeTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const sizes = [5, 10, 15, 20];
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: context.isDark
-              ? const Color(0xFF1A2A3A)
-              : const Color(0xFFE3F2FD),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(child: Text('🃏', style: TextStyle(fontSize: 18))),
-      ),
-      title: Text(
-        'カードセッション枚数',
-        style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
-      ),
-      subtitle: Text(
-        '1回のセッションで $current 枚出題',
-        style: const TextStyle(fontSize: 12, color: kTextSecondary),
-      ),
-      trailing: SegmentedButton<int>(
-        segments: sizes
-            .map((s) => ButtonSegment<int>(
-                  value: s,
-                  label: Text('$s', style: const TextStyle(fontSize: 13)),
-                ))
-            .toList(),
-        selected: {current},
-        onSelectionChanged: (s) {
-          HapticService.lightImpact();
-          ref.read(profileProvider.notifier).setFlashcardSessionSize(s.first);
-        },
-        style: ButtonStyle(
-          padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 6)),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
+    return _SettingsSelectorTile<int>(
+      emoji: '🃏',
+      iconBg: context.isDark
+          ? const Color(0xFF1A2A3A)
+          : const Color(0xFFE3F2FD),
+      title: 'カードセッション枚数',
+      subtitle: '1回のセッションで $current 枚出題',
+      segments: sizes
+          .map((s) => ButtonSegment<int>(
+                value: s,
+                label: Text('$s', style: const TextStyle(fontSize: 13)),
+              ))
+          .toList(),
+      selected: {current},
+      onSelectionChanged: (s) {
+        HapticService.lightImpact();
+        ref.read(profileProvider.notifier).setFlashcardSessionSize(s.first);
+      },
     );
   }
 }
@@ -1437,46 +1426,24 @@ class _FlashcardAutoFlipTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const options = [3, 5, 10];
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: context.isDark
-              ? const Color(0xFF2A1A3A)
-              : const Color(0xFFF3E5F5),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(child: Text('⏱', style: TextStyle(fontSize: 18))),
-      ),
-      title: Text(
-        '自動めくり間隔',
-        style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
-      ),
-      subtitle: Text(
-        '$current秒後に自動でカードを裏返す',
-        style: const TextStyle(fontSize: 12, color: kTextSecondary),
-      ),
-      trailing: SegmentedButton<int>(
-        segments: options
-            .map((s) => ButtonSegment<int>(
-                  value: s,
-                  label: Text('$s秒', style: const TextStyle(fontSize: 12)),
-                ))
-            .toList(),
-        selected: {current},
-        onSelectionChanged: (s) {
-          HapticService.lightImpact();
-          ref.read(profileProvider.notifier).setFlashcardAutoFlipSecs(s.first);
-        },
-        style: ButtonStyle(
-          padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 4)),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
+    return _SettingsSelectorTile<int>(
+      emoji: '⏱',
+      iconBg: context.isDark
+          ? const Color(0xFF2A1A3A)
+          : const Color(0xFFF3E5F5),
+      title: '自動めくり間隔',
+      subtitle: '$current秒後に自動でカードを裏返す',
+      segments: options
+          .map((s) => ButtonSegment<int>(
+                value: s,
+                label: Text('$s秒', style: const TextStyle(fontSize: 12)),
+              ))
+          .toList(),
+      selected: {current},
+      onSelectionChanged: (s) {
+        HapticService.lightImpact();
+        ref.read(profileProvider.notifier).setFlashcardAutoFlipSecs(s.first);
+      },
     );
   }
 }
@@ -1489,46 +1456,24 @@ class _DailyGoalTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const goals = [1, 3, 5];
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: context.isDark
-              ? kPrimaryColor.withValues(alpha: 0.15)
-              : kPrimaryColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(child: Text('🎯', style: TextStyle(fontSize: 18))),
-      ),
-      title: Text(
-        '1日の目標ステージ数',
-        style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
-      ),
-      subtitle: Text(
-        '1日に $current ステージのクリアを目指す',
-        style: const TextStyle(fontSize: 12, color: kTextSecondary),
-      ),
-      trailing: SegmentedButton<int>(
-        segments: goals
-            .map((g) => ButtonSegment<int>(
-                  value: g,
-                  label: Text('$g', style: const TextStyle(fontSize: 13)),
-                ))
-            .toList(),
-        selected: {current},
-        onSelectionChanged: (s) {
-          HapticService.lightImpact();
-          ref.read(profileProvider.notifier).setDailyGoal(s.first);
-        },
-        style: ButtonStyle(
-          padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 6)),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
+    return _SettingsSelectorTile<int>(
+      emoji: '🎯',
+      iconBg: context.isDark
+          ? kPrimaryColor.withValues(alpha: 0.15)
+          : kPrimaryColor.withValues(alpha: 0.1),
+      title: '1日の目標ステージ数',
+      subtitle: '1日に $current ステージのクリアを目指す',
+      segments: goals
+          .map((g) => ButtonSegment<int>(
+                value: g,
+                label: Text('$g', style: const TextStyle(fontSize: 13)),
+              ))
+          .toList(),
+      selected: {current},
+      onSelectionChanged: (s) {
+        HapticService.lightImpact();
+        ref.read(profileProvider.notifier).setDailyGoal(s.first);
+      },
     );
   }
 }
@@ -1541,46 +1486,24 @@ class _QuizTimerSecondsTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     const options = [30, 45, 60, 90];
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: context.isDark
-              ? const Color(0xFF1A2A1A)
-              : const Color(0xFFE8F5E9),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Center(child: Text('⏳', style: TextStyle(fontSize: 18))),
-      ),
-      title: Text(
-        '1問あたりの制限時間',
-        style: TextStyle(fontWeight: FontWeight.w500, color: context.textPrimary),
-      ),
-      subtitle: Text(
-        '$current秒で回答しよう',
-        style: const TextStyle(fontSize: 12, color: kTextSecondary),
-      ),
-      trailing: SegmentedButton<int>(
-        segments: options
-            .map((s) => ButtonSegment<int>(
-                  value: s,
-                  label: Text('$s秒', style: const TextStyle(fontSize: 11)),
-                ))
-            .toList(),
-        selected: {current},
-        onSelectionChanged: (s) {
-          HapticService.lightImpact();
-          ref.read(profileProvider.notifier).setQuizTimerSeconds(s.first);
-        },
-        style: ButtonStyle(
-          padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 3)),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-        ),
-      ),
+    return _SettingsSelectorTile<int>(
+      emoji: '⏳',
+      iconBg: context.isDark
+          ? const Color(0xFF1A2A1A)
+          : const Color(0xFFE8F5E9),
+      title: '1問あたりの制限時間',
+      subtitle: '$current秒で回答しよう',
+      segments: options
+          .map((s) => ButtonSegment<int>(
+                value: s,
+                label: Text('$s秒', style: const TextStyle(fontSize: 11)),
+              ))
+          .toList(),
+      selected: {current},
+      onSelectionChanged: (s) {
+        HapticService.lightImpact();
+        ref.read(profileProvider.notifier).setQuizTimerSeconds(s.first);
+      },
     );
   }
 }

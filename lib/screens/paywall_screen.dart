@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../providers/subscription_provider.dart';
 import '../utils/constants.dart';
@@ -13,6 +14,7 @@ class PaywallScreen extends ConsumerStatefulWidget {
 
 class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   bool _isLoading = false;
+  bool _isYearlySelected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -108,30 +110,51 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       ),
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        '¥120',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displaySmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '月額（7日間無料トライアル付き）',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final offerings =
+                        ref.watch(subscriptionProvider).availableOfferings;
+                    final monthlyPackage = _findPackage(
+                      offerings,
+                      PackageType.monthly,
+                    );
+                    final yearlyPackage = _findPackage(
+                      offerings,
+                      PackageType.annual,
+                    );
+                    final monthlyPrice =
+                        monthlyPackage?.storeProduct.priceString ?? '¥300';
+                    final yearlyPrice =
+                        yearlyPackage?.storeProduct.priceString ?? '¥2,400';
+
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: _buildPlanCard(
+                            context,
+                            label: '月額プラン',
+                            price: monthlyPrice,
+                            caption: '毎月お支払い',
+                            selected: !_isYearlySelected,
+                            onTap: () =>
+                                setState(() => _isYearlySelected = false),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildPlanCard(
+                            context,
+                            label: '年額プラン',
+                            price: yearlyPrice,
+                            caption: 'お得（2ヶ月分無料相当）',
+                            selected: _isYearlySelected,
+                            onTap: () =>
+                                setState(() => _isYearlySelected = true),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -228,6 +251,61 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
   }
 
+  Package? _findPackage(List<Package>? offerings, PackageType type) {
+    if (offerings == null) return null;
+    for (final package in offerings) {
+      if (package.packageType == type) return package;
+    }
+    return null;
+  }
+
+  Widget _buildPlanCard(
+    BuildContext context, {
+    required String label,
+    required String price,
+    required String caption,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: selected ? Colors.blue : Colors.grey.shade300,
+            width: selected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          color: selected ? Colors.blue.shade50 : null,
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              price,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              caption,
+              style: Theme.of(context).textTheme.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFeatureItem(
     BuildContext context, {
     required IconData icon,
@@ -271,9 +349,14 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         throw Exception('購読プランが利用できません');
       }
 
+      final selectedType =
+          _isYearlySelected ? PackageType.annual : PackageType.monthly;
+      final selectedPackage =
+          _findPackage(offerings, selectedType) ?? offerings.first;
+
       await ref
           .read(subscriptionProvider.notifier)
-          .purchaseSubscription(offerings.first);
+          .purchaseSubscription(selectedPackage);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
