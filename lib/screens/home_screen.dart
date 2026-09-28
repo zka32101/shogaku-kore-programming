@@ -51,7 +51,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(profileProvider);
-    ref.watch(progressProvider);
+    final progressMap = ref.watch(progressProvider);
     final progress = ref.read(progressProvider.notifier);
     final coins = ref.watch(coinProvider).balance;
     final allStages = ref.watch(allChallengesProvider);
@@ -60,9 +60,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     var allCleared = false;
     if (allStages.isNotEmpty) {
       allCleared =
-          allStages.every((s) => progress.state[s.id]?.isCompleted ?? false);
+          allStages.every((s) => progressMap[s.id]?.isCompleted ?? false);
       nextStage = allStages.firstWhere(
-        (s) => !(progress.state[s.id]?.isCompleted ?? false),
+        (s) => !(progressMap[s.id]?.isCompleted ?? false),
         orElse: () => allStages.first,
       );
     }
