@@ -11,11 +11,11 @@ import 'package:shared_core/shared_core.dart' show SubscriptionConfig;
 
 /// 小学コレ！プログラミング用の RevenueCat API キー設定
 ///
-/// TODO: 本番用の実キーに差し替えること
+/// API キーは `--dart-define=REVENUE_CAT_GOOGLE_KEY=goog_...` で渡す。
 const _kSubscriptionConfig = SubscriptionConfig(
-  googleKey: 'goog_placeholder_key',
-  appleKey: 'appl_placeholder_key',
-  premiumEntitlementId: 'premium',
+  googleKey: String.fromEnvironment('REVENUE_CAT_GOOGLE_KEY'),
+  appleKey: String.fromEnvironment('REVENUE_CAT_APPLE_KEY'),
+  premiumEntitlementId: '小学コレ_pro',
 );
 
 class RevenueCatService {

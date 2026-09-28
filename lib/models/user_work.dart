@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'block_model.dart';
+
 class UserWork {
   final String id;
   final String challengeId;
@@ -18,6 +22,22 @@ class UserWork {
     required this.difficulty,
     this.isStarred = false,
   });
+
+  /// blockCode に保存されたブロック列をデコードする。
+  /// 旧バージョンの作品（プレースホルダー文字列のみ）は再生できないので空リストを返す。
+  List<Block> get blocks {
+    try {
+      final decoded = jsonDecode(blockCode);
+      if (decoded is! List) return const [];
+      return decoded
+          .map((e) => Block.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  bool get isPlayable => blocks.isNotEmpty;
 
   Map<String, dynamic> toMap() {
     return {

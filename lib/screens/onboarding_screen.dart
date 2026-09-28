@@ -8,6 +8,7 @@ import '../main.dart';
 import '../providers/profile_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
+import '../widgets/avatar_picker_grid.dart';
 import '../widgets/shortcut_help.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -25,19 +26,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   // ページ1: ニックネーム＋アバター
   final _nicknameController = TextEditingController(text: 'たんけんか');
-  String _selectedAvatar = '🧑‍💻';
+  String _selectedAvatar = kAvailableAvatars.first.emoji;
 
   // ページ2: 機能紹介
   // ページ3: 完了
 
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
-
-  static const List<String> _avatarList = [
-    '🧑‍💻', '👦', '👧', '🧒', '🐱', '🐶', '🦊', '🐸',
-    '🚀', '⭐', '🌟', '💡', '🎮', '🎯', '🏆', '💎',
-    '🌈', '🔥', '⚡', '🎵', '🎨', '🦁', '🐯', '🐼',
-  ];
 
   @override
   void initState() {
@@ -262,41 +257,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             ),
           ),
           const SizedBox(height: 12),
-          // アバターグリッド
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 6,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            children: _avatarList.map((emoji) {
-              final isSelected = emoji == _selectedAvatar;
-              return GestureDetector(
-                onTap: () {
-                  HapticService.selectionClick();
-                  setState(() => _selectedAvatar = emoji);
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? kPrimaryColor.withValues(alpha: 0.15)
-                        : context.subCardBg,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isSelected ? kPrimaryColor : Colors.transparent,
-                      width: 2,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      emoji,
-                      style: TextStyle(fontSize: isSelected ? 24 : 20),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+          // アバターグリッド（国語などと同じ、コインで解放するカタログ）
+          AvatarPickerGrid(
+            selectedEmoji: _selectedAvatar,
+            onSelect: (avatar) => setState(() => _selectedAvatar = avatar.emoji),
           ),
           const SizedBox(height: 16),
         ],

@@ -7,14 +7,21 @@ import 'package:shared_core/models/friend_model.dart';
 /// shared_core の [FriendFetchHandler], [FriendAddHandler], [FriendRemoveHandler]
 /// インターフェースを実装し、[friendProvider.notifier] に注入される。
 class FirestoreFriendService {
-  final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
+  final FirebaseFirestore? _injectedFirestore;
+  final FirebaseAuth? _injectedAuth;
+
+  /// main() は Firebase.initializeApp() より前にこのサービスを構築するため、
+  /// コンストラクタで FirebaseFirestore.instance / FirebaseAuth.instance を
+  /// 評価すると「No Firebase App has been created」で main() ごと落ちて
+  /// 白画面になる。実際に使われるタイミング（初期化後）まで遅延評価する。
+  FirebaseFirestore get _firestore => _injectedFirestore ?? FirebaseFirestore.instance;
+  FirebaseAuth get _auth => _injectedAuth ?? FirebaseAuth.instance;
 
   FirestoreFriendService({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+  })  : _injectedFirestore = firestore,
+        _injectedAuth = auth;
 
   /// 友達一覧を取得（FriendFetchHandler実装）。
   ///

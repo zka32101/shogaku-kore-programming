@@ -18,10 +18,12 @@ import '../providers/wrong_answers_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 import '../widgets/ai_response_dialog.dart';
+import '../providers/quiz_access_override_provider.dart';
 import '../widgets/app_dialog.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
+import 'paywall_screen.dart';
 import 'quiz_result_screen.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
@@ -569,6 +571,19 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
 
   @override
   Widget build(BuildContext context) {
+    // 無料トライアル（14日間）終了 & 未購読の場合はペイウォールを表示し、
+    // 実際の出題は行わない（トライアル終了後の無制限利用を防止）
+    final accessAsync = ref.watch(canAccessProgrammingChallengesProvider);
+    final canAccess = accessAsync.asData?.value;
+    if (canAccess == false) {
+      return const PaywallScreen();
+    }
+    if (canAccess == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final questions = _questions;
     if (questions.isEmpty) {
       return Scaffold(
