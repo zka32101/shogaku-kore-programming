@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 // TODO: AnalyticsDashboardWidget/DailyActivityData/AccuracyTrendData don't exist in shared_core
 import 'package:shared_core/shared_core.dart' show requireParentalGate, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -421,6 +422,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                       icon: '📄',
                       title: '利用規約',
                       onTap: () => _showTermsOfService(context),
+                    ),
+                    _SettingsTile(
+                      icon: '📱',
+                      title: '他のアプリを見る',
+                      subtitle: '小学コレ！シリーズの他の教科アプリを紹介します',
+                      onTap: () => launchUrl(
+                        Uri.parse('https://sites.google.com/view/yourwishapps'),
+                        mode: LaunchMode.externalApplication,
+                      ),
                     ),
                     const _Divider(),
                   ],
