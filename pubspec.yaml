@@ -18,6 +18,7 @@ dependencies:
       ref: main
 
   cupertino_icons: ^1.0.8
+  url_launcher: ^6.3.0
   flutter_riverpod: ^2.6.1
   shared_preferences: ^2.3.0
   firebase_core: ^4.15.0
