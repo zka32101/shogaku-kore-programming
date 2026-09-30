@@ -142,7 +142,12 @@ class _ShogakuKoreProgrammingAppState
           options: DefaultFirebaseOptions.currentPlatform,
         );
       } catch (_) {
-        // Firebase initialization failed, continue anyway
+        // .env が無い等で dart 側の設定が組み立てられない場合は、Android の
+        // google-services.json（ネイティブ設定）を使って初期化する。
+        // これも失敗した場合は Firebase なしで動作を続ける。
+        try {
+          await Firebase.initializeApp();
+        } catch (_) {}
       }
 
       // Phase 4.18: プッシュ通知サービス初期化
