@@ -38,7 +38,7 @@ const _kTitles = [
 class _RobotStageEditorScreenState extends State<RobotStageEditorScreen> {
   static const int _n = RobotStage.gridSize;
 
-  late List<List<String>> _grid = [
+  late final List<List<String>> _grid = [
     for (var y = 0; y < _n; y++)
       [for (var x = 0; x < _n; x++) y == 2 && x == 0 ? 'S' : (y == 2 && x == _n - 1 ? 'G' : '.')],
   ];

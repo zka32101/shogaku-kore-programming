@@ -18,8 +18,7 @@ class CreatedStageStore {
       if (raw == null) return [];
       final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
       return [
-        for (final m in list)
-          if (RobotStage.tryParse(m) case final s?) s,
+        for (final m in list) ?RobotStage.tryParse(m),
       ];
     } catch (_) {
       return [];
@@ -128,8 +127,7 @@ class StageShareService {
         .limit(50)
         .get());
     return [
-      for (final d in snap.docs)
-        if (SharedStage.tryParse(d.id, d.data()) case final s?) s,
+      for (final d in snap.docs) ?SharedStage.tryParse(d.id, d.data()),
     ];
   }
 
@@ -177,8 +175,7 @@ class StageShareService {
         .where('stageId', isEqualTo: stageId)
         .get());
     final results = [
-      for (final d in snap.docs)
-        if (StageResult.tryParse(d.data()) case final r?) r,
+      for (final d in snap.docs) ?StageResult.tryParse(d.data()),
     ]..sort((a, b) {
         final byStars = b.stars.compareTo(a.stars);
         return byStars != 0 ? byStars : a.blocks.compareTo(b.blocks);
