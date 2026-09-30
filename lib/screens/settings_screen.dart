@@ -106,10 +106,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
       appBar: AppBar(
         title: const Text('設定'),
         backgroundColor: kPrimaryColor,
+        foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
           tabs: const [
-            Tab(text: '設定'),
+            Tab(text: '基本設定'),
             Tab(text: '学習分析'),
           ],
         ),
@@ -119,12 +124,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
         children: [
           Column(
         children: [
-          // ヘッダー
-          _buildHeader(context, profile, progressNotifier),
-          // 設定リスト
+          // 設定リスト（ヘッダーもリストの一部としてスクロールさせる）
           Expanded(
             child: ListView(
               children: [
+                _buildHeader(context, profile, progressNotifier),
                 // ─── アカウント ──────────────────────────────
                 Column(
                   children: [
@@ -142,7 +146,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                       icon: '⭐',
                       iconBg: const Color(0xFFFFF8E1),
                       title: 'プレミアムプラン',
-                      subtitle: '月額 ¥300 / 年額 ¥2,400 — 全ステージ解放',
+                      subtitle: '月額 ¥300 / 年額 ¥2,400',
                       onTap: () => _navigateToPaywall(context),
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(
@@ -233,7 +237,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                       icon: '📳',
                       iconBg: const Color(0xFFE8EAF6),
                       title: 'バイブレーション',
-                      subtitle: 'タップ・回答時の振動フィードバック',
+                      subtitle: 'タップ・回答時の振動',
                       value: profile.hapticsEnabled,
                       onChanged: (v) {
                         ref.read(profileProvider.notifier).setHapticsEnabled(v);
@@ -577,7 +581,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
       ),
       padding: EdgeInsets.fromLTRB(
         20,
-        MediaQuery.of(context).padding.top + 16,
+        16, // AppBar が status bar 分を確保済みのため追加の上余白は不要
         20,
         20,
       ),

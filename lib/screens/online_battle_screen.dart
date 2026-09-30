@@ -354,7 +354,7 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
   //     builder: (context) => AlertDialog(
   //       title: const Text('プレミアム機能'),
   //       content: const Text(
-  //         'オンライン対戦は月額¥120のプレミアム会員向けです。'
+  //         'オンライン対戦は月額¥300のプレミアム会員向けです。'
   //       ),
   //       actions: [
   //         TextButton(

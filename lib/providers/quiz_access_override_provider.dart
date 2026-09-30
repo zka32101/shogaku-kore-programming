@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../config/constants.dart';
 import 'subscription_provider.dart';
 
 /// shogaku-kore-programming 用：ユーザー登録日プロバイダー
@@ -55,6 +56,9 @@ final quizAccessOverrideProvider = FutureProvider<
 
 /// クイズへのアクセス可否（簡略版）
 final canAccessProgrammingChallengesProvider = FutureProvider<bool>((ref) async {
+  // 公開前テスト用: 全機能開放中はトライアル/購読状態に関係なく常にアクセス可
+  if (AppConstants.unlockAllForTesting) return true;
+
   final registeredAt =
       await ref.watch(userRegisteredAtOverrideProvider.future);
   final isSubscribed =

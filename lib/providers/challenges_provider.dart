@@ -5,8 +5,30 @@ import '../models/stage.dart';
 
 // 全ステージデータ
 final allChallengesProvider = Provider<List<Stage>>((ref) {
-  return _buildChallenges();
+  final stages = _buildChallenges();
+  if (!constants.AppConstants.unlockAllForTesting) return stages;
+  return stages.map(_asFree).toList();
 });
+
+// テスト用: 全ステージを無料扱いにする（ロックアイコン/ペイウォール遷移を出さない）
+Stage _asFree(Stage s) => s.isFree
+    ? s
+    : Stage(
+        id: s.id,
+        stageNumber: s.stageNumber,
+        title: s.title,
+        description: s.description,
+        type: s.type,
+        level: s.level,
+        icon: s.icon,
+        isFree: true,
+        expectedOutput: s.expectedOutput,
+        conceptExplanation: s.conceptExplanation,
+        hints: s.hints,
+        availableBlocks: s.availableBlocks,
+        questions: s.questions,
+        goalCondition: s.goalCondition,
+      );
 
 // レベル別フィルター
 final beginnerChallengesProvider = Provider<List<Stage>>((ref) {

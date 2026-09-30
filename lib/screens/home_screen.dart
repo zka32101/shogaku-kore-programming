@@ -5,14 +5,27 @@ import '../config/theme.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/coin_provider.dart';
+import '../providers/daily_review_provider.dart';
 import '../providers/friends_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 import '../utils/page_transitions.dart';
+import 'ai_programming_screen.dart';
+import 'daily_review_screen.dart';
 import 'editor_screen.dart';
+import 'flashcard_screen.dart';
+import 'free_create_screen.dart';
+import 'friends_list_screen.dart';
+import 'gallery_screen.dart';
 import 'quiz_screen.dart';
+import 'ranking_screen.dart';
+import 'robot_game_screen.dart';
+import 'shop_screen.dart';
+import 'stage_share_screen.dart';
+import 'time_attack_screen.dart';
+import 'wrong_answers_list_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -48,6 +61,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Navigator.of(context).push(smoothPageRoute(route));
   }
 
+  void _push(Widget screen) {
+    HapticService.lightImpact();
+    SoundService().playTap();
+    Navigator.of(context).push(smoothPageRoute(screen));
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(profileProvider);
@@ -78,12 +97,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               _buildHeader(context, profile, progress, coins),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               if (nextStage != null)
                 _buildNextStageCard(context, nextStage, allCleared),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               _buildTodayProgress(context, profile, progress),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+              _buildDailyReviewCard(context),
+              const SizedBox(height: 16),
+              _buildAiProgrammingBanner(context),
+              const SizedBox(height: 16),
+              _buildQuickAccess(context),
+              const SizedBox(height: 16),
               _buildStatsRow(context, progress),
             ],
           ),
@@ -271,6 +296,173 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  BoxDecoration _cardDecoration(BuildContext context, {Color? borderColor}) {
+    return BoxDecoration(
+      color: context.isDark ? const Color(0xFF1E1E1E) : Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      border: borderColor == null
+          ? null
+          : Border.all(color: borderColor, width: 1.5),
+    );
+  }
+
+  /// 今日の復習（1日1回）
+  Widget _buildDailyReviewCard(BuildContext context) {
+    final review = ref.watch(dailyReviewProvider);
+    final done = review.doneToday;
+    return GestureDetector(
+      onTap: done ? null : () => _push(const DailyReviewScreen()),
+      child: Opacity(
+        opacity: done ? 0.65 : 1.0,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: _cardDecoration(
+            context,
+            borderColor: kPrimaryColor.withValues(alpha: 0.5),
+          ),
+          child: Row(
+            children: [
+              const Text('📖', style: TextStyle(fontSize: 28)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      done ? '今日の復習は完了！' : '今日の復習',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: context.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      review.reviewStreak > 0
+                          ? '🔥 ${review.reviewStreak}日連続'
+                          : '1日1回、まちがえた問題をおさらい',
+                      style: const TextStyle(fontSize: 12, color: kTextSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              if (!done) const Icon(Icons.chevron_right, color: kPrimaryColor),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// AIとプログラミング（解説・試す・注意点・悪い例）への入口
+  Widget _buildAiProgrammingBanner(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _push(const AiProgrammingScreen()),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6C5CE7), Color(0xFF8E7BFF)],
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            const Text('🤖', style: TextStyle(fontSize: 34)),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AIとプログラミング',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'AIのじょうずな使い方と、気をつけること',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.white),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 主要機能への入口（2列グリッド）
+  Widget _buildQuickAccess(BuildContext context) {
+    final items = <(String, String, Widget)>[
+      ('🤖', 'ロボットゲーム', const RobotGameScreen()),
+      ('🤝', 'ステージ交換', const StageShareScreen()),
+      ('👥', 'ともだち', const FriendsListScreen()),
+      ('🎨', '自由に作る', const FreeCreateScreen()),
+      ('⏱️', 'タイムアタック', const TimeAttackScreen()),
+      ('🃏', '単語帳', const FlashcardScreen()),
+      ('🔁', 'にがて問題', const WrongAnswersListScreen()),
+      ('🛒', 'ショップ', const ShopScreen()),
+      ('🏅', 'ランキング', const RankingScreen()),
+      ('🖼️', 'ギャラリー', const GalleryScreen()),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            'いろいろあそぶ',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: context.textPrimary,
+            ),
+          ),
+        ),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 2.4,
+          children: [
+            for (final (emoji, label, screen) in items)
+              GestureDetector(
+                onTap: () => _push(screen),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: _cardDecoration(context),
+                  child: Row(
+                    children: [
+                      Text(emoji, style: const TextStyle(fontSize: 22)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: context.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 
