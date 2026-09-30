@@ -15,7 +15,9 @@ class FriendService {
 
   FriendService._internal();
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  /// Firebase の初期化はアプリ起動後に非同期で行われるため、
+  /// インスタンス生成時ではなく使う時点で取得する。
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> get _users =>
       _firestore.collection('users');

@@ -421,6 +421,9 @@ class _PathHeader extends ConsumerWidget {
           const SizedBox(height: 12),
           TabBar(
             controller: tabController,
+            labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+            labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            unselectedLabelStyle: const TextStyle(fontSize: 13),
             tabs: [
               Tab(text: '🧩 初級 ${unitDone(StageLevel.beginner)}/${unitTotal(StageLevel.beginner)}'),
               Tab(text: '🐍 中級 ${unitDone(StageLevel.intermediate)}/${unitTotal(StageLevel.intermediate)}'),
@@ -817,8 +820,12 @@ class _StagePathView extends StatelessWidget {
 
     return LayoutBuilder(builder: (context, constraints) {
       final w = constraints.maxWidth;
-      final leftX = w * 0.28;
-      final rightX = w * 0.72;
+      // 円の中心位置。ラベル(左右どちらか)が画面外にはみ出さない範囲で
+      // できるだけ左右に振る。ラベル幅は画面幅から算出する。
+      final leftX = w * 0.40;
+      final rightX = w * 0.60;
+      final labelWidth =
+          (leftX - _nodeSize / 2 - 8 - 8).clamp(56.0, 90.0).toDouble();
 
       final totalHeight = challenges.length * _rowHeight + _topPadding * 2 + 60;
 
@@ -826,7 +833,7 @@ class _StagePathView extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.only(top: 8, bottom: 32),
+        padding: const EdgeInsets.only(top: 8, bottom: 96), // ランダムFABに隠れない余白
         child: SizedBox(
           width: w,
           height: totalHeight,
@@ -861,9 +868,11 @@ class _StagePathView extends StatelessWidget {
                 final isLocked = !challenge.isFree;
 
                 return Positioned(
-                  left: x - _nodeSize / 2,
+                  // 円の中心が x になるよう、左ラベルの場合はラベル分だけ左にずらす
+                  left: x - _nodeSize / 2 - (isLeft ? labelWidth + 8 : 0),
                   top: y - _nodeSize / 2,
                   child: _StageNode(
+                    labelWidth: labelWidth,
                     challenge: challenge,
                     isCompleted: isCompleted,
                     isCurrent: isCurrent,
@@ -1019,6 +1028,7 @@ class _StageNode extends StatefulWidget {
   final Color levelColor;
   final double size;
   final bool labelOnRight;
+  final double labelWidth;
   final bool isFavorite;
   final bool hasWrongAnswers;
   final VoidCallback onFavoriteToggle;
@@ -1034,6 +1044,7 @@ class _StageNode extends StatefulWidget {
     required this.levelColor,
     required this.size,
     required this.labelOnRight,
+    this.labelWidth = 90,
     required this.isFavorite,
     this.hasWrongAnswers = false,
     required this.onFavoriteToggle,
@@ -1233,7 +1244,7 @@ class _StageNodeState extends State<_StageNode>
   @override
   Widget build(BuildContext context) {
     // ノード幅（ラベル含む）
-    const labelWidth = 90.0;
+    final labelWidth = widget.labelWidth;
     final nodeSize = widget.size;
 
     return SizedBox(
@@ -1415,7 +1426,7 @@ class _StageNodeState extends State<_StageNode>
     final isCurrent = widget.isCurrent;
 
     return SizedBox(
-      width: 90,
+      width: widget.labelWidth,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: widget.labelOnRight

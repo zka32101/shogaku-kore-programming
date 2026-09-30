@@ -13,7 +13,8 @@ const _localUserIdKey = 'local_user_id';
 class AuthService {
   static final AuthService _instance = AuthService._internal();
 
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  /// Firebase の初期化はアプリ起動後に非同期で行われるため、使う時点で取得する。
+  FirebaseAuth get _firebaseAuth => FirebaseAuth.instance;
 
   AuthService._internal();
 

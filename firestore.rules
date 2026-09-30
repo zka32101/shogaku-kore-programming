@@ -11,6 +11,25 @@ service cloud.firestore {
       return isAuth() && request.auth.uid == uid;
     }
 
+    // ownerUid の friends に otherUid が登録されているか（フレンド関係の確認）
+    function isFriendOf(ownerUid, otherUid) {
+      return exists(/databases/$(database)/documents/users/$(ownerUid)/friends/$(otherUid));
+    }
+
+    // 受信者 toUid の受信箱に書き込める、形式の正しい共有ステージか
+    function isValidSharedStage(toUid) {
+      return isAuth() &&
+        request.auth.uid != toUid &&
+        request.auth.uid == request.resource.data.fromUid &&
+        isFriendOf(toUid, request.auth.uid) &&
+        request.resource.data.title is string &&
+        request.resource.data.title.size() <= 20 &&
+        request.resource.data.rows is list &&
+        request.resource.data.rows.size() == 5 &&
+        request.resource.data.par is int &&
+        request.resource.data.par >= 1 && request.resource.data.par <= 24;
+    }
+
     // ─── users コレクション ───
     // 公開プロフィール（nickname / avatarEmoji / points のみ）。
     // フレンドをユーザーIDで検索できるよう、認証済みユーザーなら誰でも
@@ -40,6 +59,32 @@ service cloud.firestore {
           request.auth.uid == fromUserId &&
           request.auth.uid != userId;
         allow update: if false;
+      }
+
+      // ─── ともだちステージ（ロボットゲーム）───
+      // 受信箱: 友だちが作ったステージが届く。読み取り・削除は受信者本人だけ。
+      // 書き込みは「userId の friends に自分が入っている（＝フレンド）」送り主だけ。
+      // 自由入力はステージ名（20文字以内）のみ。盤面は5行・par は1〜24に制限する。
+      match /inbox/{stageId} {
+        allow read, delete: if isOwner(userId);
+        allow create: if isValidSharedStage(userId);
+        allow update: if isValidSharedStage(userId) &&
+          resource.data.fromUid == request.auth.uid;
+      }
+
+      // 遊んだ結果: ステージを作った人(userId)だけが読める。
+      // 書き込みは、フレンドである遊んだ本人だけ（ドキュメントIDも本人のuidで固定）。
+      match /stageResults/{resultId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isAuth() &&
+          request.auth.uid != userId &&
+          request.auth.uid == request.resource.data.playerUid &&
+          resultId == request.resource.data.stageId + '_' + request.auth.uid &&
+          isFriendOf(userId, request.auth.uid) &&
+          request.resource.data.stars is int &&
+          request.resource.data.stars >= 1 && request.resource.data.stars <= 3 &&
+          request.resource.data.blocks is int &&
+          request.resource.data.blocks >= 1 && request.resource.data.blocks <= 24;
       }
     }
 

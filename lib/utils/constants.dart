@@ -16,7 +16,8 @@ class AppConstants {
   static const bool unlimitedQuizzesWithSubscription = true;
 
   // Pricing (for display)
-  static const String monthlyPrice = '¥120';
+  static const String monthlyPrice = '¥300';
+  static const String yearlyPrice = '¥2,400';
   static const int trialDays = 7;
 
   // App info
