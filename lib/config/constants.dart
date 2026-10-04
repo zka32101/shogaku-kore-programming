@@ -6,7 +6,7 @@ class AppConstants {
 
   /// 公開前のテスト用: true の間は全ステージ・全機能を課金/トライアルに関係なく開放する。
   /// 公開時は必ず false に戻す。
-  static const bool unlockAllForTesting = true;
+  static const bool unlockAllForTesting = false;
 
   // RevenueCat Configuration (Phase 4.7: Moved to shared_core SubscriptionConfig)
   // - revenueCatApiKey: Use SubscriptionConfig.apiKey
