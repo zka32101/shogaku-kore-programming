@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -331,8 +332,7 @@ class _FriendRankingTab extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            Text(icon,
-                                style: const TextStyle(fontSize: 16)),
+                            ProfileAvatar(icon, size: 26),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -610,7 +610,7 @@ class _MyStatsCard extends StatelessWidget {
               ),
             ),
             child: Center(
-              child: Text(icon, style: const TextStyle(fontSize: 22)),
+              child: ProfileAvatar(icon, size: 40),
             ),
           ),
           const SizedBox(width: 12),

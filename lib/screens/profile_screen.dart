@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -322,10 +323,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               border: Border.all(color: Colors.white, width: 3),
             ),
             child: Center(
-              child: Text(
-                profile.avatarEmoji,
-                style: const TextStyle(fontSize: 40),
-              ),
+              child: ProfileAvatar(profile.avatarEmoji, size: 64),
             ),
           ),
           const SizedBox(height: 10),
