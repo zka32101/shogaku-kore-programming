@@ -329,13 +329,20 @@ class _PathHeader extends ConsumerWidget {
                 )
               else
                 const SizedBox(width: 4),
+              // 戻るボタン等で幅が狭くなっても縦に折り返さず、収まらない分は縮小する
               const Expanded(
-                child: Text(
-                  'ステージ',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'ステージ',
+                    maxLines: 1,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
