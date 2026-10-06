@@ -13,6 +13,7 @@ import '../providers/challenges_provider.dart';
 import '../providers/coin_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/profile_provider.dart';
+import '../providers/my_character_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/wrong_answers_provider.dart';
 import '../services/haptic_service.dart';
@@ -347,12 +348,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
         ref.read(progressProvider.notifier).addBonusPoints(5);
         _resolvedWrongCount++;
       }
-      // TODO: growFromCorrectAnswer not available in shared_core's CharacterNotifier
-      // キャラクター成長トリガー
-      // ref.read(characterProvider.notifier).growFromCorrectAnswer(
-      //   challengeType: _getStageType(widget.challenge),
-      //   difficulty: widget.challenge.level,
-      // );
+      // マイキャラが成長する（クイズの正解 = ちえ）
+      ref.read(myCharacterProvider.notifier).grow(2, focus: 'wisdom');
     }
 
     // スピードボーナス: タイマー有効かつ残り時間が元の75%以上（素早く回答）

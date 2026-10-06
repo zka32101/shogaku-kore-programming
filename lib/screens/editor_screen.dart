@@ -18,6 +18,8 @@ import '../providers/editor_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/gallery_provider.dart';
 import '../providers/profile_provider.dart';
+import '../models/character_model.dart';
+import '../providers/my_character_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/step_executor_provider.dart';
 import '../services/haptic_service.dart';
@@ -234,12 +236,21 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         message: kCelebrationMessages[_rng.nextInt(kCelebrationMessages.length)],
         hold: const Duration(seconds: 4),
       );
-      // TODO: CharacterNotifier methods not available in shared_core
-      // await ref.read(characterProvider.notifier).growFromCorrectAnswer(
-      //       challengeType: 'visual',
-      //       difficulty: widget.challenge.level,
-      //     );
+      // マイキャラが成長する（ブロック操作の正解 = そうぞう）
+      final evolvedBefore = ref.read(myCharacterProvider).stage;
+      await ref
+          .read(myCharacterProvider.notifier)
+          .grow(5, focus: 'creativity');
       if (!mounted) return;
+      final my = ref.read(myCharacterProvider);
+      if (my.stage != evolvedBefore) {
+        _reactCharacter(
+          CharacterMood.celebrating,
+          message: '${my.definition.name}が「${kStageNames[my.stage]}」に進化したよ！',
+          hold: const Duration(seconds: 4),
+        );
+        ref.read(myCharacterProvider.notifier).clearEvolution();
+      }
       // final charState = ref.read(characterProvider);
       // if (charState.didStageUp && charState.lastGrowthMessage != null) {
       //   // ステージアップ！ 特別なリアクションで進化の瞬間を演出
