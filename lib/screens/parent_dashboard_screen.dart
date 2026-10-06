@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -319,10 +320,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
               color: Colors.white.withValues(alpha: 0.2),
             ),
             child: Center(
-              child: Text(
-                profile.avatarEmoji,
-                style: const TextStyle(fontSize: 32),
-              ),
+              child: ProfileAvatar(profile.avatarEmoji, size: 44),
             ),
           ),
           const SizedBox(width: 14),

@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -368,10 +369,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ],
             ),
             child: Center(
-              child: Text(
-                _selectedAvatar,
-                style: const TextStyle(fontSize: 40),
-              ),
+              child: ProfileAvatar(_selectedAvatar, size: 72),
             ),
           ).animate().scale(
             begin: const Offset(0.6, 0.6),

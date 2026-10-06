@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -150,7 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               border: Border.all(color: Colors.white, width: 2),
             ),
             child: Center(
-              child: Text(profile.avatarEmoji, style: const TextStyle(fontSize: 28)),
+              child: ProfileAvatar(profile.avatarEmoji, size: 44),
             ),
           ),
           const SizedBox(width: 14),

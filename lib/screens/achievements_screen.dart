@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -339,8 +340,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
           // タイトル行
           Row(
             children: [
-              Text(profile.avatarEmoji,
-                  style: const TextStyle(fontSize: 22)),
+              ProfileAvatar(profile.avatarEmoji, size: 28),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(

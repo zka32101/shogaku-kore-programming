@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -602,10 +603,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                 border: Border.all(color: Colors.white, width: 2),
               ),
               child: Center(
-                child: Text(
-                  profile.avatarEmoji,
-                  style: const TextStyle(fontSize: 28),
-                ),
+                child: ProfileAvatar(profile.avatarEmoji, size: 40),
               ),
             ),
           ),
@@ -926,7 +924,7 @@ class _ProfileTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
-          child: Text(profile.avatarEmoji, style: const TextStyle(fontSize: 22)),
+          child: ProfileAvatar(profile.avatarEmoji, size: 32),
         ),
       ),
       title: Text(
