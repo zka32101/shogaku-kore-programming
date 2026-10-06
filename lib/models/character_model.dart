@@ -54,13 +54,22 @@ class CharacterDefinition {
   final Map<CharacterStage, String> stageEmojis;
   final String growthFocus; // 'strength', 'wisdom', 'speed', 'creativity'
 
+  /// 画像ファイル名の接頭辞（`assets/characters/{assetKey}_{stage}.png`）。
+  /// 省略時は [id]。画像が無いキャラは絵文字で表示する。
+  final String? assetKey;
+
   const CharacterDefinition({
     required this.id,
     required this.name,
     required this.description,
     required this.stageEmojis,
     required this.growthFocus,
+    this.assetKey,
   });
+
+  /// 指定した成長段階の画像パス
+  String imageAsset(CharacterStage stage) =>
+      'assets/characters/${assetKey ?? id}_${stage.name}.png';
 }
 
 /// ユーザーのキャラクター状態
@@ -147,6 +156,7 @@ const kAvailableCharacters = [
       CharacterStage.master: '💫',
     },
     growthFocus: 'speed',
+    assetKey: 'robot',
   ),
   CharacterDefinition(
     id: 'wizard',
@@ -159,6 +169,77 @@ const kAvailableCharacters = [
       CharacterStage.teen:   '🌟',
       CharacterStage.adult:  '🔮',
       CharacterStage.master: '🌈',
+    },
+    growthFocus: 'creativity',
+    assetKey: 'wizard',
+  ),
+  CharacterDefinition(
+    id: 'block_dragon',
+    name: 'ブロックドラゴン',
+    description: '積み木でできたドラゴン。順番を考える問題が得意！',
+    stageEmojis: {
+      CharacterStage.egg:    '🥚',
+      CharacterStage.baby:   '🐲',
+      CharacterStage.child:  '🧱',
+      CharacterStage.teen:   '🐉',
+      CharacterStage.adult:  '🔥',
+      CharacterStage.master: '🌟',
+    },
+    growthFocus: 'strength',
+  ),
+  CharacterDefinition(
+    id: 'loop_panda',
+    name: 'ループパンダ',
+    description: 'くるくる回るパンダ。くり返しのブロックが得意！',
+    stageEmojis: {
+      CharacterStage.egg:    '🥚',
+      CharacterStage.baby:   '🐼',
+      CharacterStage.child:  '🔁',
+      CharacterStage.teen:   '🎋',
+      CharacterStage.adult:  '♾️',
+      CharacterStage.master: '🌀',
+    },
+    growthFocus: 'wisdom',
+  ),
+  CharacterDefinition(
+    id: 'debug_ladybug',
+    name: 'デバッグてんとう',
+    description: 'バグ探しが大好きなてんとう虫の探偵！',
+    stageEmojis: {
+      CharacterStage.egg:    '🥚',
+      CharacterStage.baby:   '🐞',
+      CharacterStage.child:  '🔍',
+      CharacterStage.teen:   '🕵️',
+      CharacterStage.adult:  '✅',
+      CharacterStage.master: '👑',
+    },
+    growthFocus: 'wisdom',
+  ),
+  CharacterDefinition(
+    id: 'rocket_bunny',
+    name: 'ロケットバニー',
+    description: '宇宙を飛ぶウサギ。タイムアタックでぐんぐん伸びる！',
+    stageEmojis: {
+      CharacterStage.egg:    '🥚',
+      CharacterStage.baby:   '🐰',
+      CharacterStage.child:  '⏱️',
+      CharacterStage.teen:   '🚀',
+      CharacterStage.adult:  '🛸',
+      CharacterStage.master: '☄️',
+    },
+    growthFocus: 'speed',
+  ),
+  CharacterDefinition(
+    id: 'pixel_penguin',
+    name: 'ピクセルペンギン',
+    description: 'ドット絵のペンギン。ゲームづくりが得意！',
+    stageEmojis: {
+      CharacterStage.egg:    '🥚',
+      CharacterStage.baby:   '🐧',
+      CharacterStage.child:  '🎮',
+      CharacterStage.teen:   '🕹️',
+      CharacterStage.adult:  '👾',
+      CharacterStage.master: '🏆',
     },
     growthFocus: 'creativity',
   ),

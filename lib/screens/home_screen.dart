@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../models/character_model.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/coin_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../providers/friends_provider.dart';
+import '../providers/my_character_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 import '../utils/page_transitions.dart';
+import '../widgets/character_image.dart';
+import 'character_screen.dart';
 import 'ai_programming_screen.dart';
 import 'daily_review_screen.dart';
 import 'editor_screen.dart';
@@ -102,6 +106,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 _buildNextStageCard(context, nextStage, allCleared),
               const SizedBox(height: 16),
               _buildTodayProgress(context, profile, progress),
+              const SizedBox(height: 16),
+              _buildMyCharacterCard(context),
               const SizedBox(height: 16),
               _buildDailyReviewCard(context),
               const SizedBox(height: 16),
@@ -306,6 +312,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       border: borderColor == null
           ? null
           : Border.all(color: borderColor, width: 1.5),
+    );
+  }
+
+  /// マイキャラ（成長するキャラ）のカード
+  Widget _buildMyCharacterCard(BuildContext context) {
+    final my = ref.watch(myCharacterProvider);
+    final def = my.definition;
+    final next = my.nextThreshold;
+    return GestureDetector(
+      onTap: () => _push(const CharacterScreen()),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: _cardDecoration(context),
+        child: Row(
+          children: [
+            CharacterImage(definition: def, stage: my.stage, size: 64),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${def.name}（${kStageNames[my.stage]}）',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: context.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value: my.progressToNext,
+                      minHeight: 8,
+                      backgroundColor: kPrimaryColor.withValues(alpha: 0.15),
+                      valueColor: const AlwaysStoppedAnimation(kPrimaryColor),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    next == null
+                        ? '最強の姿になったよ！'
+                        : '進化まで あと ${next - my.totalXp} XP',
+                    style: TextStyle(fontSize: 11, color: context.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
+      ),
     );
   }
 

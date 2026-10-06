@@ -77,6 +77,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/
+    - assets/characters/
     - assets/logos/
   fonts:
     # 漢字が正しい字形(日本語字形)で表示されない不具合の修正。
