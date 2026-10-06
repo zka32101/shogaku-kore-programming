@@ -1451,10 +1451,12 @@ class _ScriptBlockItem extends StatelessWidget {
                 ]
               : null,
         ),
-        child: Row(
-          children: [
-            // 行番号
-            Container(
+        // ブロック欄が細い端末では操作ボタンを2行目に回し、
+        // テキストが1文字ずつ縦に折り返されないようにする
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final narrow = constraints.maxWidth < 340;
+            final Widget numberBox = Container(
               width: 28,
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
@@ -1474,11 +1476,8 @@ class _ScriptBlockItem extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(block.icon, style: const TextStyle(fontSize: 15)),
-            const SizedBox(width: 6),
-            Expanded(
+            );
+            final Widget label = Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1500,7 +1499,8 @@ class _ScriptBlockItem extends StatelessWidget {
                     ),
                 ],
               ),
-            ),
+            );
+            final List<Widget> actions = [
             const Icon(Icons.drag_handle, color: Colors.grey, size: 20),
             // ブレークポイントボタン
             SizedBox(
@@ -1529,7 +1529,38 @@ class _ScriptBlockItem extends StatelessWidget {
                 splashRadius: 20,
               ),
             ),
-          ],
+            ];
+            final Widget icon = Text(block.icon, style: const TextStyle(fontSize: 15));
+            if (!narrow) {
+              return Row(
+                children: [
+                  numberBox,
+                  const SizedBox(width: 8),
+                  icon,
+                  const SizedBox(width: 6),
+                  label,
+                  ...actions,
+                ],
+              );
+            }
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    numberBox,
+                    const SizedBox(width: 8),
+                    icon,
+                    const SizedBox(width: 6),
+                    label,
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: actions,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
