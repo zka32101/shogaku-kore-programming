@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cross_promo_kit/cross_promo_kit.dart' show CrossPromoSection;
 // TODO: AnalyticsDashboardWidget/DailyActivityData/AccuracyTrendData don't exist in shared_core
 import 'package:shared_core/shared_core.dart' show requireParentalGate, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -531,6 +532,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                     ),
                   ],
                 ).animate(delay: 360.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
+
+                CrossPromoSection(
+                  currentAppId: 'com.yourwish.shougakukore.programming',
+                  currentCategory: '小学コレ',
+                  beforeOpenStore: (context) => requireParentalGate(context),
+                ),
 
                 const SizedBox(height: 32),
               ],

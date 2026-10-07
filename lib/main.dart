@@ -8,8 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'
 import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier, RevenueCatService, coinProvider;
-import 'package:shared_core/shared_core.dart'
-    show badgeProvider, BadgeNotifier, unifiedBadges, rankingProvider, friendProvider, globalRankingProvider, PushNotificationService, screenTimeProvider, ScreenTimeLimitReachedWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
@@ -149,6 +147,11 @@ class _ShogakuKoreProgrammingAppState
           await Firebase.initializeApp();
         } catch (_) {}
       }
+
+      // クロスプロモーション（他アプリ紹介）。失敗しても起動は止めない
+      try {
+        await CrossPromoService.init();
+      } catch (_) {}
 
       // Phase 4.18: プッシュ通知サービス初期化
       final pushService = PushNotificationService();
