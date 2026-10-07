@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// クイズ回答直後に表示する、キャラクターのふきだし反応。
 /// 正解/不正解どちらでも、責めずに親しみやすいトーンで話しかける。

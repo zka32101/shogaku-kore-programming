@@ -55,7 +55,7 @@ class UkalabEmoji extends StatelessWidget {
       height: size,
       fit: BoxFit.contain,
       excludeFromSemantics: true,
-      errorBuilder: (_, __, ___) =>
+      errorBuilder: (context, error, stackTrace) =>
           Text(emoji, style: (style ?? const TextStyle()).copyWith(fontSize: size)),
     );
   }
