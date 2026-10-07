@@ -44,6 +44,12 @@ class UkalabEmoji extends StatelessWidget {
     '🌱': 'sprout',
     '📌': 'pin',
     '📋': 'clipboard',
+    '⏱': 'timer',
+    '🔒': 'lock',
+    '🤖': 'robot',
+    '💬': 'chat',
+    '🎁': 'gift',
+    '🎮': 'gamepad',
   };
 
   /// 画像名を返す。置き換え対象でなければ null。
