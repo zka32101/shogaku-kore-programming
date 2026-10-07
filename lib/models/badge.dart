@@ -2,6 +2,8 @@
 class Badge {
   final String? id; // Unique identifier for badge
   final String icon;
+  /// 共通バッジ意匠名（assets/badges/badge_NAME.webp）。null は絵文字のまま
+  final String? design;
   final String name;
   final String description;
   final String category;
@@ -14,6 +16,7 @@ class Badge {
   const Badge({
     this.id,
     required this.icon,
+    this.design,
     required this.name,
     required this.description,
     required this.category,
