@@ -424,6 +424,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // 進捗バッジ
       Badge(
         icon: '🚀',
+        design: 'first_step',
         name: 'はじめの一歩',
         description: '最初のステージをクリア',
         category: 'progress',
@@ -433,6 +434,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🌿',
+        design: 'challenge',
         name: 'コードビギナー',
         description: '3ステージクリア',
         category: 'progress',
@@ -442,6 +444,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🌱',
+        design: 'challenge',
         name: '成長中',
         description: '5ステージクリア',
         category: 'progress',
@@ -451,6 +454,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🧩',
+        design: 'challenge',
         name: 'ブロック名人',
         description: '8ステージクリア（初級の折り返し）',
         category: 'progress',
@@ -460,6 +464,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🎯',
+        design: 'challenge',
         name: '1/4制覇',
         description: '10ステージクリア',
         category: 'progress',
@@ -469,6 +474,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '⭐',
+        design: 'challenge',
         name: '15ステージ通過',
         description: '15ステージクリア',
         category: 'progress',
@@ -478,6 +484,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🐍',
+        design: 'challenge',
         name: 'Python入門者',
         description: '20ステージクリア',
         category: 'progress',
@@ -487,6 +494,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🏅',
+        design: 'challenge',
         name: '半分制覇',
         description: '25ステージクリア（折り返し地点！）',
         category: 'progress',
@@ -496,6 +504,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🔥',
+        design: 'challenge',
         name: '上級者突入',
         description: '30ステージクリア',
         category: 'progress',
@@ -505,6 +514,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '⚡',
+        design: 'challenge',
         name: 'ゴールが見えた！',
         description: '35ステージクリア（あと5ステージ！）',
         category: 'progress',
@@ -514,6 +524,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '👑',
+        design: 'gradcap',
         name: '全ステージ制覇',
         description: '${AppConstants.totalStages}ステージ全てクリア！',
         category: 'progress',
@@ -524,6 +535,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // ユニット制覇バッジ
       Badge(
         icon: '🧩',
+        design: 'gradcap',
         name: '初級クリア！',
         description: '初級の全ステージをクリア！',
         category: 'progress',
@@ -533,6 +545,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🐍',
+        design: 'gradcap',
         name: '中級クリア！',
         description: '中級の全ステージをクリア！',
         category: 'progress',
@@ -542,6 +555,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🚀',
+        design: 'gradcap',
         name: '全部クリア！',
         description: '全ユニット（初・中・上級）をクリア！',
         category: 'progress',
@@ -552,6 +566,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // スターバッジ
       Badge(
         icon: '⭐',
+        design: 'collection',
         name: '星コレクター',
         description: 'ポイント50以上',
         category: 'stars',
@@ -561,6 +576,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '💎',
+        design: 'collection',
         name: 'スター収集家',
         description: 'ポイント60以上',
         category: 'stars',
@@ -570,6 +586,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🌟',
+        design: 'collection',
         name: '輝く星',
         description: 'ポイント150以上',
         category: 'stars',
@@ -579,6 +596,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '💰',
+        design: 'collection',
         name: 'ポイント長者',
         description: 'ポイント300以上',
         category: 'stars',
@@ -588,6 +606,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🌠',
+        design: 'perfect',
         name: 'パーフェクトクリア',
         description: '全${AppConstants.totalStages}ステージ3つ星（${AppConstants.totalStages * 3}ポイント満点）',
         category: 'stars',
@@ -598,6 +617,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // 3つ星バッジ
       Badge(
         icon: '✨',
+        design: 'perfect',
         name: '完璧主義者',
         description: '3ステージで3つ星',
         category: 'stars',
@@ -607,6 +627,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '⭐',
+        design: 'perfect',
         name: '5ステージ完璧',
         description: '5ステージで3つ星',
         category: 'stars',
@@ -616,6 +637,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🌠',
+        design: 'perfect',
         name: '3つ星コレクター',
         description: '10ステージで3つ星',
         category: 'stars',
@@ -625,6 +647,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🎖️',
+        design: 'perfect',
         name: 'パーフェクトマスター',
         description: '20ステージで3つ星満点',
         category: 'stars',
@@ -635,6 +658,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // ストリークバッジ
       Badge(
         icon: '💫',
+        design: 'streak',
         name: '2日連続',
         description: '2日連続でチャレンジ',
         category: 'streak',
@@ -644,6 +668,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🔥',
+        design: 'streak',
         name: '3日連続',
         description: '3日連続でチャレンジ',
         category: 'streak',
@@ -653,6 +678,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🔥🔥',
+        design: 'streak',
         name: '1週間連続',
         description: '7日連続でチャレンジ',
         category: 'streak',
@@ -662,6 +688,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '⚡⚡',
+        design: 'streak',
         name: '2週間連続',
         description: '14日連続でチャレンジ',
         category: 'streak',
@@ -671,6 +698,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🏆',
+        design: 'streak',
         name: 'チャンピオン',
         description: '30日連続でチャレンジ',
         category: 'streak',
@@ -680,6 +708,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🔥🔥🔥',
+        design: 'streak',
         name: '1ヶ月連続',
         description: '60日連続でチャレンジ',
         category: 'streak',
@@ -689,6 +718,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🌟',
+        design: 'streak',
         name: '100日連続！',
         description: '100日連続でチャレンジ！伝説！',
         category: 'streak',
@@ -699,6 +729,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // タイムアタック
       Badge(
         icon: '⚡',
+        design: 'speed',
         name: 'タイムアタック参戦',
         description: 'タイムアタックに1回挑戦',
         category: 'special',
@@ -708,6 +739,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🏎️',
+        design: 'speed',
         name: 'スピードランナー',
         description: 'タイムアタックに10回挑戦',
         category: 'special',
@@ -717,6 +749,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🔥',
+        design: 'speed',
         name: 'タイムアタック達人',
         description: 'タイムアタックで8問以上正解',
         category: 'special',
@@ -726,6 +759,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '⚡',
+        design: 'speed',
         name: 'ライトニングクイズ',
         description: 'タイムアタックで全問正解',
         category: 'special',
@@ -735,6 +769,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🔥',
+        design: 'speed',
         name: 'コンボ5連続',
         description: 'タイムアタックで5問連続正解',
         category: 'special',
@@ -744,6 +779,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🌟',
+        design: 'speed',
         name: 'コンボ神業',
         description: 'タイムアタックで10問連続正解（全問コンボ！）',
         category: 'special',
@@ -754,6 +790,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // パーフェクトラン
       Badge(
         icon: '💯',
+        design: 'perfect',
         name: 'パーフェクトチャレンジャー',
         description: 'クイズを全問正解でクリア',
         category: 'special',
@@ -763,6 +800,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '✨',
+        design: 'perfect',
         name: 'パーフェクトマスター',
         description: 'クイズを全問正解で5回クリア',
         category: 'special',
@@ -772,6 +810,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '👑',
+        design: 'perfect',
         name: 'パーフェクトレジェンド',
         description: 'クイズを全問正解で20回クリア',
         category: 'special',
@@ -782,6 +821,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // フラッシュカード
       Badge(
         icon: '📚',
+        design: 'book',
         name: '単語マスター',
         description: 'フラッシュカード5枚習得',
         category: 'special',
@@ -791,6 +831,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🃏',
+        design: 'book',
         name: 'カードビギナー',
         description: 'フラッシュカード10枚習得',
         category: 'special',
@@ -800,6 +841,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🧠',
+        design: 'book',
         name: 'Python知識人',
         description: 'フラッシュカード20枚習得',
         category: 'special',
@@ -809,6 +851,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '💡',
+        design: 'book',
         name: '上級知識人',
         description: 'フラッシュカード30枚習得',
         category: 'special',
@@ -818,6 +861,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🎴',
+        design: 'book',
         name: 'カードマスター',
         description: 'フラッシュカード全${kFlashcards.length}枚習得！',
         category: 'special',
@@ -828,6 +872,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // 苦手問題克服
       Badge(
         icon: '💪',
+        design: 'levelup',
         name: '苦手克服',
         description: '苦手リストをゼロにした！',
         category: 'special',
@@ -836,6 +881,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // 苦手問題累計克服マイルストーン
       Badge(
         icon: '🎯',
+        design: 'levelup',
         name: '苦手10問克服',
         description: '累計10問の苦手問題を克服した！',
         category: 'special',
@@ -845,6 +891,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🌟',
+        design: 'levelup',
         name: '苦手30問克服',
         description: '累計30問の苦手問題を克服した！',
         category: 'special',
@@ -855,6 +902,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // スペシャル
       Badge(
         icon: '👑',
+        design: 'gem',
         name: 'コード王',
         description: '全${AppConstants.totalStages}ステージクリア＋30日連続',
         category: 'special',
@@ -865,6 +913,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // 累計回答数バッジ
       Badge(
         icon: '📝',
+        design: 'check',
         name: '100問挑戦',
         description: '累計100問に回答',
         category: 'special',
@@ -874,6 +923,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '📚',
+        design: 'check',
         name: '500問達成',
         description: '累計500問に回答',
         category: 'special',
@@ -883,6 +933,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🧠',
+        design: 'check',
         name: '1000問マスター',
         description: '累計1000問に回答',
         category: 'special',
@@ -893,6 +944,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // 今日の復習連続バッジ
       Badge(
         icon: '📖',
+        design: 'daily',
         name: '復習3日連続',
         description: '今日の復習を3日連続で完了',
         category: 'streak',
@@ -902,6 +954,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '📖📖',
+        design: 'daily',
         name: '復習1週間連続',
         description: '今日の復習を7日連続で完了',
         category: 'streak',
@@ -911,6 +964,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '📖📖📖',
+        design: 'daily',
         name: '復習2週間連続',
         description: '今日の復習を14日連続で完了',
         category: 'streak',
@@ -920,6 +974,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🔖',
+        design: 'daily',
         name: '復習1ヶ月連続',
         description: '今日の復習を30日連続で完了！すごい！',
         category: 'streak',
@@ -930,6 +985,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // 累計復習回数バッジ
       Badge(
         icon: '📋',
+        design: 'book',
         name: '復習5回達成',
         description: '今日の復習を累計5回完了',
         category: 'special',
@@ -939,6 +995,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '📒',
+        design: 'book',
         name: '復習10回達成',
         description: '今日の復習を累計10回完了',
         category: 'special',
@@ -948,6 +1005,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '📕',
+        design: 'book',
         name: '復習30回達成！',
         description: '今日の復習を累計30回完了！復習の達人！',
         category: 'special',
@@ -958,6 +1016,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // お気に入りバッジ
       Badge(
         icon: '❤️',
+        design: 'heart',
         name: 'お気に入り登録',
         description: 'ステージを1つお気に入りに追加',
         category: 'special',
@@ -967,6 +1026,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '💝',
+        design: 'heart',
         name: 'お気に入りコレクター',
         description: 'ステージを5つお気に入りに追加',
         category: 'special',
@@ -976,6 +1036,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '💖',
+        design: 'heart',
         name: 'お気に入りマスター',
         description: 'ステージを10つお気に入りに追加',
         category: 'special',
@@ -986,6 +1047,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       // 累計学習時間バッジ
       Badge(
         icon: '⏱',
+        design: 'clock',
         name: '10分学習',
         description: '累計10分学習した',
         category: 'special',
@@ -995,6 +1057,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '⏰',
+        design: 'clock',
         name: '30分学習',
         description: '累計30分学習した',
         category: 'special',
@@ -1004,6 +1067,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🕐',
+        design: 'clock',
         name: '1時間学習',
         description: '累計1時間学習した',
         category: 'special',
@@ -1013,6 +1077,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🕑',
+        design: 'clock',
         name: '2時間学習',
         description: '累計2時間学習した',
         category: 'special',
@@ -1022,6 +1087,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🕒',
+        design: 'clock',
         name: '3時間学習',
         description: '累計3時間学習した',
         category: 'special',
@@ -1031,6 +1097,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       ),
       Badge(
         icon: '🏆',
+        design: 'clock',
         name: '10時間学習',
         description: '累計10時間学習！本気の学習者！',
         category: 'special',

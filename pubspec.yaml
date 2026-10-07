@@ -77,6 +77,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons_common/
+    - assets/badges/
     - assets/icons/
     - assets/characters/
     - assets/logos/
