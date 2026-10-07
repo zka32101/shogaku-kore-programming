@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/constants.dart';
 import '../config/theme.dart';
+import '../utils/shuffle_choices.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
@@ -474,7 +475,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
           final questions = c.questions ?? [];
           for (final q in questions) {
             if (wrongTexts.contains(q.text)) {
-              allQs.add(_TAQuestion(question: q, challengeTitle: c.title));
+              allQs.add(_TAQuestion(question: q.shuffled(), challengeTitle: c.title));
             }
           }
         }
@@ -495,7 +496,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
           (_selectedLevel == null || c.level == _selectedLevel)) {
         final questions = c.questions ?? [];
         for (final q in questions) {
-          allQs.add(_TAQuestion(question: q, challengeTitle: c.title));
+          allQs.add(_TAQuestion(question: q.shuffled(), challengeTitle: c.title));
         }
       }
     }

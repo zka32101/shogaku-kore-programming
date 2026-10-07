@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../utils/shuffle_choices.dart';
 import '../models/stage.dart';
 import '../providers/ai_programming_coach_provider.dart';
 import '../providers/bgm_provider.dart';
@@ -41,8 +42,13 @@ class QuizScreen extends ConsumerStatefulWidget {
 
 class _QuizScreenState extends ConsumerState<QuizScreen>
     with SingleTickerProviderStateMixin {
-  List<Question> get _questions =>
-      widget.overrideQuestions ?? widget.challenge.questions ?? [];
+  // 正解位置の偏りを避けるため、出題時に選択肢をシャッフルする（画面ごとに1回）。
+  late final List<Question> _questions = [
+    for (final q in widget.overrideQuestions ??
+        widget.challenge.questions ??
+        const <Question>[])
+      q.shuffled(),
+  ];
 
   int _currentQuestionIndex = 0;
   int? _selectedOptionIndex;

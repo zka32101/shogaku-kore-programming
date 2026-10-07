@@ -8,6 +8,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../utils/shuffle_choices.dart';
 import '../models/stage.dart';
 import '../providers/ai_programming_coach_provider.dart';
 import '../providers/challenges_provider.dart';
@@ -274,16 +275,16 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
     for (final c in allChallenges) {
       if (progressMap[c.id]?.isCompleted != true) continue;
       if ((c.questions?.isEmpty ?? true)) continue;
-      for (final q in c.questions ?? []) {
-        pool.add(_ReviewQuestion(question: q, challengeTitle: c.title));
+      for (final q in c.questions ?? const <Question>[]) {
+        pool.add(_ReviewQuestion(question: q.shuffled(), challengeTitle: c.title));
       }
     }
 
     if (pool.isEmpty) {
       // 完了済みステージがない場合は全ステージから
       for (final c in allChallenges) {
-        for (final q in c.questions ?? []) {
-          pool.add(_ReviewQuestion(question: q, challengeTitle: c.title));
+        for (final q in c.questions ?? const <Question>[]) {
+          pool.add(_ReviewQuestion(question: q.shuffled(), challengeTitle: c.title));
         }
       }
     }
