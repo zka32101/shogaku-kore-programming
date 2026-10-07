@@ -36,7 +36,7 @@ class CharacterReactionBubble extends ConsumerWidget {
     // return Row(
     //   crossAxisAlignment: CrossAxisAlignment.start,
     //   children: [
-    //     Text(emoji, style: const TextStyle(fontSize: 32)),
+    //     UkalabEmoji(emoji, size: 32),
     //     const SizedBox(width: 8),
     //     Expanded(
     //       child: Container(

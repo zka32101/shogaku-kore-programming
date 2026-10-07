@@ -25,6 +25,7 @@ import '../widgets/shortcut_help.dart';
 import '../widgets/stat_item.dart';
 import '../widgets/weekly_chart.dart';
 import 'flashcard_screen.dart' show kFlashcards;
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -1614,7 +1615,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  Text(c.icon, style: const TextStyle(fontSize: 18)),
+                  UkalabEmoji(c.icon, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(

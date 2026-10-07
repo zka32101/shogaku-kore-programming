@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/daily_mission.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// 毎日ミッションカードウィジェット
 class DailyMissionCard extends StatelessWidget {
@@ -53,10 +54,7 @@ class DailyMissionCard extends StatelessWidget {
                           : Colors.grey.withValues(alpha: 0.1),
                     ),
                     padding: const EdgeInsets.all(12),
-                    child: Text(
-                      mission.emoji,
-                      style: const TextStyle(fontSize: 28),
-                    ),
+                    child: UkalabEmoji(mission.emoji, size: 28),
                   ),
                   const SizedBox(width: 12),
 

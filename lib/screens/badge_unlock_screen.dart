@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../config/theme.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class BadgeUnlockScreen extends StatefulWidget {
   final String badgeIcon;
@@ -208,10 +209,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    widget.badgeIcon,
-                                    style: const TextStyle(fontSize: 48),
-                                  ),
+                                  UkalabEmoji(widget.badgeIcon, size: 48),
                                   Text(
                                     widget.badgeName,
                                     style: const TextStyle(

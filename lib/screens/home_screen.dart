@@ -31,6 +31,7 @@ import 'shop_screen.dart';
 import 'stage_share_screen.dart';
 import 'time_attack_screen.dart';
 import 'wrong_answers_list_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -222,7 +223,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Center(
-                child: Text(stage.icon, style: const TextStyle(fontSize: 28)),
+                child: UkalabEmoji(stage.icon, size: 28),
               ),
             ),
             const SizedBox(width: 16),
@@ -503,7 +504,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   decoration: _cardDecoration(context),
                   child: Row(
                     children: [
-                      Text(emoji, style: const TextStyle(fontSize: 22)),
+                      UkalabEmoji(emoji, size: 22),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -548,7 +549,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _statItem(BuildContext context, String emoji, String value, String label) {
     return Column(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 22)),
+        UkalabEmoji(emoji, size: 22),
         const SizedBox(height: 6),
         Text(
           value,

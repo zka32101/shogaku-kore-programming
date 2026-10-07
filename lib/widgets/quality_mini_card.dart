@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// 進捗バー付きの統計ミニカード
 /// アニメーション付きの進捗表示を含む
@@ -40,7 +41,7 @@ class QualityMiniCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 18)),
+              UkalabEmoji(emoji, size: 18),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(

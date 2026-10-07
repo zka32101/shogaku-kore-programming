@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../config/theme.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// 汎用のローディング表示。単なるスピナーではなく、絵文字が
 /// ふわふわ動くアニメーション＋短いメッセージで「待っている感」を
@@ -22,7 +23,7 @@ class FriendlyLoading extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 40))
+          UkalabEmoji(emoji, size: 40)
               .animate(onPlay: (c) => c.repeat(reverse: true))
               .moveY(begin: -6, end: 6, duration: 700.ms, curve: Curves.easeInOut),
           const SizedBox(height: 12),

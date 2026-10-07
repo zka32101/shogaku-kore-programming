@@ -22,6 +22,7 @@ import 'badge_unlock_screen.dart';
 import 'flashcard_screen.dart' show FlashcardScreen, kFlashcards;
 import 'quiz_review_screen.dart';
 import 'quiz_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class QuizResultScreen extends ConsumerStatefulWidget {
   final Stage challenge;
@@ -638,10 +639,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                         // 結果絵文字（バウンスアニメーション）
                         ScaleTransition(
                           scale: _bounceAnimation,
-                          child: Text(
-                            _resultEmoji,
-                            style: const TextStyle(fontSize: 64),
-                          ),
+                          child: UkalabEmoji(_resultEmoji, size: 64),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -1491,7 +1489,7 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 16)),
+        UkalabEmoji(icon, size: 16),
         const SizedBox(width: 10),
         Text(
           label,

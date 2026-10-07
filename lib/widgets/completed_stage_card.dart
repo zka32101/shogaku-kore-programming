@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../config/constants.dart';
 import '../config/theme.dart';
 import '../models/stage.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// Card displaying a completed stage with stars and level indicator
 class CompletedStageCard extends StatelessWidget {
@@ -42,7 +43,7 @@ class CompletedStageCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(challenge.icon, style: const TextStyle(fontSize: 28)),
+          UkalabEmoji(challenge.icon, size: 28),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

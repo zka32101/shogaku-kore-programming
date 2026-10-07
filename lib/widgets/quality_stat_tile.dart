@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// Mini stat tile displaying emoji, value, and label
 class QualityStatTile extends StatelessWidget {
@@ -19,7 +20,7 @@ class QualityStatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 22)),
+        UkalabEmoji(emoji, size: 22),
         const SizedBox(height: 4),
         Text(
           value,

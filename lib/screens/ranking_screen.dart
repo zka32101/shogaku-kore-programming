@@ -15,6 +15,7 @@ import '../services/haptic_service.dart';
 import '../utils/page_transitions.dart';
 import '../widgets/shortcut_help.dart';
 import 'friends_list_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class RankingScreen extends ConsumerStatefulWidget {
   const RankingScreen({super.key});
@@ -519,7 +520,7 @@ class _WeeklyChallengesCard extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      Text(emoji, style: const TextStyle(fontSize: 16)),
+                      UkalabEmoji(emoji, size: 16),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Column(

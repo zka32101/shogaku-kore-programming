@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// Summary tile displaying emoji, animated number, and label
 class SummaryTile extends StatelessWidget {
@@ -21,7 +22,7 @@ class SummaryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 26)),
+        UkalabEmoji(emoji, size: 26),
         const SizedBox(height: 4),
         TweenAnimationBuilder<int>(
           tween: IntTween(begin: 0, end: numValue),

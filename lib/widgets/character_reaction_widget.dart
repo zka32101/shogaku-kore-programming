@@ -52,12 +52,12 @@ class CharacterReactionWidget extends StatelessWidget {
     //         alignment: Alignment.center,
     //         clipBehavior: Clip.none,
     //         children: [
-    //           Text(baseEmoji, style: const TextStyle(fontSize: 18)),
+    //           UkalabEmoji(baseEmoji, size: 18),
     //           if (_badgeEmoji.isNotEmpty)
     //             Positioned(
     //               right: -3,
     //               top: -3,
-    //               child: Text(_badgeEmoji, style: const TextStyle(fontSize: 13)),
+    //               child: UkalabEmoji(_badgeEmoji, size: 13),
     //             ),
     //         ],
     //       ),

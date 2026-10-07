@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// シンプルな統計アイテム表示ウィジェット
 /// アイコン、値、ラベルを縦に並べて表示
@@ -18,7 +19,7 @@ class StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 22)),
+        UkalabEmoji(icon, size: 22),
         const SizedBox(height: 4),
         Text(
           value,

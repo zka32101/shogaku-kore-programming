@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/level.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// レベルアップ通知ウィジェット（アニメーション付き）
 class LevelUpNotification extends StatefulWidget {
@@ -105,10 +106,7 @@ class _LevelUpNotificationState extends State<LevelUpNotification>
                     ),
                   ],
                 ),
-                child: Text(
-                  level.emoji,
-                  style: const TextStyle(fontSize: 80),
-                ),
+                child: UkalabEmoji(level.emoji, size: 80),
               ),
               const SizedBox(height: 24),
               Text(
@@ -259,10 +257,7 @@ class LevelUpBanner extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                level.emoji,
-                style: const TextStyle(fontSize: 40),
-              ),
+              UkalabEmoji(level.emoji, size: 40),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
