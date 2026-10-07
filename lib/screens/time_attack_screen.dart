@@ -23,6 +23,7 @@ import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
 import 'quiz_result_screen.dart';
 import 'quiz_review_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 // ── タイムアタックモード ─────────────────────────────────────────────────────
 // 全ステージから最大10問をランダムに抽出し、1問30秒で回答するモード。
@@ -775,7 +776,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
+          UkalabEmoji(emoji, size: 18),
           const SizedBox(width: 8),
           Text(
             label,
@@ -1414,10 +1415,7 @@ class _TimeAttackResultScreenState
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    rank.emoji,
-                    style: const TextStyle(fontSize: 56),
-                  ).animate().scale(
+                  UkalabEmoji(rank.emoji, size: 56).animate().scale(
                     begin: const Offset(0.4, 0.4),
                     end: const Offset(1.0, 1.0),
                     curve: Curves.elasticOut,
@@ -1998,7 +1996,7 @@ class _ResultChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 20)),
+        UkalabEmoji(emoji, size: 20),
         const SizedBox(height: 4),
         Text(
           value,

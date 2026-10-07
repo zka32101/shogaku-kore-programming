@@ -25,6 +25,7 @@ import 'parent_dashboard_screen.dart';
 import 'flashcard_screen.dart' show kFlashcards;
 import '../widgets/shortcut_help.dart';
 import '../widgets/app_dialog.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// Settings screen with integrated shared_core components (Phase 4.19)
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -974,7 +975,7 @@ class _SwitchTile extends StatelessWidget {
               : (iconBg ?? kPrimaryColor.withValues(alpha: 0.1)),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(child: Text(icon, style: const TextStyle(fontSize: 18))),
+        child: Center(child: UkalabEmoji(icon, size: 18)),
       ),
       title: Text(
         title,
@@ -1028,7 +1029,7 @@ class _SettingsTile extends StatelessWidget {
               : (iconBg ?? kPrimaryColor.withValues(alpha: 0.1)),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(child: Text(icon, style: const TextStyle(fontSize: 18))),
+        child: Center(child: UkalabEmoji(icon, size: 18)),
       ),
       title: Text(
         title,
@@ -1119,7 +1120,7 @@ class _SettingsSelectorTile<T> extends StatelessWidget {
                   color: iconBg,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Center(child: Text(emoji, style: const TextStyle(fontSize: 18))),
+                child: Center(child: UkalabEmoji(emoji, size: 18)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1719,7 +1720,7 @@ class _StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 28)),
+        UkalabEmoji(icon, size: 28),
         const SizedBox(height: 8),
         Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),

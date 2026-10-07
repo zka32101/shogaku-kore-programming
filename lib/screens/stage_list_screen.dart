@@ -21,6 +21,7 @@ import 'editor_screen.dart';
 import 'flashcard_screen.dart';
 import 'paywall_screen.dart';
 import 'quiz_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class StageListScreen extends ConsumerStatefulWidget {
   final String? initialLevel;
@@ -1117,7 +1118,7 @@ class _StageNodeState extends State<_StageNode>
             const SizedBox(height: 16),
             Row(
               children: [
-                Text(c.icon, style: const TextStyle(fontSize: 28)),
+                UkalabEmoji(c.icon, size: 28),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -1212,7 +1213,7 @@ class _StageNodeState extends State<_StageNode>
                     ),
                     title: Row(
                       children: [
-                        Text(c.icon, style: const TextStyle(fontSize: 24)),
+                        UkalabEmoji(c.icon, size: 24),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -1329,10 +1330,7 @@ class _StageNodeState extends State<_StageNode>
                       ? Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              widget.challenge.icon,
-                              style: const TextStyle(fontSize: 22),
-                            ),
+                            UkalabEmoji(widget.challenge.icon, size: 22),
                             // ミニ星
                             Row(
                               mainAxisSize: MainAxisSize.min,
@@ -1376,7 +1374,7 @@ class _StageNodeState extends State<_StageNode>
                   border: Border.all(color: context.cardBg, width: 1.5),
                 ),
                 child: Center(
-                  child: Text(typeEmoji, style: const TextStyle(fontSize: 9)),
+                  child: UkalabEmoji(typeEmoji, size: 9),
                 ),
               ),
             ),
@@ -1608,10 +1606,7 @@ class _StageInfoSheet extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: Text(
-                    challenge.icon,
-                    style: const TextStyle(fontSize: 28),
-                  ),
+                  child: UkalabEmoji(challenge.icon, size: 28),
                 ),
               ),
               const SizedBox(width: 14),
@@ -2226,7 +2221,7 @@ class _LevelGoalCardState extends State<_LevelGoalCard> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: Row(
                 children: [
-                  Text(_headerEmoji, style: const TextStyle(fontSize: 16)),
+                  UkalabEmoji(_headerEmoji, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -2462,7 +2457,7 @@ class _StageSearchDelegate extends SearchDelegate<Stage?> {
               padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  Text(c.icon, style: const TextStyle(fontSize: 28)),
+                  UkalabEmoji(c.icon, size: 28),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

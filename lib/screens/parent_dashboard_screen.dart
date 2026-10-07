@@ -20,6 +20,7 @@ import '../widgets/learning_calendar.dart';
 import '../widgets/shortcut_help.dart';
 import '../widgets/weekly_chart.dart';
 import 'flashcard_screen.dart' show kFlashcards;
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class ParentDashboardScreen extends ConsumerStatefulWidget {
   const ParentDashboardScreen({super.key});
@@ -995,7 +996,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
             ),
             child: Row(
               children: [
-                Text(c.icon, style: const TextStyle(fontSize: 20)),
+                UkalabEmoji(c.icon, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -1476,7 +1477,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen> {
                 ),
                 child: Row(
                   children: [
-                    Text(advice.emoji, style: const TextStyle(fontSize: 24)),
+                    UkalabEmoji(advice.emoji, size: 24),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -1596,7 +1597,7 @@ class _SummaryCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 22)),
+          UkalabEmoji(emoji, size: 22),
           const SizedBox(height: 4),
           Text(
             value,
@@ -1653,7 +1654,7 @@ class _UnitProgressCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(unit.emoji, style: const TextStyle(fontSize: 22)),
+              UkalabEmoji(unit.emoji, size: 22),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(

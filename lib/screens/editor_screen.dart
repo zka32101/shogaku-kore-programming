@@ -36,6 +36,7 @@ import '../widgets/variable_viewer.dart';
 import '../widgets/glossary_text.dart';
 import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final Stage challenge;
@@ -1334,7 +1335,7 @@ class _BlockPaletteItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
-                    child: Text(block.icon, style: const TextStyle(fontSize: 20)),
+                    child: UkalabEmoji(block.icon, size: 20),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1386,7 +1387,7 @@ class _BlockPaletteItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             child: Row(
               children: [
-                Text(block.icon, style: const TextStyle(fontSize: 16)),
+                UkalabEmoji(block.icon, size: 16),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -1541,7 +1542,7 @@ class _ScriptBlockItem extends StatelessWidget {
               ),
             ),
             ];
-            final Widget icon = Text(block.icon, style: const TextStyle(fontSize: 15));
+            final Widget icon = UkalabEmoji(block.icon, size: 15);
             if (!narrow) {
               return Row(
                 children: [
@@ -1680,7 +1681,7 @@ class _ParamEditorSheetState extends State<_ParamEditorSheet> {
             // タイトル
             Row(
               children: [
-                Text(widget.block.icon, style: const TextStyle(fontSize: 24)),
+                UkalabEmoji(widget.block.icon, size: 24),
                 const SizedBox(width: 10),
                 Text(
                   widget.block.name,

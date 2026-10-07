@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../data/glossary_data.dart';
 import '../models/glossary_term.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class _TermMatch {
   final int start;
@@ -153,7 +154,7 @@ class _GlossaryPopupSheet extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(term.emoji, style: const TextStyle(fontSize: 36)),
+              UkalabEmoji(term.emoji, size: 36),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

@@ -26,6 +26,7 @@ import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
 import 'quiz_result_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
   final Stage challenge;
@@ -1349,10 +1350,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
-                  child: Text(
-                    widget.challenge.icon,
-                    style: const TextStyle(fontSize: 28),
-                  ),
+                  child: UkalabEmoji(widget.challenge.icon, size: 28),
                 ),
               ),
               const SizedBox(width: 12),

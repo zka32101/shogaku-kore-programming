@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// 「AIとプログラミング」: 解説・試す・注意点・悪い例（実例）をまとめた学習画面。
 ///
@@ -97,7 +98,7 @@ class _Section extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 24)),
+              UkalabEmoji(emoji, size: 24),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(

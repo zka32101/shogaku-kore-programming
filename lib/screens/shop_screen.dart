@@ -7,6 +7,7 @@ import '../models/shop_item.dart';
 import '../providers/coin_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// コインショップ画面 (#15)
 class ShopScreen extends ConsumerStatefulWidget {
@@ -203,7 +204,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         SnackBar(
           content: Row(
             children: [
-              Text(item.emoji, style: const TextStyle(fontSize: 20)),
+              UkalabEmoji(item.emoji, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -360,10 +361,7 @@ class _ShopItemCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
-              child: Text(
-                item.emoji,
-                style: const TextStyle(fontSize: 26),
-              ),
+              child: UkalabEmoji(item.emoji, size: 26),
             ),
           ),
           const SizedBox(width: 12),

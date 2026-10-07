@@ -23,6 +23,7 @@ import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
 import 'quiz_result_screen.dart';
 import 'quiz_review_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 // ── 今日の復習 (Daily Review) ────────────────────────────────────────────────
 // 完了済みステージからランダムに5問を抽出する毎日リセット型の復習クイズ。
@@ -1217,7 +1218,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                 .fadeIn(duration: 300.ms),
             const SizedBox(height: 16),
           ],
-          Text(emoji, style: const TextStyle(fontSize: 72))
+          UkalabEmoji(emoji, size: 72)
               .animate()
               .scale(begin: const Offset(0, 0), curve: Curves.elasticOut, duration: 600.ms)
               .fadeIn(duration: 300.ms),

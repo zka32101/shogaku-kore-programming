@@ -9,6 +9,7 @@ import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// 受信中のフレンド申請一覧・承認/拒否画面
 class FriendRequestsScreen extends ConsumerStatefulWidget {
@@ -188,7 +189,7 @@ class _RequestTile extends StatelessWidget {
               gradient: LinearGradient(colors: [kPrimaryColor, kPrimaryDark]),
             ),
             child: Center(
-              child: Text(request.fromAvatarEmoji, style: const TextStyle(fontSize: 20)),
+              child: UkalabEmoji(request.fromAvatarEmoji, size: 20),
             ),
           ),
           const SizedBox(width: 12),

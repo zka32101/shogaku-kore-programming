@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../config/theme.dart';
 import 'programming_basics_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// なぜプログラミングが必要か説明画面 (#13)
 class WhyProgrammingScreen extends StatefulWidget {
@@ -218,10 +219,7 @@ class _PageContent extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: Text(
-                data.emoji,
-                style: const TextStyle(fontSize: 56),
-              ),
+              child: UkalabEmoji(data.emoji, size: 56),
             ),
           )
               .animate()

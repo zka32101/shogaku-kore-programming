@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// 育成中キャラクターの「気持ち」。エディタ・クイズ画面で状況に応じて切り替える。
 enum CharacterMood { idle, thinking, excited, celebrating, encouraging }
@@ -52,12 +53,12 @@ class CharacterReactionWidget extends StatelessWidget {
     //         alignment: Alignment.center,
     //         clipBehavior: Clip.none,
     //         children: [
-    //           Text(baseEmoji, style: const TextStyle(fontSize: 18)),
+    //           UkalabEmoji(baseEmoji, size: 18),
     //           if (_badgeEmoji.isNotEmpty)
     //             Positioned(
     //               right: -3,
     //               top: -3,
-    //               child: Text(_badgeEmoji, style: const TextStyle(fontSize: 13)),
+    //               child: UkalabEmoji(_badgeEmoji, size: 13),
     //             ),
     //         ],
     //       ),

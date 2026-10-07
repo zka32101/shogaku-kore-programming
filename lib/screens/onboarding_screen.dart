@@ -11,6 +11,7 @@ import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 import '../widgets/avatar_picker_grid.dart';
 import '../widgets/shortcut_help.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -484,7 +485,7 @@ class _FeatureCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 36)),
+          UkalabEmoji(emoji, size: 36),
           const SizedBox(width: 14),
           Expanded(
             child: Column(

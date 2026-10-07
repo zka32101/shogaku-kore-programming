@@ -36,6 +36,7 @@ import '../widgets/unit_progress_row.dart';
 import 'flashcard_screen.dart' show kFlashcards;
 import 'quiz_review_screen.dart';
 import 'wrong_answers_list_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class AchievementsScreen extends ConsumerStatefulWidget {
   const AchievementsScreen({super.key});
@@ -2148,7 +2149,7 @@ class _StatsTab extends ConsumerWidget {
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Row(
                   children: [
-                    Text(icon, style: const TextStyle(fontSize: 16)),
+                    UkalabEmoji(icon, size: 16),
                     const SizedBox(width: 8),
                     Text(
                       label,

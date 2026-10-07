@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/level.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// レベル進捗表示ウィジェット
 class LevelProgressWidget extends StatelessWidget {
@@ -245,10 +246,7 @@ class LevelHeaderWidget extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              level.emoji,
-              style: const TextStyle(fontSize: 20),
-            ),
+            UkalabEmoji(level.emoji, size: 20),
             const SizedBox(width: 8),
             Column(
               mainAxisSize: MainAxisSize.min,

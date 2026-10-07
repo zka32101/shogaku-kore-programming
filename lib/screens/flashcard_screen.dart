@@ -15,6 +15,7 @@ import '../services/sound_service.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 // ─── データモデル ──────────────────────────────────────────────────────────────
 
@@ -2709,7 +2710,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 72))
+          UkalabEmoji(emoji, size: 72)
               .animate()
               .scale(
                 begin: const Offset(0.0, 0.0),

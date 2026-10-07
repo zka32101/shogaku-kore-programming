@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// Row widget displaying progress with icon, label, count, and animated progress bar
 class UnitProgressRow extends StatelessWidget {
@@ -25,7 +26,7 @@ class UnitProgressRow extends StatelessWidget {
 
     return Row(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 22)),
+        UkalabEmoji(icon, size: 22),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
