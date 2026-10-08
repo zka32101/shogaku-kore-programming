@@ -33,7 +33,12 @@ void main() {
       expect(File(i.asset).existsSync(), true, reason: i.asset);
       expect(File(i.thumb).existsSync(), true, reason: i.thumb);
     }
-    expect(kDecorItems.length, 18);
+    expect(kDecorItems.length, 22);
+    // 季節の網羅: 春夏秋冬のどれにも商品があり、通年(常設)もある
+    for (final s in ['spring', 'summer', 'autumn', 'winter']) {
+      expect(kDecorItems.where((i) => i.season == s).isNotEmpty, true, reason: s);
+    }
+    expect(kDecorItems.any((i) => i.season == null && i.kind == DecorKind.effect), true);
   });
 
   test('ショップの通常商品ときせかえのIDが重ならない', () {
