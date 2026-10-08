@@ -481,11 +481,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(
-            'いろいろあそぶ',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              color: DecorScope.chipBg(context),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              'いろいろあそぶ',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: context.textPrimary,
+              ),
             ),
           ),
         ),

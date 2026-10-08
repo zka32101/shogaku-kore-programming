@@ -135,10 +135,19 @@ class CharacterScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'キャラをかえても、XPはそのまま引きつがれるよ。',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: context.textSecondary),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: BoxDecoration(
+                color: DecorScope.chipBg(context),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                'キャラをかえても、XPはそのまま引きつがれるよ。',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: context.textSecondary),
+              ),
+            ),
           ),
         ],
       ),

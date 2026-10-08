@@ -125,7 +125,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
               decoration: BoxDecoration(
                 color: selected
                     ? kPrimaryColor
-                    : kPrimaryColor.withValues(alpha: 0.08),
+                    // 半透明だと背景の絵が透けるので、白地に重ねて不透明にする
+                    : Color.alphaBlend(kPrimaryColor.withValues(alpha: 0.08), context.isDark ? const Color(0xFF1E1E1E) : Colors.white),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: selected
