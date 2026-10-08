@@ -99,9 +99,20 @@ class _Effect extends StatelessWidget {
   Widget build(BuildContext context) {
     final asset = 'assets/shop/$id.webp';
     if (id == 'effect_waves') {
+      // 下ナビや下部の内容を隠さないよう、画面高の12%以下・半透明にする
+      final h = MediaQuery.sizeOf(context).height * 0.12;
       return Align(
         alignment: Alignment.bottomCenter,
-        child: Image.asset(asset, width: double.infinity, fit: BoxFit.fitWidth, excludeFromSemantics: true),
+        child: Opacity(
+          key: const ValueKey('decor_waves'),
+          opacity: 0.55,
+          child: SizedBox(
+            width: double.infinity,
+            height: h,
+            child: Image.asset(asset,
+                fit: BoxFit.cover, alignment: Alignment.bottomCenter, excludeFromSemantics: true),
+          ),
+        ),
       );
     }
     return Image.asset(asset, fit: BoxFit.cover, excludeFromSemantics: true);
