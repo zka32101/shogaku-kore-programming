@@ -34,16 +34,16 @@ class BrandedSplash extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(26),
+                      borderRadius: BorderRadius.circular(40),
                       child: Image.asset(
                         iconAsset,
                         key: const ValueKey('splash_app_icon'),
-                        width: 112,
-                        height: 112,
+                        width: 168,
+                        height: 168,
                         fit: BoxFit.cover,
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: 22,
                       height: 22,
@@ -59,17 +59,17 @@ class BrandedSplash extends StatelessWidget {
             Image.asset(
               seriesLogoAsset,
               key: const ValueKey('splash_series_logo'),
-              width: 180,
+              width: 260,
               fit: BoxFit.contain,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             ClipRRect(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(16),
               child: Image.asset(
                 companyLogoAsset,
                 key: const ValueKey('splash_company_logo'),
-                width: 52,
-                height: 52,
+                width: 84,
+                height: 84,
                 fit: BoxFit.cover,
               ),
             ),
