@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#A16DD9</color>
+    <!-- Flutter側の起動画面グラデーションの開始色（OS起動画面と揃える） -->
+    <color name="splash_background">#1ABC9C</color>
 </resources>
