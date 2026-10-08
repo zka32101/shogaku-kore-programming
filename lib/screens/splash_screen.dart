@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../config/theme.dart';
 import '../main.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/branded_splash.dart';
 import 'onboarding_screen.dart';
 
-/// 起動画面（国語コレと同じ形: 中央に教科アイコン、下に組織ロゴ）。
+/// 起動画面（白背景: 中央にアプリアイコン、下にシリーズロゴと組織ロゴ）。
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -58,10 +57,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const BrandedSplash(
-      title: '小学コレ！プログラミング',
-      subtitle: 'コードの世界を探険しよう！',
-      gradient: [kPrimaryColor, kPrimaryDark],
-    );
+    return const BrandedSplash();
   }
 }
