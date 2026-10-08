@@ -48,7 +48,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       curve: Curves.elasticOut,
     );
     _scaleController.forward();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _focusNode.requestFocus(),
+    );
   }
 
   @override
@@ -88,11 +90,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     // ? → キーボードショートカット一覧
     if (key == LogicalKeyboardKey.slash &&
         HardwareKeyboard.instance.isShiftPressed) {
-      showShortcutsHelpDialog(context, shortcuts: const [
-        ('Enter / Space / →', '次のページへ'),
-        ('← / Esc / BS', '前のページへ'),
-        ('?', 'このヘルプを表示'),
-      ]);
+      showShortcutsHelpDialog(
+        context,
+        shortcuts: const [
+          ('Enter / Space / →', '次のページへ'),
+          ('← / Esc / BS', '前のページへ'),
+          ('?', 'このヘルプを表示'),
+        ],
+      );
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -114,10 +119,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   void _finish() async {
     HapticService.heavyImpact();
     SoundService().playComplete();
-    await ref.read(profileProvider.notifier).completeOnboarding(
-      nickname: _nicknameController.text,
-      avatarEmoji: _selectedAvatar,
-    );
+    await ref
+        .read(profileProvider.notifier)
+        .completeOnboarding(
+          nickname: _nicknameController.text,
+          avatarEmoji: _selectedAvatar,
+        );
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -146,11 +153,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (i) => setState(() => _currentPage = i),
-                children: [
-                  _buildPage1(),
-                  _buildPage2(),
-                  _buildPage3(),
-                ],
+                children: [_buildPage1(), _buildPage2(), _buildPage3()],
               ),
             ),
             // ナビゲーションボタン
@@ -227,16 +230,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             decoration: InputDecoration(
               counterText: '',
               hintText: 'ニックネーム（最大12文字）',
-              hintStyle:
-                  const TextStyle(fontSize: 14, color: kTextSecondary),
+              hintStyle: const TextStyle(fontSize: 14, color: kTextSecondary),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: kPrimaryColor, width: 2),
+                borderSide: const BorderSide(color: kPrimaryColor, width: 2),
               ),
               filled: true,
               fillColor: context.subCardBg,
@@ -262,7 +263,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           // アバターグリッド（国語などと同じ、コインで解放するカタログ）
           AvatarPickerGrid(
             selectedEmoji: _selectedAvatar,
-            onSelect: (avatar) => setState(() => _selectedAvatar = avatar.emoji),
+            onSelect: (avatar) =>
+                setState(() => _selectedAvatar = avatar.emoji),
           ),
           const SizedBox(height: 16),
         ],
@@ -272,124 +274,144 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
   // ──────────── Page 2: 機能紹介 ────────────
   Widget _buildPage2() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('🎓', style: TextStyle(fontSize: 64)),
-          const SizedBox(height: 16),
-          Text(
-            'こんなことができるよ！',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('🎓', style: TextStyle(fontSize: 64)),
+              const SizedBox(height: 16),
+              Text(
+                'こんなことができるよ！',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: context.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 32),
+              _FeatureCard(
+                    emoji: '🧩',
+                    title: 'ブロックプログラミング',
+                    desc: 'ブロックを並べてロボットを動かそう！\nビジュアルで直感的に学べるよ',
+                    color: const Color(0xFF1ABC9C),
+                  )
+                  .animate()
+                  .fadeIn(duration: 350.ms)
+                  .slideX(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
+              const SizedBox(height: 12),
+              _FeatureCard(
+                    emoji: '🐍',
+                    title: 'Python入門',
+                    desc: '本物のコードを書いてみよう！\nクイズ形式で楽しく学べるよ',
+                    color: const Color(0xFF9B59B6),
+                  )
+                  .animate(delay: 100.ms)
+                  .fadeIn(duration: 350.ms)
+                  .slideX(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
+              const SizedBox(height: 12),
+              _FeatureCard(
+                    emoji: '🏆',
+                    title: 'バッジ＆ランキング',
+                    desc: 'クリアするとバッジがもらえるよ！\n友達とポイントを競おう',
+                    color: const Color(0xFFF39C12),
+                  )
+                  .animate(delay: 200.ms)
+                  .fadeIn(duration: 350.ms)
+                  .slideX(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
+              const SizedBox(height: 12),
+              _FeatureCard(
+                    emoji: '🃏',
+                    title: 'フラッシュカード＆今日の復習',
+                    desc: '用語カードで単語を記憶しよう！\n苦手問題を毎日復習できるよ',
+                    color: const Color(0xFF3498DB),
+                  )
+                  .animate(delay: 300.ms)
+                  .fadeIn(duration: 350.ms)
+                  .slideX(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
+            ],
           ),
-          const SizedBox(height: 32),
-          _FeatureCard(
-            emoji: '🧩',
-            title: 'ブロックプログラミング',
-            desc: 'ブロックを並べてロボットを動かそう！\nビジュアルで直感的に学べるよ',
-            color: const Color(0xFF1ABC9C),
-          ).animate().fadeIn(duration: 350.ms).slideX(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 12),
-          _FeatureCard(
-            emoji: '🐍',
-            title: 'Python入門',
-            desc: '本物のコードを書いてみよう！\nクイズ形式で楽しく学べるよ',
-            color: const Color(0xFF9B59B6),
-          ).animate(delay: 100.ms).fadeIn(duration: 350.ms).slideX(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 12),
-          _FeatureCard(
-            emoji: '🏆',
-            title: 'バッジ＆ランキング',
-            desc: 'クリアするとバッジがもらえるよ！\n友達とポイントを競おう',
-            color: const Color(0xFFF39C12),
-          ).animate(delay: 200.ms).fadeIn(duration: 350.ms).slideX(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
-          const SizedBox(height: 12),
-          _FeatureCard(
-            emoji: '🃏',
-            title: 'フラッシュカード＆今日の復習',
-            desc: '用語カードで単語を記憶しよう！\n苦手問題を毎日復習できるよ',
-            color: const Color(0xFF3498DB),
-          ).animate(delay: 300.ms).fadeIn(duration: 350.ms).slideX(begin: 0.1, curve: Curves.easeOut, duration: 350.ms),
-        ],
+        ),
       ),
     );
   }
 
   // ──────────── Page 3: 完了 ────────────
   Widget _buildPage3() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('🚀', style: TextStyle(fontSize: 80)),
-          const SizedBox(height: 24),
-          Text(
-            '${_nicknameController.text.trim().isEmpty ? "たんけんか" : _nicknameController.text.trim()} さん、\nようこそ！',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
-              height: 1.3,
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'コードの世界を探険しよう！\nステージをクリアしてプログラマーを目指せ！',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: kTextSecondary,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 32),
-          // 選択したアバター表示
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [kPrimaryColor, kPrimaryDark],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: kPrimaryColor.withValues(alpha: 0.4),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('🚀', style: TextStyle(fontSize: 80)),
+              const SizedBox(height: 24),
+              Text(
+                '${_nicknameController.text.trim().isEmpty ? "たんけんか" : _nicknameController.text.trim()} さん、\nようこそ！',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: context.textPrimary,
+                  height: 1.3,
                 ),
-              ],
-            ),
-            child: Center(
-              child: ProfileAvatar(_selectedAvatar, size: 72),
-            ),
-          ).animate().scale(
-            begin: const Offset(0.6, 0.6),
-            end: const Offset(1.0, 1.0),
-            curve: Curves.elasticOut,
-            duration: 600.ms,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'コードの世界を探険しよう！\nステージをクリアしてプログラマーを目指せ！',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: kTextSecondary,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 32),
+              // 選択したアバター表示
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [kPrimaryColor, kPrimaryDark],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: kPrimaryColor.withValues(alpha: 0.4),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Center(child: ProfileAvatar(_selectedAvatar, size: 72)),
+              ).animate().scale(
+                begin: const Offset(0.6, 0.6),
+                end: const Offset(1.0, 1.0),
+                curve: Curves.elasticOut,
+                duration: 600.ms,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _nicknameController.text.trim().isEmpty
+                    ? 'たんけんか'
+                    : _nicknameController.text.trim(),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: context.textPrimary,
+                ),
+              ).animate(delay: 200.ms).fadeIn(duration: 300.ms),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            _nicknameController.text.trim().isEmpty
-                ? 'たんけんか'
-                : _nicknameController.text.trim(),
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
-            ),
-          ).animate(delay: 200.ms).fadeIn(duration: 300.ms),
-        ],
+        ),
       ),
     );
   }
