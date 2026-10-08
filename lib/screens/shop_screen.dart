@@ -3,6 +3,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../features/shop/decor/decor_items.dart';
+import '../features/shop/decor/decor_screen.dart';
+import '../features/shop/decor/decor_scope.dart';
 import '../models/shop_item.dart';
 import '../providers/coin_provider.dart';
 import '../services/haptic_service.dart';
@@ -20,9 +23,12 @@ class ShopScreen extends ConsumerStatefulWidget {
 class _ShopScreenState extends ConsumerState<ShopScreen> {
   ShopCategory? _selectedCategory; // null = 全て
 
+  /// 通常の商品 + きせかえ（背景・フレーム・エフェクト）
+  static final List<ShopItem> _allItems = [...kShopItems, ...decorShopItems()];
+
   List<ShopItem> get _filteredItems {
-    if (_selectedCategory == null) return kShopItems;
-    return kShopItems.where((i) => i.category == _selectedCategory).toList();
+    if (_selectedCategory == null) return _allItems;
+    return _allItems.where((i) => i.category == _selectedCategory).toList();
   }
 
   @override
@@ -30,7 +36,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     final coinState = ref.watch(coinProvider);
 
     return Scaffold(
-      backgroundColor: context.cardBg,
+      backgroundColor: DecorScope.pageBg(context, context.cardBg),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -48,6 +54,14 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         ),
         centerTitle: true,
         actions: [
+          TextButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const DecorScreen()),
+            ),
+            icon: const Icon(Icons.palette_outlined, size: 18),
+            label: const Text('きせかえ'),
+          ),
           // コイン残高バッジ
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -223,8 +237,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                       style: const TextStyle(fontSize: 11),
                     ),
                     if (!item.isConsumable)
-                      const Text(
-                        '設定画面で使えるよ！',
+                      Text(
+                        item.imageAsset != null
+                            ? '「きせかえ」でつけよう！'
+                            : '設定画面で使えるよ！',
                         style: TextStyle(fontSize: 11),
                       ),
                   ],
@@ -321,6 +337,8 @@ class _ShopItemCard extends StatelessWidget {
     switch (item.category) {
       case ShopCategory.character:  return const Color(0xFF9B59B6);
       case ShopCategory.background: return const Color(0xFF3498DB);
+      case ShopCategory.frame:      return const Color(0xFFE91E63);
+      case ShopCategory.effect:     return const Color(0xFF00ACC1);
       case ShopCategory.sound:      return const Color(0xFF27AE60);
       case ShopCategory.hint:       return const Color(0xFFE67E22);
     }
@@ -360,9 +378,17 @@ class _ShopItemCard extends StatelessWidget {
               color: _categoryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: UkalabEmoji(item.emoji, size: 26),
-            ),
+            clipBehavior: Clip.antiAlias,
+            child: item.imageAsset != null
+                ? Image.asset(
+                    item.imageAsset!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Center(child: UkalabEmoji(item.emoji, size: 26)),
+                  )
+                : Center(
+                    child: UkalabEmoji(item.emoji, size: 26),
+                  ),
           ),
           const SizedBox(width: 12),
           // 情報エリア

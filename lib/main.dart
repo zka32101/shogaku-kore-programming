@@ -10,6 +10,7 @@ import 'package:shared_core/shared_core.dart'
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier, RevenueCatService, coinProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
+import 'features/shop/decor/decor_scope.dart';
 import 'config/theme.dart';
 import 'config/constants.dart';
 import 'providers/profile_provider.dart';
@@ -327,6 +328,7 @@ class _ShogakuKoreProgrammingAppState
       darkTheme: darkAppTheme,
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) => DecorBackdrop(child: child ?? const SizedBox.shrink()),
       home: const SplashScreen(),
     );
   }
