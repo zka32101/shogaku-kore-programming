@@ -3,20 +3,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shogaku_kore_programming/widgets/branded_splash.dart';
 
 void main() {
-  testWidgets('起動画面: 中央に教科アイコン、下に組織ロゴ（1枚構成）', (tester) async {
-    await tester.pumpWidget(const MaterialApp(
-      home: BrandedSplash(
-        title: '小学コレ！プログラミング',
-        subtitle: 'テスト',
-        gradient: [Colors.green, Colors.teal],
-      ),
-    ));
-    await tester.pump(const Duration(milliseconds: 1300));
-    expect(find.text('小学コレ！プログラミング'), findsOneWidget);
-    expect(find.text('Your Wish'), findsOneWidget);
-    final icon = tester.getCenter(find.byKey(const ValueKey('splash_app_icon')));
-    final logo = tester.getCenter(find.byKey(const ValueKey('splash_company_logo')));
-    expect(logo.dy, greaterThan(icon.dy));
+  testWidgets('起動画面: 白背景・アイコン/シリーズロゴ/組織ロゴの3つが縦に並ぶ', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: BrandedSplash()));
+    await tester.pump();
+    final icon = find.byKey(const ValueKey('splash_app_icon'));
+    final series = find.byKey(const ValueKey('splash_series_logo'));
+    final company = find.byKey(const ValueKey('splash_company_logo'));
+    expect(icon, findsOneWidget);
+    expect(series, findsOneWidget);
+    expect(company, findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+        const Color(0xFFFFFFFF));
+    expect(tester.getCenter(series).dy, greaterThan(tester.getCenter(icon).dy));
+    expect(tester.getCenter(company).dy,
+        greaterThan(tester.getCenter(series).dy));
+    expect(tester.getSize(company).width,
+        lessThan(tester.getSize(series).width));
     expect(tester.takeException(), isNull);
   });
 }

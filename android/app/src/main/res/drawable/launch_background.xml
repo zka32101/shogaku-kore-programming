@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- OS側の起動画面。Flutterの起動画面グラデーション開始色に合わせる -->
+<!-- OS側の起動画面。Flutter側の起動画面の背景（白）に合わせる単色 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/splash_background" />
 </layer-list>
