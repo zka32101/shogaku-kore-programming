@@ -1,3 +1,4 @@
+import '../features/shop/decor/decor_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,7 +19,7 @@ class CharacterScreen extends ConsumerWidget {
     final next = my.nextThreshold;
 
     return Scaffold(
-      backgroundColor: context.isDark ? const Color(0xFF121212) : const Color(0xFFF5F7FA),
+      backgroundColor: DecorScope.pageBg(context, context.isDark ? const Color(0xFF121212) : const Color(0xFFF5F7FA)),
       appBar: AppBar(
         title: const Text('マイキャラ'),
         backgroundColor: kPrimaryColor,

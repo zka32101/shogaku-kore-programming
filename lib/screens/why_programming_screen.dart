@@ -1,3 +1,4 @@
+import '../features/shop/decor/decor_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -59,7 +60,7 @@ class _WhyProgrammingScreenState extends State<WhyProgrammingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.cardBg,
+      backgroundColor: DecorScope.pageBg(context, context.cardBg),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

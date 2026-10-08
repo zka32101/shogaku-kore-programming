@@ -1,3 +1,4 @@
+import '../features/shop/decor/decor_scope.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -150,7 +151,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
         return KeyEventResult.ignored;
       },
       child: Scaffold(
-      backgroundColor: context.isDark ? kDarkBackground : const Color(0xFFFFF8F0),
+      backgroundColor: DecorScope.pageBg(context, context.isDark ? kDarkBackground : const Color(0xFFFFF8F0)),
       body: SafeArea(
         child: Stack(
           children: [

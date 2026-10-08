@@ -1,3 +1,4 @@
+import '../features/shop/decor/decor_scope.dart';
 import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,7 +94,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: context.isDark ? const Color(0xFF121212) : const Color(0xFFF5F7FA),
+      backgroundColor: DecorScope.pageBg(context, context.isDark ? const Color(0xFF121212) : const Color(0xFFF5F7FA)),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_core/shared_core.dart' show AvatarImage, AvatarModel, allAvatars;
+import '../features/shop/decor/decor_scope.dart';
 
 /// プロフィールのアバター表示。
 ///
@@ -28,6 +29,7 @@ class ProfileAvatar extends StatelessWidget {
         child: Center(child: Text(emoji, style: TextStyle(fontSize: size * 0.7))),
       );
     }
-    return AvatarImage(avatar: a, size: size);
+    // 買ったフレームをつけていれば重ねる
+    return DecorFrame(size: size, child: AvatarImage(avatar: a, size: size));
   }
 }

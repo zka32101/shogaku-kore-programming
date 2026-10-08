@@ -84,6 +84,8 @@ flutter:
     - assets/badges/
     - assets/icons/
     - assets/characters/
+    - assets/shop/
+    - assets/shop/thumb/
     - assets/logos/
   fonts:
     # 漢字が正しい字形(日本語字形)で表示されない不具合の修正。
