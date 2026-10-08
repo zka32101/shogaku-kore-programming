@@ -18,6 +18,10 @@ class DecorScope extends InheritedWidget {
   static Color pageBg(BuildContext context, Color fallback) =>
       (maybeOf(context)?.hasBackground ?? false) ? Colors.transparent : fallback;
 
+  /// 背景つきのとき、背景に直接載る文字の下に敷く白いうすい地。なければ透明。
+  static Color chipBg(BuildContext context) =>
+      (maybeOf(context)?.hasBackground ?? false) ? Colors.white.withValues(alpha: 0.82) : Colors.transparent;
+
   @override
   bool updateShouldNotify(DecorScope oldWidget) =>
       hasBackground != oldWidget.hasBackground || frameAsset != oldWidget.frameAsset;
@@ -61,6 +65,26 @@ class DecorBackdrop extends ConsumerWidget {
           Positioned.fill(child: ColoredBox(color: veil)),
         ],
         content,
+        // 白い雲の背景でも、白い時計・電池アイコンが読めるよう、上端にうすい暗い帯を敷く
+        if (bg != null)
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            height: MediaQuery.paddingOf(context).top + 6,
+            child: const IgnorePointer(
+              child: DecoratedBox(
+                key: ValueKey('decor_status_scrim'),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x59000000), Color(0x00000000)],
+                  ),
+                ),
+              ),
+            ),
+          ),
         if (fx != null) Positioned.fill(child: IgnorePointer(child: _Effect(fx.id))),
       ],
     );
