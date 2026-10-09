@@ -86,6 +86,7 @@ flutter:
     - assets/characters/
     - assets/shop/
     - assets/shop/thumb/
+    - assets/illustrations/
     - assets/logos/
     - assets/certificates/
   fonts:
