@@ -33,7 +33,14 @@ void main() {
       expect(File(i.asset).existsSync(), true, reason: i.asset);
       expect(File(i.thumb).existsSync(), true, reason: i.thumb);
     }
-    expect(kDecorItems.length, 23);
+    expect(kDecorItems.length, 29);
+    // 追加分: 教科別エフェクト1 + 冬の季節5
+    for (final id in ['effect_programming', 'bg_christmas', 'bg_newyear', 'frame_christmas', 'effect_christmas', 'effect_newyear']) {
+      expect(decorItemById(id), isNotNull, reason: id);
+    }
+    expect(decorItemById('effect_programming')!.season, isNull);
+    expect(kDecorItems.where((i) => i.season == 'winter').length, 8);
+    expect(File('assets/illustrations/empty_closet.webp').existsSync(), true);
     // 季節の網羅: 春夏秋冬のどれにも商品があり、通年(常設)もある
     for (final s in ['spring', 'summer', 'autumn', 'winter']) {
       expect(kDecorItems.where((i) => i.season == s).isNotEmpty, true, reason: s);
@@ -115,6 +122,7 @@ void main() {
     await tester.pumpWidget(UncontrolledProviderScope(container: empty, child: const MaterialApp(home: DecorScreen())));
     await tester.pump();
     expect(find.textContaining('まだきせかえをもっていないよ'), findsOneWidget);
+    expect(find.byKey(const ValueKey('decor_empty_illustration')), findsOneWidget);
   });
 
   testWidgets('DecorBackdrop: 背景つきなら絵と膜を敷き、なければ子だけ', (tester) async {
