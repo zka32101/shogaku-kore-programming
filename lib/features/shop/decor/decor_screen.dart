@@ -5,6 +5,7 @@ import '../../../providers/coin_provider.dart';
 import 'decor_items.dart';
 import 'decor_provider.dart';
 import 'decor_scope.dart';
+import '../title/title_section.dart';
 
 /// 買ったきせかえ（背景・フレーム・エフェクト）をえらんでつける画面。
 class DecorScreen extends ConsumerWidget {
@@ -23,21 +24,23 @@ class DecorScreen extends ConsumerWidget {
         backgroundColor: kPrimaryColor,
         foregroundColor: Colors.white,
       ),
-      body: mine.isEmpty
-          ? const _Empty()
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                for (final kind in DecorKind.values) ...[
-                  _Section(
-                    kind: kind,
-                    items: [for (final i in mine) if (i.kind == kind) i],
-                    activeId: active.of(kind),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ],
-            ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (mine.isEmpty)
+            const SizedBox(height: 320, child: _Empty())
+          else
+            for (final kind in DecorKind.values) ...[
+              _Section(
+                kind: kind,
+                items: [for (final i in mine) if (i.kind == kind) i],
+                activeId: active.of(kind),
+              ),
+              const SizedBox(height: 16),
+            ],
+          const TitleSection(),
+        ],
+      ),
     );
   }
 }
