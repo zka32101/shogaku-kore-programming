@@ -123,6 +123,8 @@ void main() {
     await tester.pump();
     expect(find.textContaining('まだきせかえをもっていないよ'), findsOneWidget);
     expect(find.byKey(const ValueKey('decor_empty_illustration')), findsOneWidget);
+    // 称号区分が進捗の読み込みを待つので、終了前に落ち着かせる
+    await tester.pumpAndSettle(const Duration(seconds: 1));
   });
 
   testWidgets('DecorBackdrop: 背景つきなら絵と膜を敷き、なければ子だけ', (tester) async {

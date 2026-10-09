@@ -1,4 +1,6 @@
 import '../features/shop/decor/decor_scope.dart';
+import '../features/shop/title/title_plate.dart';
+import '../features/shop/title/title_provider.dart';
 import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -175,6 +177,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   'レベル ${progress.currentLevel} ・ 🔥 ${progress.streakDays}日連続',
                   style: const TextStyle(fontSize: 12, color: Colors.white70),
                 ),
+                if (ref.watch(activeTitleProvider) case final title?) ...[
+                  const SizedBox(height: 6),
+                  TitlePlate(name: title.name),
+                ],
               ],
             ),
           ),
