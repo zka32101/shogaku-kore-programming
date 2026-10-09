@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_work.dart';
 import '../providers/gallery_provider.dart';
 import '../services/haptic_service.dart';
+import '../widgets/work_thumbnail.dart';
 import 'free_create_screen.dart';
 import 'play_created_game_screen.dart';
 
@@ -124,28 +125,12 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // 作品サムネイル
-                  Container(
-                    width: double.infinity,
+                  SizedBox(
                     height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                    child: WorkThumbnail(
+                      work: work,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: work.resultImage.isNotEmpty
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.memory(
-                              Uri.parse(work.resultImage).data!.contentAsBytes(),
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => const Icon(
-                                Icons.broken_image,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          )
-                        : const Center(
-                            child: Icon(Icons.image_not_supported),
-                          ),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -193,34 +178,12 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
           children: [
             // サムネイル
             Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
+              child: WorkThumbnail(
+                work: work,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
                 ),
-                child: work.resultImage.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                        child: Image.memory(
-                          Uri.parse(work.resultImage)
-                              .data!
-                              .contentAsBytes(),
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const Icon(
-                            Icons.broken_image,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      )
-                    : const Center(
-                        child: Icon(Icons.image_not_supported, size: 40),
-                      ),
               ),
             ),
             // 情報セクション

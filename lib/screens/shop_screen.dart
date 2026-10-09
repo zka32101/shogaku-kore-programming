@@ -38,34 +38,28 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     return Scaffold(
       backgroundColor: DecorScope.pageBg(context, context.cardBg),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => Navigator.pop(context),
+        // 他画面と同じテーマ標準のAppBar（ステータスバー領域も同色で塗る）
+        title: const Text(
+          '🏪 ショップ',
+          key: Key('shop_title'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        title: Text(
-          '🏪 コインショップ',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: context.textPrimary,
-          ),
-        ),
-        centerTitle: true,
         actions: [
-          TextButton.icon(
+          IconButton(
+            tooltip: 'きせかえ',
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute<void>(builder: (_) => const DecorScreen()),
             ),
-            icon: const Icon(Icons.palette_outlined, size: 18),
-            label: const Text('きせかえ'),
+            icon: const Icon(Icons.palette_outlined),
           ),
           // コイン残高バッジ
           Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _CoinBadge(balance: coinState.balance, large: false),
+            padding: const EdgeInsets.only(right: 12),
+            child: Center(
+              child: _CoinBadge(balance: coinState.balance, large: false),
+            ),
           ),
         ],
       ),

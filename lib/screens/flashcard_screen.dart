@@ -1007,9 +1007,9 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
       ),
       padding: EdgeInsets.fromLTRB(
         4,
-        MediaQuery.of(context).padding.top + 8,
+        MediaQuery.of(context).padding.top + 4,
         16,
-        16,
+        12,
       ),
       child: Column(
         children: [
@@ -1025,6 +1025,10 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                   children: [
                     const Text(
                       'フラッシュカード',
+                      key: Key('flashcard_header_title'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -1046,6 +1050,20 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                   ],
                 ),
               ),
+            ],
+          ),
+          // アクションは2段目に分け、タイトルが縦に折り返さないようにする
+          IconButtonTheme(
+            data: IconButtonThemeData(
+              style: IconButton.styleFrom(
+                minimumSize: const Size(40, 36),
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+            child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
               // 自動めくりトグル
               if (!_listViewMode)
                 IconButton(
@@ -1208,6 +1226,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                   style: const TextStyle(fontSize: 13, color: Colors.white70),
                 ),
             ],
+          ),
           ),
           if (!_sessionDone) ...[
             const SizedBox(height: 8),
