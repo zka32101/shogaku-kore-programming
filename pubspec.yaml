@@ -89,6 +89,7 @@ flutter:
     - assets/illustrations/
     - assets/logos/
     - assets/certificates/
+    - assets/celebrate/
   fonts:
     # 漢字が正しい字形(日本語字形)で表示されない不具合の修正。
     # fontFamily: 'NotoSansJP' はテーマ(theme.dart)で指定されているが、

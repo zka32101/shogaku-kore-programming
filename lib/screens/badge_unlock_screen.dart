@@ -170,7 +170,23 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                       height: 200,
                       child: Stack(
                         alignment: Alignment.center,
+                        clipBehavior: Clip.none,
                         children: [
+                          // 達成演出: 背面のスターバースト（画面幅の約0.8）
+                          IgnorePointer(
+                            child: OverflowBox(
+                              maxWidth: double.infinity,
+                              maxHeight: double.infinity,
+                              child: Image.asset(
+                                'assets/celebrate/celebrate_starburst.webp',
+                                key: const Key('badgeStarburst'),
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, _, _) =>
+                                    const SizedBox.shrink(),
+                              ),
+                            ),
+                          ),
                           // 光線
                           AnimatedBuilder(
                             animation: _raysScale,
@@ -221,6 +237,43 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
+                              ),
+                            ),
+                          ),
+                          // 達成演出: リボン＋おめでとう（バッジ上部に重ねる）
+                          Positioned(
+                            top: -18,
+                            child: IgnorePointer(
+                              child: ScaleTransition(
+                                scale: _badgeScale,
+                                child: SizedBox(
+                                  key: const Key('badgeRibbon'),
+                                  width: 170,
+                                  height: 48,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/celebrate/celebrate_ribbon_banner.webp',
+                                        width: 170,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, _, _) =>
+                                            const SizedBox.shrink(),
+                                      ),
+                                      const FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'おめでとう！',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF461905),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),

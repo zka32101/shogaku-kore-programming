@@ -729,14 +729,31 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Text('⬆️', style: TextStyle(fontSize: 18)),
+                                  Image.asset(
+                                    'assets/celebrate/celebrate_trophy.webp',
+                                    key: const Key('levelUpTrophy'),
+                                    width: 32,
+                                    height: 32,
+                                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Image.asset(
+                                    'assets/celebrate/levelup_arrow.webp',
+                                    key: const Key('levelUpArrow'),
+                                    width: 28,
+                                    height: 28,
+                                    errorBuilder: (_, _, _) =>
+                                        const Text('⬆️', style: TextStyle(fontSize: 18)),
+                                  ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    'レベルアップ！ Lv.${widget.newLevel} になった！',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                  Flexible(
+                                    child: Text(
+                                      'レベルアップ！ Lv.${widget.newLevel} になった！',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],
