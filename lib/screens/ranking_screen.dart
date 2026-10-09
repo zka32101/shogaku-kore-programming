@@ -1,3 +1,4 @@
+import '../config/challenge_colors.dart';
 import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -504,13 +505,12 @@ class _WeeklyChallengesCard extends ConsumerWidget {
               children: challenges.asMap().entries.map((entry) {
                 final i = entry.key;
                 final (emoji, title, desc, done) = entry.value;
+                final cc = ChallengeItemColors.of(dark: context.isDark, done: done);
                 return Container(
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
-                    color: done
-                        ? kPrimaryColor.withValues(alpha: 0.08)
-                        : context.shadowColor.withValues(alpha: 0.5),
+                    color: cc.background,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: done
@@ -531,16 +531,16 @@ class _WeeklyChallengesCard extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: context.textPrimary,
+                                color: cc.title,
                                 decoration: done ? TextDecoration.lineThrough : null,
-                                decorationColor: context.textSecondary,
+                                decorationColor: cc.desc,
                               ),
                             ),
                             Text(
                               desc,
                               style: TextStyle(
-                                fontSize: 10,
-                                color: context.textSecondary,
+                                fontSize: 11,
+                                color: cc.desc,
                               ),
                             ),
                           ],
