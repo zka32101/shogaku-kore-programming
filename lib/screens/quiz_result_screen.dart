@@ -734,7 +734,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                                     key: const Key('levelUpTrophy'),
                                     width: 32,
                                     height: 32,
-                                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
                                   ),
                                   const SizedBox(width: 4),
                                   Image.asset(
@@ -742,7 +742,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                                     key: const Key('levelUpArrow'),
                                     width: 28,
                                     height: 28,
-                                    errorBuilder: (_, __, ___) =>
+                                    errorBuilder: (_, _, _) =>
                                         const Text('⬆️', style: TextStyle(fontSize: 18)),
                                   ),
                                   const SizedBox(width: 8),

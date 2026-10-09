@@ -182,7 +182,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                                 key: const Key('badgeStarburst'),
                                 width: MediaQuery.of(context).size.width * 0.8,
                                 fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) =>
+                                errorBuilder: (_, _, _) =>
                                     const SizedBox.shrink(),
                               ),
                             ),
@@ -257,7 +257,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                                         'assets/celebrate/celebrate_ribbon_banner.webp',
                                         width: 170,
                                         fit: BoxFit.contain,
-                                        errorBuilder: (_, __, ___) =>
+                                        errorBuilder: (_, _, _) =>
                                             const SizedBox.shrink(),
                                       ),
                                       const FittedBox(
