@@ -19,7 +19,7 @@ dependencies:
   cross_promo_kit:
     git:
       url: https://github.com/zka32101/cross_promo_kit.git
-      ref: v0.2.0
+      ref: v0.3.0
 
   cupertino_icons: ^1.0.8
   url_launcher: ^6.3.0
@@ -76,6 +76,14 @@ flutter_launcher_icons:
   min_sdk_android: 21
   adaptive_icon_background: "assets/icons/adaptive_bg.png"
   adaptive_icon_foreground: "assets/icons/adaptive_fg.png"
+
+# shared_core が cross_promo_kit を v0.2.0 で固定している間は、v0.3.0 に上書きする。
+# shared_core 側が v0.3.0 以降を参照するようになったら削除してよい。
+dependency_overrides:
+  cross_promo_kit:
+    git:
+      url: https://github.com/zka32101/cross_promo_kit.git
+      ref: v0.3.0
 
 flutter:
   uses-material-design: true
