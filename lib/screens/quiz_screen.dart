@@ -27,6 +27,7 @@ import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
 import 'quiz_result_screen.dart';
+import '../data/explain_images.dart';
 import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
@@ -1382,6 +1383,20 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
             ],
           ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.05, curve: Curves.easeOut),
           const SizedBox(height: 20),
+          // 説明画像（あるステージのみ）
+          if (explainImageForStage(widget.challenge.id) != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                explainImageForStage(widget.challenge.id)!,
+                height: 160,
+                width: double.infinity,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           // 説明本文
           ...lines.asMap().entries.map((e) {
             final line = e.value.trim();
