@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/notification_service.dart';
+import '../streak_dates.dart';
 
 /// User progress for a challenge/stage
 class UserProgress {
@@ -56,6 +57,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
 
   static const String _storageKey = 'user_progress';
   static const String _streakKey = 'streak_count';
+  static const String _studyDatesKey = 'study_dates';
   static const String _lastActiveDateKey = 'last_active_date';
   static const String _bonusKey = 'bonus_points';
   static const String _totalQuestionsKey = 'total_questions_answered';
@@ -71,6 +73,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   static const String _activityLogKey = 'activity_log_v2'; // 日付別アクティビティ（全モード合算）
 
   int _streakDays = 0;
+  List<String> _studyDates = [];
   int _longestStreak = 0;
   DateTime? _lastActiveDate;
   int _bonusPoints = 0;
@@ -89,6 +92,9 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   bool _isLoaded = false; // _loadProgress 完了フラグ（初回ロード完了を検出するため）
 
   int get streakDays => _streakDays;
+
+  /// 学習(クイズ完了)した日。連続学習カレンダー用。バックフィルなし(連続は「開いた日」基準のため)。
+  Set<DateTime> get studyDates => studyDatesToSet(_studyDates);
   int get longestStreak => _longestStreak;
   int get bonusPoints => _bonusPoints;
   int get totalQuestionsAnswered => _totalQuestionsAnswered;
@@ -232,6 +238,9 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
         lastDateStr != null ? DateTime.tryParse(lastDateStr) : null;
     _lastShownStreakMilestone = prefs.getInt(_lastShownStreakMilestoneKey) ?? 0;
 
+    _studyDates = normalizeStudyDates(
+        prefs.getStringList(_studyDatesKey) ?? const [], DateTime.now());
+
     // 起動時にストリーク更新
     await _updateStreakOnOpen(prefs);
 
@@ -309,6 +318,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   Future<void> completeChallenge(String challengeId, int stars) async {
     // 再挑戦でスターが下がっても以前のベストを保持する
     final bestStars = (state[challengeId]?.starsEarned ?? 0);
+    _studyDates = addStudyDate(_studyDates, DateTime.now());
     state = {
       ...state,
       (challengeId): UserProgress(
@@ -319,6 +329,8 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
       ),
     };
     await _saveProgress();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_studyDatesKey, _studyDates);
   }
 
   UserProgress getProgress(String challengeId) {
@@ -344,7 +356,9 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     _activityLog = {};
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_storageKey);
+    _studyDates = [];
     await prefs.remove(_streakKey);
+    await prefs.remove(_studyDatesKey);
     await prefs.remove(_lastActiveDateKey);
     await prefs.remove(_bonusKey);
     await prefs.remove(_totalQuestionsKey);

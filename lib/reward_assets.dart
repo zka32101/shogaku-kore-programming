@@ -19,3 +19,18 @@ String rewardStickerAsset(int correct, int total) {
   if (total > 0 && correct / total >= 0.8) return '${base}sticker_star.webp';
   return '${base}sticker_flower.webp';
 }
+
+/// おまけシール(結果画面のメインシールの隣、最大2個)。
+/// 優先順: 初挑戦=rocket, 自己ベスト=trophy_blue, 初回満点=rainbow_star。
+List<String> bonusStickerAssets({
+  required bool firstAttempt,
+  required bool personalBest,
+  required bool firstPerfect,
+}) {
+  const base = 'assets/reward/';
+  return [
+    if (firstAttempt) '${base}sticker_rocket.webp',
+    if (personalBest) '${base}sticker_trophy_blue.webp',
+    if (firstPerfect) '${base}sticker_rainbow_star.webp',
+  ].take(2).toList();
+}
