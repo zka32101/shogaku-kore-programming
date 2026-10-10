@@ -10,6 +10,7 @@ import '../config/constants.dart';
 import '../config/theme.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
+import '../reward_assets.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
@@ -899,6 +900,15 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
               ),
             ),
           ),
+          if (widget.stars >= 1 && widget.totalCount > 0) ...[
+            const SizedBox(height: 10),
+            Image.asset(
+              rewardStickerAsset(widget.correctCount, widget.totalCount),
+              width: 72,
+              height: 72,
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            ),
+          ],
           // 全問正解パーフェクトバナー
           if (widget.stars == 3) ...[
             const SizedBox(height: 10),
