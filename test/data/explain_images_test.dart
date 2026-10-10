@@ -20,7 +20,7 @@ void main() {
     expect(explainImageForLesson('lesson_bug'),
         'assets/illustrations/explain_lesson_bug.webp');
     expect(explainImageForLesson('nope'), isNull);
-    expect(kExplainStageIds.length, 21);
+    expect(kExplainStageIds.length, 23);
     expect(kExplainLessonIds.length, 7);
   });
 }
