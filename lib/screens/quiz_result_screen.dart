@@ -902,11 +902,30 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
           ),
           if (widget.stars >= 1 && widget.totalCount > 0) ...[
             const SizedBox(height: 10),
-            Image.asset(
-              rewardStickerAsset(widget.correctCount, widget.totalCount),
-              width: 72,
-              height: 72,
-              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  rewardStickerAsset(widget.correctCount, widget.totalCount),
+                  width: 72,
+                  height: 72,
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                ),
+                for (final b in bonusStickerAssets(
+                  firstAttempt: widget.isFirstComplete,
+                  personalBest:
+                      !widget.isFirstComplete && widget.stars > widget.previousStars,
+                  firstPerfect: widget.stars == 3 && widget.previousStars < 3,
+                ))
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Image.asset(
+                      b,
+                      height: 48,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
+                  ),
+              ],
             ),
           ],
           // 全問正解パーフェクトバナー

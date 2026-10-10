@@ -1,4 +1,5 @@
 import '../reward_assets.dart';
+import '../widgets/streak_calendar.dart';
 import '../features/shop/decor/decor_scope.dart';
 import '../features/shop/title/title_plate.dart';
 import '../features/shop/title/title_provider.dart';
@@ -174,7 +175,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                Row(
+                InkWell(
+                  key: const Key('streak_calendar_button'),
+                  onTap: () => showStreakCalendar(context, progress.studyDates),
+                  child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Flexible(
@@ -197,6 +201,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       style: const TextStyle(fontSize: 12, color: Colors.white70),
                     ),
                   ],
+                  ),
                 ),
                 if (ref.watch(activeTitleProvider) case final title?) ...[
                   const SizedBox(height: 6),
