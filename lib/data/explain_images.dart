@@ -1,6 +1,18 @@
 /// 説明画像（assets/illustrations/explain_*.webp）の対応表。
 /// 画像が無いステージ／レッスンは null を返し、UI 側では非表示にする。
 const Set<String> kExplainStageIds = {
+  'stage_01',
+  'stage_06',
+  'stage_07',
+  'stage_08',
+  'stage_09',
+  'stage_10',
+  'stage_21',
+  'stage_22',
+  'stage_24',
+  'stage_42',
+  'stage_47',
+  'stage_53',
   'stage_02',
   'stage_03',
   'stage_04',
@@ -36,9 +48,12 @@ const Set<String> kExplainLessonIds = {
   'lesson_bug',
 };
 
+/// 画像ファイルを他ステージと共有するもの（stage_24 は stage_21 の画像を流用）。
+const Map<String, String> _kExplainStageAlias = {'stage_24': 'stage_21'};
+
 String? explainImageForStage(String stageId) =>
     kExplainStageIds.contains(stageId)
-    ? 'assets/illustrations/explain_$stageId.webp'
+    ? 'assets/illustrations/explain_${_kExplainStageAlias[stageId] ?? stageId}.webp'
     : null;
 
 String? explainImageForLesson(String lessonId) =>
