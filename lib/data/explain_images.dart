@@ -10,6 +10,7 @@ const Set<String> kExplainStageIds = {
   'stage_21',
   'stage_22',
   'stage_24',
+  'stage_41',
   'stage_42',
   'stage_47',
   'stage_53',
