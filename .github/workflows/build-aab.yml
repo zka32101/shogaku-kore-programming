@@ -1,0 +1,93 @@
+name: Build Release AAB (no upload)
+
+# 手動実行専用。署名済みの AAB を Artifacts に出すだけで、Play へはアップロードしない。
+# 必要な Secrets: RELEASE_KEYSTORE_BASE64 / KEYSTORE_PASSWORD / KEY_PASSWORD / KEY_ALIAS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-aab:
+    name: Build signed release AAB
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.1'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: |
+          rm -rf .dart_tool pubspec.lock
+          flutter clean
+          flutter pub get
+
+      - name: Ensure Gradle wrapper JAR
+        working-directory: android
+        run: |
+          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+            GRADLE_VERSION=$(sed -n 's|.*/gradle-\(.*\)-all\.zip|\1|p' gradle/wrapper/gradle-wrapper.properties)
+            TMP=$(mktemp -d)
+            touch "$TMP/settings.gradle"
+            (cd "$TMP" && gradle wrapper --gradle-version "$GRADLE_VERSION" --distribution-type all -q)
+            cp "$TMP/gradle/wrapper/gradle-wrapper.jar" gradle/wrapper/gradle-wrapper.jar
+            rm -rf "$TMP"
+            echo "Generated gradle-wrapper.jar for Gradle $GRADLE_VERSION"
+          else
+            echo "gradle-wrapper.jar already exists"
+          fi
+
+      - name: Write release keystore and key.properties
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          for v in RELEASE_KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_PASSWORD KEY_ALIAS; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Secret $v is not set. Add it in Settings > Secrets and variables > Actions."
+              exit 1
+            fi
+          done
+          mkdir -p android/keystore
+          echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > android/keystore/release.jks
+          {
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyPassword=$KEY_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "storeFile=$GITHUB_WORKSPACE/android/keystore/release.jks"
+          } > android/key.properties
+
+      - name: Build AAB
+        run: flutter build appbundle --release
+
+      - name: Verify AAB output
+        run: |
+          AAB=build/app/outputs/bundle/release/app-release.aab
+          if [ ! -f "$AAB" ]; then
+            echo "::error::AAB not found at $AAB"
+            exit 1
+          fi
+          ls -lh "$AAB"
+
+      - name: Upload AAB to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aab-release
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
