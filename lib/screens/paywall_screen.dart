@@ -17,6 +17,17 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   bool _isYearlySelected = false;
 
   @override
+  void initState() {
+    super.initState();
+    // プラン(Offering)は購入/復元の後でしか取得されていなかったため、
+    // 課金画面を開いた時点で取得する（未取得だと「購読プランが利用できません」になる）
+    Future.microtask(() {
+      if (!mounted) return;
+      ref.read(subscriptionProvider.notifier).refreshSubscriptionStatus();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -342,8 +353,12 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final subscription = ref.read(subscriptionProvider);
-      final offerings = subscription.availableOfferings;
+      var offerings = ref.read(subscriptionProvider).availableOfferings;
+      if (offerings == null || offerings.isEmpty) {
+        // まだ取得できていなければ、ここで取得し直す
+        await ref.read(subscriptionProvider.notifier).refreshSubscriptionStatus();
+        offerings = ref.read(subscriptionProvider).availableOfferings;
+      }
 
       if (offerings == null || offerings.isEmpty) {
         throw Exception('購読プランが利用できません');
