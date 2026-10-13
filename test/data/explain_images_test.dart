@@ -16,11 +16,11 @@ void main() {
   test('lookup', () {
     expect(explainImageForStage('stage_02'),
         'assets/illustrations/explain_stage_02.webp');
-    expect(explainImageForStage('stage_01'), isNull);
+    expect(explainImageForStage('stage_99'), isNull);
     expect(explainImageForLesson('lesson_bug'),
         'assets/illustrations/explain_lesson_bug.webp');
     expect(explainImageForLesson('nope'), isNull);
-    expect(kExplainStageIds.length, 23);
+    expect(kExplainStageIds.length, 60);
     expect(kExplainLessonIds.length, 7);
   });
 }
