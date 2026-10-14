@@ -1955,9 +1955,6 @@ class _PremiumGateSheet extends StatelessWidget {
                   const SizedBox(height: 6),
                   _BenefitRow(text: '上級Pythonコース')
                       .animate(delay: 390.ms).fadeIn(duration: 250.ms).slideX(begin: 0.05, curve: Curves.easeOut, duration: 250.ms),
-                  const SizedBox(height: 6),
-                  _BenefitRow(text: '広告なしで快適に学習')
-                      .animate(delay: 440.ms).fadeIn(duration: 250.ms).slideX(begin: 0.05, curve: Curves.easeOut, duration: 250.ms),
                 ],
               ),
             ).animate(delay: 320.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
