@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:shared_core/shared_core.dart' show requireParentalGate;
 
 import '../providers/subscription_provider.dart';
 import '../utils/constants.dart';
@@ -343,6 +344,13 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   }
 
   Future<void> _handlePurchase() async {
+    // 課金の前に、保護者(大人)であることを確認する。
+    // どの画面から課金画面に来ても、ここで必ずゲートを通る。
+    final passedGate = await requireParentalGate(
+      context,
+      description: 'これはアプリ内課金の操作です。\n下の計算の答えを入力してください。',
+    );
+    if (!passedGate || !mounted) return;
     setState(() => _isLoading = true);
 
     try {
