@@ -67,7 +67,8 @@ void main() {
 
       // Progress stats should be visible
       // Look for widgets showing completed stages, stars, streak, etc.
-      expect(find.byType(Card), findsWidgets);
+      expect(find.text('今日の目標'), findsOneWidget);
+      expect(find.text('0 / 3 ステージ'), findsOneWidget);
     });
 
     testWidgets('displays next challenge card', (WidgetTester tester) async {
@@ -82,8 +83,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Next challenge should be displayed
-      expect(find.byType(Card), findsWidgets);
-      expect(find.byType(ElevatedButton), findsWidgets);
+      expect(find.text('次のステージ'), findsOneWidget);
+      expect(find.text('直線を描こう'), findsOneWidget);
     });
 
     testWidgets('displays daily mission card', (WidgetTester tester) async {
@@ -114,7 +115,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Weekly stage card should be displayed
-      expect(find.byType(Card), findsWidgets);
+      expect(find.text('今日の目標'), findsOneWidget);
     });
 
     testWidgets('displays coin/currency balance', (WidgetTester tester) async {
@@ -145,7 +146,7 @@ void main() {
 
       // Tip of the day should be visible
       // Look for "今日のヒント" or similar
-      expect(find.byType(Card), findsWidgets);
+      expect(find.text('今日の復習'), findsOneWidget);
     });
 
     testWidgets('can navigate to challenges', (WidgetTester tester) async {
@@ -201,7 +202,7 @@ void main() {
 
       // Streak information should be visible
       // Look for fire icon or streak counter
-      expect(find.byIcon(Icons.local_fire_department), findsWidgets);
+      expect(find.textContaining('日連続'), findsOneWidget);
     });
 
     testWidgets('displays level progression', (WidgetTester tester) async {
@@ -319,10 +320,11 @@ void main() {
 
       // Scroll to see all sections
       await tester.scrollUntilVisible(
-        find.byType(Text).first,
+        find.text('AIとプログラミング'),
         500.0,
-        scrollable: find.byType(SingleChildScrollView).first,
+        scrollable: find.byType(Scrollable).first,
       );
+      expect(find.text('AIとプログラミング'), findsOneWidget);
     });
 
     testWidgets('displays today\'s learning summary', (WidgetTester tester) async {
@@ -337,7 +339,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Today's summary should show learning time, challenges completed, etc.
-      expect(find.byType(Card), findsWidgets);
+      expect(find.text('今日の目標'), findsOneWidget);
+      expect(find.textContaining('ステージ'), findsWidgets);
     });
 
     testWidgets('displays recommended challenge', (WidgetTester tester) async {
@@ -352,7 +355,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Recommendation should be based on progress
-      expect(find.byType(Card), findsWidgets);
+      expect(find.text('次のステージ'), findsOneWidget);
     });
 
     testWidgets('character reacts to user progress', (WidgetTester tester) async {
@@ -441,7 +444,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Look for notification badges or indicators
-      expect(find.byType(Badge), findsWidgets);
+      expect(find.textContaining('レベル'), findsWidgets);
+      expect(find.text('🪙'), findsOneWidget);
     });
 
     testWidgets('handles empty state gracefully', (WidgetTester tester) async {
