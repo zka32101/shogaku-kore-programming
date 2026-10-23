@@ -177,8 +177,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Learning streak should be visible
-        expect(find.byIcon(Icons.local_fire_department), findsWidgets);
+        // Learning streak should be visible (🔥 emoji)
+        expect(find.text('🔥'), findsWidgets);
       });
 
       testWidgets('displays perfect stages count', (WidgetTester tester) async {
@@ -286,7 +286,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Share button should be available
-        expect(find.byIcon(Icons.share), findsWidgets);
+        expect(find.byIcon(Icons.share_outlined), findsWidgets);
       });
 
       testWidgets('copies profile stats to clipboard with S key',
@@ -331,9 +331,11 @@ void main() {
 
       testWidgets('navigates back with Escape key', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: const ProfileScreen(),
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: const ProfileScreen(),
+              ),
             ),
           ),
         );
@@ -347,9 +349,11 @@ void main() {
       testWidgets('navigates back with Backspace key',
           (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: const ProfileScreen(),
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: const ProfileScreen(),
+              ),
             ),
           ),
         );
@@ -481,7 +485,8 @@ void main() {
     group('Navigation', () {
       testWidgets('back button navigates correctly', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          ProviderScope(
+            child: MaterialApp(
             home: Scaffold(
               appBar: AppBar(
                 leading: Builder(
@@ -492,6 +497,7 @@ void main() {
                 ),
               ),
               body: const ProfileScreen(),
+            ),
             ),
           ),
         );
@@ -514,7 +520,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Navigation buttons should be present
-        expect(find.byType(ElevatedButton), findsWidgets);
+        expect(find.byType(OutlinedButton), findsWidgets);
       });
     });
 
@@ -635,11 +641,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // Scroll through all sections
-        await tester.scrollUntilVisible(
-          find.byType(Text).first,
-          500.0,
-          scrollable: find.byType(SingleChildScrollView).first,
-        );
+        await tester.drag(find.byType(Scrollable).first, const Offset(0, -500));
+        await tester.pumpAndSettle();
 
         // All major components should be present
         expect(find.byType(Text), findsWidgets);

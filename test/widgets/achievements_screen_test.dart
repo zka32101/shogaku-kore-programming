@@ -64,7 +64,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // First tab should be badges/achievements
-      expect(find.byType(Card), findsWidgets);
+      expect(find.text('次に解除できるバッジ'), findsOneWidget);
+      expect(find.text('はじめの一歩'), findsOneWidget);
     });
 
     testWidgets('displays badge icons', (WidgetTester tester) async {
@@ -187,8 +188,8 @@ void main() {
         await tester.tap(tabs.at(1));
         await tester.pumpAndSettle();
 
-        // Clear records should be displayed
-        expect(find.byType(ListView), findsWidgets);
+        // まだクリアしたステージが無いときは案内が表示される
+        expect(find.textContaining('まだクリアしたステージがありません'), findsOneWidget);
       }
     });
 
@@ -368,7 +369,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Look for share button
-      final shareButton = find.byIcon(Icons.share);
+      final shareButton = find.byIcon(Icons.share_outlined);
       expect(shareButton, findsWidgets);
     });
 
@@ -471,9 +472,13 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Look for help button
-      final helpButton = find.byIcon(Icons.help_outline);
-      expect(helpButton, findsWidgets);
+      // ヘルプは専用ボタンではなく Shift + ? のショートカットで開く
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.pumpAndSettle();
+
+      expect(find.text('このヘルプを表示'), findsOneWidget);
     });
 
     testWidgets('scrolls through badges list', (WidgetTester tester) async {
@@ -491,8 +496,9 @@ void main() {
       await tester.drag(find.byType(ListView).first, const Offset(0, -300));
       await tester.pumpAndSettle();
 
-      // More badges should be visible
-      expect(find.byType(Card), findsWidgets);
+      // スクロール後もバッジ一覧が表示されている
+      expect(find.byType(ListView), findsWidgets);
+      expect(find.textContaining('ステージクリア'), findsWidgets);
     });
   });
 }

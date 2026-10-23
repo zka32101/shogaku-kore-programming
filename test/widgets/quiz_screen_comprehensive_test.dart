@@ -10,6 +10,20 @@ import 'package:shogaku_kore_programming/providers/profile_provider.dart';
 import 'package:shogaku_kore_programming/config/constants.dart';
 import 'test_helpers.dart';
 
+/// 回答後は Future.delayed（コンボ表示のクリア・自動進行）が残るため、
+/// 画面サイズはスマホ縦画面に揃える。テスト本体のあとに画面を破棄して時間を進め、残タイマーを消化する。
+void testQuiz(String description, Future<void> Function(WidgetTester) body) {
+  testWidgets(description, (tester) async {
+    // スマホ縦画面。既定の800x600だと下側の選択肢が画面外になりタップできない。
+    tester.view.physicalSize = const Size(411, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await body(tester);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 10));
+  });
+}
+
 void main() {
   setUp(useReducedMotion);
   late ProviderContainer container;
@@ -67,7 +81,7 @@ void main() {
   group('QuizScreen Comprehensive Widget Tests', () {
     // Basic Screen Rendering Tests
     group('Basic Screen Rendering', () {
-      testWidgets('displays quiz screen without errors',
+      testQuiz('displays quiz screen without errors',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -81,7 +95,7 @@ void main() {
         expect(find.byType(QuizScreen), findsOneWidget);
       });
 
-      testWidgets('displays AppBar with challenge title',
+      testQuiz('displays AppBar with challenge title',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -93,13 +107,11 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // AppBar should be visible
-        expect(find.byType(AppBar), findsOneWidget);
-        // Challenge title should be in AppBar
-        expect(find.text('Python基礎'), findsWidgets);
+        // ヘッダーにステージ名が表示される
+        expect(find.text('Python基礎'), findsOneWidget);
       });
 
-      testWidgets('displays progress indicator showing question count',
+      testQuiz('displays progress indicator showing question count',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -111,11 +123,11 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Progress indicator should show current question
-        expect(find.byType(LinearProgressIndicator), findsWidgets);
+        // ヘッダーに「現在の問題番号/全問題数」と正解数が表示される
+        expect(find.text('問1/3  ✅ 0正解'), findsOneWidget);
       });
 
-      testWidgets('displays first question on load', (WidgetTester tester) async {
+      testQuiz('displays first question on load', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -134,26 +146,44 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('displays concept explanation card initially',
+      testQuiz('displays concept explanation card initially',
           (WidgetTester tester) async {
+        final conceptStage = Stage(
+          id: 'quiz_concept',
+          stageNumber: 1,
+          title: 'Python基礎',
+          description: 'Python基本の問題です',
+          level: '初級',
+          icon: '⬜',
+          isFree: true,
+          questions: mockStage.questions,
+          conceptExplanation: 'Pythonの基本的な文法を学びます',
+          type: 'quiz',
+        );
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
-              home: QuizScreen(challenge: mockStage),
+              home: QuizScreen(challenge: conceptStage),
             ),
           ),
         );
 
         await tester.pumpAndSettle();
 
-        // Concept card should be visible at start
-        expect(find.byType(Card), findsWidgets);
+        // 解説カードが問題より先に表示され、押すと問題に進む
+        expect(find.text('クイズの前に読もう！'), findsOneWidget);
+        expect(find.text('Pythonの基本的な文法を学びます'), findsOneWidget);
+        expect(find.text('Pythonで変数を定義するには？'), findsNothing);
+
+        await tester.tap(find.text('わかった！クイズをはじめる'));
+        await tester.pumpAndSettle();
+        expect(find.text('Pythonで変数を定義するには？'), findsOneWidget);
       });
     });
 
     // Question Display Tests
     group('Question Display and Content', () {
-      testWidgets('displays question text clearly', (WidgetTester tester) async {
+      testQuiz('displays question text clearly', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -167,7 +197,7 @@ void main() {
         expect(find.text('Pythonで変数を定義するには？'), findsOneWidget);
       });
 
-      testWidgets('displays all answer options', (WidgetTester tester) async {
+      testQuiz('displays all answer options', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -184,7 +214,7 @@ void main() {
         expect(find.text('def x = 5'), findsOneWidget);
       });
 
-      testWidgets('displays code snippet when available',
+      testQuiz('displays code snippet when available',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -200,7 +230,7 @@ void main() {
         expect(find.byType(Container), findsWidgets);
       });
 
-      testWidgets('displays question number and total',
+      testQuiz('displays question number and total',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -216,7 +246,7 @@ void main() {
         expect(find.byType(Text), findsWidgets);
       });
 
-      testWidgets('displays difficulty level indicator',
+      testQuiz('displays difficulty level indicator',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -234,7 +264,7 @@ void main() {
 
     // Answer Selection Tests
     group('Answer Selection and Feedback', () {
-      testWidgets('selects answer when option tapped',
+      testQuiz('selects answer when option tapped',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -249,11 +279,13 @@ void main() {
         await tester.tap(find.text('x = 5'));
         await tester.pumpAndSettle();
 
-        // Option should show selection state
-        expect(find.byType(Card), findsWidgets);
+        // 選んだ答えを「確認する」で送ると、正解として採点される
+        await tester.tap(find.text('確認する'));
+        await tester.pumpAndSettle();
+        expect(find.text('✅ 正解！'), findsOneWidget);
       });
 
-      testWidgets('allows changing selected answer before submission',
+      testQuiz('allows changing selected answer before submission',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -272,11 +304,14 @@ void main() {
         await tester.tap(find.text('var x = 5'));
         await tester.pumpAndSettle();
 
-        // Second option should be selected
-        expect(find.byType(Card), findsWidgets);
+        // 最後に選んだ答え(不正解)で採点される
+        await tester.tap(find.text('確認する'));
+        await tester.pumpAndSettle();
+        expect(find.text('✅ 正解！'), findsNothing);
+        expect(find.textContaining('不正解'), findsWidgets);
       });
 
-      testWidgets('shows correct/incorrect feedback after submission',
+      testQuiz('shows correct/incorrect feedback after submission',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -299,7 +334,7 @@ void main() {
         }
       });
 
-      testWidgets('disables answer selection after submission',
+      testQuiz('disables answer selection after submission',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -322,7 +357,7 @@ void main() {
         }
       });
 
-      testWidgets('shows explanation after correct answer',
+      testQuiz('shows explanation after correct answer',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -338,20 +373,18 @@ void main() {
         await tester.pumpAndSettle();
 
         // Submit
-        final submitButton = find.byType(ElevatedButton);
-        if (submitButton.evaluate().isNotEmpty) {
-          await tester.tap(submitButton.first);
-          await tester.pumpAndSettle(const Duration(seconds: 1));
+        await tester.tap(find.text('確認する'));
+        await tester.pump(const Duration(milliseconds: 600));
 
-          // Explanation should be visible
-          expect(
-            find.text('Pythonでは `x = 5` で変数を定義します'),
-            findsWidgets,
-          );
-        }
+        // 正解の表示と解説が出る
+        expect(find.text('✅ 正解！'), findsOneWidget);
+        expect(
+          find.text('Pythonでは `x = 5` で変数を定義します'),
+          findsOneWidget,
+        );
       });
 
-      testWidgets('shows explanation after incorrect answer',
+      testQuiz('shows explanation after incorrect answer',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -377,7 +410,7 @@ void main() {
 
     // Question Navigation Tests
     group('Question Navigation', () {
-      testWidgets('navigates to next question after answering',
+      testQuiz('navigates to next question after answering',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -400,7 +433,7 @@ void main() {
         }
       });
 
-      testWidgets('displays subsequent questions in sequence',
+      testQuiz('displays subsequent questions in sequence',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -416,7 +449,7 @@ void main() {
         expect(find.text('Pythonで変数を定義するには？'), findsOneWidget);
       });
 
-      testWidgets('shows progress through quiz', (WidgetTester tester) async {
+      testQuiz('shows progress through quiz', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -427,11 +460,18 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Progress bar should indicate position
-        expect(find.byType(LinearProgressIndicator), findsWidgets);
+        // 1問目の進捗が表示され、答えて「次へ」を押すと2問目になる
+        expect(find.text('問1/3  ✅ 0正解'), findsOneWidget);
+        await tester.tap(find.text('x = 5'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('確認する'));
+        await tester.pump(const Duration(milliseconds: 600));
+        await tester.tap(find.text('次へ'));
+        await tester.pumpAndSettle();
+        expect(find.text('問2/3  ✅ 1正解'), findsOneWidget);
       });
 
-      testWidgets('navigates back with back button', (WidgetTester tester) async {
+      testQuiz('navigates back with back button', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -453,7 +493,7 @@ void main() {
 
     // Hint System Tests
     group('Hint System', () {
-      testWidgets('displays hint button', (WidgetTester tester) async {
+      testQuiz('displays hint button', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -465,11 +505,10 @@ void main() {
         await tester.pumpAndSettle();
 
         // Hint button should be present
-        final hintButton = find.byIcon(Icons.lightbulb_outline);
-        expect(hintButton.evaluate().isNotEmpty, true);
+        expect(find.byTooltip('ヒントを見る'), findsOneWidget);
       });
 
-      testWidgets('shows hint when hint button tapped',
+      testQuiz('shows hint when hint button tapped',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -492,7 +531,7 @@ void main() {
         }
       });
 
-      testWidgets('can only use hint once per question',
+      testQuiz('can only use hint once per question',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -515,7 +554,7 @@ void main() {
         }
       });
 
-      testWidgets('hint text displays clearly', (WidgetTester tester) async {
+      testQuiz('hint text displays clearly', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -540,7 +579,7 @@ void main() {
 
     // Timer Tests
     group('Timer and Time Management', () {
-      testWidgets('displays timer', (WidgetTester tester) async {
+      testQuiz('displays timer', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -555,7 +594,7 @@ void main() {
         expect(find.byType(Text), findsWidgets);
       });
 
-      testWidgets('timer counts down', (WidgetTester tester) async {
+      testQuiz('timer counts down', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -573,7 +612,7 @@ void main() {
         expect(find.byType(Text), findsWidgets);
       });
 
-      testWidgets('timer color changes as time runs out',
+      testQuiz('timer color changes as time runs out',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -594,7 +633,7 @@ void main() {
 
     // Score Tracking Tests
     group('Score and Performance Tracking', () {
-      testWidgets('tracks correct answers', (WidgetTester tester) async {
+      testQuiz('tracks correct answers', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -615,7 +654,7 @@ void main() {
         }
       });
 
-      testWidgets('displays score feedback', (WidgetTester tester) async {
+      testQuiz('displays score feedback', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -629,7 +668,7 @@ void main() {
         expect(find.byType(Text), findsWidgets);
       });
 
-      testWidgets('calculates combo streak', (WidgetTester tester) async {
+      testQuiz('calculates combo streak', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -651,7 +690,7 @@ void main() {
         }
       });
 
-      testWidgets('shows speed bonus indication', (WidgetTester tester) async {
+      testQuiz('shows speed bonus indication', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -668,7 +707,7 @@ void main() {
 
     // Keyboard Shortcuts Tests
     group('Keyboard Shortcuts', () {
-      testWidgets('selects answer with number keys (1-4)',
+      testQuiz('selects answer with number keys (1-4)',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -687,7 +726,7 @@ void main() {
         expect(find.byType(QuizScreen), findsOneWidget);
       });
 
-      testWidgets('submits answer with Enter key', (WidgetTester tester) async {
+      testQuiz('submits answer with Enter key', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -706,7 +745,7 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('requests hint with H key', (WidgetTester tester) async {
+      testQuiz('requests hint with H key', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -722,7 +761,7 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('navigates with arrow keys', (WidgetTester tester) async {
+      testQuiz('navigates with arrow keys', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -741,7 +780,7 @@ void main() {
 
     // Bookmark/Flag Tests
     group('Bookmark and Flag Functionality', () {
-      testWidgets('displays bookmark button', (WidgetTester tester) async {
+      testQuiz('displays bookmark button', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -753,11 +792,10 @@ void main() {
         await tester.pumpAndSettle();
 
         // Bookmark button should be present
-        final bookmarkButton = find.byIcon(Icons.bookmark_outline);
-        expect(bookmarkButton.evaluate().isNotEmpty, true);
+        expect(find.byTooltip('お気に入りに追加 (B)'), findsOneWidget);
       });
 
-      testWidgets('toggles bookmark on question', (WidgetTester tester) async {
+      testQuiz('toggles bookmark on question', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -779,7 +817,7 @@ void main() {
         }
       });
 
-      testWidgets('persists bookmark state across questions',
+      testQuiz('persists bookmark state across questions',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -802,7 +840,7 @@ void main() {
 
     // Session Completion Tests
     group('Quiz Completion', () {
-      testWidgets('shows final results screen after all questions',
+      testQuiz('shows final results screen after all questions',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -825,7 +863,7 @@ void main() {
         }
       });
 
-      testWidgets('displays final score summary', (WidgetTester tester) async {
+      testQuiz('displays final score summary', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -839,7 +877,7 @@ void main() {
         expect(find.byType(Container), findsWidgets);
       });
 
-      testWidgets('shows achievement badges if earned', (WidgetTester tester) async {
+      testQuiz('shows achievement badges if earned', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -853,7 +891,7 @@ void main() {
         expect(find.byType(Container), findsWidgets);
       });
 
-      testWidgets('calculates stars earned', (WidgetTester tester) async {
+      testQuiz('calculates stars earned', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -867,7 +905,7 @@ void main() {
         expect(find.byType(Container), findsWidgets);
       });
 
-      testWidgets('updates progress after completion',
+      testQuiz('updates progress after completion',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -885,7 +923,7 @@ void main() {
 
     // Override Questions Tests
     group('Override Questions Feature', () {
-      testWidgets('uses override questions when provided',
+      testQuiz('uses override questions when provided',
           (WidgetTester tester) async {
         final overrideQuestions = [
           Question(
@@ -915,7 +953,7 @@ void main() {
         expect(find.text('Override question?'), findsOneWidget);
       });
 
-      testWidgets('displays override question options', (WidgetTester tester) async {
+      testQuiz('displays override question options', (WidgetTester tester) async {
         final overrideQuestions = [
           Question(
             id: 'override_q1',
@@ -947,7 +985,7 @@ void main() {
 
     // Error Handling Tests
     group('Error Handling and Edge Cases', () {
-      testWidgets('handles empty questions list gracefully',
+      testQuiz('handles empty questions list gracefully',
           (WidgetTester tester) async {
         final emptyStage = Stage(
           id: 'empty',
@@ -974,7 +1012,7 @@ void main() {
         expect(find.byType(QuizScreen), findsOneWidget);
       });
 
-      testWidgets('handles question with no explanation',
+      testQuiz('handles question with no explanation',
           (WidgetTester tester) async {
         final noExplainStage = Stage(
           id: 'no_explain',
@@ -1010,7 +1048,7 @@ void main() {
         expect(find.text('Question without explanation?'), findsOneWidget);
       });
 
-      testWidgets('handles rapid answer selection', (WidgetTester tester) async {
+      testQuiz('handles rapid answer selection', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -1030,7 +1068,7 @@ void main() {
         expect(find.byType(QuizScreen), findsOneWidget);
       });
 
-      testWidgets('handles submission without selection',
+      testQuiz('handles submission without selection',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -1054,7 +1092,7 @@ void main() {
 
     // Visual and UI Tests
     group('Visual Design and Theme', () {
-      testWidgets('respects theme colors', (WidgetTester tester) async {
+      testQuiz('respects theme colors', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -1068,7 +1106,7 @@ void main() {
         expect(find.byType(QuizScreen), findsOneWidget);
       });
 
-      testWidgets('displays proper text styling', (WidgetTester tester) async {
+      testQuiz('displays proper text styling', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -1082,7 +1120,7 @@ void main() {
         expect(find.byType(Text), findsWidgets);
       });
 
-      testWidgets('option cards have distinct appearance',
+      testQuiz('option cards have distinct appearance',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -1094,10 +1132,16 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        expect(find.byType(Card), findsWidgets);
+        // 選択肢はA〜Dのラベル付きで4つ表示される
+        for (final label in ['A', 'B', 'C', 'D']) {
+          expect(find.text(label), findsOneWidget);
+        }
+        for (final option in ['x = 5', 'var x = 5', '5 -> x', 'def x = 5']) {
+          expect(find.text(option), findsOneWidget);
+        }
       });
 
-      testWidgets('feedback animations display correctly',
+      testQuiz('feedback animations display correctly',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -1115,7 +1159,7 @@ void main() {
 
     // Integration Tests
     group('Integration and Workflow Tests', () {
-      testWidgets('complete quiz workflow', (WidgetTester tester) async {
+      testQuiz('complete quiz workflow', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -1139,7 +1183,7 @@ void main() {
         expect(find.byType(QuizScreen), findsOneWidget);
       });
 
-      testWidgets('quiz with hint and bookmark usage',
+      testQuiz('quiz with hint and bookmark usage',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -1172,7 +1216,7 @@ void main() {
         expect(find.byType(QuizScreen), findsOneWidget);
       });
 
-      testWidgets('quiz navigation with keyboard shortcuts',
+      testQuiz('quiz navigation with keyboard shortcuts',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
@@ -1194,7 +1238,7 @@ void main() {
         expect(find.byType(QuizScreen), findsOneWidget);
       });
 
-      testWidgets('multiple correct answers in sequence',
+      testQuiz('multiple correct answers in sequence',
           (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
