@@ -59,9 +59,9 @@ void main() {
       final firstEventId = state.collection!.allEvents[0].eventId;
 
       // Create new notifier and reinitialize
-      final _notifier2 = SeasonalEventNotifier();
       final container2 = ProviderContainer();
-      container2.read(seasonalEventProvider.notifier).initializeEvents('test_user');
+      addTearDown(container2.dispose);
+      await container2.read(seasonalEventProvider.notifier).initializeEvents('test_user');
 
       final newState = container2.read(seasonalEventProvider);
       expect(newState.collection!.allEvents[0].eventId, firstEventId);
@@ -166,7 +166,7 @@ void main() {
 
       await notifier.joinEvent('test_user', eventId);
       expect(
-        container.read(seasonalEventProvider).participations.participations[0].isCompleted,
+        container.read(seasonalEventProvider).collection!.participations.participations[0].isCompleted,
         false,
       );
 
@@ -214,6 +214,7 @@ void main() {
       final eventId = state.collection!.allEvents[0].eventId;
 
       await notifier.joinEvent('test_user', eventId);
+      state = container.read(seasonalEventProvider);
       expect(state.collection!.participations.participations.isNotEmpty, true);
 
       await notifier.leaveEvent('test_user', eventId);
@@ -264,7 +265,7 @@ void main() {
       await notifier.claimEventReward('test_user', eventId);
 
       state = container.read(seasonalEventProvider);
-      expect(state.collection!.error, isNotNull);
+      expect(state.error, isNotNull);
     });
 
     test('claimEventReward prevents duplicate claims', () async {
@@ -280,7 +281,7 @@ void main() {
       await notifier.claimEventReward('test_user', eventId);
 
       state = container.read(seasonalEventProvider);
-      expect(state.collection!.error, isNotNull);
+      expect(state.error, isNotNull);
     });
 
     test('persists to SharedPreferences', () async {

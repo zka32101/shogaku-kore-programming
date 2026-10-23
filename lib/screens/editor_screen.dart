@@ -82,9 +82,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     });
   }
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
     _sessionStart = DateTime.now();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
@@ -100,7 +104,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (!_timeRecorded && _sessionStart != null) {
       final elapsed = DateTime.now().difference(_sessionStart!).inSeconds;
       if (elapsed > 0) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _confettiController.dispose();
@@ -145,7 +149,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       final editorState = ref.read(editorProvider);
       if (editorState.scriptBlocks.isNotEmpty && !editorState.hasSubmitted) {
         HapticService.lightImpact();
-        ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput ?? "");
+        ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput ?? "", shape: widget.challenge.goalCondition?['shape'] as String?);
         Future.delayed(const Duration(milliseconds: 100), () {
           final s = ref.read(editorProvider);
           if (s.hasSubmitted) _showResult(s.isCorrect);
@@ -1279,7 +1283,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                       : () {
                           ref
                               .read(editorProvider.notifier)
-                              .submitScript(widget.challenge.expectedOutput ?? "");
+                              .submitScript(widget.challenge.expectedOutput ?? "", shape: widget.challenge.goalCondition?['shape'] as String?);
                           Future.delayed(const Duration(milliseconds: 100), () {
                             final s = ref.read(editorProvider);
                             if (s.hasSubmitted) _showResult(s.isCorrect);

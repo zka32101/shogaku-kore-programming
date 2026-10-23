@@ -7,12 +7,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../test_utils.dart';
 import '../../lib/screens/daily_review_screen.dart';
 import '../../lib/screens/quiz_result_screen.dart';
+import '../../lib/providers/challenges_provider.dart';
 import '../../lib/providers/daily_review_provider.dart';
 import '../../lib/providers/progress_provider.dart';
 import '../../lib/providers/profile_provider.dart';
 import '../../lib/config/theme.dart';
+import 'test_helpers.dart';
 
 void main() {
+  setUp(useReducedMotion);
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
@@ -40,7 +43,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(AppBar), findsWidgets);
+      // 独自ヘッダー（AppBar ではない）にタイトルが表示される
+      expect(find.text('📖 今日の復習'), findsOneWidget);
     });
 
     testWidgets('renders loading state initially', (WidgetTester tester) async {
@@ -49,9 +53,14 @@ void main() {
           const DailyReviewScreen(),
         ),
       );
+      // 問題を読み込むまではローディング表示
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
       await tester.pumpAndSettle();
 
-      expect(find.byType(CircularProgressIndicator), findsWidgets);
+      // 読み込み後はローディングが消え、問題が表示される
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('答え合わせ'), findsOneWidget);
     });
 
     testWidgets('displays quiz question after loading', (WidgetTester tester) async {
@@ -306,7 +315,18 @@ void main() {
       );
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
-      expect(find.byIcon(Icons.lightbulb), findsWidgets);
+      // 出題はランダムなので、表示中の問題に hint があるかどうかで期待値を決める
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DailyReviewScreen)),
+      );
+      final shown = container
+          .read(allChallengesProvider)
+          .expand((c) => c.questions ?? const [])
+          .where((q) => find.text(q.text).evaluate().isNotEmpty)
+          .toList();
+      expect(shown, isNotEmpty);
+      final hasHint = shown.any((q) => q.hint != null);
+      expect(find.text('ヒントを見る'), hasHint ? findsOneWidget : findsNothing);
     });
 
     testWidgets('pressing H key shows hint', (WidgetTester tester) async {
@@ -380,7 +400,8 @@ void main() {
       );
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
-      expect(find.byIcon(Icons.flag), findsWidgets);
+      expect(find.byTooltip('苦手リストに追加'), findsOneWidget);
+      expect(find.text('🏳️'), findsOneWidget);
     });
 
     testWidgets('pressing F key flags current question', (WidgetTester tester) async {

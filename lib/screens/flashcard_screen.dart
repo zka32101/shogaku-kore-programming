@@ -395,9 +395,13 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
   // キーボードショートカット
   final FocusNode _focusNode = FocusNode();
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
     // Initialize with provided category if available
     _selectedCategory = widget.initialCategory;
     _flipController = AnimationController(
@@ -517,7 +521,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
     if (!_timeRecorded) {
       final elapsed = DateTime.now().difference(_sessionStart).inSeconds;
       if (elapsed > 0) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _flipController.dispose();
@@ -2893,8 +2897,11 @@ class _CardFront extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      // 小さい画面でも内容が溢れないよう、収まらない場合はスクロールさせる
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Text('📘', style: TextStyle(fontSize: 36)),
           const SizedBox(height: 20),
@@ -2927,6 +2934,8 @@ class _CardFront extends StatelessWidget {
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

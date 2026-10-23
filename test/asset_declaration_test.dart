@@ -43,7 +43,11 @@ void main() {
     final problems = <String>[];
     for (final path in used) {
       if (knownExceptions.contains(path)) continue;
-      if (!File(path).existsSync()) problems.add('missing file: $path');
+      // 末尾が / のリテラルは「ディレクトリ接頭辞」(後ろにファイル名を連結して使う)
+      final exists = path.endsWith('/')
+          ? Directory(path).existsSync()
+          : File(path).existsSync();
+      if (!exists) problems.add('missing file: $path');
       final dir = path.substring(0, path.lastIndexOf('/') + 1);
       if (!declared.contains(path) && !declared.contains(dir)) {
         problems.add('not declared in pubspec: $path');

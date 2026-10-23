@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +8,7 @@ import 'package:shogaku_kore_programming/providers/profile_provider.dart';
 import 'test_helpers.dart';
 
 void main() {
+  setUp(useTallViewport);
   late ProviderContainer container;
 
   setUp(() {
@@ -60,7 +62,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Sound setting should be visible
+      // 「効果音」トグルが表示される
+      expect(find.text('効果音'), findsOneWidget);
       expect(find.byType(Switch), findsWidgets);
     });
 
@@ -168,8 +171,11 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Theme selector should be visible (dropdown, radio buttons, or buttons)
-      expect(find.byType(PopupMenuButton), findsWidgets);
+      // テーマ選択（システム / ライト / ダーク）が表示される
+      expect(find.text('テーマ'), findsOneWidget);
+      expect(find.text('システム'), findsOneWidget);
+      expect(find.text('ライト'), findsOneWidget);
+      expect(find.text('ダーク'), findsOneWidget);
     });
 
     testWidgets('can change theme mode', (WidgetTester tester) async {
@@ -194,7 +200,8 @@ void main() {
       }
     });
 
-    testWidgets('displays language selector', (WidgetTester tester) async {
+    // 現行の設定画面に言語設定は無いため、実在する選択式の設定（コードの文字サイズ）を検証する
+    testWidgets('displays code font size selector', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -205,8 +212,11 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Language selector should be visible
-      expect(find.byType(PopupMenuButton), findsWidgets);
+      // コードの文字サイズ（小 / 中 / 大）の選択が表示される
+      expect(find.text('コードの文字サイズ'), findsOneWidget);
+      expect(find.text('小'), findsOneWidget);
+      expect(find.text('中'), findsOneWidget);
+      expect(find.text('大'), findsOneWidget);
     });
 
     testWidgets('displays reminder time settings', (WidgetTester tester) async {
@@ -395,12 +405,13 @@ void main() {
 
       // Scroll to find clear data button
       await tester.scrollUntilVisible(
-        find.byType(ListTile).last,
+        find.text('学習データをリセット'),
         500.0,
-        scrollable: find.byType(ListView).first,
+        scrollable: find.byType(Scrollable).first,
       );
-
       await tester.pumpAndSettle();
+
+      expect(find.text('学習データをリセット'), findsOneWidget);
     });
 
     testWidgets('supports keyboard shortcuts', (WidgetTester tester) async {
@@ -446,7 +457,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Scroll down to see more settings
-      await tester.scroll(find.byType(ListView).first, const Offset(0, -500));
+      await tester.drag(find.byType(ListView).first, const Offset(0, -500));
       await tester.pumpAndSettle();
 
       // More settings should be visible
@@ -537,7 +548,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Weekly report settings should be visible
+      // 学習リマインダーなど通知関連のトグルが表示される
+      expect(find.text('学習リマインダー'), findsOneWidget);
       expect(find.byType(Switch), findsWidgets);
     });
   });

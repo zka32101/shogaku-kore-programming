@@ -52,7 +52,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
     _confettiController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3000),
-    )..repeat();
+    );
 
     _raysController = AnimationController(
       vsync: this,
@@ -94,6 +94,17 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
     Future.delayed(const Duration(milliseconds: 700), () {
       if (mounted) _textController.forward();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 「アニメーションを減らす」設定では紙吹雪を循環させない
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _confettiController.stop();
+    } else if (!_confettiController.isAnimating) {
+      _confettiController.repeat();
+    }
   }
 
   @override
@@ -227,14 +238,22 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   UkalabEmoji(widget.badgeIcon, size: 48),
-                                  Text(
+                                  Flexible(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      child: Text(
                                     widget.badgeName,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF8B6914),
                                     ),
                                     textAlign: TextAlign.center,
+                                  ),
+                                    ),
                                   ),
                                 ],
                               ),

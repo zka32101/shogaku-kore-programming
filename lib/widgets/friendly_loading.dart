@@ -23,9 +23,12 @@ class FriendlyLoading extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          UkalabEmoji(emoji, size: 40)
-              .animate(onPlay: (c) => c.repeat(reverse: true))
-              .moveY(begin: -6, end: 6, duration: 700.ms, curve: Curves.easeInOut),
+          if (MediaQuery.disableAnimationsOf(context))
+            UkalabEmoji(emoji, size: 40)
+          else
+            UkalabEmoji(emoji, size: 40)
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .moveY(begin: -6, end: 6, duration: 700.ms, curve: Curves.easeInOut),
           const SizedBox(height: 12),
           Text(
             message,

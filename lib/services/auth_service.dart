@@ -24,8 +24,13 @@ class AuthService {
 
   /// 現在のユーザーを取得
   AppUser? get currentUser {
-    final user = _firebaseAuth.currentUser;
-    return user != null ? AppUser.fromFirebaseUser(user) : null;
+    try {
+      final user = _firebaseAuth.currentUser;
+      return user != null ? AppUser.fromFirebaseUser(user) : null;
+    } catch (_) {
+      // Firebase 未初期化・利用不可の環境ではログインなし扱いにする
+      return null;
+    }
   }
 
   /// ユーザー認証状態のストリーム

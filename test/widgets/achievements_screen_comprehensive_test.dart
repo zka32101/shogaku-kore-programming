@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,7 +46,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(AppBar), findsWidgets);
+      // 現行は AppBar ではなく独自ヘッダー（ニックネーム + 実績タイトル）
+      expect(find.text('たんけんかの実績'), findsOneWidget);
     });
 
     testWidgets('renders three tabs: Badges, Completed, Statistics', (WidgetTester tester) async {
@@ -420,6 +422,16 @@ void main() {
     });
 
     testWidgets('displays completed stage cards with star ratings', (WidgetTester tester) async {
+      // stage_01 を3つ星でクリア済みにしておく
+      SharedPreferences.setMockInitialValues({
+        'user_progress': jsonEncode({
+          'stage_01': {
+            'isCompleted': true,
+            'starsEarned': 3,
+            'completedAt': DateTime(2026, 1, 1).toIso8601String(),
+          },
+        }),
+      });
       await tester.pumpWidget(
         createTestApp(
           const AchievementsScreen(),
@@ -431,7 +443,9 @@ void main() {
       await tester.tap(secondTab);
       await tester.pumpAndSettle();
 
-      expect(find.byType(ListView), findsWidgets);
+      // クリア済みステージが一覧に出て、スターで並び替えられる
+      expect(find.text('直線を描こう'), findsOneWidget);
+      expect(find.text('⭐ スター'), findsOneWidget);
     });
 
     testWidgets('stage cards show difficulty level', (WidgetTester tester) async {
@@ -450,8 +464,8 @@ void main() {
     });
 
     testWidgets('scrolling completes stage list', (WidgetTester tester) async {
-      tester.binding.window.physicalSize = const Size(1080, 1920);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1080, 1920);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         createTestApp(
@@ -1115,8 +1129,8 @@ void main() {
     });
 
     testWidgets('complete workflow: scroll in completed tab', (WidgetTester tester) async {
-      tester.binding.window.physicalSize = const Size(1080, 1920);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1080, 1920);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         createTestApp(

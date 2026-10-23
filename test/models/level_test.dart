@@ -189,11 +189,11 @@ void main() {
         progress: 50.0,
       );
 
-      // Progress2: At 100% of level 1 (ready to level up)
+      // Progress2: レベル2の累積XP(100+115=215)に到達 → レベルアップ可能
       final progress2 = UserLevelProgress(
         level: level,
-        currentXp: 100,
-        totalXpEarned: 100,
+        currentXp: 115,
+        totalXpEarned: 215,
         progress: 100.0,
       );
 
@@ -221,11 +221,11 @@ void main() {
         progress: 50.0,
       );
 
-      // Ready: 100% progress (ready to level up)
+      // Ready: レベル2の累積XP(215)に到達
       final ready = UserLevelProgress(
         level: level,
-        currentXp: 100,
-        totalXpEarned: 100,
+        currentXp: 115,
+        totalXpEarned: 215,
         progress: 100.0,
       );
 
@@ -339,7 +339,11 @@ void main() {
       final level1 = DefaultLevels.getLevelFromTotalXp(50);
       expect(level1, 1);
 
-      final level2 = DefaultLevels.getLevelFromTotalXp(150);
+      // レベル2の累積XPは 100+115=215
+      final stillLevel1 = DefaultLevels.getLevelFromTotalXp(150);
+      expect(stillLevel1, 1);
+
+      final level2 = DefaultLevels.getLevelFromTotalXp(215);
       expect(level2, 2);
 
       final level50 = DefaultLevels.getLevelFromTotalXp(1000000);

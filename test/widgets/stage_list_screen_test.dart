@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +13,7 @@ import 'package:shogaku_kore_programming/config/theme.dart';
 import 'test_helpers.dart';
 
 void main() {
+  setUp(useReducedMotion);
   late ProviderContainer container;
 
   setUp(() {
@@ -82,8 +85,10 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Stage cards should be visible
-        expect(find.byType(Card), findsWidgets);
+        // 初級のステージが番号とタイトル付きで並ぶ
+        expect(find.text('Stage 1'), findsOneWidget);
+        expect(find.text('直線を描こう'), findsOneWidget);
+        expect(find.text('四角を描こう'), findsOneWidget);
       });
     });
 
@@ -238,6 +243,15 @@ void main() {
 
       testWidgets('displays star ratings for completed stages',
           (WidgetTester tester) async {
+        SharedPreferences.setMockInitialValues({
+          'user_progress': json.encode({
+            'stage_01': {
+              'isCompleted': true,
+              'starsEarned': 2,
+              'completedAt': DateTime(2026, 1, 1).toIso8601String(),
+            },
+          }),
+        });
         await tester.pumpWidget(
           const ProviderScope(
             child: MaterialApp(
@@ -248,8 +262,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Stars should display for completed stages
-        expect(find.byIcon(Icons.star), findsWidgets);
+        // クリア済みステージには獲得した星の数だけ塗りの星が出る
+        expect(find.byIcon(Icons.star), findsNWidgets(2));
       });
 
       testWidgets('displays estimated time for each stage', (WidgetTester tester) async {
@@ -303,6 +317,9 @@ void main() {
         // Send R key for random challenge
         await tester.sendKeyEvent(LogicalKeyboardKey.keyR);
         await tester.pumpAndSettle();
+
+        // 初級タブの未クリアから1つ選ばれ、ステージ情報シートが開く
+        expect(find.text('🧩 ブロックプログラミング'), findsOneWidget);
       });
 
       testWidgets('navigates to flashcard screen with F key',
@@ -326,6 +343,9 @@ void main() {
     // Favorites Filter Tests
     group('Favorites Filtering', () {
       testWidgets('displays favorites filter option', (WidgetTester tester) async {
+        SharedPreferences.setMockInitialValues({
+          'favorites_v1': json.encode(['stage_01']),
+        });
         await tester.pumpWidget(
           const ProviderScope(
             child: MaterialApp(
@@ -336,8 +356,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Favorites filter should be available
-        expect(find.byIcon(Icons.favorite), findsWidgets);
+        // お気に入りがあるときだけ、件数付きのフィルターが出る
+        expect(find.text('⭐ お気に入り (1)'), findsOneWidget);
       });
 
       testWidgets('filters stages to show only favorites', (WidgetTester tester) async {
@@ -392,8 +412,9 @@ void main() {
         await tester.sendKeyEvent(LogicalKeyboardKey.slash);
         await tester.pumpAndSettle();
 
-        // Search delegate should be visible
-        expect(find.byType(SearchBar), findsWidgets);
+        // 検索画面（入力欄つき）が開く
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.text('ステージを検索...'), findsOneWidget);
       });
 
       testWidgets('has search bar visible', (WidgetTester tester) async {
@@ -500,9 +521,11 @@ void main() {
 
       testWidgets('navigates back with Escape key', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: const StageListScreen(),
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: const StageListScreen(),
+              ),
             ),
           ),
         );
@@ -512,13 +535,18 @@ void main() {
         // Send Escape key
         await tester.sendKeyEvent(LogicalKeyboardKey.escape);
         await tester.pumpAndSettle();
+
+        // ルート画面なので戻る先がなく、画面はそのまま残る
+        expect(find.byType(StageListScreen), findsOneWidget);
       });
 
       testWidgets('navigates back with Backspace key', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: const StageListScreen(),
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: const StageListScreen(),
+              ),
             ),
           ),
         );
@@ -528,6 +556,8 @@ void main() {
         // Send Backspace key
         await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
         await tester.pumpAndSettle();
+
+        expect(find.byType(StageListScreen), findsOneWidget);
       });
     });
 
@@ -544,8 +574,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Should have scrollable content
-        expect(find.byType(ListView), findsWidgets);
+        // ステージ一覧はスクロールできる
+        expect(find.byType(Scrollable), findsWidgets);
       });
 
       testWidgets('maintains scroll position when switching tabs',
@@ -581,8 +611,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Cards should be arranged in grid
-        expect(find.byType(Card), findsWidgets);
+        // 複数のステージが番号付きで並ぶ
+        expect(find.textContaining('Stage '), findsWidgets);
       });
     });
 

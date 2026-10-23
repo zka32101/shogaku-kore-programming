@@ -5,10 +5,19 @@ import 'package:shogaku_kore_programming/widgets/mini_stat_card.dart';
 import 'package:shogaku_kore_programming/widgets/quality_mini_card.dart';
 import 'package:shogaku_kore_programming/widgets/completed_stage_card.dart';
 import 'package:shogaku_kore_programming/widgets/filter_chip.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 import 'package:shogaku_kore_programming/config/theme.dart';
 import 'package:shogaku_kore_programming/models/stage.dart';
+import 'test_helpers.dart';
+
+/// 絵文字は UkalabEmoji 経由で（対応表にあれば画像として）描画されるため、
+/// Text ではなく UkalabEmoji の引数で探す。
+Finder findEmoji(String emoji) => find.byWidgetPredicate(
+      (w) => w is UkalabEmoji && w.emoji == emoji,
+    );
 
 void main() {
+  setUp(useReducedMotion);
   group('Extracted Widget Tests', () {
     // StatItem Widget Tests
     group('StatItem Widget', () {
@@ -26,7 +35,7 @@ void main() {
           ),
         );
 
-        expect(find.text('🧩'), findsOneWidget);
+        expect(findEmoji('🧩'), findsOneWidget);
         expect(find.text('42'), findsOneWidget);
         expect(find.text('Puzzles Solved'), findsOneWidget);
       });
@@ -68,7 +77,7 @@ void main() {
           ),
         );
 
-        expect(find.text(emoji), findsOneWidget);
+        expect(findEmoji(emoji), findsOneWidget);
       });
     });
 
@@ -89,7 +98,7 @@ void main() {
           ),
         );
 
-        expect(find.text('🎯'), findsOneWidget);
+        expect(findEmoji('🎯'), findsOneWidget);
         expect(find.text('15'), findsOneWidget);
         expect(find.text('Accuracy'), findsOneWidget);
       });
@@ -171,7 +180,7 @@ void main() {
           ),
         );
 
-        expect(find.text('📚'), findsOneWidget);
+        expect(findEmoji('📚'), findsOneWidget);
         expect(find.text('75%'), findsOneWidget);
         expect(find.text('Comprehension'), findsOneWidget);
       });
@@ -192,7 +201,7 @@ void main() {
           ),
         );
 
-        expect(find.byType(TweenAnimationBuilder), findsOneWidget);
+        expect(find.byType(TweenAnimationBuilder<double>), findsOneWidget);
       });
 
       testWidgets('handles progress values between 0 and 1',
@@ -303,7 +312,16 @@ void main() {
           level: '中級',
           type: 'quiz',
           isFree: true,
-          questions: const [],
+          questions: List.generate(
+            3,
+            (n) => Question(
+              id: 'q$n',
+              text: '問題$n',
+              options: const ['a', 'b'],
+              correctIndex: 0,
+              explanation: '解説',
+            ),
+          ),
         );
 
         await tester.pumpWidget(
@@ -320,8 +338,9 @@ void main() {
         final starIcons = find.byIcon(Icons.star);
         final starBorderIcons = find.byIcon(Icons.star_border);
 
-        expect(starIcons, findsWidgets);
-        expect(starBorderIcons, findsWidgets);
+        // 3問中2問正解 → 塗りの星2つ、枠だけの星1つ
+        expect(starIcons, findsNWidgets(2));
+        expect(starBorderIcons, findsOneWidget);
       });
 
       testWidgets('displays completion date when provided',

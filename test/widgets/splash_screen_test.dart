@@ -5,6 +5,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shogaku_kore_programming/screens/splash_screen.dart';
 import 'test_helpers.dart';
 
+/// スプラッシュは表示から2秒後に自動で遷移する（Future.delayed）。
+/// 遷移前の状態を検証し、終了時にタイマーを消化して pending timer を残さない。
+void splashTest(
+  String description,
+  Future<void> Function(WidgetTester tester) body,
+) {
+  testWidgets(description, (tester) async {
+    try {
+      await body(tester);
+    } finally {
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 3));
+    }
+  });
+}
+
 void main() {
   late ProviderContainer container;
 
@@ -18,7 +34,7 @@ void main() {
   });
 
   group('SplashScreen Widget Tests', () {
-    testWidgets('displays splash screen', (WidgetTester tester) async {
+    splashTest('displays splash screen', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -31,7 +47,7 @@ void main() {
       expect(find.byType(SplashScreen), findsOneWidget);
     });
 
-    testWidgets('displays app logo', (WidgetTester tester) async {
+    splashTest('displays app logo', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -40,13 +56,13 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Logo should be displayed
       expect(find.byType(Image), findsWidgets);
     });
 
-    testWidgets('displays app name/branding', (WidgetTester tester) async {
+    splashTest('displays app name/branding', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -55,14 +71,15 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
-      // App name should be visible
-      // "小学コレ！プログラミング" or similar
-      expect(find.byType(Text), findsWidgets);
+      // 現行の起動画面は画像のみ: アプリアイコン・シリーズロゴ・組織ロゴ
+      expect(find.byKey(const ValueKey('splash_app_icon')), findsOneWidget);
+      expect(find.byKey(const ValueKey('splash_series_logo')), findsOneWidget);
+      expect(find.byKey(const ValueKey('splash_company_logo')), findsOneWidget);
     });
 
-    testWidgets('animates logo on entry', (WidgetTester tester) async {
+    splashTest('animates logo on entry', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -78,7 +95,7 @@ void main() {
       await tester.pumpAndSettle(const Duration(milliseconds: 1000));
     });
 
-    testWidgets('floating animation is visible', (WidgetTester tester) async {
+    splashTest('floating animation is visible', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -91,11 +108,12 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      // Content should be visible and animated
-      expect(find.byType(Text), findsWidgets);
+      // アイコンが表示され、読み込み表示が回り続けている
+      expect(find.byKey(const ValueKey('splash_app_icon')), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('displays loading indicator', (WidgetTester tester) async {
+    splashTest('displays loading indicator', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -104,13 +122,13 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Loading spinner should be visible
       expect(find.byType(CircularProgressIndicator), findsWidgets);
     });
 
-    testWidgets('displays progress message', (WidgetTester tester) async {
+    splashTest('displays progress message', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -119,13 +137,13 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
-      // Progress message like "ロード中..." should be visible
-      expect(find.byType(Text), findsWidgets);
+      // 現行は文言ではなくスピナーで読み込み中を示す
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('splash screen has appropriate duration', (WidgetTester tester) async {
+    splashTest('splash screen has appropriate duration', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -135,13 +153,13 @@ void main() {
       );
 
       // Initial pump
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Verify splash is still visible after < 2 seconds
       expect(find.byType(SplashScreen), findsOneWidget);
     });
 
-    testWidgets('background color is set appropriately',
+    splashTest('background color is set appropriately',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
@@ -151,13 +169,13 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Scaffold or Container should have background
       expect(find.byType(Scaffold), findsWidgets);
     });
 
-    testWidgets('logo animation uses appropriate curve',
+    splashTest('logo animation uses appropriate curve',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
@@ -175,7 +193,7 @@ void main() {
       expect(find.byType(SplashScreen), findsOneWidget);
     });
 
-    testWidgets('handles orientation changes', (WidgetTester tester) async {
+    splashTest('handles orientation changes', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -184,16 +202,16 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Simulate orientation change
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.view.resetPhysicalSize);
 
       // Should still be visible and functional
       expect(find.byType(SplashScreen), findsOneWidget);
     });
 
-    testWidgets('displays version number if applicable',
+    splashTest('displays version number if applicable',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
@@ -203,18 +221,18 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
-      // Version might be displayed (implementation dependent)
-      expect(find.byType(Text), findsWidgets);
+      // 現行の起動画面にバージョンなどの文言は表示しない（画像のみ）
+      expect(find.byType(Text), findsNothing);
     });
 
-    testWidgets('splash elements scale appropriately for different screens',
+    splashTest('splash elements scale appropriately for different screens',
         (WidgetTester tester) async {
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.view.resetPhysicalSize);
 
       // Set to tablet size
-      tester.binding.window.physicalSize = const Size(1024, 1366);
+      tester.view.physicalSize = const Size(1024, 1366);
 
       await tester.pumpWidget(
         const ProviderScope(
@@ -224,13 +242,13 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Should render correctly on larger screens
       expect(find.byType(SplashScreen), findsOneWidget);
     });
 
-    testWidgets('floating animation loops continuously',
+    splashTest('floating animation loops continuously',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
@@ -251,7 +269,7 @@ void main() {
       // Animation should still be looping
     });
 
-    testWidgets('logo has fade-in effect', (WidgetTester tester) async {
+    splashTest('logo has fade-in effect', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -267,7 +285,7 @@ void main() {
       // Logo should be visible and might be fading in
     });
 
-    testWidgets('display is centered and responsive',
+    splashTest('display is centered and responsive',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
@@ -277,18 +295,16 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
-      // Content should be centered
-      final textFinder = find.byType(Text).first;
-      expect(textFinder, findsOneWidget);
-
-      // Verify it's positioned centrally
-      final center = tester.getCenter(textFinder);
-      expect(center, isNotNull);
+      // アイコンは画面の左右中央に置かれる
+      final icon = find.byKey(const ValueKey('splash_app_icon'));
+      expect(icon, findsOneWidget);
+      final screenCenterX = tester.getSize(find.byType(Scaffold)).width / 2;
+      expect(tester.getCenter(icon).dx, closeTo(screenCenterX, 0.5));
     });
 
-    testWidgets('handles rapid rebuilds', (WidgetTester tester) async {
+    splashTest('handles rapid rebuilds', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -305,7 +321,7 @@ void main() {
       expect(find.byType(SplashScreen), findsOneWidget);
     });
 
-    testWidgets('progress indicator visibility is correct',
+    splashTest('progress indicator visibility is correct',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
@@ -315,13 +331,13 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Loading indicator should be present
       expect(find.byType(CircularProgressIndicator), findsWidgets);
     });
 
-    testWidgets('app logo is properly sized', (WidgetTester tester) async {
+    splashTest('app logo is properly sized', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -330,7 +346,7 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Image should have reasonable size
       final imageFinder = find.byType(Image);
@@ -341,7 +357,7 @@ void main() {
       }
     });
 
-    testWidgets('maintains state during animation', (WidgetTester tester) async {
+    splashTest('maintains state during animation', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
