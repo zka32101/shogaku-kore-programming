@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 
@@ -25,6 +26,7 @@ import '../providers/step_executor_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 import '../utils/hint_ladder.dart';
+import '../utils/robot_simulator.dart' as sim;
 import '../widgets/app_dialog.dart';
 import '../widgets/character_reaction_widget.dart';
 import '../widgets/execution_timeline.dart';
@@ -53,6 +55,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   int _hintIndex = 0;
   // 段階ヒント（不正解の回数・ヒント欄を開いたか・お手本を見たか）
   final HintLadder _ladder = HintLadder();
+
+  // ─── 実行の段階再生（1ブロックずつ光らせながらロボットを動かす） ───
+  static const Duration _playInterval = Duration(milliseconds: 450);
+  Timer? _playTimer;
+  List<sim.SimStep>? _playSteps;
+  List<Offset> _playFullPath = const [];
+  int _playIndex = 0;
+
+  /// 再生中の、スクリプト内でのブロックの位置（再生中でなければ null）
+  int? get _playingBlockIndex =>
+      _playSteps == null ? null : _playSteps![_playIndex].blockIndex;
   late ConfettiController _confettiController;
   final FocusNode _focusNode = FocusNode();
   DateTime? _sessionStart;
@@ -103,6 +116,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   @override
   void dispose() {
+    _cancelPlayback();
     // クリア時に記録済みでなければ記録（中途終了パス）
     if (!_timeRecorded && _sessionStart != null) {
       final elapsed = DateTime.now().difference(_sessionStart!).inSeconds;
@@ -233,6 +247,49 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     );
   }
 
+  /// 「実行」: 結果を出したうえで、ロボットを1ブロックずつ動かして見せる。
+  /// 「アニメーションを減らす」設定のときは、従来どおり結果をすぐに表示する。
+  void _startPlayback() {
+    _cancelPlayback();
+    final notifier = ref.read(editorProvider.notifier);
+    notifier.executeScript();
+    final blocks = ref.read(editorProvider).scriptBlocks;
+    if (MediaQuery.disableAnimationsOf(context)) return;
+    final steps = sim.simulateSteps(blocks);
+    if (steps.isEmpty) return;
+    final (fullPath, _) = sim.simulateRobot(blocks);
+    setState(() {
+      _playSteps = steps;
+      _playFullPath = fullPath;
+      _playIndex = 0;
+    });
+    _playTimer = Timer.periodic(_playInterval, (t) {
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
+      // 再生中にブロックが編集されたら、そこで止めて最新の状態を見せる
+      if (!identical(ref.read(editorProvider).scriptBlocks, blocks) ||
+          _playIndex + 1 >= steps.length) {
+        _stopPlayback();
+        return;
+      }
+      HapticService.selectionClick();
+      setState(() => _playIndex++);
+    });
+  }
+
+  /// 再生を止めて、最終結果の表示にもどす。
+  void _stopPlayback() => setState(_cancelPlayback);
+
+  void _cancelPlayback() {
+    _playTimer?.cancel();
+    _playTimer = null;
+    _playSteps = null;
+    _playFullPath = const [];
+    _playIndex = 0;
+  }
+
   /// ヒントを使ったことを記録する（星・ノーヒント判定と、保護者向けメッセージに使う）。
   void _markHintUsed() {
     _ladder.openHint();
@@ -281,6 +338,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   Future<void> _showResult(bool isCorrect) async {
+    _stopPlayback(); // 回答したら再生は止めて、結果の表示にする
     final isFirstComplete =
         !(ref.read(progressProvider)[widget.challenge.id]?.isCompleted ?? false);
 
@@ -1063,7 +1121,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         builder: (ctx, consumerRef, _) {
                           final execState = consumerRef.watch(stepExecutorProvider);
                           final isCurrentBlock =
-                              _stepExecutionMode && execState.currentBlockId == block.id;
+                              (_stepExecutionMode && execState.currentBlockId == block.id) ||
+                                  _playingBlockIndex == index;
                           final hasBreakpoint = execState.breakpoints.contains(index);
 
                           return _ScriptBlockItem(
@@ -1107,10 +1166,18 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             ? consumerRef.watch(stepExecutorProvider)
             : null;
 
-        final robotPath =
-            _stepExecutionMode && execState != null ? execState.robotPath : editorState.robotPath;
-        final robotAngle =
-            _stepExecutionMode && execState != null ? execState.robotAngle : editorState.robotAngle;
+        final playSteps = _playSteps;
+        final playStep = playSteps?[_playIndex];
+        final robotPath = playStep != null
+            ? _playFullPath.sublist(0, playStep.pathLength.clamp(1, _playFullPath.length))
+            : _stepExecutionMode && execState != null
+                ? execState.robotPath
+                : editorState.robotPath;
+        final robotAngle = playStep != null
+            ? playStep.angle
+            : _stepExecutionMode && execState != null
+                ? execState.robotAngle
+                : editorState.robotAngle;
 
         final isCorrect = editorState.isCorrect && editorState.hasSubmitted;
         final isWrong = !editorState.isCorrect && editorState.hasSubmitted;
@@ -1141,6 +1208,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 finalAngle: robotAngle,
                 hasSubmitted: editorState.hasSubmitted,
                 isCorrect: editorState.isCorrect,
+                // 段階再生中は、1ブロックずつ呼び出し側が進めるので全体の描き直しは止める
+                animate: playStep == null,
               ),
             ),
           ),
@@ -1295,19 +1364,26 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   onPressed: editorState.scriptBlocks.isEmpty
                       ? null
                       : () {
-                          if (_stepExecutionMode) {
+                          if (_playSteps != null) {
+                            // 再生中に押したら、最後まで飛ばして結果を見せる
+                            _stopPlayback();
+                          } else if (_stepExecutionMode) {
                             // ステップ実行モード開始
                             ref.read(stepExecutorProvider.notifier)
                                 .initializeExecution(editorState.scriptBlocks);
                             setState(() {});
                           } else {
-                            // 通常実行
-                            ref.read(editorProvider.notifier).executeScript();
+                            // 通常実行（1ブロックずつロボットを動かして見せる）
+                            _startPlayback();
                             _reactCharacter(CharacterMood.excited, message: 'どうなるかな…！');
                           }
                         },
-                  icon: const Text('▶', style: TextStyle(fontSize: 12)),
-                  label: Text(_stepExecutionMode ? 'ステップ準備' : '実行'),
+                  icon: Text(_playSteps != null ? '⏩' : '▶', style: const TextStyle(fontSize: 12)),
+                  label: Text(_playSteps != null
+                      ? 'スキップ'
+                      : _stepExecutionMode
+                          ? 'ステップ準備'
+                          : '実行'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(

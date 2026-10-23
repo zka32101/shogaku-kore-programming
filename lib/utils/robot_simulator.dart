@@ -13,7 +13,36 @@ const double _kStepsPerCell = 50.0; // steps per grid cell
 ///
 /// [clamp] が false のときは盤面の端で止めず、プログラムが描く本来の軌跡を返す
 /// （形の判定用。表示用は true のまま盤面内に収める）。
-(List<Offset>, double) simulateRobot(List<Block> blocks, {bool clamp = true}) {
+(List<Offset>, double) simulateRobot(List<Block> blocks, {bool clamp = true}) =>
+    _run(blocks, clamp, null);
+
+/// 実行した1ブロックぶんの結果。再生（1ブロックずつ動かす表示）に使う。
+class SimStep {
+  /// スクリプト内でのブロックの位置（繰り返しの中身は、実行のたびに同じ位置が出る）
+  final int blockIndex;
+
+  /// このブロックの実行直後に、軌跡のうち何点までが描かれているか
+  final int pathLength;
+
+  /// このブロックの実行直後のロボットの向き（度）
+  final double angle;
+
+  const SimStep(this.blockIndex, this.pathLength, this.angle);
+}
+
+/// [simulateRobot] と同じ順序・結果で、ブロックを1つずつ実行した経過を返す。
+/// 最後の [SimStep] の `pathLength` / `angle` は、[simulateRobot] の結果と一致する。
+List<SimStep> simulateSteps(List<Block> blocks, {bool clamp = true}) {
+  final steps = <SimStep>[];
+  _run(blocks, clamp, (i, len, angle) => steps.add(SimStep(i, len, angle)));
+  return steps;
+}
+
+(List<Offset>, double) _run(
+  List<Block> blocks,
+  bool clamp,
+  void Function(int blockIndex, int pathLength, double angle)? onStep,
+) {
   double x = kRobotGridSize / 2;
   double y = kRobotGridSize / 2;
   double angle = 0.0; // 0° = right, clockwise positive
@@ -26,38 +55,32 @@ const double _kStepsPerCell = 50.0; // steps per grid cell
     return base == 'repeat' || base == 'while_loop';
   });
 
-  List<Block> execBlocks;
-  List<Block> loopBlocks;
-  int loopTimes = 1;
+  final int execCount = loopIdx >= 0 ? loopIdx : blocks.length;
+  final int loopStart = loopIdx >= 0 ? loopIdx + 1 : blocks.length;
+  final int loopTimes =
+      loopIdx >= 0 ? ((blocks[loopIdx].params['times'] as num?)?.toInt() ?? 3) : 1;
 
-  if (loopIdx >= 0) {
-    execBlocks = blocks.sublist(0, loopIdx);
-    loopBlocks = blocks.sublist(loopIdx + 1);
-    loopTimes = (blocks[loopIdx].params['times'] as num?)?.toInt() ?? 3;
-  } else {
-    execBlocks = blocks;
-    loopBlocks = [];
-  }
-
-  for (final block in execBlocks) {
-    _executeBlock(block, path, (nx, ny, na) {
+  void run(int index) {
+    _executeBlock(blocks[index], path, (nx, ny, na) {
       x = nx;
       y = ny;
       angle = na;
     }, x, y, angle, clamp);
     x = path.last.dx;
     y = path.last.dy;
+    onStep?.call(index, path.length, angle);
   }
 
-  for (int r = 0; r < loopTimes; r++) {
-    for (final block in loopBlocks) {
-      _executeBlock(block, path, (nx, ny, na) {
-        x = nx;
-        y = ny;
-        angle = na;
-      }, x, y, angle, clamp);
-      x = path.last.dx;
-      y = path.last.dy;
+  for (var i = 0; i < execCount; i++) {
+    run(i);
+  }
+  if (loopIdx >= 0) {
+    // 繰り返しブロック自体は動かないので、その時点の状態のまま1ステップとして数える
+    onStep?.call(loopIdx, path.length, angle);
+  }
+  for (var r = 0; r < loopTimes; r++) {
+    for (var i = loopStart; i < blocks.length; i++) {
+      run(i);
     }
   }
 
