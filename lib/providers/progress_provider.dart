@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../config/constants.dart' show kBugHunterIdPrefix;
 import '../services/notification_service.dart';
 import '../streak_dates.dart';
 
@@ -382,8 +383,18 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     state = {...state};
   }
 
+  /// 本編のステージの進捗（バグハンターなどの独立ステージ群は含めない）。
+  /// 全クリア判定・実績の分母が本編のステージ数と一致するように、集計はこちらを使う。
+  Iterable<UserProgress> get _mainProgress =>
+      state.entries.where((e) => !e.key.startsWith(kBugHunterIdPrefix)).map((e) => e.value);
+
+  /// バグハンターでクリアしたステージ数
+  int get bugHunterCompletedCount => state.entries
+      .where((e) => e.key.startsWith(kBugHunterIdPrefix) && e.value.isCompleted)
+      .length;
+
   int get totalStarsEarned {
-    final base = state.values.fold(0, (sum, p) => sum + p.starsEarned);
+    final base = _mainProgress.fold(0, (sum, p) => sum + p.starsEarned);
     return base + _bonusPoints;
   }
 
@@ -450,7 +461,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   }
 
   int get completedCount {
-    return state.values.where((p) => p.isCompleted).length;
+    return _mainProgress.where((p) => p.isCompleted).length;
   }
 
   // レベル閾値: 40ステージ×3★=120★満点、Lv.20 が最大
@@ -505,7 +516,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
 
   /// 3つ星クリアしたステージ数
   int get perfectStagesCount {
-    return state.values.where((p) => p.isCompleted && p.starsEarned >= 3).length;
+    return _mainProgress.where((p) => p.isCompleted && p.starsEarned >= 3).length;
   }
 
   /// 今日クリアしたステージ数

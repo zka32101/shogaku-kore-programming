@@ -43,6 +43,8 @@ ShuffledChoices shuffleChoices(List<String> choices, int correctIndex,
 extension QuestionShuffle on Question {
   /// 選択肢をシャッフルし正解インデックスを付け替えた Question を返す。
   Question shuffled([Random? rng]) {
+    // バグハンターの選択肢はコードの行そのもの。順序が意味を持つのでシャッフルしない。
+    if (bugHunt) return this;
     final r = shuffleChoices(options, correctIndex, rng);
     return Question(
       id: id,
