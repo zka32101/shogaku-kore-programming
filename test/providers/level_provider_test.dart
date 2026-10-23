@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shogaku_kore_programming/models/level.dart';
 import 'package:shogaku_kore_programming/providers/level_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -127,8 +128,9 @@ void main() {
       final notifier = container.read(levelProvider.notifier);
       final xpNeeded = notifier.getXpToNextLevel();
 
+      // レベル1(0XP) → レベル2 の累積XPまでが必要量
       expect(xpNeeded, greaterThan(0));
-      expect(xpNeeded, lessThanOrEqualTo(100));
+      expect(xpNeeded, lessThanOrEqualTo(DefaultLevels.getLevelByNumber(2)!.requiredXp));
     });
 
     test('LevelNotifier getMilestoneStatus tracks achievements', () async {
@@ -139,8 +141,8 @@ void main() {
 
       final notifier = container.read(levelProvider.notifier);
 
-      // Add enough XP to reach level 10 (~1000 XP)
-      await notifier.addExperience(1500);
+      // レベル10の累積XPは約2026(レベル11は約2430)
+      await notifier.addExperience(2100);
 
       final milestones = notifier.getMilestoneStatus();
 
@@ -161,12 +163,14 @@ void main() {
       var canLevel = notifier.canLevelUp();
       expect(canLevel, false);
 
-      // Add enough XP to next level
+      // 次のレベルに必要なXPを加えると、その場でレベルアップが確定する
+      // （レベルが上がった後は、さらに次のレベルまで未到達なので canLevelUp は false）
       final progress = notifier.getLevelProgress();
-      await notifier.addExperience(progress.remainingXp);
+      final events = await notifier.addExperience(progress.remainingXp);
 
-      canLevel = notifier.canLevelUp();
-      expect(canLevel, true);
+      expect(events.length, 1);
+      expect(container.read(levelProvider).currentLevel, 2);
+      expect(notifier.canLevelUp(), false);
     });
 
     test('LevelNotifier getStats returns complete information', () async {
@@ -244,8 +248,8 @@ void main() {
 
       final notifier = container.read(levelProvider.notifier);
 
-      // Level 1 needs 100 XP
-      final events = await notifier.addExperience(120);
+      // レベル2の累積XPは約214（レベル3は約346）
+      final events = await notifier.addExperience(220);
 
       final state = container.read(levelProvider);
       expect(state.currentLevel, 2);
@@ -281,8 +285,8 @@ void main() {
 
       final notifier = container.read(levelProvider.notifier);
 
-      // Add enough XP to reach level 10
-      await notifier.addExperience(1200);
+      // レベル10の累積XPは約2026
+      await notifier.addExperience(2100);
 
       final state = container.read(levelProvider);
       expect(state.milestoneReached, contains(10));
@@ -296,8 +300,8 @@ void main() {
 
       final notifier = container.read(levelProvider.notifier);
 
-      // Reach level 10
-      await notifier.addExperience(1200);
+      // Reach level 10 (約2026 XP)
+      await notifier.addExperience(2100);
       var state = container.read(levelProvider);
       expect(state.milestoneReached, contains(10));
 

@@ -35,8 +35,14 @@ void main() {
     isFree: true,
     questions: [],
     conceptExplanation: 'ブロックを組み合わせてロボットを動かします',
-    type: 'editor',
+    type: 'visual',
+    hints: ['まず「前に進む」を使おう', '次に「右に回転」を足そう'],
   );
+
+  /// ヒント文は用語集つきの RichText で描画されるため、平文で探す
+  Finder _hintText(String text) => find.byWidgetPredicate(
+        (w) => w is RichText && w.text.toPlainText() == text,
+      );
 
   group('EditorScreen Comprehensive Widget Tests', () {
     // Basic Screen Rendering Tests
@@ -65,8 +71,9 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        expect(find.byType(AppBar), findsOneWidget);
-        expect(find.text('ブロックプログラミング基礎'), findsWidgets);
+        // 専用ヘッダー（AppBar ではない）にステージ名と説明が出る
+        expect(find.text('ブロックプログラミング基礎'), findsOneWidget);
+        expect(find.text('視覚的なブロックでプログラムを組み立てます'), findsOneWidget);
       });
 
       testWidgets('displays block programming canvas', (WidgetTester tester) async {
@@ -212,8 +219,9 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Run button should be present
-        expect(find.byIcon(Icons.play_arrow), findsWidgets);
+        // 実行ボタンと回答ボタンが並ぶ
+        expect(find.text('実行'), findsOneWidget);
+        expect(find.text('回答する'), findsOneWidget);
       });
 
       testWidgets('executes program when run button tapped', (WidgetTester tester) async {
@@ -404,14 +412,22 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final hintButton = find.byIcon(Icons.lightbulb_outline);
-        if (hintButton.evaluate().isNotEmpty) {
-          // Tap multiple times to cycle hints
-          for (int i = 0; i < 3; i++) {
-            await tester.tap(hintButton.first);
-            await tester.pumpAndSettle();
-          }
-        }
+        // ヒントは最初は閉じている
+        expect(find.byIcon(Icons.lightbulb), findsNothing);
+
+        await tester.tap(find.byIcon(Icons.lightbulb_outline));
+        await tester.pumpAndSettle();
+        expect(find.byIcon(Icons.lightbulb), findsOneWidget);
+        expect(_hintText('まず「前に進む」を使おう'), findsOneWidget);
+
+        // 「次へ」で次のヒントに進み、最後まで行くと最初に戻る
+        await tester.tap(find.text('次へ'));
+        await tester.pumpAndSettle();
+        expect(_hintText('次に「右に回転」を足そう'), findsOneWidget);
+
+        await tester.tap(find.text('次へ'));
+        await tester.pumpAndSettle();
+        expect(_hintText('まず「前に進む」を使おう'), findsOneWidget);
       });
 
       testWidgets('displays concept explanation', (WidgetTester tester) async {
@@ -548,7 +564,7 @@ void main() {
         expect(find.byType(Container), findsWidgets);
       });
 
-      testWidgets('shows stars earned', (WidgetTester tester) async {
+      testWidgets('shows first-clear badge after a correct answer', (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
@@ -559,8 +575,21 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Star display
-        expect(find.byIcon(Icons.star), findsWidgets);
+        expect(find.text('はじめの一歩！'), findsNothing);
+
+        // ブロックを置いて回答する
+        await tester.tap(find.text('前に進む'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('回答する'));
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+
+        // 最初のステージを初めてクリアしたので、バッジ演出とレベルアップが出る
+        expect(find.text('はじめの一歩！'), findsOneWidget);
+        expect(find.text('最初のステージをクリア！コーディング冒険の始まり！'), findsOneWidget);
+        expect(find.text('+10 ポイント'), findsOneWidget);
+        expect(find.textContaining('レベルアップ'), findsOneWidget);
+        await tester.pump(const Duration(seconds: 5));
       });
     });
 

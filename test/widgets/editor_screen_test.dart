@@ -35,23 +35,21 @@ void main() {
       isFree: true,
       questions: const [],
       conceptExplanation: '順序を意識してブロックを組み立てます',
-      type: 'editor',
+      type: 'visual',
       availableBlocks: [
         const BlockTemplate(
-          id: 'move_right',
-          name: '右に進む',
+          id: 'move_forward',
+          name: '前に進む',
           icon: '📍',
-          category: 'movement',
-          description: 'ロボットを右に進める',
-          properties: {'steps': 1},
+          category: 'motion',
+          description: 'ロボットを前に進める',
         ),
         const BlockTemplate(
-          id: 'move_down',
-          name: '下に進む',
-          icon: '📍',
-          category: 'movement',
-          description: 'ロボットを下に進める',
-          properties: {'steps': 1},
+          id: 'turn_right',
+          name: '右に回転',
+          icon: '↪️',
+          category: 'motion',
+          description: 'ロボットを右に回転する',
         ),
         const BlockTemplate(
           id: 'repeat',
@@ -59,7 +57,6 @@ void main() {
           icon: '🔁',
           category: 'control',
           description: '処理を繰り返す',
-          properties: {'times': 2},
         ),
       ],
     );
@@ -73,6 +70,8 @@ void main() {
           ),
         ),
       );
+
+      await tester.pumpAndSettle();
 
       // Verify editor screen is displayed
       expect(find.byType(EditorScreen), findsOneWidget);
@@ -93,11 +92,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify blocks are displayed in the library
-      expect(find.text('右に進む'), findsWidgets);
-      expect(find.text('下に進む'), findsWidgets);
+      expect(find.text('前に進む'), findsOneWidget);
+      expect(find.text('右に回転'), findsOneWidget);
+      expect(find.text('繰り返す'), findsOneWidget);
     });
 
-    testWidgets('can drag block to workspace', (WidgetTester tester) async {
+    testWidgets('tapping a palette block adds it to the workspace',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -107,18 +108,15 @@ void main() {
       );
 
       await tester.pumpAndSettle();
+      expect(find.text('0 ブロック'), findsOneWidget);
 
-      // Find a block in the library
-      final blockInLibrary = find.text('右に進む').first;
+      await tester.tap(find.text('前に進む'));
+      await tester.pumpAndSettle();
+      // キャラクターの反応を元に戻す遅延タイマーを消化する
+      await tester.pump(const Duration(seconds: 3));
 
-      if (blockInLibrary.evaluate().isNotEmpty) {
-        // Drag the block to the workspace area
-        final center = tester.getCenter(blockInLibrary);
-        await tester.dragFrom(center, const Offset(100, 200));
-        await tester.pumpAndSettle();
-
-        // Block should be added to workspace (implementation dependent)
-      }
+      expect(find.text('1 ブロック'), findsOneWidget);
+      expect(find.text('📍 前に100歩進む'), findsOneWidget);
     });
 
     testWidgets('displays workspace area', (WidgetTester tester) async {
@@ -254,10 +252,19 @@ void main() {
       final favoriteButton = find.byIcon(Icons.favorite_outline);
       if (favoriteButton.evaluate().isNotEmpty) {
         await tester.tap(favoriteButton.first);
+        // お気に入り数のマイルストーン判定が遅延タイマーを使うため時間を進める
+        await tester.pump(const Duration(seconds: 1));
         await tester.pumpAndSettle();
 
+        // 初めてのお気に入り登録ではバッジ演出が出る
+        expect(find.text('はじめてのお気に入り登録！'), findsOneWidget);
+        await tester.tap(find.text('とじる'));
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 1));
+
         // Challenge should be marked as favorite (icon changes)
-        expect(find.byIcon(Icons.favorite), findsWidgets);
+        expect(find.byIcon(Icons.favorite), findsOneWidget);
+        expect(find.byIcon(Icons.favorite_border), findsNothing);
       }
     });
 
@@ -272,9 +279,17 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // When a block is selected, its parameters should be visible
-      // Look for parameter inputs
-      expect(find.byType(TextField), findsWidgets);
+      // ブロックを追加してタップすると、歩数を変えるシートが開く
+      await tester.tap(find.text('前に進む'));
+      await tester.pumpAndSettle();
+      // キャラクターの反応を元に戻す遅延タイマーを消化する
+      await tester.pump(const Duration(seconds: 3));
+      await tester.tap(find.text('タップして値を変更'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('歩数'), findsOneWidget);
+      expect(find.byType(Slider), findsOneWidget);
+      expect(find.text('決定'), findsOneWidget);
     });
 
     testWidgets('displays robot canvas for preview', (WidgetTester tester) async {
@@ -325,23 +340,17 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Add a block
-      final blockInLibrary = find.text('右に進む').first;
-      if (blockInLibrary.evaluate().isNotEmpty) {
-        final center = tester.getCenter(blockInLibrary);
-        await tester.dragFrom(center, const Offset(100, 200));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('前に進む'));
+      await tester.pumpAndSettle();
+      // キャラクターの反応を元に戻す遅延タイマーを消化する
+      await tester.pump(const Duration(seconds: 3));
+      expect(find.text('1 ブロック'), findsOneWidget);
 
-        // Right-click or long-press to delete
-        // Look for delete option
-        final deleteButton = find.byIcon(Icons.close);
-        if (deleteButton.evaluate().isNotEmpty) {
-          await tester.tap(deleteButton.first);
-          await tester.pumpAndSettle();
+      // ブロック右端の × ボタンで削除する
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
 
-          // Block should be removed
-        }
-      }
+      expect(find.text('0 ブロック'), findsOneWidget);
     });
 
     testWidgets('supports keyboard shortcuts', (WidgetTester tester) async {

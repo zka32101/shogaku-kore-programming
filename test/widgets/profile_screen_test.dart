@@ -484,9 +484,11 @@ void main() {
           MaterialApp(
             home: Scaffold(
               appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.pop(context),
+                leading: Builder(
+                  builder: (context) => IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
               ),
               body: const ProfileScreen(),

@@ -721,7 +721,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Scroll down to see more content
-        await tester.scroll(find.byType(SingleChildScrollView).first, const Offset(0, -500));
+        await tester.drag(find.byType(SingleChildScrollView).first, const Offset(0, -500));
         await tester.pumpAndSettle();
 
         expect(find.byType(Text), findsWidgets);
@@ -741,7 +741,7 @@ void main() {
 
         // Scroll multiple times
         for (int i = 0; i < 3; i++) {
-          await tester.scroll(
+          await tester.drag(
             find.byType(SingleChildScrollView).first,
             const Offset(0, -200),
           );
@@ -1029,7 +1029,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Scroll through content
-        await tester.scroll(
+        await tester.drag(
           find.byType(SingleChildScrollView).first,
           const Offset(0, -300),
         );

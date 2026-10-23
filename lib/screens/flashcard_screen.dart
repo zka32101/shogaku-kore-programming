@@ -2897,8 +2897,11 @@ class _CardFront extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      // 小さい画面でも内容が溢れないよう、収まらない場合はスクロールさせる
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Text('📘', style: TextStyle(fontSize: 36)),
           const SizedBox(height: 20),
@@ -2931,6 +2934,8 @@ class _CardFront extends StatelessWidget {
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

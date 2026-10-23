@@ -1588,7 +1588,8 @@ class _StageInfoSheet extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1867,6 +1868,7 @@ class _StageInfoSheet extends ConsumerWidget {
                 duration: 300.ms,
               ),
         ],
+      ),
       ),
     );
   }

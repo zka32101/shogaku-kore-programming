@@ -410,7 +410,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     _activityLog[today] = (_activityLog[today] ?? 0) + count;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_activityLogKey, json.encode(_activityLog));
-    state = {...state};
+    if (mounted) state = {...state};
   }
 
   /// 学習時間を記録する。マイルストーン達成時は (icon, name, message, nextGoal) を返す。
@@ -421,7 +421,8 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     final afterMinutes = _totalLearningSeconds ~/ 60;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_totalLearningSecondsKey, _totalLearningSeconds);
-    state = {...state};
+    // 画面を閉じた直後に呼ばれると notifier が破棄済みのことがある（保存は済んでいる）
+    if (mounted) state = {...state};
 
     // 学習時間マイルストーン判定
     const milestones = [

@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -487,7 +488,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Scroll through badges
-      await tester.scroll(find.byType(ListView).first, const Offset(0, -300));
+      await tester.drag(find.byType(ListView).first, const Offset(0, -300));
       await tester.pumpAndSettle();
 
       // More badges should be visible

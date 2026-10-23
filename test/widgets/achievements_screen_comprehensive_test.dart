@@ -450,8 +450,8 @@ void main() {
     });
 
     testWidgets('scrolling completes stage list', (WidgetTester tester) async {
-      tester.binding.window.physicalSize = const Size(1080, 1920);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1080, 1920);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         createTestApp(
@@ -1115,8 +1115,8 @@ void main() {
     });
 
     testWidgets('complete workflow: scroll in completed tab', (WidgetTester tester) async {
-      tester.binding.window.physicalSize = const Size(1080, 1920);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1080, 1920);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         createTestApp(

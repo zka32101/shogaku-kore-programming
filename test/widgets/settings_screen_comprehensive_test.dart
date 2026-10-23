@@ -618,8 +618,8 @@ void main() {
 
   group('SettingsScreen - Scrolling and Layout', () {
     testWidgets('settings list is scrollable', (WidgetTester tester) async {
-      tester.binding.window.physicalSize = const Size(1080, 1920);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1080, 1920);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         createTestApp(
@@ -638,8 +638,8 @@ void main() {
     });
 
     testWidgets('can scroll to bottom of settings list', (WidgetTester tester) async {
-      tester.binding.window.physicalSize = const Size(1080, 1920);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1080, 1920);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         createTestApp(
@@ -658,8 +658,8 @@ void main() {
     });
 
     testWidgets('can scroll up to top of settings list', (WidgetTester tester) async {
-      tester.binding.window.physicalSize = const Size(1080, 1920);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1080, 1920);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         createTestApp(
@@ -906,8 +906,8 @@ void main() {
     });
 
     testWidgets('complete workflow: scroll through settings', (WidgetTester tester) async {
-      tester.binding.window.physicalSize = const Size(1080, 1920);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1080, 1920);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         createTestApp(
