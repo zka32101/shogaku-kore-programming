@@ -1,3 +1,7 @@
+/// バグハンターのステージ id の接頭辞。本編の全クリア判定などの集計から
+/// 独立ステージ群を区別するために使う。
+const String kBugHunterIdPrefix = 'bug_';
+
 class AppConstants {
   static const String appName = '小学コレ！プログラミング';
   static const String appSubtitle = 'コード探険';

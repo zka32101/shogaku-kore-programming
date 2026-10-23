@@ -510,3 +510,30 @@ void checkFavoriteMilestoneBadge(
     );
   });
 }
+
+/// ヒントなしでクリアしたステージ数が節目（3・10・25）になったときに祝福する。
+void checkNoHintMilestoneBadge(
+  BuildContext context, {
+  required int count,
+}) {
+  final (icon, name, message, nextGoal) = switch (count) {
+    3  => ('💡', 'ノーヒント入門',   'ヒントなしで3ステージをクリア！',       '10ステージでノーヒントマスターだよ！'),
+    10 => ('🧠', 'ノーヒントマスター', 'ヒントなしで10ステージをクリア！',      '25ステージでノーヒント王を目指そう！'),
+    25 => ('👑', 'ノーヒント王',     'ヒントなしで25ステージをクリア！すごい！', 'この調子で全ステージを制覇しよう！'),
+    _  => ('', '', '', ''),
+  };
+  if (icon.isEmpty) return;
+  Future.delayed(const Duration(milliseconds: 2500), () {
+    if (!context.mounted) return;
+    showBadgeUnlock(
+      context,
+      icon: icon,
+      name: name,
+      message: message,
+      points: count * 5,
+      nextGoal: nextGoal,
+      onContinue: () {},
+      continueLabel: 'とじる',
+    );
+  });
+}

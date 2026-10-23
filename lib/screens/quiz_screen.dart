@@ -22,6 +22,7 @@ import '../services/sound_service.dart';
 import '../widgets/ai_response_dialog.dart';
 import '../providers/quiz_access_override_provider.dart';
 import '../widgets/app_dialog.dart';
+import '../widgets/bug_hunt_code_view.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
@@ -186,6 +187,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
           _hintUsed = true;
           _hintVisible = !_hintVisible;
         });
+        _recordHintUse();
         return KeyEventResult.handled;
       }
     }
@@ -324,6 +326,11 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted && _hasAnswered) _nextQuestion();
     });
+  }
+
+  /// ヒントを使ったことを記録する（保護者向けメッセージで使う）。
+  void _recordHintUse() {
+    ref.read(progressProvider.notifier).recordHintUse(widget.challenge.id);
   }
 
   void _selectOption(int index) {
@@ -686,7 +693,16 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                           ),
                         ),
                         const SizedBox(height: 16),
-                        if (question.codeSnippet != null) ...[
+                        if (question.codeSnippet != null && question.bugHunt) ...[
+                          BugHuntCodeView(
+                            lines: question.options,
+                            selectedIndex: _selectedOptionIndex,
+                            answered: _hasAnswered,
+                            correctIndex: question.correctIndex,
+                            onSelect: _selectOption,
+                          ),
+                          const SizedBox(height: 16),
+                        ] else if (question.codeSnippet != null) ...[
                           CodeHighlightWidget(code: question.codeSnippet!),
                           const SizedBox(height: 16),
                         ],
@@ -751,7 +767,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                     ).animate()
                      .fadeIn(duration: 250.ms)
                      .slideY(begin: 0.06, curve: Curves.easeOut, duration: 250.ms),
-                    // 選択肢
+                    // 選択肢（バグハンターはコードの行を直接タップするので出さない）
+                    if (!question.bugHunt)
                     ...question.options.asMap().entries.map((entry) {
                       final index = entry.key;
                       final option = entry.value;
@@ -1055,6 +1072,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                       _hintUsed = true;
                       _hintVisible = !_hintVisible;
                     });
+                    _recordHintUse();
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),

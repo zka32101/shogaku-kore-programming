@@ -12,6 +12,10 @@ class RobotCanvasWidget extends StatefulWidget {
   final bool isCorrect;
   final double gridSize;         // グリッドのセル数（デフォルト 7）
 
+  /// true のとき、軌跡が変わるたびに全体を描き直すアニメーションを再生する。
+  /// 1ブロックずつ段階的に再生する場合は、呼び出し側が進行を管理するので false にする。
+  final bool animate;
+
   const RobotCanvasWidget({
     super.key,
     required this.path,
@@ -19,6 +23,7 @@ class RobotCanvasWidget extends StatefulWidget {
     required this.hasSubmitted,
     required this.isCorrect,
     this.gridSize = 7.0,
+    this.animate = true,
   });
 
   @override
@@ -41,7 +46,7 @@ class _RobotCanvasWidgetState extends State<RobotCanvasWidget>
       parent: _animController,
       curve: Curves.easeInOut,
     );
-    if (widget.path.length > 1) {
+    if (widget.animate && widget.path.length > 1) {
       _animController.forward(from: 0);
     }
   }
@@ -49,7 +54,8 @@ class _RobotCanvasWidgetState extends State<RobotCanvasWidget>
   @override
   void didUpdateWidget(RobotCanvasWidget old) {
     super.didUpdateWidget(old);
-    if (old.path != widget.path && widget.path.length > 1) {
+    // 段階再生（animate: false）から通常表示にもどるときは、描き直さずそのまま見せる
+    if (widget.animate && old.animate && old.path != widget.path && widget.path.length > 1) {
       _animController.forward(from: 0);
     }
   }
@@ -69,7 +75,7 @@ class _RobotCanvasWidgetState extends State<RobotCanvasWidget>
           painter: _RobotPainter(
             path: widget.path,
             finalAngle: widget.finalAngle,
-            progress: widget.path.length > 1 ? _progress.value : 1.0,
+            progress: widget.animate && widget.path.length > 1 ? _progress.value : 1.0,
             hasSubmitted: widget.hasSubmitted,
             isCorrect: widget.isCorrect,
             gridSize: widget.gridSize,

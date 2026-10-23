@@ -31,6 +31,7 @@ import 'friends_list_screen.dart';
 import 'gallery_screen.dart';
 import 'quiz_screen.dart';
 import 'ranking_screen.dart';
+import 'bug_hunter_screen.dart';
 import 'robot_game_screen.dart';
 import 'shop_screen.dart';
 import 'stage_share_screen.dart';
@@ -498,6 +499,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildQuickAccess(BuildContext context) {
     final items = <(String, String, Widget)>[
       ('🤖', 'ロボットゲーム', const RobotGameScreen()),
+      ('🐛', 'バグハンター', const BugHunterScreen()),
       ('🤝', 'ステージ交換', const StageShareScreen()),
       ('👥', 'ともだち', const FriendsListScreen()),
       ('🎨', '自由に作る', const FreeCreateScreen()),
