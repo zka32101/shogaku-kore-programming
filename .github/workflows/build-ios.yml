@@ -1,11 +1,7 @@
 name: Build iOS
 
+# macOS ランナーは課金が10倍のため、push では動かさない（手動実行または PR のみ）
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - 'v*'
   pull_request:
     branches:
       - main

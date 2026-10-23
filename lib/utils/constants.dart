@@ -2,11 +2,9 @@
 // Phase 4.2: RevenueCat Configuration
 
 class AppConstants {
-  // RevenueCat Configuration
-  static const String revenueCatApiKey = String.fromEnvironment(
-    'REVENUE_CAT_API_KEY',
-    defaultValue: 'appl_ProgrammingKoreDevelopment',
-  );
+  // RevenueCat の API キーはここに置かない（開発用キーが本番ビルドに残るのを防ぐ）。
+  // `--dart-define=REVENUE_CAT_GOOGLE_KEY` / `REVENUE_CAT_APPLE_KEY` で渡し、
+  // revenue_cat_service.dart の SubscriptionConfig が読む。
 
   static const String subscriptionProductId = 'programming_premium_monthly';
   static const String premiumEntitlementId = 'premium_access';
