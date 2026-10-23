@@ -158,6 +158,17 @@ void main() {
 
     expect(container.read(progressProvider)['stage_hint_test']!.starsEarned, 3);
     expect(container.read(progressProvider.notifier).noHintClearCount, 0);
+    // 保護者向けメッセージ用に、ヒントを使ったステージとして記録される
+    expect(container.read(progressProvider.notifier).hintStageIdsWithin(),
+        ['stage_hint_test']);
+    await finish(tester);
+  });
+
+  testWidgets('ヒントを使わずにクリアしたステージは、ヒント使用に記録されない', (tester) async {
+    await open(tester);
+    await submitSquare(tester);
+
+    expect(container.read(progressProvider.notifier).hintStageIdsWithin(), isEmpty);
     await finish(tester);
   });
 }

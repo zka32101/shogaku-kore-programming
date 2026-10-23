@@ -60,6 +60,8 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   static const String _streakKey = 'streak_count';
   static const String _studyDatesKey = 'study_dates';
   static const String _noHintClearsKey = 'no_hint_clears';
+  static const String _hintUsesKey = 'hint_uses';
+  static const int _maxHintUses = 300;
   static const String _lastActiveDateKey = 'last_active_date';
   static const String _bonusKey = 'bonus_points';
   static const String _totalQuestionsKey = 'total_questions_answered';
@@ -78,6 +80,8 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   List<String> _studyDates = [];
   // ヒントなしでクリアしたステージ id（ブロックエディタの段階ヒントで使う）
   Set<String> _noHintClears = {};
+  // ヒントを使った記録（'yyyy-MM-dd|ステージid'。同じ日の同じステージは1件）
+  List<String> _hintUses = [];
   int _longestStreak = 0;
   DateTime? _lastActiveDate;
   int _bonusPoints = 0;
@@ -246,6 +250,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     _studyDates = normalizeStudyDates(
         prefs.getStringList(_studyDatesKey) ?? const [], DateTime.now());
     _noHintClears = (prefs.getStringList(_noHintClearsKey) ?? const <String>[]).toSet();
+    _hintUses = prefs.getStringList(_hintUsesKey) ?? <String>[];
 
     // 起動時にストリーク更新
     await _updateStreakOnOpen(prefs);
@@ -341,6 +346,40 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     await prefs.setStringList(_studyDatesKey, _studyDates);
   }
 
+  /// ヒント（ヒント欄・お手本）を使ったことを記録する。保護者向けメッセージで使う。
+  Future<void> recordHintUse(String challengeId, {DateTime? now}) async {
+    final d = now ?? DateTime.now();
+    final day =
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    final entry = '$day|$challengeId';
+    if (_hintUses.contains(entry)) return;
+    _hintUses = [..._hintUses, entry];
+    if (_hintUses.length > _maxHintUses) {
+      _hintUses = _hintUses.sublist(_hintUses.length - _maxHintUses);
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_hintUsesKey, _hintUses);
+  }
+
+  /// 直近 [days] 日間にヒントを使ったステージ id（使った日数の多い順）。
+  List<String> hintStageIdsWithin({int days = 7, DateTime? now}) {
+    final n = now ?? DateTime.now();
+    final today = DateTime(n.year, n.month, n.day);
+    final start = today.subtract(Duration(days: days - 1));
+    final counts = <String, int>{};
+    for (final e in _hintUses) {
+      final i = e.indexOf('|');
+      if (i < 0) continue;
+      final date = DateTime.tryParse(e.substring(0, i));
+      if (date == null || date.isBefore(start)) continue;
+      final id = e.substring(i + 1);
+      counts[id] = (counts[id] ?? 0) + 1;
+    }
+    final ids = counts.keys.toList()
+      ..sort((a, b) => counts[b]!.compareTo(counts[a]!));
+    return ids;
+  }
+
   /// ヒントなしでクリアしたステージ数
   int get noHintClearCount => _noHintClears.length;
 
@@ -381,6 +420,8 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     await prefs.remove(_studyDatesKey);
     _noHintClears = {};
     await prefs.remove(_noHintClearsKey);
+    _hintUses = [];
+    await prefs.remove(_hintUsesKey);
     await prefs.remove(_lastActiveDateKey);
     await prefs.remove(_bonusKey);
     await prefs.remove(_totalQuestionsKey);

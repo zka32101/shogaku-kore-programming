@@ -233,11 +233,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     );
   }
 
-  /// ヒント欄の開閉。開いたらヒントを使ったことを記録する（星・ノーヒント判定に影響）。
+  /// ヒントを使ったことを記録する（星・ノーヒント判定と、保護者向けメッセージに使う）。
+  void _markHintUsed() {
+    _ladder.openHint();
+    ref.read(progressProvider.notifier).recordHintUse(widget.challenge.id);
+  }
+
+  /// ヒント欄の開閉。開いたらヒントを使ったことを記録する。
   void _toggleHint() {
     setState(() {
       _showHint = !_showHint;
-      if (_showHint) _ladder.openHint();
+      if (_showHint) _markHintUsed();
     });
   }
 
@@ -246,6 +252,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final steps = modelSteps(widget.challenge.expectedOutput ?? '');
     if (steps.isEmpty) return;
     _ladder.viewModel();
+    _markHintUsed();
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -316,7 +323,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           (widget.challenge.hints?.isNotEmpty ?? false)) {
         setState(() {
           _showHint = true;
-          _ladder.openHint();
+          _markHintUsed();
         });
       }
       // 不正解でも責めず、応援する

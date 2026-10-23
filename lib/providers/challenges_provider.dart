@@ -30,6 +30,7 @@ List<Stage> buildBugHunterStages() {
         constants.StageLevel.beginner, [
       Question.bugHunt(
         id: 'bh_1_1',
+        text: '名前と年れいを表示したいのに、うまくいかないよ。バグの行をタップしよう！',
         code: 'name = "たろう"\nage = 10\nprint("こんにちは " + name)\nprint("年れいは " + age)',
         bugLine: 4,
         explanation: '文字(" ")と数字(10)はそのままつなげられないよ。数字を文字にかえる str(age) を使って print("年れいは " + str(age)) にすると動くよ。',
@@ -37,6 +38,7 @@ List<Stage> buildBugHunterStages() {
       ),
       Question.bugHunt(
         id: 'bh_1_2',
+        text: '1から3までの合計を表示したいのに、エラーになるよ。バグの行をタップしよう！',
         code: 'total = 0\nfor i in range(1, 4):\n    total = total + i\nprint(total',
         bugLine: 4,
         explanation: 'print( のカッコが とじられていないよ。最後に ) をつけて print(total) にしよう。',
@@ -44,6 +46,7 @@ List<Stage> buildBugHunterStages() {
       ),
       Question.bugHunt(
         id: 'bh_1_3',
+        text: '60点以上なら「ごうかく！」と表示したいのに、エラーになるよ。バグの行をタップしよう！',
         code: 'score = 80\nif score >= 60:\nprint("ごうかく！")',
         bugLine: 3,
         explanation: 'if の中でやることは、字下げ(スペース4つ)をしてそろえるルールだよ。print の前にスペースを入れよう。',
@@ -54,6 +57,7 @@ List<Stage> buildBugHunterStages() {
         constants.StageLevel.beginner, [
       Question.bugHunt(
         id: 'bh_2_1',
+        text: 'x と y をたした答えを表示したいのに、エラーになるよ。バグの行をタップしよう！',
         code: 'x = 10\ny = 20\nz = x + y\nprint(Z)',
         bugLine: 4,
         explanation: 'Python は大文字と小文字をべつの文字として考えるよ。z と Z はちがうものなので、print(z) にしよう。',
@@ -61,6 +65,7 @@ List<Stage> buildBugHunterStages() {
       ),
       Question.bugHunt(
         id: 'bh_2_2',
+        text: 'くだものを1つずつ表示したいのに、エラーになるよ。バグの行をタップしよう！',
         code: 'fruits = ["りんご", "みかん", "バナナ"]\nfor f in fruits\n    print(f)',
         bugLine: 2,
         explanation: 'for の行の最後には「:(コロン)」が必要だよ。for f in fruits: にしよう。',
@@ -68,6 +73,7 @@ List<Stage> buildBugHunterStages() {
       ),
       Question.bugHunt(
         id: 'bh_2_3',
+        text: '0、1、2 と表示して止まってほしいのに、止まらなくなるよ。バグの行をタップしよう！',
         code: 'count = 0\nwhile count < 3:\n    print(count)\n    count = count - 1',
         bugLine: 4,
         explanation: 'count が へっていくので、ずっと 3 より小さいままで止まらなくなるよ。count = count + 1 にして、1ずつ ふやそう。',

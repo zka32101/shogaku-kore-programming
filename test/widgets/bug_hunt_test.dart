@@ -105,6 +105,17 @@ void main() {
       }
     });
 
+    test('問題文は全ステージの全問で重複しない（間違えた問題リストは問題文で区別する）', () {
+      final texts = <String>{};
+      final main = ProviderContainer().read(allChallengesProvider);
+      for (final s in [...main, ...stages]) {
+        for (final q in s.questions ?? const <Question>[]) {
+          if (!q.bugHunt) continue;
+          expect(texts.add(q.text), isTrue, reason: '${q.id} の問題文が重複: ${q.text}');
+        }
+      }
+    });
+
     test('本編のステージ一覧(60件)には含めない', () {
       final main = ProviderContainer().read(allChallengesProvider);
       expect(main.length, AppConstants.totalStages);

@@ -187,6 +187,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
           _hintUsed = true;
           _hintVisible = !_hintVisible;
         });
+        _recordHintUse();
         return KeyEventResult.handled;
       }
     }
@@ -325,6 +326,11 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted && _hasAnswered) _nextQuestion();
     });
+  }
+
+  /// ヒントを使ったことを記録する（保護者向けメッセージで使う）。
+  void _recordHintUse() {
+    ref.read(progressProvider.notifier).recordHintUse(widget.challenge.id);
   }
 
   void _selectOption(int index) {
@@ -1066,6 +1072,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                       _hintUsed = true;
                       _hintVisible = !_hintVisible;
                     });
+                    _recordHintUse();
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
