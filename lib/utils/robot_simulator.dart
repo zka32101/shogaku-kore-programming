@@ -10,7 +10,10 @@ const double _kStepsPerCell = 50.0; // steps per grid cell
 /// ブロックリストを実行してロボットのパス（正規化座標）と最終角度を返す。
 /// editor_provider.dart（ステージ課題）と自由制作モードの両方から使われる
 /// 共通シミュレーションロジック。
-(List<Offset>, double) simulateRobot(List<Block> blocks) {
+///
+/// [clamp] が false のときは盤面の端で止めず、プログラムが描く本来の軌跡を返す
+/// （形の判定用。表示用は true のまま盤面内に収める）。
+(List<Offset>, double) simulateRobot(List<Block> blocks, {bool clamp = true}) {
   double x = kRobotGridSize / 2;
   double y = kRobotGridSize / 2;
   double angle = 0.0; // 0° = right, clockwise positive
@@ -41,7 +44,7 @@ const double _kStepsPerCell = 50.0; // steps per grid cell
       x = nx;
       y = ny;
       angle = na;
-    }, x, y, angle);
+    }, x, y, angle, clamp);
     x = path.last.dx;
     y = path.last.dy;
   }
@@ -52,7 +55,7 @@ const double _kStepsPerCell = 50.0; // steps per grid cell
         x = nx;
         y = ny;
         angle = na;
-      }, x, y, angle);
+      }, x, y, angle, clamp);
       x = path.last.dx;
       y = path.last.dy;
     }
@@ -68,6 +71,7 @@ void _executeBlock(
   double x,
   double y,
   double angle,
+  bool clamp,
 ) {
   final baseId = block.id.split('@').first;
   switch (baseId) {
@@ -75,8 +79,12 @@ void _executeBlock(
       final steps = (block.params['steps'] as num?)?.toDouble() ?? 100;
       final dist = steps / _kStepsPerCell;
       final rad = angle * math.pi / 180.0;
-      final nx = (x + math.cos(rad) * dist).clamp(0.0, kRobotGridSize);
-      final ny = (y + math.sin(rad) * dist).clamp(0.0, kRobotGridSize);
+      var nx = x + math.cos(rad) * dist;
+      var ny = y + math.sin(rad) * dist;
+      if (clamp) {
+        nx = nx.clamp(0.0, kRobotGridSize);
+        ny = ny.clamp(0.0, kRobotGridSize);
+      }
       path.add(Offset(nx, ny));
       update(nx, ny, angle);
     case 'turn_right':
@@ -91,15 +99,12 @@ void _executeBlock(
   }
 }
 
-/// ロボットの軌跡が正方形になっているかを調べる。
-///
-/// 使ったブロックの種類（繰り返しの有無など）は問わず、軌跡の形だけで判定する。
-/// 正方形なら null、そうでなければ子ども向けのヒント文を返す。
-String? squareHint(List<Offset> path) {
-  const eps = 0.05;
-  bool same(Offset a, Offset b) => (a - b).distance < eps;
+const double _kEps = 0.05;
 
-  // 動いていない点・同一直線上の中間点（50歩を2回など）をまとめる
+/// 軌跡から、動いていない点と同一直線上の中間点（50歩を2回など）を除いて
+/// 「頂点だけ」の列にする。
+List<Offset> _vertices(List<Offset> path) {
+  bool same(Offset a, Offset b) => (a - b).distance < _kEps;
   final pts = <Offset>[];
   for (final p in path) {
     if (pts.isEmpty || !same(pts.last, p)) pts.add(p);
@@ -110,12 +115,110 @@ String? squareHint(List<Offset> path) {
     final b = pts[i + 1] - pts[i];
     final cross = a.dx * b.dy - a.dy * b.dx;
     final dot = a.dx * b.dx + a.dy * b.dy;
-    if (cross.abs() < eps && dot > 0) {
+    if (cross.abs() < _kEps && dot > 0) {
       pts.removeAt(i);
     } else {
       i++;
     }
   }
+  return pts;
+}
+
+/// ステージの `shape` に応じて、ロボットの軌跡が正解の形かを調べる。
+///
+/// 使ったブロックの種類（繰り返しの有無など）は問わず、軌跡の形だけで判定する。
+/// 正解なら null、そうでなければ子ども向けのヒント文を返す。
+String? shapeHint(String shape, List<Offset> path) {
+  switch (shape) {
+    case 'square':
+      return squareHint(path);
+    case 'triangle':
+      return triangleHint(path);
+    case 'zigzag':
+      return zigzagHint(path);
+    case 'line':
+      return lineHint(path);
+  }
+  return null;
+}
+
+/// 100歩（2マス）まっすぐ進めているか。
+String? lineHint(List<Offset> path) {
+  final pts = _vertices(path);
+  if (pts.length < 2) return '「前に進む」ブロックを使ってロボットを動かそう！';
+  if (pts.length > 2) return 'まっすぐ進むだけでいいよ。曲がらずに1本の線にしよう！';
+  final len = (pts[1] - pts[0]).distance;
+  if (len < 2 - _kEps) return 'まだ足りないよ。歩数を100にしよう！';
+  if (len > 2 + _kEps) return '進みすぎだよ。歩数を100にしよう！';
+  return null;
+}
+
+/// 正三角形（3辺が同じ長さで、スタートにもどる）になっているか。
+String? triangleHint(List<Offset> path) {
+  final pts = _vertices(path);
+  if (pts.length < 2) return '「前に進む」ブロックを使ってロボットを動かそう！';
+  if (pts.length - 1 < 3) {
+    return '三角は辺が3本あるよ。「前に進む」と「回転」を3回ずつ使ってみよう！'
+        '（「繰り返す」ブロックを使うと楽だよ）';
+  }
+  if (pts.length - 1 > 3) {
+    return '辺が多すぎるみたい。「前に進む」と「回転」は3回ずつにしよう！';
+  }
+  final lengths = [for (var k = 0; k < 3; k++) (pts[k + 1] - pts[k]).distance];
+  if (lengths.any((l) => (l - lengths.first).abs() > _kEps)) {
+    return '3つの辺の長さをそろえよう。すべて同じ歩数にするといいよ！';
+  }
+  if ((pts.last - pts.first).distance > _kEps) {
+    return '三角がとじていないよ。回転は120度にしよう！（右でも左でも同じ向きにそろえてね）';
+  }
+  return null;
+}
+
+/// 右45度のあと左45度（またはその逆）で、同じ長さを3回進んでいるか。
+String? zigzagHint(List<Offset> path) {
+  final pts = _vertices(path);
+  if (pts.length < 2) return '「前に進む」ブロックを使ってロボットを動かそう！';
+  if (pts.length - 1 < 3) {
+    return 'ジグザグは3回進むよ。進む → 曲がる を使って、3回目も進もう！';
+  }
+  if (pts.length - 1 > 3) {
+    return '進むのは3回でいいよ。曲がるのは2回だけにしよう！';
+  }
+  final sides = [for (var k = 0; k < 3; k++) pts[k + 1] - pts[k]];
+  final first = sides.first.distance;
+  if (sides.any((s) => (s.distance - first).abs() > _kEps)) {
+    return '3回とも同じ歩数だけ進もう！';
+  }
+  double turn(Offset a, Offset b) {
+    var d = (math.atan2(b.dy, b.dx) - math.atan2(a.dy, a.dx)) * 180 / math.pi;
+    while (d > 180) {
+      d -= 360;
+    }
+    while (d <= -180) {
+      d += 360;
+    }
+    return d;
+  }
+
+  final t1 = turn(sides[0], sides[1]);
+  final t2 = turn(sides[1], sides[2]);
+  if ((t1.abs() - 45).abs() > 3 || (t2.abs() - 45).abs() > 3) {
+    return '曲がる角度は45度にしよう！';
+  }
+  if (t1 * t2 > 0) {
+    return '右と左を交互に使おう。1回目と2回目で曲がる向きを変えるとジグザグになるよ！';
+  }
+  return null;
+}
+
+/// ロボットの軌跡が正方形になっているかを調べる。
+///
+/// 使ったブロックの種類（繰り返しの有無など）は問わず、軌跡の形だけで判定する。
+/// 正方形なら null、そうでなければ子ども向けのヒント文を返す。
+String? squareHint(List<Offset> path) {
+  const eps = _kEps;
+  bool same(Offset a, Offset b) => (a - b).distance < eps;
+  final pts = _vertices(path);
 
   if (pts.length < 2) return '「前に進む」ブロックを使ってロボットを動かそう！';
   if (pts.length - 1 < 4) {

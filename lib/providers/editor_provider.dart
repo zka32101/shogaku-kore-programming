@@ -180,17 +180,19 @@ class EditorNotifier extends StateNotifier<EditorState> {
 
   /// [shape] が指定されたステージは、使ったブロックではなくロボットの軌跡の形で採点する
   /// （例: 'square' は繰り返しを使わなくても、四角が描ければ正解）。
+  /// 対応する形は robot_simulator.dart の shapeHint を参照。
   void submitScript(String expectedOutput, {String? shape}) {
     final output = _generateOutput();
     final blockIds = state.scriptBlocks.map((b) => b.id.split('@').first).toList();
     final (path, angle) = _simulateRobot(state.scriptBlocks);
     String? shapeHint;
-    if (shape == 'square') {
-      shapeHint = sim.squareHint(path);
+    if (shape != null) {
+      // 形の判定は盤面の端で止めない本来の軌跡で行う（表示用の path は盤面内）
+      final (rawPath, _) = sim.simulateRobot(state.scriptBlocks, clamp: false);
+      shapeHint = sim.shapeHint(shape, rawPath);
     }
-    final correct = shape == 'square'
-        ? shapeHint == null
-        : _checkAnswer(blockIds, expectedOutput);
+    final correct =
+        shape != null ? shapeHint == null : _checkAnswer(blockIds, expectedOutput);
 
     state = state.copyWith(
       previewOutput: correct

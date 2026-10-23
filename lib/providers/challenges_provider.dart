@@ -73,6 +73,7 @@ List<Stage> _buildChallenges() {
         ),
       ],
       goalCondition: {
+        'shape': 'line',
         'goalX': 3.5,
         'goalY': 3.5,
         'tolerance': 0.5,
@@ -997,13 +998,14 @@ with open("data.txt", "r") as f:
       id: 'stage_13',
       stageNumber: 13,
       title: '三角を描こう',
-      description: '3回同じ動きを繰り返して三角形を描こう！120°ずつ回転するよ。',
+      description: '三角形を描こう！120°ずつ回転するよ。繰り返しを使うと少ないブロックでできるよ',
       type: constants.ChallengeType.visual,
       level: constants.StageLevel.beginner,
       icon: '🔺',
       isFree: true,
       expectedOutput: 'repeat(3):\n  move_forward(100)\n  turn_right(120)',
-      hints: ['繰り返しは3回だよ', '三角形は120°ずつ回るよ', '「前に進む」→「右に120°回転」を繰り返そう'],
+      hints: ['三角形は辺が3本。「前に進む」と「回転」を3回ずつ使おう', '三角形は120°ずつ回るよ', '「繰り返す」ブロックを3回にすると少ないブロックでできるよ（使わなくてもOK）'],
+      goalCondition: {'shape': 'triangle'},
     ),
     Stage(
       id: 'stage_14',
@@ -1016,6 +1018,7 @@ with open("data.txt", "r") as f:
       isFree: true,
       expectedOutput: 'move_forward(100)\nturn_right(45)\nmove_forward(100)\nturn_left(45)\nmove_forward(100)',
       hints: ['斜めに進んでから方向を変えよう', '右・左と交互に使うよ'],
+      goalCondition: {'shape': 'zigzag'},
     ),
     Stage(
       id: 'stage_15',
