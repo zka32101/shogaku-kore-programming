@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -56,14 +57,27 @@ class LearningAnalyticsNotifier extends StateNotifier<LearningAnalyticsState> {
             ),
           ),
         ) {
-    _initializeAnalyticsData();
+    _initialized = _initializeAnalyticsData();
   }
+
+  /// 保存データの復元完了を待つための Future（記録が復元に上書きされるのを防ぐ）
+  late final Future<void> _initialized;
 
   static const String _dailyStatsKey = 'learning_daily_stats';
   static const String _progressKey = 'learning_progress';
   static const String _streakKey = 'learning_streak';
   static const String _longestStreakKey = 'learning_longest_streak';
   static const String _lastUpdatedKey = 'learning_last_updated';
+
+  /// 保存済みJSONを復元する。旧形式など壊れたデータは null を返して無視する
+  static Map<String, dynamic>? _tryDecode(String raw) {
+    try {
+      final v = jsonDecode(raw);
+      return v is Map<String, dynamic> ? v : null;
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// 学習分析データの初期化
   Future<void> _initializeAnalyticsData() async {
@@ -90,22 +104,17 @@ class LearningAnalyticsNotifier extends StateNotifier<LearningAnalyticsState> {
 
     if (savedDailyStats.isNotEmpty) {
       dailyStats = savedDailyStats
-          .map((json) => DailyLearningStats.fromJson(
-            Map<String, dynamic>.from(
-              Map.from(Uri.parse('?$json').queryParameters)
-                  .map((k, v) => MapEntry(k, v)),
-            ),
-          ))
+          .map(_tryDecode)
+          .whereType<Map<String, dynamic>>()
+          .map(DailyLearningStats.fromJson)
           .toList();
     }
 
     if (savedProgress != null) {
-      progress = OverallLearningProgress.fromJson(
-        Map<String, dynamic>.from(
-          Map.from(Uri.parse('?$savedProgress').queryParameters)
-              .map((k, v) => MapEntry(k, v)),
-        ),
-      );
+      final decoded = _tryDecode(savedProgress);
+      if (decoded != null) {
+        progress = OverallLearningProgress.fromJson(decoded);
+      }
     }
 
     state = LearningAnalyticsState(
@@ -127,6 +136,7 @@ class LearningAnalyticsNotifier extends StateNotifier<LearningAnalyticsState> {
     required int xpGained,
     required int coinsGained,
   }) async {
+    await _initialized;
     final prefs = await SharedPreferences.getInstance();
     final now = DateTime.now();
 
@@ -299,11 +309,11 @@ class LearningAnalyticsNotifier extends StateNotifier<LearningAnalyticsState> {
 
     await prefs.setStringList(
       _dailyStatsKey,
-      recentStats.map((s) => s.toJson().toString()).toList(),
+      recentStats.map((s) => jsonEncode(s.toJson())).toList(),
     );
 
     // 総合進捗を保存
-    await prefs.setString(_progressKey, progress.toJson().toString());
+    await prefs.setString(_progressKey, jsonEncode(progress.toJson()));
 
     // ストリーク情報を保存
     await prefs.setInt(_streakKey, currentStreak);

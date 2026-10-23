@@ -227,14 +227,22 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   UkalabEmoji(widget.badgeIcon, size: 48),
-                                  Text(
+                                  Flexible(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      child: Text(
                                     widget.badgeName,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF8B6914),
                                     ),
                                     textAlign: TextAlign.center,
+                                  ),
+                                    ),
                                   ),
                                 ],
                               ),
