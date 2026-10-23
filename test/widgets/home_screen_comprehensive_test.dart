@@ -48,8 +48,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // AppBar should be present
-        expect(find.byType(AppBar), findsOneWidget);
+        // 現行のホームは AppBar ではなく、ニックネームを表示する独自ヘッダー
+        expect(find.text('たんけんか'), findsOneWidget);
       });
 
       testWidgets('displays scrollable content', (WidgetTester tester) async {
@@ -64,7 +64,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Should have scrollable content
-        expect(find.byType(SingleChildScrollView), findsWidgets);
+        expect(find.byType(ListView), findsWidgets);
       });
 
       testWidgets('displays user profile section', (WidgetTester tester) async {
@@ -153,8 +153,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Streak with fire icon should show
-        expect(find.byIcon(Icons.local_fire_department), findsWidgets);
+        // 連続学習日数（「1日連続」）が表示される
+        expect(find.textContaining('日連続'), findsOneWidget);
       });
 
       testWidgets('displays learning time', (WidgetTester tester) async {
@@ -199,8 +199,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Daily missions section should be visible
-        expect(find.byType(Card), findsWidgets);
+        // 今日の目標（デイリーミッション）が表示される
+        expect(find.text('今日の目標'), findsOneWidget);
       });
 
       testWidgets('displays mission count and progress', (WidgetTester tester) async {
@@ -307,7 +307,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        expect(find.byType(ElevatedButton), findsWidgets);
+        expect(find.text('次のステージ'), findsOneWidget);
+        expect(find.text('直線を描こう'), findsOneWidget);
       });
 
       testWidgets('taps stage to open it', (WidgetTester tester) async {
@@ -342,8 +343,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Tip card should display
-        expect(find.byType(Card), findsWidgets);
+        // 今日の復習カードが表示される
+        expect(find.text('今日の復習'), findsOneWidget);
       });
 
       testWidgets('shows tip text content', (WidgetTester tester) async {
@@ -621,8 +622,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Quick buttons should be visible
-        expect(find.byType(ElevatedButton), findsWidgets);
+        // クイック導線（今日の復習）が表示される
+        expect(find.text('今日の復習'), findsOneWidget);
       });
 
       testWidgets('achievement button is present', (WidgetTester tester) async {
@@ -636,8 +637,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Achievement/badge button should show
-        expect(find.byIcon(Icons.emoji_events), findsWidgets);
+        // 実績はホームではなく下部ナビ（main.dart）にある。ホームでは所持コインを表示する
+        expect(find.text('🪙'), findsOneWidget);
       });
 
       testWidgets('profile button is present', (WidgetTester tester) async {
@@ -651,8 +652,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Profile button should show
-        expect(find.byIcon(Icons.person), findsWidgets);
+        // プロフィールもホームではなく下部ナビにある。ホームのヘッダーにはレベルが表示される
+        expect(find.textContaining('レベル'), findsWidgets);
       });
 
       testWidgets('taps achievement button to navigate', (WidgetTester tester) async {
@@ -706,7 +707,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Should be able to scroll
-        expect(find.byType(SingleChildScrollView), findsWidgets);
+        expect(find.byType(ListView), findsWidgets);
       });
 
       testWidgets('all sections visible when scrolled', (WidgetTester tester) async {
@@ -721,7 +722,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Scroll down to see more content
-        await tester.drag(find.byType(SingleChildScrollView).first, const Offset(0, -500));
+        await tester.drag(find.byType(ListView).first, const Offset(0, -500));
         await tester.pumpAndSettle();
 
         expect(find.byType(Text), findsWidgets);
@@ -742,7 +743,7 @@ void main() {
         // Scroll multiple times
         for (int i = 0; i < 3; i++) {
           await tester.drag(
-            find.byType(SingleChildScrollView).first,
+            find.byType(ListView).first,
             const Offset(0, -200),
           );
           await tester.pumpAndSettle();
@@ -1030,7 +1031,7 @@ void main() {
 
         // Scroll through content
         await tester.drag(
-          find.byType(SingleChildScrollView).first,
+          find.byType(ListView).first,
           const Offset(0, -300),
         );
         await tester.pumpAndSettle();
