@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/auth_provider.dart';
 import 'package:shared_core/shared_core.dart' show missionProvider, coinProvider, RewardType, weeklyBonusProvider;
 
 /// デイリーミッション一覧画面（Phase 4.5）
@@ -30,9 +31,11 @@ class MissionScreen extends ConsumerWidget {
                       Text('エラーが発生しました: ${missionState.error}'),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           // ミッションを再読み込み
-                          ref.read(missionProvider.notifier).initializeMissions('current_user');
+                          final userId =
+                              await ref.read(authServiceProvider).currentUserId();
+                          ref.read(missionProvider.notifier).initializeMissions(userId);
                         },
                         child: const Text('再読み込み'),
                       ),
@@ -270,8 +273,9 @@ class _MissionTile extends ConsumerWidget {
 
   void _claimReward(BuildContext context, WidgetRef ref) async {
     final mission = missionItem.mission;
+    final userId = await ref.read(authServiceProvider).currentUserId();
     final rewards = await ref.read(missionProvider.notifier).awardMissionRewards(
-          userId: 'current_user',
+          userId: userId,
           missionId: mission.missionId,
         );
 
@@ -294,7 +298,7 @@ class _MissionTile extends ConsumerWidget {
     }
 
     // ミッション状態を再読み込み
-    ref.read(missionProvider.notifier).initializeMissions('current_user');
+    ref.read(missionProvider.notifier).initializeMissions(userId);
   }
 
   List<Widget> _buildRewardBadges(List<dynamic> rewards) {

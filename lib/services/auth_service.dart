@@ -33,6 +33,15 @@ class AuthService {
     }
   }
 
+  /// 現在のユーザーID。Firebase にログイン済みならその uid、使えない環境では
+  /// 端末に保存したローカルID（なければ作る）を返す。Firestore のドキュメントや
+  /// 対戦の識別に使うので、固定文字列ではなく必ずこれを使う。
+  Future<String> currentUserId() async {
+    final user = currentUser;
+    if (user != null) return user.uid;
+    return (await _signInWithLocalFallback()).uid;
+  }
+
   /// ユーザー認証状態のストリーム
   Stream<AppUser?> get authStateChanges {
     return _firebaseAuth.authStateChanges().map((user) {
