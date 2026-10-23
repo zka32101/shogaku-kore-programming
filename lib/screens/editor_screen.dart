@@ -149,7 +149,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       final editorState = ref.read(editorProvider);
       if (editorState.scriptBlocks.isNotEmpty && !editorState.hasSubmitted) {
         HapticService.lightImpact();
-        ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput ?? "");
+        ref.read(editorProvider.notifier).submitScript(widget.challenge.expectedOutput ?? "", shape: widget.challenge.goalCondition?['shape'] as String?);
         Future.delayed(const Duration(milliseconds: 100), () {
           final s = ref.read(editorProvider);
           if (s.hasSubmitted) _showResult(s.isCorrect);
@@ -1283,7 +1283,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                       : () {
                           ref
                               .read(editorProvider.notifier)
-                              .submitScript(widget.challenge.expectedOutput ?? "");
+                              .submitScript(widget.challenge.expectedOutput ?? "", shape: widget.challenge.goalCondition?['shape'] as String?);
                           Future.delayed(const Duration(milliseconds: 100), () {
                             final s = ref.read(editorProvider);
                             if (s.hasSubmitted) _showResult(s.isCorrect);

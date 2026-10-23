@@ -178,16 +178,24 @@ class EditorNotifier extends StateNotifier<EditorState> {
     );
   }
 
-  void submitScript(String expectedOutput) {
+  /// [shape] が指定されたステージは、使ったブロックではなくロボットの軌跡の形で採点する
+  /// （例: 'square' は繰り返しを使わなくても、四角が描ければ正解）。
+  void submitScript(String expectedOutput, {String? shape}) {
     final output = _generateOutput();
     final blockIds = state.scriptBlocks.map((b) => b.id.split('@').first).toList();
-    final correct = _checkAnswer(blockIds, expectedOutput);
     final (path, angle) = _simulateRobot(state.scriptBlocks);
+    String? shapeHint;
+    if (shape == 'square') {
+      shapeHint = sim.squareHint(path);
+    }
+    final correct = shape == 'square'
+        ? shapeHint == null
+        : _checkAnswer(blockIds, expectedOutput);
 
     state = state.copyWith(
       previewOutput: correct
           ? '✅ 正解！素晴らしい！\n\n$output'
-          : '❌ もう一度試してみよう！\n\nヒント: ${_getHint(expectedOutput)}',
+          : '❌ もう一度試してみよう！\n\nヒント: ${shapeHint ?? _getHint(expectedOutput)}',
       isCorrect: correct,
       hasSubmitted: true,
       robotPath: path,
