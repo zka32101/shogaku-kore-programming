@@ -14,7 +14,9 @@ class AIProgrammingCoachService {
 
   AIProgrammingCoachService._internal();
 
-  final String _apiKey = dotenv.env['ANTHROPIC_API_KEY'] ?? '';
+  /// .env が未ロード（ファイル無し等）でも例外にせず、未設定扱いにする
+  String get _apiKey =>
+      dotenv.isInitialized ? (dotenv.env['ANTHROPIC_API_KEY'] ?? '') : '';
   final String _apiUrl = 'https://api.anthropic.com/v1/messages';
 
   bool get isConfigured => _apiKey.isNotEmpty;

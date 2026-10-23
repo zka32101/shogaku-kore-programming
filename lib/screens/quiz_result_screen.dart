@@ -799,6 +799,8 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
             ),
           ),
           // 紙吹雪（RepaintBoundary: パーティクル毎フレーム描画を親から分離）
+          // 「アニメーションを減らす」設定では表示しない
+          if (!MediaQuery.disableAnimationsOf(context))
           Align(
             alignment: Alignment.topCenter,
             child: RepaintBoundary(
