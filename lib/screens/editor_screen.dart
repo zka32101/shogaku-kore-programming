@@ -24,6 +24,7 @@ import '../providers/progress_provider.dart';
 import '../providers/step_executor_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
+import '../utils/hint_ladder.dart';
 import '../widgets/app_dialog.dart';
 import '../widgets/character_reaction_widget.dart';
 import '../widgets/execution_timeline.dart';
@@ -50,6 +51,8 @@ class EditorScreen extends ConsumerStatefulWidget {
 class _EditorScreenState extends ConsumerState<EditorScreen> {
   bool _showHint = false;
   int _hintIndex = 0;
+  // 段階ヒント（不正解の回数・ヒント欄を開いたか・お手本を見たか）
+  final HintLadder _ladder = HintLadder();
   late ConfettiController _confettiController;
   final FocusNode _focusNode = FocusNode();
   DateTime? _sessionStart;
@@ -118,7 +121,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (key == LogicalKeyboardKey.keyH) {
       if (widget.challenge.hints?.isNotEmpty ?? false) {
         HapticService.selectionClick();
-        setState(() => _showHint = !_showHint);
+        _toggleHint();
         return KeyEventResult.handled;
       }
     }
@@ -230,6 +233,46 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     );
   }
 
+  /// ヒント欄の開閉。開いたらヒントを使ったことを記録する（星・ノーヒント判定に影響）。
+  void _toggleHint() {
+    setState(() {
+      _showHint = !_showHint;
+      if (_showHint) _ladder.openHint();
+    });
+  }
+
+  /// お手本（正解のブロック手順）を見せる。見たらそのステージの星が1つへる。
+  void _showModel() {
+    final steps = modelSteps(widget.challenge.expectedOutput ?? '');
+    if (steps.isEmpty) return;
+    _ladder.viewModel();
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('📖 お手本'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final line in steps)
+              Text(line, style: const TextStyle(fontSize: 15, height: 1.6)),
+            const SizedBox(height: 12),
+            const Text(
+              'お手本を見たので、このステージの星が1つへるよ。',
+              style: TextStyle(fontSize: 12, color: kTextSecondary),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('とじる'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _showResult(bool isCorrect) async {
     final isFirstComplete =
         !(ref.read(progressProvider)[widget.challenge.id]?.isCompleted ?? false);
@@ -267,6 +310,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       //   ref.read(characterProvider.notifier).clearGrowthMessage();
       // }
     } else {
+      _ladder.recordWrong();
+      // 2回目の不正解からは、ステージのヒント欄を開いておく
+      if (_ladder.shouldOpenHintBar && !_showHint &&
+          (widget.challenge.hints?.isNotEmpty ?? false)) {
+        setState(() {
+          _showHint = true;
+          _ladder.openHint();
+        });
+      }
       // 不正解でも責めず、応援する
       _reactCharacter(
         CharacterMood.encouraging,
@@ -279,9 +331,20 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       final levelBefore = ref.read(progressProvider.notifier).currentLevel;
       ref.read(progressProvider.notifier).completeChallenge(
             widget.challenge.id,
-            3,
+            _ladder.stars,
           );
       final levelAfter = ref.read(progressProvider.notifier).currentLevel;
+
+      // ヒントなしクリアを数え、節目（3・10・25回）で祝福する
+      if (_ladder.isNoHintClear) {
+        ref
+            .read(progressProvider.notifier)
+            .recordNoHintClear(widget.challenge.id)
+            .then((count) {
+          if (!mounted) return;
+          checkNoHintMilestoneBadge(context, count: count);
+        });
+      }
 
       // ギャラリーに作品を保存
       Future.delayed(const Duration(milliseconds: 500), () {
@@ -347,6 +410,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       ),
       builder: (ctx) => _EditorResultSheet(
         isCorrect: isCorrect,
+        stars: _ladder.stars,
+        hintText: isCorrect ? '' : ref.read(editorProvider).hintText,
+        wrongAttempts: _ladder.wrongAttempts,
+        onViewModel: !isCorrect && _ladder.canViewModel &&
+                (widget.challenge.expectedOutput?.isNotEmpty ?? false)
+            ? _showModel
+            : null,
         elapsedSeconds: elapsedSec,
         challengeTitle: widget.challenge.title,
         nextStage: nextStage,
@@ -721,7 +791,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               _showHint ? Icons.lightbulb : Icons.lightbulb_outline,
               color: _showHint ? kStarColor : Colors.white70,
             ),
-            onPressed: () => setState(() => _showHint = !_showHint),
+            onPressed: _toggleHint,
             tooltip: 'ヒント',
           ),
           Consumer(builder: (context, ref, _) {
@@ -1857,9 +1927,17 @@ class _EditorResultSheet extends StatefulWidget {
   final VoidCallback? onNext;
   final int elapsedSeconds;
   final String challengeTitle;
+  final int stars;
+  final String hintText;
+  final int wrongAttempts;
+  final VoidCallback? onViewModel;
 
   const _EditorResultSheet({
     required this.isCorrect,
+    this.stars = 3,
+    this.hintText = '',
+    this.wrongAttempts = 0,
+    this.onViewModel,
     required this.onRetry,
     required this.onComplete,
     this.nextStage,
@@ -1992,17 +2070,58 @@ class _EditorResultSheetState extends State<_EditorResultSheet> {
             style: const TextStyle(fontSize: 14, color: kTextSecondary),
             textAlign: TextAlign.center,
           ).animate(delay: 280.ms).fadeIn(duration: 300.ms),
+          if (!widget.isCorrect && widget.hintText.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              key: const Key('editorHintCard'),
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: kStarColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('💡', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.hintText,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.4,
+                        color: context.textPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (!widget.isCorrect && widget.onViewModel != null) ...[
+            const SizedBox(height: 8),
+            TextButton.icon(
+              key: const Key('viewModelButton'),
+              onPressed: widget.onViewModel,
+              icon: const Text('📖', style: TextStyle(fontSize: 16)),
+              label: const Text('お手本を見る（星が1つへるよ）'),
+            ),
+          ],
           if (widget.isCorrect) ...[
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.star, color: kStarColor, size: 36)
-                    .animate(delay: 350.ms).scale(begin: const Offset(0.3, 0.3), curve: Curves.elasticOut, duration: 450.ms),
-                const Icon(Icons.star, color: kStarColor, size: 36)
-                    .animate(delay: 420.ms).scale(begin: const Offset(0.3, 0.3), curve: Curves.elasticOut, duration: 450.ms),
-                const Icon(Icons.star, color: kStarColor, size: 36)
-                    .animate(delay: 490.ms).scale(begin: const Offset(0.3, 0.3), curve: Curves.elasticOut, duration: 450.ms),
+                for (var i = 0; i < 3; i++)
+                  Icon(
+                    i < widget.stars ? Icons.star : Icons.star_border,
+                    color: kStarColor,
+                    size: 36,
+                  ).animate(delay: Duration(milliseconds: 350 + 70 * i)).scale(
+                      begin: const Offset(0.3, 0.3),
+                      curve: Curves.elasticOut,
+                      duration: 450.ms),
               ],
             ),
             if (widget.elapsedSeconds > 0) ...[

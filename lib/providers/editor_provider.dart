@@ -11,6 +11,8 @@ class EditorState {
   final String previewOutput;
   final bool isCorrect;
   final bool hasSubmitted;
+  /// 直近の不正解で出した具体的なヒント（正解・未提出のときは空）
+  final String hintText;
   // ロボットシミュレーション
   final List<Offset> robotPath;   // 正規化座標 (0–7)
   final double robotAngle;        // 最終角度（度）
@@ -20,6 +22,7 @@ class EditorState {
     this.previewOutput = '',
     this.isCorrect = false,
     this.hasSubmitted = false,
+    this.hintText = '',
     this.robotPath = const [],
     this.robotAngle = 0,
   });
@@ -29,6 +32,7 @@ class EditorState {
     String? previewOutput,
     bool? isCorrect,
     bool? hasSubmitted,
+    String? hintText,
     List<Offset>? robotPath,
     double? robotAngle,
   }) {
@@ -37,6 +41,7 @@ class EditorState {
       previewOutput: previewOutput ?? this.previewOutput,
       isCorrect: isCorrect ?? this.isCorrect,
       hasSubmitted: hasSubmitted ?? this.hasSubmitted,
+      hintText: hintText ?? this.hintText,
       robotPath: robotPath ?? this.robotPath,
       robotAngle: robotAngle ?? this.robotAngle,
     );
@@ -200,6 +205,7 @@ class EditorNotifier extends StateNotifier<EditorState> {
           : '❌ もう一度試してみよう！\n\nヒント: ${shapeHint ?? _getHint(expectedOutput)}',
       isCorrect: correct,
       hasSubmitted: true,
+      hintText: correct ? '' : (shapeHint ?? _getHint(expectedOutput)),
       robotPath: path,
       robotAngle: angle,
     );

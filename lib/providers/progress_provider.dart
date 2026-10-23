@@ -59,6 +59,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   static const String _storageKey = 'user_progress';
   static const String _streakKey = 'streak_count';
   static const String _studyDatesKey = 'study_dates';
+  static const String _noHintClearsKey = 'no_hint_clears';
   static const String _lastActiveDateKey = 'last_active_date';
   static const String _bonusKey = 'bonus_points';
   static const String _totalQuestionsKey = 'total_questions_answered';
@@ -75,6 +76,8 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
 
   int _streakDays = 0;
   List<String> _studyDates = [];
+  // ヒントなしでクリアしたステージ id（ブロックエディタの段階ヒントで使う）
+  Set<String> _noHintClears = {};
   int _longestStreak = 0;
   DateTime? _lastActiveDate;
   int _bonusPoints = 0;
@@ -174,6 +177,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
 
   Future<void> _loadProgress() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
 
     // 進捗データ
     final data = prefs.getString(_storageKey);
@@ -241,10 +245,13 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
 
     _studyDates = normalizeStudyDates(
         prefs.getStringList(_studyDatesKey) ?? const [], DateTime.now());
+    _noHintClears = (prefs.getStringList(_noHintClearsKey) ?? const <String>[]).toSet();
 
     // 起動時にストリーク更新
     await _updateStreakOnOpen(prefs);
 
+    // ロード中に破棄された場合（コンテナの破棄など）は state を更新しない
+    if (!mounted) return;
     // ロード完了後に1回だけ state を更新し、UI に最新ストリーク等を反映させる
     _isLoaded = true;
     state = {...state};
@@ -334,6 +341,18 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     await prefs.setStringList(_studyDatesKey, _studyDates);
   }
 
+  /// ヒントなしでクリアしたステージ数
+  int get noHintClearCount => _noHintClears.length;
+
+  /// ヒントなしクリアを記録し、通算のステージ数を返す（同じステージは1回だけ数える）。
+  Future<int> recordNoHintClear(String challengeId) async {
+    if (_noHintClears.add(challengeId)) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_noHintClearsKey, _noHintClears.toList());
+    }
+    return _noHintClears.length;
+  }
+
   UserProgress getProgress(String challengeId) {
     return state[challengeId] ?? UserProgress(challengeId: challengeId);
   }
@@ -360,6 +379,8 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     _studyDates = [];
     await prefs.remove(_streakKey);
     await prefs.remove(_studyDatesKey);
+    _noHintClears = {};
+    await prefs.remove(_noHintClearsKey);
     await prefs.remove(_lastActiveDateKey);
     await prefs.remove(_bonusKey);
     await prefs.remove(_totalQuestionsKey);
