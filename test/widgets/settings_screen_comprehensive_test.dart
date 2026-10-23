@@ -11,6 +11,7 @@ import '../../lib/screens/paywall_screen.dart';
 import '../../lib/providers/profile_provider.dart';
 import '../../lib/providers/progress_provider.dart';
 import '../../lib/config/theme.dart';
+import 'package:shared_core/shared_core.dart' show ParentalGateDialog;
 import 'test_helpers.dart';
 
 void main() {
@@ -171,7 +172,9 @@ void main() {
       await tester.tap(profileTile);
       await tester.pumpAndSettle();
 
-      expect(find.byType(SettingsScreen), findsWidgets);
+      // プロフィール画面へ遷移する（設定画面は背面に残る）
+      expect(find.byType(ProfileScreen), findsOneWidget);
+      expect(find.byType(SettingsScreen, skipOffstage: false), findsOneWidget);
     });
   });
 
@@ -206,13 +209,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final premiumButton = find.byType(GestureDetector);
-      if (premiumButton.evaluate().isNotEmpty) {
-        await tester.tap(premiumButton.first);
-        await tester.pumpAndSettle();
-      }
+      await tester.tap(find.text('プレミアムプラン'));
+      await tester.pumpAndSettle();
 
-      expect(find.byType(SettingsScreen), findsWidgets);
+      // 課金画面の前に保護者ゲートが表示される
+      expect(find.byType(ParentalGateDialog), findsOneWidget);
     });
   });
 
@@ -247,8 +248,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final themeTile = find.byType(ListTile).at(0);
-      await tester.tap(themeTile);
+      // テーマ選択（システム / ライト / ダーク）を切り替えても設定画面に留まる
+      await tester.tap(find.text('ダーク'));
       await tester.pumpAndSettle();
 
       expect(find.byType(SettingsScreen), findsOneWidget);
@@ -449,7 +450,8 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.keyU);
       await tester.pumpAndSettle();
 
-      expect(find.byType(PaywallScreen), findsWidgets);
+      // 課金画面の前に保護者ゲートが表示される
+      expect(find.byType(ParentalGateDialog), findsOneWidget);
     });
 
     testWidgets('pressing Escape key navigates back', (WidgetTester tester) async {
@@ -636,6 +638,9 @@ void main() {
         await tester.pumpAndSettle();
       }
 
+      // スクロールで構築された項目の遅延アニメーション（flutter_animate のタイマー）を消化する
+      await tester.pump(const Duration(seconds: 1));
+
       expect(find.byType(SettingsScreen), findsOneWidget);
     });
 
@@ -655,6 +660,9 @@ void main() {
         await tester.drag(listView, const Offset(0, -600));
         await tester.pumpAndSettle();
       }
+
+      // スクロールで構築された項目の遅延アニメーション（flutter_animate のタイマー）を消化する
+      await tester.pump(const Duration(seconds: 1));
 
       expect(find.byType(SettingsScreen), findsOneWidget);
     });
@@ -677,6 +685,9 @@ void main() {
         await tester.drag(listView, const Offset(0, 300));
         await tester.pumpAndSettle();
       }
+
+      // スクロールで構築された項目の遅延アニメーション（flutter_animate のタイマー）を消化する
+      await tester.pump(const Duration(seconds: 1));
 
       expect(find.byType(SettingsScreen), findsOneWidget);
     });
@@ -981,19 +992,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final tiles = find.byType(ListTile);
-      if (tiles.evaluate().isNotEmpty) {
-        await tester.tap(tiles.first);
-        await tester.pumpAndSettle();
-      }
-
       final switches = find.byType(Switch);
-      if (switches.evaluate().isNotEmpty) {
-        await tester.tap(switches.first);
-        await tester.pumpAndSettle();
-      }
-
+      expect(switches, findsWidgets);
+      await tester.tap(switches.first);
+      await tester.pumpAndSettle();
       expect(find.byType(SettingsScreen), findsOneWidget);
+
+      await tester.tap(find.byType(ListTile).first);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ProfileScreen), findsOneWidget);
     });
 
     testWidgets('complete workflow: navigate with keyboard only', (WidgetTester tester) async {
@@ -1016,7 +1024,8 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.keyU);
       await tester.pumpAndSettle();
 
-      expect(find.byType(PaywallScreen), findsWidgets);
+      // 課金画面の前に保護者ゲートが表示される
+      expect(find.byType(ParentalGateDialog), findsOneWidget);
     });
   });
 }
