@@ -1153,21 +1153,21 @@ class _BadgesTabState extends State<_BadgesTab> {
       padding: const EdgeInsets.all(16),
       children: [
         // フィルターチップ
-        Row(
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
           children: [
             CustomFilterChip(
               label: '全て (${widget.badges.length})',
               selected: _filter == _BadgeFilter.all,
               onTap: () => setState(() => _filter = _BadgeFilter.all),
             ),
-            const SizedBox(width: 8),
             CustomFilterChip(
               label: '✅ 解除済み ($unlockedCount)',
               selected: _filter == _BadgeFilter.unlocked,
               onTap: () => setState(() => _filter = _BadgeFilter.unlocked),
               selectedColor: const Color(0xFF27AE60),
             ),
-            const SizedBox(width: 8),
             CustomFilterChip(
               label: '🔒 未解除 ($lockedCount)',
               selected: _filter == _BadgeFilter.locked,

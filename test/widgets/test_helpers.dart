@@ -103,3 +103,18 @@ void useReducedMotion() {
       const FakeAccessibilityFeatures(disableAnimations: true);
   addTearDown(binding.platformDispatcher.clearAccessibilityFeaturesTestValue);
 }
+
+/// 縦長のビューポートにして、遅延構築される長いリスト（設定画面など）の
+/// 全項目を一度に構築させる。`setUp(useTallViewport);` のように使う。
+void useTallViewport({Size size = const Size(800, 5000)}) {
+  final binding = TestWidgetsFlutterBinding.ensureInitialized();
+  final view = binding.platformDispatcher.views.first;
+  // テスト用の TestFlutterView を通して物理サイズを変更する
+  final testView = view as dynamic;
+  testView.physicalSize = size;
+  testView.devicePixelRatio = 1.0;
+  addTearDown(() {
+    testView.resetPhysicalSize();
+    testView.resetDevicePixelRatio();
+  });
+}

@@ -11,8 +11,10 @@ import '../../lib/screens/paywall_screen.dart';
 import '../../lib/providers/profile_provider.dart';
 import '../../lib/providers/progress_provider.dart';
 import '../../lib/config/theme.dart';
+import 'test_helpers.dart';
 
 void main() {
+  setUp(useTallViewport);
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
