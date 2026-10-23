@@ -12,6 +12,7 @@ import 'package:shogaku_kore_programming/config/constants.dart';
 import 'test_helpers.dart';
 
 void main() {
+  setUp(useReducedMotion);
   late ProviderContainer container;
 
   setUp(() {

@@ -11,8 +11,10 @@ import '../../lib/providers/daily_review_provider.dart';
 import '../../lib/providers/progress_provider.dart';
 import '../../lib/providers/profile_provider.dart';
 import '../../lib/config/theme.dart';
+import 'test_helpers.dart';
 
 void main() {
+  setUp(useReducedMotion);
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {

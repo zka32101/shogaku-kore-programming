@@ -7,8 +7,10 @@ import 'package:shogaku_kore_programming/widgets/completed_stage_card.dart';
 import 'package:shogaku_kore_programming/widgets/filter_chip.dart';
 import 'package:shogaku_kore_programming/config/theme.dart';
 import 'package:shogaku_kore_programming/models/stage.dart';
+import 'test_helpers.dart';
 
 void main() {
+  setUp(useReducedMotion);
   group('Extracted Widget Tests', () {
     // StatItem Widget Tests
     group('StatItem Widget', () {

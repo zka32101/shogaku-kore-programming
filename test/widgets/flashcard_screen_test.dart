@@ -9,6 +9,7 @@ import 'package:shogaku_kore_programming/providers/progress_provider.dart';
 import 'test_helpers.dart';
 
 void main() {
+  setUp(useReducedMotion);
   late ProviderContainer container;
 
   setUp(() {

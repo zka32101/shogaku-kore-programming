@@ -82,9 +82,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     });
   }
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
     _sessionStart = DateTime.now();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
@@ -100,7 +104,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     if (!_timeRecorded && _sessionStart != null) {
       final elapsed = DateTime.now().difference(_sessionStart!).inSeconds;
       if (elapsed > 0) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _confettiController.dispose();

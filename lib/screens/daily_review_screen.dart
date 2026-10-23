@@ -65,9 +65,13 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
   late ConfettiController _confettiController;
   final FocusNode _focusNode = FocusNode();
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -83,7 +87,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
     if (!_timeRecorded && _sessionStartTime != null) {
       final elapsed = DateTime.now().difference(_sessionStartTime!).inSeconds;
       if (elapsed >= 5) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _confettiController.dispose();

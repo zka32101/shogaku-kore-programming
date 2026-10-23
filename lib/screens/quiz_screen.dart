@@ -78,9 +78,15 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
   late AnimationController _autoAdvanceController;
   late Animation<double> _autoAdvanceAnim;
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+  late final BgmNotifier _bgmNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
+    _bgmNotifier = ref.read(bgmProvider.notifier);
     _sessionStart = DateTime.now();
     _showConceptCard = widget.challenge.conceptExplanation != null;
     _autoAdvanceController = AnimationController(
@@ -107,12 +113,12 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
   void dispose() {
     _timer.cancel();
     // BGM を停止
-    ref.read(bgmProvider.notifier).stopBgm();
+    _bgmNotifier.stopBgm();
     // 通常完了以外（中途終了）の場合も学習時間を記録
     if (!_timeRecorded) {
       final elapsed = DateTime.now().difference(_sessionStart).inSeconds;
       if (elapsed >= 5) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _focusNode.dispose();

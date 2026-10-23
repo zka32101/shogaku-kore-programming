@@ -78,9 +78,13 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
 
   final List<_TAResult> _results = [];
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
     _barController = AnimationController(
       vsync: this,
       duration: Duration(seconds: _defaultSeconds),
@@ -114,7 +118,7 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
     if (!_timeRecorded && _sessionStart != null) {
       final elapsed = DateTime.now().difference(_sessionStart!).inSeconds;
       if (elapsed >= 5) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _barController.dispose();

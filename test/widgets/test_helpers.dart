@@ -93,3 +93,13 @@ void expectText(String text) {
 void expectNoText(String text) {
   expect(find.text(text), findsNothing);
 }
+
+/// 「アニメーションを減らす」設定を有効にする。
+/// 終わらない演出（紙吹雪・脈動など）が止まり、pumpAndSettle が収束する。
+/// `setUp(useReducedMotion);` のように使う。
+void useReducedMotion() {
+  final binding = TestWidgetsFlutterBinding.ensureInitialized();
+  binding.platformDispatcher.accessibilityFeaturesTestValue =
+      const FakeAccessibilityFeatures(disableAnimations: true);
+  addTearDown(binding.platformDispatcher.clearAccessibilityFeaturesTestValue);
+}

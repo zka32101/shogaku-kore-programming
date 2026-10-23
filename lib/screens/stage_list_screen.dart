@@ -1078,21 +1078,30 @@ class _StageNodeState extends State<_StageNode>
     _scale = Tween<double>(begin: 1.0, end: 1.08)
         .chain(CurveTween(curve: Curves.easeInOut))
         .animate(_pulse);
+  }
 
-    if (widget.isCurrent) {
-      _pulse.repeat(reverse: true);
+  /// 現在のステージだけ脈動させる。「アニメーションを減らす」設定では止める
+  void _syncPulse() {
+    final shouldPulse =
+        widget.isCurrent && !MediaQuery.disableAnimationsOf(context);
+    if (shouldPulse) {
+      if (!_pulse.isAnimating) _pulse.repeat(reverse: true);
+    } else if (_pulse.isAnimating || _pulse.value != 0) {
+      _pulse.stop();
+      _pulse.reset();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncPulse();
   }
 
   @override
   void didUpdateWidget(_StageNode old) {
     super.didUpdateWidget(old);
-    if (widget.isCurrent && !old.isCurrent) {
-      _pulse.repeat(reverse: true);
-    } else if (!widget.isCurrent && old.isCurrent) {
-      _pulse.stop();
-      _pulse.reset();
-    }
+    if (widget.isCurrent != old.isCurrent) _syncPulse();
   }
 
   void _showContextMenu(BuildContext context) {
