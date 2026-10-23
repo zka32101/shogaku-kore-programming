@@ -52,7 +52,6 @@ void main() {
           hint: '2足す3は？',
         ),
       ],
-      conceptExplanation: 'Pythonの基本的な文法を学びます',
       type: 'quiz',
     );
 
@@ -64,6 +63,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Verify quiz screen is displayed
       expect(find.byType(QuizScreen), findsOneWidget);
@@ -80,6 +80,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Verify all options are displayed
       expect(find.text('x = 5'), findsOneWidget);
@@ -96,6 +97,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Tap the first option
       await tester.tap(find.text('x = 5'));
@@ -113,6 +115,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Select the correct answer
       await tester.tap(find.text('x = 5'));
@@ -134,6 +137,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Answer first question
       await tester.tap(find.text('x = 5'));
@@ -158,6 +162,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Select correct answer
       await tester.tap(find.text('x = 5'));
@@ -185,6 +190,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Wait for code snippet to appear
       await tester.pumpAndSettle();
@@ -201,6 +207,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Look for hint button
       final hintButton = find.byIcon(Icons.lightbulb_outline);
@@ -244,6 +251,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Answer the question
       await tester.tap(find.text('4'));
@@ -268,6 +276,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Simulate pressing '1' key to select first option
       await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
@@ -284,6 +293,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Look for progress indicators (e.g., "Question 1 of 2")
       // The exact text depends on implementation
@@ -298,6 +308,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Look for timer display
       final timerText = find.byType(Text).evaluate();
@@ -316,6 +327,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Try to submit without selecting
       final submitButton = find.byType(ElevatedButton);
@@ -333,6 +345,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Select wrong answer
       await tester.tap(find.text('var x = 5'));
@@ -356,6 +369,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Look for back button
       final backButton = find.byIcon(Icons.arrow_back);

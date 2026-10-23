@@ -61,7 +61,6 @@ void main() {
         hint: '角括弧を使用します',
       ),
     ],
-    conceptExplanation: 'Pythonの基本的な文法を学びます',
     type: 'quiz',
   );
 
@@ -77,6 +76,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         expect(find.byType(QuizScreen), findsOneWidget);
       });
@@ -131,6 +131,7 @@ void main() {
           find.text('Pythonで変数を定義するには？'),
           findsOneWidget,
         );
+        await tester.pumpAndSettle();
       });
 
       testWidgets('displays concept explanation card initially',
@@ -242,6 +243,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Tap first option
         await tester.tap(find.text('x = 5'));
@@ -260,6 +262,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Select first option
         await tester.tap(find.text('x = 5'));
@@ -282,6 +285,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Select correct answer
         await tester.tap(find.text('x = 5'));
@@ -304,6 +308,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Select answer
         await tester.tap(find.text('x = 5'));
@@ -326,6 +331,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Select correct answer
         await tester.tap(find.text('x = 5'));
@@ -354,6 +360,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Select incorrect answer
         await tester.tap(find.text('var x = 5'));
@@ -379,6 +386,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Answer first question
         await tester.tap(find.text('x = 5'));
@@ -594,6 +602,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Answer correctly
         await tester.tap(find.text('x = 5'));
@@ -1009,6 +1018,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Rapidly tap options
         await tester.tap(find.text('x = 5'));
@@ -1113,6 +1123,7 @@ void main() {
             ),
           ),
         );
+        await tester.pumpAndSettle();
 
         // Question 1: Answer and submit
         await tester.pumpAndSettle();
