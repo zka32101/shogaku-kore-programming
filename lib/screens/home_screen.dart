@@ -17,6 +17,7 @@ import '../providers/friends_provider.dart';
 import '../providers/my_character_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
+import '../providers/quiz_access_override_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 import '../utils/page_transitions.dart';
@@ -30,6 +31,7 @@ import 'free_create_screen.dart';
 import 'friends_list_screen.dart';
 import 'gallery_screen.dart';
 import 'quiz_screen.dart';
+import 'paywall_screen.dart';
 import 'ranking_screen.dart';
 import 'bug_hunter_screen.dart';
 import 'robot_game_screen.dart';
@@ -77,6 +79,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     HapticService.lightImpact();
     SoundService().playTap();
     Navigator.of(context).push(smoothPageRoute(screen));
+  }
+
+  /// バグハンターはプレミアム（購読中・無料期間中）の機能。使えないときは課金画面へ。
+  Future<void> _openBugHunter() async {
+    final canAccess =
+        await ref.read(canAccessProgrammingChallengesProvider.future);
+    if (!mounted) return;
+    _push(canAccess ? const BugHunterScreen() : const PaywallScreen());
   }
 
   @override
@@ -540,7 +550,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             for (final (emoji, label, screen) in items)
               GestureDetector(
-                onTap: () => _push(screen),
+                onTap: () => screen is BugHunterScreen
+                    ? _openBugHunter()
+                    : _push(screen),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: _cardDecoration(context),
