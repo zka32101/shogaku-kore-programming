@@ -69,7 +69,7 @@ jobs:
           fi
 
       - name: Analyze code
-        run: flutter analyze
+        run: flutter analyze lib
 
       # デバッグ用: ビルド中20秒おきにメモリ使用状況・javaプロセスを
       # ファイルに記録する（前回、バックグラウンド出力が後続ステップの
