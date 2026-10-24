@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../config/theme.dart';
 import '../models/badge.dart';
 import '../services/haptic_service.dart';
+import 'badge_emblem.dart';
 
 /// Badge display card with unlock progress and detail modal
 class AchievementBadgeCard extends StatelessWidget {
@@ -32,13 +33,16 @@ class AchievementBadgeCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              badge.isUnlocked ? badge.icon : '🔒',
-              style: TextStyle(
-                fontSize: 56,
-                color: badge.isUnlocked ? null : Colors.grey,
-              ),
-            ),
+            badge.isUnlocked
+                ? BadgeEmblem(
+                    design: badge.design,
+                    fallbackEmoji: badge.icon,
+                    size: 64,
+                  )
+                : Text(
+                    '🔒',
+                    style: TextStyle(fontSize: 56, color: Colors.grey),
+                  ),
             const SizedBox(height: 12),
             Text(
               badge.name,
@@ -193,13 +197,16 @@ class AchievementBadgeCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                badge.isUnlocked ? badge.icon : '🔒',
-                style: TextStyle(
-                  fontSize: 28,
-                  color: badge.isUnlocked ? null : Colors.grey,
-                ),
-              ),
+              badge.isUnlocked
+                  ? BadgeEmblem(
+                      design: badge.design,
+                      fallbackEmoji: badge.icon,
+                      size: 36,
+                    )
+                  : Text(
+                      '🔒',
+                      style: TextStyle(fontSize: 28, color: Colors.grey),
+                    ),
               const SizedBox(height: 4),
               Text(
                 badge.name,

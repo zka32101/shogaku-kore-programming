@@ -2,6 +2,8 @@
 enum ShopCategory {
   character,   // キャラクタースキン
   background,  // 背景テーマ
+  frame,       // アイコンのフレーム
+  effect,      // 画面エフェクト
   sound,       // 効果音セット
   hint,        // ヒント（消耗品）
 }
@@ -11,6 +13,8 @@ extension ShopCategoryLabel on ShopCategory {
     switch (this) {
       case ShopCategory.character:  return '🥷 キャラ';
       case ShopCategory.background: return '🖼️ 背景';
+      case ShopCategory.frame:      return '🪞 フレーム';
+      case ShopCategory.effect:     return '✨ エフェクト';
       case ShopCategory.sound:      return '🎵 サウンド';
       case ShopCategory.hint:       return '💡 ヒント';
     }
@@ -25,6 +29,7 @@ class ShopItem {
   final int price;
   final ShopCategory category;
   final bool isConsumable; // 消耗品（ヒントなど）
+  final String? imageAsset; // 一覧に出す画像（きせかえのサムネイル）。null なら絵文字
 
   const ShopItem({
     required this.id,
@@ -34,6 +39,7 @@ class ShopItem {
     required this.price,
     required this.category,
     this.isConsumable = false,
+    this.imageAsset,
   });
 }
 
@@ -73,31 +79,7 @@ const List<ShopItem> kShopItems = [
     category: ShopCategory.character,
   ),
 
-  // ─── 背景テーマ ───
-  ShopItem(
-    id: 'bg_space',
-    emoji: '🌌',
-    name: '宇宙テーマ',
-    description: '星がきらめく宇宙の世界！',
-    price: 150,
-    category: ShopCategory.background,
-  ),
-  ShopItem(
-    id: 'bg_ocean',
-    emoji: '🌊',
-    name: '海テーマ',
-    description: '深い海の底のような世界！',
-    price: 200,
-    category: ShopCategory.background,
-  ),
-  ShopItem(
-    id: 'bg_forest',
-    emoji: '🌲',
-    name: '森テーマ',
-    description: '緑あふれる森の世界！',
-    price: 250,
-    category: ShopCategory.background,
-  ),
+  // 背景・フレーム・エフェクトは features/shop/decor/decor_items.dart（きせかえ）から追加される
 
   // ─── 効果音セット ───
   ShopItem(

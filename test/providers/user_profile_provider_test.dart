@@ -330,11 +330,11 @@ void main() {
       expect(collection!.userId, 'test_user');
     });
 
-    test('userProfileProvider_profile provides profile', () async {
+    test('userProfileProviderProfile provides profile', () async {
       final notifier = container.read(userProfileProvider.notifier);
       await notifier.initializeProfile('test_user', 'testuser');
 
-      final profile = container.read(userProfileProvider_profile);
+      final profile = container.read(userProfileProviderProfile);
       expect(profile, isNotNull);
       expect(profile!.username, 'testuser');
     });

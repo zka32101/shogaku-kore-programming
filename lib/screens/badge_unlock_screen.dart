@@ -1,3 +1,4 @@
+import '../features/shop/decor/decor_scope.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../config/theme.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class BadgeUnlockScreen extends StatefulWidget {
   final String badgeIcon;
@@ -50,7 +52,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
     _confettiController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3000),
-    )..repeat();
+    );
 
     _raysController = AnimationController(
       vsync: this,
@@ -92,6 +94,17 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
     Future.delayed(const Duration(milliseconds: 700), () {
       if (mounted) _textController.forward();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 「アニメーションを減らす」設定では紙吹雪を循環させない
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _confettiController.stop();
+    } else if (!_confettiController.isAnimating) {
+      _confettiController.repeat();
+    }
   }
 
   @override
@@ -149,7 +162,7 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
         return KeyEventResult.ignored;
       },
       child: Scaffold(
-      backgroundColor: context.isDark ? kDarkBackground : const Color(0xFFFFF8F0),
+      backgroundColor: DecorScope.pageBg(context, context.isDark ? kDarkBackground : const Color(0xFFFFF8F0)),
       body: SafeArea(
         child: Stack(
           children: [
@@ -168,7 +181,23 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                       height: 200,
                       child: Stack(
                         alignment: Alignment.center,
+                        clipBehavior: Clip.none,
                         children: [
+                          // 達成演出: 背面のスターバースト（画面幅の約0.8）
+                          IgnorePointer(
+                            child: OverflowBox(
+                              maxWidth: double.infinity,
+                              maxHeight: double.infinity,
+                              child: Image.asset(
+                                'assets/celebrate/celebrate_starburst.webp',
+                                key: const Key('badgeStarburst'),
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, _, _) =>
+                                    const SizedBox.shrink(),
+                              ),
+                            ),
+                          ),
                           // 光線
                           AnimatedBuilder(
                             animation: _raysScale,
@@ -208,12 +237,15 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    widget.badgeIcon,
-                                    style: const TextStyle(fontSize: 48),
-                                  ),
-                                  Text(
+                                  UkalabEmoji(widget.badgeIcon, size: 48),
+                                  Flexible(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      child: Text(
                                     widget.badgeName,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
@@ -221,7 +253,46 @@ class _BadgeUnlockScreenState extends State<BadgeUnlockScreen>
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
+                                    ),
+                                  ),
                                 ],
+                              ),
+                            ),
+                          ),
+                          // 達成演出: リボン＋おめでとう（バッジ上部に重ねる）
+                          Positioned(
+                            top: -18,
+                            child: IgnorePointer(
+                              child: ScaleTransition(
+                                scale: _badgeScale,
+                                child: SizedBox(
+                                  key: const Key('badgeRibbon'),
+                                  width: 170,
+                                  height: 48,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/celebrate/celebrate_ribbon_banner.webp',
+                                        width: 170,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, _, _) =>
+                                            const SizedBox.shrink(),
+                                      ),
+                                      const FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          'おめでとう！',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF461905),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -433,6 +504,33 @@ void checkFavoriteMilestoneBadge(
       name: name,
       message: message,
       points: newCount * 5,
+      nextGoal: nextGoal,
+      onContinue: () {},
+      continueLabel: 'とじる',
+    );
+  });
+}
+
+/// ヒントなしでクリアしたステージ数が節目（3・10・25）になったときに祝福する。
+void checkNoHintMilestoneBadge(
+  BuildContext context, {
+  required int count,
+}) {
+  final (icon, name, message, nextGoal) = switch (count) {
+    3  => ('💡', 'ノーヒント入門',   'ヒントなしで3ステージをクリア！',       '10ステージでノーヒントマスターだよ！'),
+    10 => ('🧠', 'ノーヒントマスター', 'ヒントなしで10ステージをクリア！',      '25ステージでノーヒント王を目指そう！'),
+    25 => ('👑', 'ノーヒント王',     'ヒントなしで25ステージをクリア！すごい！', 'この調子で全ステージを制覇しよう！'),
+    _  => ('', '', '', ''),
+  };
+  if (icon.isEmpty) return;
+  Future.delayed(const Duration(milliseconds: 2500), () {
+    if (!context.mounted) return;
+    showBadgeUnlock(
+      context,
+      icon: icon,
+      name: name,
+      message: message,
+      points: count * 5,
       nextGoal: nextGoal,
       onContinue: () {},
       continueLabel: 'とじる',

@@ -1,8 +1,10 @@
+import '../features/shop/decor/decor_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../config/theme.dart';
 import 'programming_basics_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// なぜプログラミングが必要か説明画面 (#13)
 class WhyProgrammingScreen extends StatefulWidget {
@@ -58,7 +60,7 @@ class _WhyProgrammingScreenState extends State<WhyProgrammingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.cardBg,
+      backgroundColor: DecorScope.pageBg(context, context.cardBg),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -218,10 +220,7 @@ class _PageContent extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: Text(
-                data.emoji,
-                style: const TextStyle(fontSize: 56),
-              ),
+              child: UkalabEmoji(data.emoji, size: 56),
             ),
           )
               .animate()

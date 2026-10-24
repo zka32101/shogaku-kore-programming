@@ -15,6 +15,7 @@ import '../services/sound_service.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 // ─── データモデル ──────────────────────────────────────────────────────────────
 
@@ -394,9 +395,13 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
   // キーボードショートカット
   final FocusNode _focusNode = FocusNode();
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
     // Initialize with provided category if available
     _selectedCategory = widget.initialCategory;
     _flipController = AnimationController(
@@ -516,7 +521,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
     if (!_timeRecorded) {
       final elapsed = DateTime.now().difference(_sessionStart).inSeconds;
       if (elapsed > 0) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _flipController.dispose();
@@ -1006,9 +1011,9 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
       ),
       padding: EdgeInsets.fromLTRB(
         4,
-        MediaQuery.of(context).padding.top + 8,
+        MediaQuery.of(context).padding.top + 4,
         16,
-        16,
+        12,
       ),
       child: Column(
         children: [
@@ -1024,6 +1029,10 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                   children: [
                     const Text(
                       'フラッシュカード',
+                      key: Key('flashcard_header_title'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -1045,6 +1054,20 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                   ],
                 ),
               ),
+            ],
+          ),
+          // アクションは2段目に分け、タイトルが縦に折り返さないようにする
+          IconButtonTheme(
+            data: IconButtonThemeData(
+              style: IconButton.styleFrom(
+                minimumSize: const Size(40, 36),
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+            child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
               // 自動めくりトグル
               if (!_listViewMode)
                 IconButton(
@@ -1207,6 +1230,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
                   style: const TextStyle(fontSize: 13, color: Colors.white70),
                 ),
             ],
+          ),
           ),
           if (!_sessionDone) ...[
             const SizedBox(height: 8),
@@ -2709,7 +2733,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 72))
+          UkalabEmoji(emoji, size: 72)
               .animate()
               .scale(
                 begin: const Offset(0.0, 0.0),
@@ -2873,8 +2897,11 @@ class _CardFront extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      // 小さい画面でも内容が溢れないよう、収まらない場合はスクロールさせる
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Text('📘', style: TextStyle(fontSize: 36)),
           const SizedBox(height: 20),
@@ -2907,6 +2934,8 @@ class _CardFront extends StatelessWidget {
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

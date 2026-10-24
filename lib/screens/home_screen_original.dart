@@ -49,6 +49,7 @@ import '../providers/coin_provider.dart';
 import '../providers/character_provider.dart';
 import '../models/character_model.dart';
 import '../utils/page_transitions.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -1057,7 +1058,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Row(
                 children: [
-                  Text(profile.avatarEmoji, style: const TextStyle(fontSize: 16)),
+                  UkalabEmoji(profile.avatarEmoji, size: 16),
                   const SizedBox(width: 6),
                   Text(
                     'レベル $level',
@@ -1486,7 +1487,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Row(
                     children: favorites.map((c) => Padding(
                       padding: const EdgeInsets.only(right: 4),
-                      child: Text(c.icon, style: const TextStyle(fontSize: 18)),
+                      child: UkalabEmoji(c.icon, size: 18),
                     )).toList(),
                   ),
                 ],
@@ -1614,7 +1615,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 22)),
+                  child: UkalabEmoji(emoji, size: 22),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1971,7 +1972,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   child: Row(
                     children: [
-                      Text(c.icon, style: const TextStyle(fontSize: 18)),
+                      UkalabEmoji(c.icon, size: 18),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -2259,7 +2260,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: Row(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 26)),
+          UkalabEmoji(emoji, size: 26),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -2465,7 +2466,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 20)),
+              UkalabEmoji(emoji, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
@@ -3214,10 +3215,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
             ),
-            Text(
-              challenge.icon,
-              style: const TextStyle(fontSize: 40),
-            ),
+            UkalabEmoji(challenge.icon, size: 40),
           ],
         ),
       ),
@@ -3656,7 +3654,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 36)),
+            UkalabEmoji(emoji, size: 36),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -3938,7 +3936,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
             ),
-            Text(unitIcon, style: const TextStyle(fontSize: 28)),
+            UkalabEmoji(unitIcon, size: 28),
             const SizedBox(width: 4),
             const Icon(Icons.chevron_right, color: kTextSecondary),
           ],
@@ -3993,7 +3991,7 @@ class _MiniGameCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
-                child: Text(emoji, style: const TextStyle(fontSize: 20)),
+                child: UkalabEmoji(emoji, size: 20),
               ),
             ),
             const SizedBox(width: 10),
@@ -4828,7 +4826,7 @@ class _CapabilityBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 14)),
+          UkalabEmoji(emoji, size: 14),
           const SizedBox(width: 4),
           Text(
             label,

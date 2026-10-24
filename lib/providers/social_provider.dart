@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'auth_provider.dart';
 
 import '../models/social.dart';
 
@@ -525,7 +526,7 @@ final friendActivityProvider =
 final socialDataProvider = Provider.autoDispose<SocialData>((ref) {
   final state = ref.watch(socialProvider);
   return SocialData(
-    userId: 'current_user',
+    userId: ref.watch(currentUserProvider)?.uid ?? '',
     friends: state.friends,
     incomingRequests: state.pendingRequests,
     outgoingRequests: const [],

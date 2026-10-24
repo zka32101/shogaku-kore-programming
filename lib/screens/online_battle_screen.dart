@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../providers/auth_provider.dart';
 // TODO: PremiumState API integration needed with shared_core
 // import 'package:shared_core/providers/premium_provider.dart';
 // import 'package:shared_core/widgets/premium_gate_widget.dart';
@@ -241,11 +242,12 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
 
     try {
       final db = FirebaseFirestore.instance;
+      final myId = await ref.read(authServiceProvider).currentUserId();
       final matchRequestId = db.collection('match_requests').doc().id;
 
       // マッチリクエスト作成
       await db.collection('match_requests').doc(matchRequestId).set({
-        'userId': 'current_user',
+        'userId': myId,
         'createdAt': FieldValue.serverTimestamp(),
         'status': 'waiting',
         'skill_level': 'intermediate',
@@ -255,7 +257,7 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
       final querySnapshot = await db
           .collection('match_requests')
           .where('status', isEqualTo: 'waiting')
-          .where('userId', isNotEqualTo: 'current_user')
+          .where('userId', isNotEqualTo: myId)
           .limit(1)
           .get();
 
@@ -265,7 +267,7 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
 
         // マッチング成功時にバトルレコード作成
         await db.collection('battles').add({
-          'player1_id': 'current_user',
+          'player1_id': myId,
           'player2_id': opponentId,
           'status': 'waiting_to_start',
           'createdAt': FieldValue.serverTimestamp(),
@@ -320,10 +322,11 @@ class _OnlineBattleScreenState extends ConsumerState<OnlineBattleScreen> {
 
     try {
       final db = FirebaseFirestore.instance;
+      final myId = await ref.read(authServiceProvider).currentUserId();
 
       // バトル開始ログを Firestore に記録
       await db.collection('battles').add({
-        'player1_id': 'current_user',
+        'player1_id': myId,
         'opponent_id': _opponent!.id,
         'status': 'in_progress',
         'startedAt': FieldValue.serverTimestamp(),

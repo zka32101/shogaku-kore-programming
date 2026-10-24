@@ -3,10 +3,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../features/shop/decor/decor_items.dart';
+import '../features/shop/decor/decor_screen.dart';
+import '../features/shop/decor/decor_scope.dart';
 import '../models/shop_item.dart';
 import '../providers/coin_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// コインショップ画面 (#15)
 class ShopScreen extends ConsumerStatefulWidget {
@@ -19,9 +23,12 @@ class ShopScreen extends ConsumerStatefulWidget {
 class _ShopScreenState extends ConsumerState<ShopScreen> {
   ShopCategory? _selectedCategory; // null = 全て
 
+  /// 通常の商品 + きせかえ（背景・フレーム・エフェクト）
+  static final List<ShopItem> _allItems = [...kShopItems, ...decorShopItems()];
+
   List<ShopItem> get _filteredItems {
-    if (_selectedCategory == null) return kShopItems;
-    return kShopItems.where((i) => i.category == _selectedCategory).toList();
+    if (_selectedCategory == null) return _allItems;
+    return _allItems.where((i) => i.category == _selectedCategory).toList();
   }
 
   @override
@@ -29,28 +36,30 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     final coinState = ref.watch(coinProvider);
 
     return Scaffold(
-      backgroundColor: context.cardBg,
+      backgroundColor: DecorScope.pageBg(context, context.cardBg),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: context.textPrimary),
-          onPressed: () => Navigator.pop(context),
+        // 他画面と同じテーマ標準のAppBar（ステータスバー領域も同色で塗る）
+        title: const Text(
+          '🏪 ショップ',
+          key: Key('shop_title'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        title: Text(
-          '🏪 コインショップ',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: context.textPrimary,
-          ),
-        ),
-        centerTitle: true,
         actions: [
+          IconButton(
+            tooltip: 'きせかえ',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const DecorScreen()),
+            ),
+            icon: const Icon(Icons.palette_outlined),
+          ),
           // コイン残高バッジ
           Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: _CoinBadge(balance: coinState.balance, large: false),
+            padding: const EdgeInsets.only(right: 12),
+            child: Center(
+              child: _CoinBadge(balance: coinState.balance, large: false),
+            ),
           ),
         ],
       ),
@@ -110,7 +119,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
               decoration: BoxDecoration(
                 color: selected
                     ? kPrimaryColor
-                    : kPrimaryColor.withValues(alpha: 0.08),
+                    // 半透明だと背景の絵が透けるので、白地に重ねて不透明にする
+                    : Color.alphaBlend(kPrimaryColor.withValues(alpha: 0.08), context.isDark ? const Color(0xFF1E1E1E) : Colors.white),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: selected
@@ -203,7 +213,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         SnackBar(
           content: Row(
             children: [
-              Text(item.emoji, style: const TextStyle(fontSize: 20)),
+              UkalabEmoji(item.emoji, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -222,8 +232,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                       style: const TextStyle(fontSize: 11),
                     ),
                     if (!item.isConsumable)
-                      const Text(
-                        '設定画面で使えるよ！',
+                      Text(
+                        item.imageAsset != null
+                            ? '「きせかえ」でつけよう！'
+                            : '設定画面で使えるよ！',
                         style: TextStyle(fontSize: 11),
                       ),
                   ],
@@ -320,6 +332,8 @@ class _ShopItemCard extends StatelessWidget {
     switch (item.category) {
       case ShopCategory.character:  return const Color(0xFF9B59B6);
       case ShopCategory.background: return const Color(0xFF3498DB);
+      case ShopCategory.frame:      return const Color(0xFFE91E63);
+      case ShopCategory.effect:     return const Color(0xFF00ACC1);
       case ShopCategory.sound:      return const Color(0xFF27AE60);
       case ShopCategory.hint:       return const Color(0xFFE67E22);
     }
@@ -359,12 +373,17 @@ class _ShopItemCard extends StatelessWidget {
               color: _categoryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: Text(
-                item.emoji,
-                style: const TextStyle(fontSize: 26),
-              ),
-            ),
+            clipBehavior: Clip.antiAlias,
+            child: item.imageAsset != null
+                ? Image.asset(
+                    item.imageAsset!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Center(child: UkalabEmoji(item.emoji, size: 26)),
+                  )
+                : Center(
+                    child: UkalabEmoji(item.emoji, size: 26),
+                  ),
           ),
           const SizedBox(width: 12),
           // 情報エリア

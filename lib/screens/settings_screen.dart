@@ -1,8 +1,10 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cross_promo_kit/cross_promo_kit.dart' show CrossPromoSection;
 // TODO: AnalyticsDashboardWidget/DailyActivityData/AccuracyTrendData don't exist in shared_core
 import 'package:shared_core/shared_core.dart' show requireParentalGate, ScreenTimeSettingsWidget, AddFriendDialog;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +26,7 @@ import 'parent_dashboard_screen.dart';
 import 'flashcard_screen.dart' show kFlashcards;
 import '../widgets/shortcut_help.dart';
 import '../widgets/app_dialog.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// Settings screen with integrated shared_core components (Phase 4.19)
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -530,6 +533,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                   ],
                 ).animate(delay: 360.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
 
+                CrossPromoSection(
+                  currentAppId: 'com.yourwish.shougakukore.programming',
+                  currentCategory: '小学コレ',
+                  isChildDirected: true,
+                  beforeOpenStore: (context) => requireParentalGate(context),
+                ),
+
                 const SizedBox(height: 32),
               ],
             ),
@@ -602,10 +612,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                 border: Border.all(color: Colors.white, width: 2),
               ),
               child: Center(
-                child: Text(
-                  profile.avatarEmoji,
-                  style: const TextStyle(fontSize: 28),
-                ),
+                child: ProfileAvatar(profile.avatarEmoji, size: 40),
               ),
             ),
           ),
@@ -926,7 +933,7 @@ class _ProfileTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
-          child: Text(profile.avatarEmoji, style: const TextStyle(fontSize: 22)),
+          child: ProfileAvatar(profile.avatarEmoji, size: 32),
         ),
       ),
       title: Text(
@@ -976,7 +983,7 @@ class _SwitchTile extends StatelessWidget {
               : (iconBg ?? kPrimaryColor.withValues(alpha: 0.1)),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(child: Text(icon, style: const TextStyle(fontSize: 18))),
+        child: Center(child: UkalabEmoji(icon, size: 18)),
       ),
       title: Text(
         title,
@@ -1030,7 +1037,7 @@ class _SettingsTile extends StatelessWidget {
               : (iconBg ?? kPrimaryColor.withValues(alpha: 0.1)),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(child: Text(icon, style: const TextStyle(fontSize: 18))),
+        child: Center(child: UkalabEmoji(icon, size: 18)),
       ),
       title: Text(
         title,
@@ -1121,7 +1128,7 @@ class _SettingsSelectorTile<T> extends StatelessWidget {
                   color: iconBg,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Center(child: Text(emoji, style: const TextStyle(fontSize: 18))),
+                child: Center(child: UkalabEmoji(emoji, size: 18)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1721,7 +1728,7 @@ class _StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 28)),
+        UkalabEmoji(icon, size: 28),
         const SizedBox(height: 8),
         Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),

@@ -93,3 +93,28 @@ void expectText(String text) {
 void expectNoText(String text) {
   expect(find.text(text), findsNothing);
 }
+
+/// 「アニメーションを減らす」設定を有効にする。
+/// 終わらない演出（紙吹雪・脈動など）が止まり、pumpAndSettle が収束する。
+/// `setUp(useReducedMotion);` のように使う。
+void useReducedMotion() {
+  final binding = TestWidgetsFlutterBinding.ensureInitialized();
+  binding.platformDispatcher.accessibilityFeaturesTestValue =
+      const FakeAccessibilityFeatures(disableAnimations: true);
+  addTearDown(binding.platformDispatcher.clearAccessibilityFeaturesTestValue);
+}
+
+/// 縦長のビューポートにして、遅延構築される長いリスト（設定画面など）の
+/// 全項目を一度に構築させる。`setUp(useTallViewport);` のように使う。
+void useTallViewport({Size size = const Size(800, 5000)}) {
+  final binding = TestWidgetsFlutterBinding.ensureInitialized();
+  final view = binding.platformDispatcher.views.first;
+  // テスト用の TestFlutterView を通して物理サイズを変更する
+  final testView = view as dynamic;
+  testView.physicalSize = size;
+  testView.devicePixelRatio = 1.0;
+  addTearDown(() {
+    testView.resetPhysicalSize();
+    testView.resetDevicePixelRatio();
+  });
+}

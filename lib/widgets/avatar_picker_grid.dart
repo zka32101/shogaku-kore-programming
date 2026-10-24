@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_core/shared_core.dart'
-    show AvatarModel, AvatarUnlockType, allAvatars;
+    show AvatarImage, AvatarModel, AvatarUnlockType, allAvatars;
 
 import '../providers/coin_provider.dart';
 import '../services/haptic_service.dart';
 
-/// 国語など他アプリと同じ、コインで解放する共通アバターカタログの
-/// うちプレミアム（課金）枠を除いたもの（無料4種＋コイン解放8種）。
-List<AvatarModel> get kAvailableAvatars =>
-    allAvatars.where((a) => a.unlockType != AvatarUnlockType.premium).toList();
+/// 共通アバターカタログ16種。最初の4種は無料、残り12種はコインで解放する。
+/// （カタログ上 premium 枠の4種も、このアプリではコイン解放にそろえる）
+List<AvatarModel> get kAvailableAvatars => allAvatars;
+
+/// premium 枠だったアバターをコインで解放するときの価格
+const int kFormerPremiumAvatarCost = 200;
+
+/// アバターの解放に必要なコイン（無料は null）
+int? avatarCoinCost(AvatarModel a) {
+  if (a.unlockType == AvatarUnlockType.free) return null;
+  return a.coinCost ?? kFormerPremiumAvatarCost;
+}
 
 /// 国語など他アプリと同じ仕組みのアバター選択グリッド。
 /// 無料アバターはそのまま選択でき、コイン解放アバターは鍵アイコン付きで
@@ -62,7 +70,7 @@ class AvatarPickerGrid extends ConsumerWidget {
 
   Future<void> _tryUnlock(
       BuildContext context, WidgetRef ref, AvatarModel avatar) async {
-    final cost = avatar.coinCost ?? 0;
+    final cost = avatarCoinCost(avatar) ?? 0;
     final balance = ref.read(coinProvider).balance;
 
     if (balance < cost) {
@@ -79,8 +87,15 @@ class AvatarPickerGrid extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('${avatar.emoji} ${avatar.name}'),
-        content: Text('$cost コインを使ってこのアバターを解放する？'),
+        title: Text(avatar.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AvatarImage(avatar: avatar, size: 96),
+            const SizedBox(height: 12),
+            Text('$cost コインを使ってこのアバターを解放する？'),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -139,10 +154,7 @@ class _AvatarCell extends StatelessWidget {
         children: [
           Opacity(
             opacity: isUnlocked ? 1.0 : 0.35,
-            child: Text(
-              avatar.emoji,
-              style: TextStyle(fontSize: isSelected ? 24 : 20),
-            ),
+            child: AvatarImage(avatar: avatar, size: isSelected ? 40 : 36),
           ),
           if (!isUnlocked)
             Positioned(
@@ -154,11 +166,11 @@ class _AvatarCell extends StatelessWidget {
                 color: Colors.grey.shade700,
               ),
             ),
-          if (!isUnlocked && avatar.coinCost != null)
+          if (!isUnlocked && avatarCoinCost(avatar) != null)
             Positioned(
               top: 1,
               child: Text(
-                '🪙${avatar.coinCost}',
+                '🪙${avatarCoinCost(avatar)}',
                 style: const TextStyle(
                   fontSize: 7,
                   fontWeight: FontWeight.bold,

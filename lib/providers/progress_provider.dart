@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../config/constants.dart' show kBugHunterIdPrefix;
 import '../services/notification_service.dart';
+import '../streak_dates.dart';
 
 /// User progress for a challenge/stage
 class UserProgress {
@@ -56,6 +58,10 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
 
   static const String _storageKey = 'user_progress';
   static const String _streakKey = 'streak_count';
+  static const String _studyDatesKey = 'study_dates';
+  static const String _noHintClearsKey = 'no_hint_clears';
+  static const String _hintUsesKey = 'hint_uses';
+  static const int _maxHintUses = 300;
   static const String _lastActiveDateKey = 'last_active_date';
   static const String _bonusKey = 'bonus_points';
   static const String _totalQuestionsKey = 'total_questions_answered';
@@ -71,6 +77,11 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   static const String _activityLogKey = 'activity_log_v2'; // 日付別アクティビティ（全モード合算）
 
   int _streakDays = 0;
+  List<String> _studyDates = [];
+  // ヒントなしでクリアしたステージ id（ブロックエディタの段階ヒントで使う）
+  Set<String> _noHintClears = {};
+  // ヒントを使った記録（'yyyy-MM-dd|ステージid'。同じ日の同じステージは1件）
+  List<String> _hintUses = [];
   int _longestStreak = 0;
   DateTime? _lastActiveDate;
   int _bonusPoints = 0;
@@ -89,6 +100,9 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   bool _isLoaded = false; // _loadProgress 完了フラグ（初回ロード完了を検出するため）
 
   int get streakDays => _streakDays;
+
+  /// 学習(クイズ完了)した日。連続学習カレンダー用。バックフィルなし(連続は「開いた日」基準のため)。
+  Set<DateTime> get studyDates => studyDatesToSet(_studyDates);
   int get longestStreak => _longestStreak;
   int get bonusPoints => _bonusPoints;
   int get totalQuestionsAnswered => _totalQuestionsAnswered;
@@ -167,6 +181,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
 
   Future<void> _loadProgress() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
 
     // 進捗データ
     final data = prefs.getString(_storageKey);
@@ -232,9 +247,16 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
         lastDateStr != null ? DateTime.tryParse(lastDateStr) : null;
     _lastShownStreakMilestone = prefs.getInt(_lastShownStreakMilestoneKey) ?? 0;
 
+    _studyDates = normalizeStudyDates(
+        prefs.getStringList(_studyDatesKey) ?? const [], DateTime.now());
+    _noHintClears = (prefs.getStringList(_noHintClearsKey) ?? const <String>[]).toSet();
+    _hintUses = prefs.getStringList(_hintUsesKey) ?? <String>[];
+
     // 起動時にストリーク更新
     await _updateStreakOnOpen(prefs);
 
+    // ロード中に破棄された場合（コンテナの破棄など）は state を更新しない
+    if (!mounted) return;
     // ロード完了後に1回だけ state を更新し、UI に最新ストリーク等を反映させる
     _isLoaded = true;
     state = {...state};
@@ -309,6 +331,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   Future<void> completeChallenge(String challengeId, int stars) async {
     // 再挑戦でスターが下がっても以前のベストを保持する
     final bestStars = (state[challengeId]?.starsEarned ?? 0);
+    _studyDates = addStudyDate(_studyDates, DateTime.now());
     state = {
       ...state,
       (challengeId): UserProgress(
@@ -319,6 +342,54 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
       ),
     };
     await _saveProgress();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_studyDatesKey, _studyDates);
+  }
+
+  /// ヒント（ヒント欄・お手本）を使ったことを記録する。保護者向けメッセージで使う。
+  Future<void> recordHintUse(String challengeId, {DateTime? now}) async {
+    final d = now ?? DateTime.now();
+    final day =
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    final entry = '$day|$challengeId';
+    if (_hintUses.contains(entry)) return;
+    _hintUses = [..._hintUses, entry];
+    if (_hintUses.length > _maxHintUses) {
+      _hintUses = _hintUses.sublist(_hintUses.length - _maxHintUses);
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_hintUsesKey, _hintUses);
+  }
+
+  /// 直近 [days] 日間にヒントを使ったステージ id（使った日数の多い順）。
+  List<String> hintStageIdsWithin({int days = 7, DateTime? now}) {
+    final n = now ?? DateTime.now();
+    final today = DateTime(n.year, n.month, n.day);
+    final start = today.subtract(Duration(days: days - 1));
+    final counts = <String, int>{};
+    for (final e in _hintUses) {
+      final i = e.indexOf('|');
+      if (i < 0) continue;
+      final date = DateTime.tryParse(e.substring(0, i));
+      if (date == null || date.isBefore(start)) continue;
+      final id = e.substring(i + 1);
+      counts[id] = (counts[id] ?? 0) + 1;
+    }
+    final ids = counts.keys.toList()
+      ..sort((a, b) => counts[b]!.compareTo(counts[a]!));
+    return ids;
+  }
+
+  /// ヒントなしでクリアしたステージ数
+  int get noHintClearCount => _noHintClears.length;
+
+  /// ヒントなしクリアを記録し、通算のステージ数を返す（同じステージは1回だけ数える）。
+  Future<int> recordNoHintClear(String challengeId) async {
+    if (_noHintClears.add(challengeId)) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_noHintClearsKey, _noHintClears.toList());
+    }
+    return _noHintClears.length;
   }
 
   UserProgress getProgress(String challengeId) {
@@ -344,7 +415,13 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     _activityLog = {};
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_storageKey);
+    _studyDates = [];
     await prefs.remove(_streakKey);
+    await prefs.remove(_studyDatesKey);
+    _noHintClears = {};
+    await prefs.remove(_noHintClearsKey);
+    _hintUses = [];
+    await prefs.remove(_hintUsesKey);
     await prefs.remove(_lastActiveDateKey);
     await prefs.remove(_bonusKey);
     await prefs.remove(_totalQuestionsKey);
@@ -368,8 +445,18 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     state = {...state};
   }
 
+  /// 本編のステージの進捗（バグハンターなどの独立ステージ群は含めない）。
+  /// 全クリア判定・実績の分母が本編のステージ数と一致するように、集計はこちらを使う。
+  Iterable<UserProgress> get _mainProgress =>
+      state.entries.where((e) => !e.key.startsWith(kBugHunterIdPrefix)).map((e) => e.value);
+
+  /// バグハンターでクリアしたステージ数
+  int get bugHunterCompletedCount => state.entries
+      .where((e) => e.key.startsWith(kBugHunterIdPrefix) && e.value.isCompleted)
+      .length;
+
   int get totalStarsEarned {
-    final base = state.values.fold(0, (sum, p) => sum + p.starsEarned);
+    final base = _mainProgress.fold(0, (sum, p) => sum + p.starsEarned);
     return base + _bonusPoints;
   }
 
@@ -396,7 +483,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     _activityLog[today] = (_activityLog[today] ?? 0) + count;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_activityLogKey, json.encode(_activityLog));
-    state = {...state};
+    if (mounted) state = {...state};
   }
 
   /// 学習時間を記録する。マイルストーン達成時は (icon, name, message, nextGoal) を返す。
@@ -407,7 +494,8 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
     final afterMinutes = _totalLearningSeconds ~/ 60;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_totalLearningSecondsKey, _totalLearningSeconds);
-    state = {...state};
+    // 画面を閉じた直後に呼ばれると notifier が破棄済みのことがある（保存は済んでいる）
+    if (mounted) state = {...state};
 
     // 学習時間マイルストーン判定
     const milestones = [
@@ -435,7 +523,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
   }
 
   int get completedCount {
-    return state.values.where((p) => p.isCompleted).length;
+    return _mainProgress.where((p) => p.isCompleted).length;
   }
 
   // レベル閾値: 40ステージ×3★=120★満点、Lv.20 が最大
@@ -490,7 +578,7 @@ class ProgressNotifier extends StateNotifier<Map<String, UserProgress>> {
 
   /// 3つ星クリアしたステージ数
   int get perfectStagesCount {
-    return state.values.where((p) => p.isCompleted && p.starsEarned >= 3).length;
+    return _mainProgress.where((p) => p.isCompleted && p.starsEarned >= 3).length;
   }
 
   /// 今日クリアしたステージ数

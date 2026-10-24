@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -262,7 +263,7 @@ class _FriendTile extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: LinearGradient(colors: [kPrimaryColor, kPrimaryDark]),
             ),
-            child: Center(child: Text(friend.avatarEmoji, style: const TextStyle(fontSize: 20))),
+            child: Center(child: ProfileAvatar(friend.avatarEmoji, size: 40)),
           ),
           const SizedBox(width: 12),
           Expanded(

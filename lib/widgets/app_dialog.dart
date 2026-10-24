@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// アプリ全体で統一されたダイアログヘルパー。
 ///
@@ -151,7 +152,7 @@ class _AppDialogWidget extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Text(emoji, style: const TextStyle(fontSize: 36)),
+                child: UkalabEmoji(emoji, size: 36),
               ),
             ),
             const SizedBox(height: 16),

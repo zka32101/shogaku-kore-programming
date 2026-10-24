@@ -10,6 +10,7 @@ import '../providers/gallery_provider.dart';
 import '../services/haptic_service.dart';
 import '../widgets/robot_canvas.dart';
 import '../widgets/glossary_text.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// 自由にブロックを組み合わせてオリジナルの「ゲーム（ロボットの動き）」を
 /// 作れる画面。ステージ課題とは違い、正解／不正解の判定はなく、
@@ -178,7 +179,7 @@ class _FreeCreateScreenState extends ConsumerState<FreeCreateScreen> {
         ),
         child: Row(
           children: [
-            Text(block.icon, style: const TextStyle(fontSize: 16)),
+            UkalabEmoji(block.icon, size: 16),
             const SizedBox(width: 6),
             Expanded(
               child: Text(

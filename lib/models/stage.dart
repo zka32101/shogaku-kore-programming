@@ -8,6 +8,10 @@ class Question {
   final String explanation;
   final String? hint;
 
+  /// バグハンター形式。true のとき [codeSnippet] の各行が選択肢になり、
+  /// [correctIndex] がバグのある行（0始まり）を指す。
+  final bool bugHunt;
+
   const Question({
     required this.id,
     required this.text,
@@ -16,7 +20,32 @@ class Question {
     required this.correctIndex,
     required this.explanation,
     this.hint,
+    this.bugHunt = false,
   });
+
+  /// バグハンター形式の問題。[bugLine] は 1 始まりの行番号（子どもに見える番号）。
+  /// 各行を選択肢にするので、採点・星・復習など既存のクイズの仕組みをそのまま使える。
+  factory Question.bugHunt({
+    required String id,
+    required String code,
+    required int bugLine,
+    required String explanation,
+    String text = 'バグ（まちがい）がある行をタップしよう！',
+    String? hint,
+  }) {
+    final lines = code.split('\n');
+    assert(bugLine >= 1 && bugLine <= lines.length, 'bugLine is out of range');
+    return Question(
+      id: id,
+      text: text,
+      codeSnippet: code,
+      options: lines,
+      correctIndex: bugLine - 1,
+      explanation: explanation,
+      hint: hint,
+      bugHunt: true,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -26,6 +55,7 @@ class Question {
         'correctIndex': correctIndex,
         'explanation': explanation,
         'hint': hint,
+        'bugHunt': bugHunt,
       };
 
   factory Question.fromJson(Map<String, dynamic> json) => Question(
@@ -36,6 +66,7 @@ class Question {
         correctIndex: json['correctIndex'] as int,
         explanation: json['explanation'] as String,
         hint: json['hint'] as String?,
+        bugHunt: json['bugHunt'] as bool? ?? false,
       );
 }
 

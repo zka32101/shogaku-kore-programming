@@ -37,9 +37,13 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
   bool _timeRecorded = false;       // 学習時間を記録済みかのフラグ
   bool _questionsRecorded = false;  // 累計回答数を記録済みかのフラグ
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
     _sessionStart = DateTime.now();
     _localAnswers = List<QuizAnswer>.from(widget.wrongAnswers);
     _initialTotal = _localAnswers.length;
@@ -52,7 +56,7 @@ class _QuizReviewScreenState extends ConsumerState<QuizReviewScreen> {
     if (!_timeRecorded && _sessionStart != null) {
       final elapsed = DateTime.now().difference(_sessionStart!).inSeconds;
       if (elapsed > 0) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _focusNode.dispose();

@@ -9,6 +9,7 @@ import 'package:shogaku_kore_programming/providers/progress_provider.dart';
 import 'test_helpers.dart';
 
 void main() {
+  setUp(useReducedMotion);
   late ProviderContainer container;
 
   setUp(() {
@@ -39,16 +40,12 @@ void main() {
     testWidgets('displays flashcard content', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
       await tester.pumpAndSettle();
-
-      // Flashcard content should be visible
-      expect(find.byType(Card), findsWidgets);
+      expect(find.text('タップして答えを見る'), findsWidgets);
+      expect(find.text('カードをめくる'), findsOneWidget);
     });
 
     testWidgets('displays card question/front side', (WidgetTester tester) async {
@@ -69,21 +66,18 @@ void main() {
     testWidgets('can flip card to show answer', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('カードをめくる'));
       await tester.pumpAndSettle();
 
-      // Tap card to flip
-      final card = find.byType(Card).first;
-      await tester.tap(card);
-      await tester.pumpAndSettle();
-
-      // Answer should be visible
-      expect(find.byType(Text), findsWidgets);
+      // 裏面（答え）と自己評価ボタンが表示される
+      expect(find.text('裏面'), findsOneWidget);
+      expect(find.text('答え'), findsOneWidget);
+      expect(find.text('もう一度'), findsOneWidget);
+      expect(find.text('知ってた！'), findsOneWidget);
     });
 
     testWidgets('displays progress indicator', (WidgetTester tester) async {
@@ -119,73 +113,49 @@ void main() {
     testWidgets('can rate card difficulty', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('カードをめくる'));
       await tester.pumpAndSettle();
 
-      // Flip card first
-      final card = find.byType(Card).first;
-      await tester.tap(card);
+      await tester.tap(find.text('知ってた！'));
       await tester.pumpAndSettle();
 
-      // Tap difficulty button (e.g., "Hard" or "Easy")
-      final difficultyButton = find.byType(ElevatedButton);
-      if (difficultyButton.evaluate().isNotEmpty) {
-        await tester.tap(difficultyButton.first);
-        await tester.pumpAndSettle();
-
-        // Should move to next card
-        expect(find.byType(Card), findsWidgets);
-      }
+      // 次のカード（表面）に進む
+      expect(find.text('カードをめくる'), findsOneWidget);
+      expect(find.text('2/10'), findsOneWidget);
     });
 
     testWidgets('advances to next card', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
+      await tester.pumpAndSettle();
+      expect(find.text('1/10'), findsOneWidget);
 
+      await tester.tap(find.text('カードをめくる'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('もう一度'));
       await tester.pumpAndSettle();
 
-      // Get initial card text
-      final initialText = find.byType(Text).first;
-
-      // Flip card
-      final card = find.byType(Card).first;
-      await tester.tap(card);
-      await tester.pumpAndSettle();
-
-      // Rate it
-      final button = find.byType(ElevatedButton);
-      if (button.evaluate().isNotEmpty) {
-        await tester.tap(button.first);
-        await tester.pumpAndSettle();
-
-        // Should show new card
-        expect(find.byType(Card), findsWidgets);
-      }
+      expect(find.text('2/10'), findsOneWidget);
     });
 
     testWidgets('displays category selector', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
       await tester.pumpAndSettle();
-
-      // Category dropdown or selector should be visible
-      expect(find.byType(PopupMenuButton), findsWidgets);
+      // カテゴリ絞り込みのチップが並ぶ
+      expect(find.text('絞り込み：'), findsOneWidget);
+      expect(find.textContaining('基本'), findsWidgets);
+      expect(find.textContaining('制御'), findsWidgets);
     });
 
     testWidgets('can filter by category', (WidgetTester tester) async {
@@ -228,70 +198,44 @@ void main() {
     testWidgets('shows mark as correct button', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('カードをめくる'));
       await tester.pumpAndSettle();
 
-      // Flip card
-      final card = find.byType(Card).first;
-      await tester.tap(card);
-      await tester.pumpAndSettle();
-
-      // Correct button should be visible
-      expect(find.byType(ElevatedButton), findsWidgets);
+      expect(find.text('知ってた！'), findsOneWidget);
     });
 
     testWidgets('shows mark as incorrect button', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('カードをめくる'));
       await tester.pumpAndSettle();
 
-      // Flip card
-      final card = find.byType(Card).first;
-      await tester.tap(card);
-      await tester.pumpAndSettle();
-
-      // Incorrect button should be visible
-      expect(find.byType(ElevatedButton), findsWidgets);
+      expect(find.text('もう一度'), findsOneWidget);
     });
 
     testWidgets('updates statistics on answer', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
+      await tester.pumpAndSettle();
+      expect(find.text('おぼえた 0 / 40'), findsOneWidget);
 
+      await tester.tap(find.text('カードをめくる'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('知ってた！'));
       await tester.pumpAndSettle();
 
-      // Get initial stats
-      final initialStats = find.byType(Text);
-
-      // Answer a card
-      final card = find.byType(Card).first;
-      await tester.tap(card);
-      await tester.pumpAndSettle();
-
-      final button = find.byType(ElevatedButton);
-      if (button.evaluate().isNotEmpty) {
-        await tester.tap(button.first);
-        await tester.pumpAndSettle();
-
-        // Stats should be updated
-        expect(find.byType(Text), findsWidgets);
-      }
+      expect(find.text('おぼえた 1 / 40'), findsOneWidget);
     });
 
     testWidgets('displays card count', (WidgetTester tester) async {
@@ -327,75 +271,64 @@ void main() {
     testWidgets('shows shuffle option', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
       await tester.pumpAndSettle();
-
-      // Look for shuffle button
-      final shuffleButton = find.byIcon(Icons.shuffle);
-      expect(shuffleButton, findsWidgets);
+      // デッキは毎回ランダムに並べ替えられ、全体(40枚)から10枚の1セッションが始まる
+      expect(find.text('1/10'), findsOneWidget);
+      expect(find.text('全て 0/40'), findsOneWidget);
     });
 
     testWidgets('can shuffle cards', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
       await tester.pumpAndSettle();
+      await tester.tap(find.text('カードをめくる'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('もう一度'));
+      await tester.pumpAndSettle();
+      expect(find.text('2/10'), findsOneWidget);
 
-      // Tap shuffle button
-      final shuffleButton = find.byIcon(Icons.shuffle);
-      if (shuffleButton.evaluate().isNotEmpty) {
-        await tester.tap(shuffleButton.first);
-        await tester.pumpAndSettle();
-
-        // Cards order should change
-      }
+      // カテゴリを選び直すとデッキが組み直され、先頭に戻る
+      await tester.tap(find.text('制御 0/5'));
+      await tester.pumpAndSettle();
+      expect(find.text('1/5'), findsOneWidget);
     });
 
     testWidgets('displays reset option', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
       await tester.pumpAndSettle();
-
-      // Look for reset button
-      final resetButton = find.byIcon(Icons.refresh);
-      expect(resetButton, findsWidgets);
+      // カテゴリチップ（絞り込み）でデッキをリセットできる
+      expect(find.text('絞り込み：'), findsOneWidget);
+      expect(find.text('全て 0/40'), findsOneWidget);
+      expect(find.text('クラス 0/1'), findsOneWidget);
     });
 
     testWidgets('can reset session', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
       await tester.pumpAndSettle();
+      await tester.tap(find.text('カードをめくる'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('知ってた！'));
+      await tester.pumpAndSettle();
+      expect(find.text('2/10'), findsOneWidget);
 
-      // Tap reset button
-      final resetButton = find.byIcon(Icons.refresh);
-      if (resetButton.evaluate().isNotEmpty) {
-        await tester.tap(resetButton.first);
-        await tester.pumpAndSettle();
-
-        // Stats should reset, back to first card
-      }
+      // 「全て」を選び直すと最初から（1枚目）
+      await tester.tap(find.text('全て 1/40'));
+      await tester.pumpAndSettle();
+      expect(find.text('1/10'), findsOneWidget);
     });
 
     testWidgets('shows completion message when finished',
@@ -453,21 +386,14 @@ void main() {
     testWidgets('card flip animation works', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
       await tester.pumpAndSettle();
-
-      // Tap card to flip with animation
-      final card = find.byType(Card).first;
-      await tester.tap(card);
+      await tester.tap(find.text('カードをめくる'));
       await tester.pumpAndSettle(const Duration(milliseconds: 600));
 
-      // Card should show answer
-      expect(find.byType(Text), findsWidgets);
+      expect(find.text('答え'), findsOneWidget);
     });
 
     testWidgets('supports keyboard navigation', (WidgetTester tester) async {
@@ -507,49 +433,35 @@ void main() {
     testWidgets('saves progress automatically', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
-
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('カードをめくる'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('知ってた！'));
       await tester.pumpAndSettle();
 
-      // Answer some cards
-      final card = find.byType(Card).first;
-      await tester.tap(card);
-      await tester.pumpAndSettle();
-
-      final button = find.byType(ElevatedButton);
-      if (button.evaluate().isNotEmpty) {
-        await tester.tap(button.first);
-        await tester.pumpAndSettle();
-
-        // Progress should be saved (handled by Riverpod provider)
-      }
+      // 回答後に進捗が反映されている
+      expect(find.text('おぼえた 1 / 40'), findsOneWidget);
     });
 
     testWidgets('displays all card text content', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: FlashcardScreen(),
-          ),
+          child: MaterialApp(home: FlashcardScreen()),
         ),
       );
+      await tester.pumpAndSettle();
+      // 表面: 問題の見出しと操作ガイド
+      expect(find.text('タップして答えを見る'), findsWidgets);
+      expect(find.text('[Space] または タップ でカードをめくる'), findsOneWidget);
 
+      await tester.tap(find.text('カードをめくる'));
       await tester.pumpAndSettle();
 
-      // Text content should be readable
-      expect(find.byType(Text), findsWidgets);
-
-      // Flip to see answer
-      final card = find.byType(Card).first;
-      await tester.tap(card);
-      await tester.pumpAndSettle();
-
-      // Answer text should be visible
-      expect(find.byType(Text), findsWidgets);
+      // 裏面: 答えが表示される
+      expect(find.text('答え'), findsOneWidget);
     });
   });
 }

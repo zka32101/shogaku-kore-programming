@@ -1,17 +1,27 @@
+import '../reward_assets.dart';
+import '../widgets/streak_calendar.dart';
+import '../features/shop/decor/decor_scope.dart';
+import '../features/shop/title/title_plate.dart';
+import '../features/shop/title/title_provider.dart';
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../models/character_model.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
 import '../providers/coin_provider.dart';
 import '../providers/daily_review_provider.dart';
 import '../providers/friends_provider.dart';
+import '../providers/my_character_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
 import '../utils/page_transitions.dart';
+import '../widgets/character_image.dart';
+import 'character_screen.dart';
 import 'ai_programming_screen.dart';
 import 'daily_review_screen.dart';
 import 'editor_screen.dart';
@@ -21,11 +31,13 @@ import 'friends_list_screen.dart';
 import 'gallery_screen.dart';
 import 'quiz_screen.dart';
 import 'ranking_screen.dart';
+import 'bug_hunter_screen.dart';
 import 'robot_game_screen.dart';
 import 'shop_screen.dart';
 import 'stage_share_screen.dart';
 import 'time_attack_screen.dart';
 import 'wrong_answers_list_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -87,7 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: context.isDark ? const Color(0xFF121212) : const Color(0xFFF5F7FA),
+      backgroundColor: DecorScope.pageBg(context, context.isDark ? const Color(0xFF121212) : const Color(0xFFF5F7FA)),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -102,6 +114,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 _buildNextStageCard(context, nextStage, allCleared),
               const SizedBox(height: 16),
               _buildTodayProgress(context, profile, progress),
+              const SizedBox(height: 16),
+              _buildMyCharacterCard(context),
               const SizedBox(height: 16),
               _buildDailyReviewCard(context),
               const SizedBox(height: 16),
@@ -144,7 +158,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               border: Border.all(color: Colors.white, width: 2),
             ),
             child: Center(
-              child: Text(profile.avatarEmoji, style: const TextStyle(fontSize: 28)),
+              child: ProfileAvatar(profile.avatarEmoji, size: 44),
             ),
           ),
           const SizedBox(width: 14),
@@ -162,10 +176,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  'レベル ${progress.currentLevel} ・ 🔥 ${progress.streakDays}日連続',
-                  style: const TextStyle(fontSize: 12, color: Colors.white70),
+                InkWell(
+                  key: const Key('streak_calendar_button'),
+                  onTap: () => showStreakCalendar(context, progress.studyDates),
+                  child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'レベル ${progress.currentLevel} ・ ',
+                        style: const TextStyle(fontSize: 12, color: Colors.white70),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (streakFlameAsset(progress.streakDays) case final flame?)
+                      Image.asset(
+                        flame,
+                        height: 16,
+                        errorBuilder: (_, _, _) => const Text('🔥', style: TextStyle(fontSize: 12)),
+                      )
+                    else
+                      const Text('🔥', style: TextStyle(fontSize: 12)),
+                    Text(
+                      ' ${progress.streakDays}日連続',
+                      style: const TextStyle(fontSize: 12, color: Colors.white70),
+                    ),
+                  ],
+                  ),
                 ),
+                if (ref.watch(activeTitleProvider) case final title?) ...[
+                  const SizedBox(height: 6),
+                  TitlePlate(name: title.name),
+                ],
               ],
             ),
           ),
@@ -215,7 +257,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Center(
-                child: Text(stage.icon, style: const TextStyle(fontSize: 28)),
+                child: UkalabEmoji(stage.icon, size: 28),
               ),
             ),
             const SizedBox(width: 16),
@@ -306,6 +348,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       border: borderColor == null
           ? null
           : Border.all(color: borderColor, width: 1.5),
+    );
+  }
+
+  /// マイキャラ（成長するキャラ）のカード
+  Widget _buildMyCharacterCard(BuildContext context) {
+    final my = ref.watch(myCharacterProvider);
+    final def = my.definition;
+    final next = my.nextThreshold;
+    return GestureDetector(
+      onTap: () => _push(const CharacterScreen()),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: _cardDecoration(context),
+        child: Row(
+          children: [
+            CharacterImage(definition: def, stage: my.stage, size: 64),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${def.name}（${kStageNames[my.stage]}）',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: context.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value: my.progressToNext,
+                      minHeight: 8,
+                      backgroundColor: kPrimaryColor.withValues(alpha: 0.15),
+                      valueColor: const AlwaysStoppedAnimation(kPrimaryColor),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    next == null
+                        ? '最強の姿になったよ！'
+                        : '進化まで あと ${next - my.totalXp} XP',
+                    style: TextStyle(fontSize: 11, color: context.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
+      ),
     );
   }
 
@@ -403,6 +499,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildQuickAccess(BuildContext context) {
     final items = <(String, String, Widget)>[
       ('🤖', 'ロボットゲーム', const RobotGameScreen()),
+      ('🐛', 'バグハンター', const BugHunterScreen()),
       ('🤝', 'ステージ交換', const StageShareScreen()),
       ('👥', 'ともだち', const FriendsListScreen()),
       ('🎨', '自由に作る', const FreeCreateScreen()),
@@ -418,11 +515,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(
-            'いろいろあそぶ',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: context.textPrimary,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              color: DecorScope.chipBg(context),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              'いろいろあそぶ',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: context.textPrimary,
+              ),
             ),
           ),
         ),
@@ -442,7 +546,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   decoration: _cardDecoration(context),
                   child: Row(
                     children: [
-                      Text(emoji, style: const TextStyle(fontSize: 22)),
+                      UkalabEmoji(emoji, size: 22),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -487,7 +591,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _statItem(BuildContext context, String emoji, String value, String label) {
     return Column(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 22)),
+        UkalabEmoji(emoji, size: 22),
         const SizedBox(height: 6),
         Text(
           value,

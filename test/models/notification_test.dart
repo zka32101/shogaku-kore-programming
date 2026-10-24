@@ -230,6 +230,8 @@ void main() {
         channelSettings: {NotificationChannel.gamification: true},
         typeSettings: {NotificationType.achievement: true},
         pushNotificationsEnabled: true,
+        // 実行時刻（既定の静音時間 22〜8時）に結果が左右されないようにする
+        respectQuietHours: false,
       );
 
       final notification = Notification(

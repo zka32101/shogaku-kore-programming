@@ -1,8 +1,10 @@
+import '../features/shop/decor/decor_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../config/theme.dart';
 import '../widgets/glossary_text.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// プログラミング基礎説明画面 (#12)
 class ProgrammingBasicsScreen extends StatefulWidget {
@@ -26,7 +28,7 @@ class _ProgrammingBasicsScreenState extends State<ProgrammingBasicsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.cardBg,
+      backgroundColor: DecorScope.pageBg(context, context.cardBg),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -320,7 +322,7 @@ class _ContentWrapper extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                  child: UkalabEmoji(emoji, size: 24),
                 ),
               ),
               const SizedBox(width: 12),
@@ -436,7 +438,7 @@ class _InfoCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 18)),
+          UkalabEmoji(icon, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: GlossaryText(
@@ -506,7 +508,7 @@ class _HowToCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(icon, style: const TextStyle(fontSize: 14)),
+                    UkalabEmoji(icon, size: 14),
                     const SizedBox(width: 6),
                     Text(
                       title,

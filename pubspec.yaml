@@ -3,7 +3,7 @@ description: "小学コレ！プログラミング - コード探険でプログ
 # Re-trigger CI - Force cache refresh (2026-09-12 04:42 UTC retry)
 publish_to: 'none'
 
-version: 0.2.0+11
+version: 0.2.4+23
 
 # Build trigger for shared_core APK integration - 2026-09-13 10:29
 environment:
@@ -16,6 +16,10 @@ dependencies:
     git:
       url: https://github.com/zka32101/shared_core.git
       ref: main
+  cross_promo_kit:
+    git:
+      url: https://github.com/zka32101/cross_promo_kit.git
+      ref: v0.3.0
 
   cupertino_icons: ^1.0.8
   url_launcher: ^6.3.0
@@ -70,14 +74,24 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/icons/app_icon.png"
   min_sdk_android: 21
-  adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/icons/app_icon.png"
+  adaptive_icon_background: "assets/icons/adaptive_bg.png"
+  adaptive_icon_foreground: "assets/icons/adaptive_fg.png"
 
 flutter:
   uses-material-design: true
   assets:
+    - assets/icons_common/
+    - assets/badges/
     - assets/icons/
+    - assets/characters/
+    - assets/shop/
+    - assets/shop/thumb/
+    - assets/illustrations/
     - assets/logos/
+    - assets/certificates/
+    - assets/celebrate/
+    - assets/title_plate/
+    - assets/reward/
   fonts:
     # 漢字が正しい字形(日本語字形)で表示されない不具合の修正。
     # fontFamily: 'NotoSansJP' はテーマ(theme.dart)で指定されているが、

@@ -79,7 +79,7 @@ void main() {
       await notifier.startActivity('test_user', 'nonexistent');
 
       state = container.read(activityProvider);
-      expect(state.collection!.error, isNotNull);
+      expect(state.error, isNotNull);
     });
 
     test('completeActivity records result', () async {

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "492221061005",
-    "project_id": "petit-works-education",
-    "storage_bucket": "petit-works-education.firebasestorage.app"
+    "project_number": "906257233334",
+    "project_id": "kore1-6b58e",
+    "storage_bucket": "kore1-6b58e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:787db4f95023038bc88fc4",
+        "mobilesdk_app_id": "1:906257233334:android:c72977fcce222f831ffd17",
         "android_client_info": {
-          "package_name": "com.petitworksapps.businesskids"
+          "package_name": "com.yourwish.shougakukore.eigo"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
+          "current_key": "AIzaSyCjpHo46GeJzN_TMINl1eaMNJet3QFXr_U"
         }
       ],
       "services": {
@@ -26,15 +26,15 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:0907600f6c201eecc88fc4",
+        "mobilesdk_app_id": "1:906257233334:android:2e17f224a0f8a7e41ffd17",
         "android_client_info": {
-          "package_name": "com.petitworksapps.gamekobo"
+          "package_name": "com.yourwish.shougakukore.kokugo"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
+          "current_key": "AIzaSyCjpHo46GeJzN_TMINl1eaMNJet3QFXr_U"
         }
       ],
       "services": {
@@ -45,235 +45,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:ae799e02c6ae84f5c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.gensotanken"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:419c57632f1f9126c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.historyzukan"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:aedf5de389dd57f8c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.seibutsuzukan"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:db5968a17fc6ff95c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.seizakore"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:f967aaf602003b1ac88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.shougakukore.dekitane"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:17e2a56df6d25ae2c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.shougakukore.eigo"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:0c9d94f157252096c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.shougakukore.kokugo"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:2c39d1d22093742bc88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.shougakukore.programming"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:ff46c223377fb864c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.shougakukore.rika"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:bb5b4b43e1378b63c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.shougakukore.sansu"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:95f8af8ac8c88b85c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.shougakukore.shakai"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:e5666e64fadf2a43c88fc4",
-        "android_client_info": {
-          "package_name": "com.petitworksapps.shougakukore.shinshin"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:492221061005:android:2c39d1d22093742bc88fc4",
+        "mobilesdk_app_id": "1:906257233334:android:62bb4fc1371adfb01ffd17",
         "android_client_info": {
           "package_name": "com.yourwish.shougakukore.programming"
         }
@@ -281,7 +53,64 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCBwPBEXptIW_8wl0_hWtZhpSJcuod00Eg"
+          "current_key": "AIzaSyCjpHo46GeJzN_TMINl1eaMNJet3QFXr_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906257233334:android:c6ee20134aee87431ffd17",
+        "android_client_info": {
+          "package_name": "com.yourwish.shougakukore.rika"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjpHo46GeJzN_TMINl1eaMNJet3QFXr_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906257233334:android:71fa3ddba50627e01ffd17",
+        "android_client_info": {
+          "package_name": "com.yourwish.shougakukore.sansu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjpHo46GeJzN_TMINl1eaMNJet3QFXr_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906257233334:android:d3588ffea7d88e931ffd17",
+        "android_client_info": {
+          "package_name": "com.yourwish.shougakukore.shakai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjpHo46GeJzN_TMINl1eaMNJet3QFXr_U"
         }
       ],
       "services": {

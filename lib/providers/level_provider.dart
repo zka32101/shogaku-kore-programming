@@ -43,8 +43,11 @@ class LevelState {
 /// ユーザーレベル管理プロバイダ
 class LevelNotifier extends StateNotifier<LevelState> {
   LevelNotifier() : super(const LevelState()) {
-    _initializeLevelData();
+    _initialized = _initializeLevelData();
   }
+
+  /// 保存データの復元完了を待つための Future（XP加算が復元に上書きされるのを防ぐ）
+  late final Future<void> _initialized;
 
   static const String _levelKey = 'user_level';
   static const String _xpKey = 'user_total_xp';
@@ -78,6 +81,7 @@ class LevelNotifier extends StateNotifier<LevelState> {
 
   /// 経験値を追加
   Future<List<LevelUpEvent>> addExperience(int xpAmount) async {
+    await _initialized;
     final prefs = await SharedPreferences.getInstance();
     final oldLevel = state.currentLevel;
     var newTotalXp = state.totalXpEarned + xpAmount;

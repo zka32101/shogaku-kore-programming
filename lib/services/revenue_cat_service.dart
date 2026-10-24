@@ -91,6 +91,9 @@ class RevenueCatService {
   /// Get available offerings (subscription plans)
   Future<List<Package>?> getOfferings() async {
     try {
+      // 起動時の初期化(通知・Firebase等のあとに回る)が間に合わない場合に備え、
+      // 取得前に初期化を保証する（初期化済みなら何もしない）
+      await initialize();
       final offerings = await Purchases.getOfferings();
       return offerings.current?.availablePackages;
     } catch (e) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_core/models/mission_model.dart';
+import 'auth_service.dart';
 
 /// Phase 4.5: ゲーミフィケーション統一工事（ミッション機能）
 /// 実装: shared_core の ALL_MISSIONS リストから取得・フィルタリング
@@ -47,7 +48,7 @@ class FirestoreMissionService {
   Future<void> updateProgress(String missionId, int progress) async {
     try {
       final db = FirebaseFirestore.instance;
-      final userId = 'current_user'; // TODO: 実装時に実際のユーザーID取得
+      final userId = await AuthService().currentUserId();
 
       await db
           .collection('users')

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/constants.dart';
 import '../providers/profile_provider.dart';
+import '../providers/challenges_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/weekly_report_provider.dart';
+import '../providers/wrong_answers_provider.dart';
 import '../services/haptic_service.dart';
 import '../services/sound_service.dart';
+import '../utils/parent_message.dart';
 
 class WeeklyReportScreen extends ConsumerStatefulWidget {
   const WeeklyReportScreen({super.key});
@@ -18,6 +22,23 @@ class WeeklyReportScreen extends ConsumerStatefulWidget {
 class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
   bool _reportGenerated = false;
 
+  /// 端末内のデータから、直近7日間の保護者向けまとめを作る。
+  ParentWeekSummary _weekSummary(String childName) {
+    final notifier = ref.read(progressProvider.notifier);
+    return buildParentWeekSummary(
+      childName: childName,
+      now: DateTime.now(),
+      stages: [
+        ...ref.read(allChallengesProvider),
+        ...ref.read(bugHunterStagesProvider),
+      ],
+      progress: ref.read(progressProvider),
+      wrong: ref.read(wrongAnswersProvider),
+      hintStageIds: notifier.hintStageIdsWithin(),
+      streakDays: notifier.streakDays,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final reportState = ref.watch(weeklyReportProvider);
@@ -27,6 +48,8 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
     final completedCount = progressNotifier.completedCount;
     final currentLevel = progressNotifier.currentLevel;
     final streakDays = progressNotifier.streakDays;
+    ref.watch(wrongAnswersProvider); // まちがいの変化でもリビルドさせる
+    final parentMessage = buildParentMessage(_weekSummary(profileState.nickname));
 
     return Scaffold(
       appBar: AppBar(
@@ -50,6 +73,10 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
               'お子さんの学習進捗をAIが分析し、保護者様向けのレポートを生成します。',
               style: TextStyle(color: Colors.grey[600]),
             ),
+            const SizedBox(height: 16),
+
+            // おうちの人へのメッセージ（通信なし・端末内のデータだけで作る）
+            _ParentMessageCard(message: parentMessage),
             const SizedBox(height: 24),
 
             // レポート生成ボタン
@@ -213,12 +240,13 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
     final streakDays = progressNotifier.streakDays;
     final completedThisWeek = progressNotifier.weeklyActivity(weeks: 1).last;
 
+    final summary = _weekSummary(profileState.nickname ?? 'お子さん');
     await ref.read(weeklyReportProvider.notifier).generateReport(
       profileState.nickname ?? 'お子さん',
       completedThisWeek,
       completedCount, // totalCompleted
-      const ['if文', 'ループ'],
-      const ['配列操作'],
+      summary.clearedTitles.take(3).toList(), // 得意: 最近クリアしたステージ
+      summary.struggledTitles.take(3).toList(), // 苦手: 最近まちがいが多いステージ
       currentLevel,
       streakDays,
     );
@@ -228,5 +256,84 @@ class _WeeklyReportScreenState extends ConsumerState<WeeklyReportScreen> {
     setState(() {
       _reportGenerated = true;
     });
+  }
+}
+
+/// 直近7日間の様子をまとめた、保護者向けのメッセージ。コピーして家族に送れる。
+class _ParentMessageCard extends StatelessWidget {
+  final ParentMessage message;
+
+  const _ParentMessageCard({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget section(String title, List<String> items) {
+      if (items.isEmpty) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            for (final item in items)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text('・$item', style: const TextStyle(height: 1.5)),
+              ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      key: const Key('parentMessageCard'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.green.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '💌 おうちの人へ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message.headline,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, height: 1.5),
+          ),
+          section('がんばったこと', message.good),
+          section('つまずいたところ', message.concerns),
+          const SizedBox(height: 12),
+          const Text('声かけのヒント', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(message.advice, style: const TextStyle(height: 1.5)),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              key: const Key('copyParentMessage'),
+              onPressed: () {
+                HapticService.lightImpact();
+                Clipboard.setData(ClipboardData(text: message.toPlainText()));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('メッセージをコピーしました'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.copy, size: 16),
+              label: const Text('コピーする'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -9,7 +9,22 @@ import 'package:shogaku_kore_programming/providers/progress_provider.dart';
 import 'package:shogaku_kore_programming/providers/profile_provider.dart';
 import 'test_helpers.dart';
 
+/// 回答後は Future.delayed（コンボ表示のクリア・自動進行）が残るため、
+/// スマホ縦画面に揃え（選択肢はシャッフルされ、800x600だと画面外になりうる）、
+/// テスト本体のあとに画面を破棄して時間を進め、残タイマーを消化する。
+void testQuiz(String description, Future<void> Function(WidgetTester) body) {
+  testWidgets(description, (tester) async {
+    tester.view.physicalSize = const Size(411, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    await body(tester);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 10));
+  });
+}
+
 void main() {
+  setUp(useReducedMotion);
   late ProviderContainer container;
 
   setUp(() {
@@ -51,11 +66,10 @@ void main() {
           hint: '2足す3は？',
         ),
       ],
-      conceptExplanation: 'Pythonの基本的な文法を学びます',
       type: 'quiz',
     );
 
-    testWidgets('displays quiz screen with question', (WidgetTester tester) async {
+    testQuiz('displays quiz screen with question', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -63,6 +77,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Verify quiz screen is displayed
       expect(find.byType(QuizScreen), findsOneWidget);
@@ -71,7 +86,7 @@ void main() {
       expect(find.text('Pythonで変数を定義するには？'), findsOneWidget);
     });
 
-    testWidgets('displays all answer options', (WidgetTester tester) async {
+    testQuiz('displays all answer options', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -79,6 +94,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Verify all options are displayed
       expect(find.text('x = 5'), findsOneWidget);
@@ -87,7 +103,7 @@ void main() {
       expect(find.text('def x = 5'), findsOneWidget);
     });
 
-    testWidgets('selects an answer when option tapped', (WidgetTester tester) async {
+    testQuiz('selects an answer when option tapped', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -95,6 +111,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Tap the first option
       await tester.tap(find.text('x = 5'));
@@ -104,7 +121,7 @@ void main() {
       // This depends on the visual indicator in the actual screen
     });
 
-    testWidgets('submits answer and shows result', (WidgetTester tester) async {
+    testQuiz('submits answer and shows result', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -112,6 +129,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Select the correct answer
       await tester.tap(find.text('x = 5'));
@@ -125,7 +143,7 @@ void main() {
       }
     });
 
-    testWidgets('displays next question after answering', (WidgetTester tester) async {
+    testQuiz('displays next question after answering', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -133,6 +151,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Answer first question
       await tester.tap(find.text('x = 5'));
@@ -149,7 +168,7 @@ void main() {
       // This may show after animation completes
     });
 
-    testWidgets('shows explanation for correct answer', (WidgetTester tester) async {
+    testQuiz('shows explanation for correct answer', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -157,6 +176,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Select correct answer
       await tester.tap(find.text('x = 5'));
@@ -176,7 +196,7 @@ void main() {
       }
     });
 
-    testWidgets('shows code snippet when available', (WidgetTester tester) async {
+    testQuiz('shows code snippet when available', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -184,6 +204,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Wait for code snippet to appear
       await tester.pumpAndSettle();
@@ -192,7 +213,7 @@ void main() {
       expect(find.text('x = 5'), findsWidgets);
     });
 
-    testWidgets('hint functionality works', (WidgetTester tester) async {
+    testQuiz('hint functionality works', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -200,6 +221,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Look for hint button
       final hintButton = find.byIcon(Icons.lightbulb_outline);
@@ -212,7 +234,7 @@ void main() {
       }
     });
 
-    testWidgets('quiz completion transitions to result screen',
+    testQuiz('quiz completion transitions to result screen',
         (WidgetTester tester) async {
       // Create a single-question challenge for easier testing
       final singleQuestionChallenge = Stage(
@@ -243,6 +265,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Answer the question
       await tester.tap(find.text('4'));
@@ -258,7 +281,7 @@ void main() {
       // After completion, should navigate to result screen or show completion
     });
 
-    testWidgets('supports keyboard shortcuts for answer selection',
+    testQuiz('supports keyboard shortcuts for answer selection',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -267,6 +290,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Simulate pressing '1' key to select first option
       await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
@@ -275,7 +299,7 @@ void main() {
       // Verify first option is selected
     });
 
-    testWidgets('displays progress indicator', (WidgetTester tester) async {
+    testQuiz('displays progress indicator', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -283,13 +307,14 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Look for progress indicators (e.g., "Question 1 of 2")
       // The exact text depends on implementation
       await tester.pumpAndSettle();
     });
 
-    testWidgets('timer counts down when enabled', (WidgetTester tester) async {
+    testQuiz('timer counts down when enabled', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -297,6 +322,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Look for timer display
       final timerText = find.byType(Text).evaluate();
@@ -306,7 +332,7 @@ void main() {
       await tester.pump(const Duration(seconds: 2));
     });
 
-    testWidgets('prevents submitting without selecting answer',
+    testQuiz('prevents submitting without selecting answer',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -315,6 +341,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Try to submit without selecting
       final submitButton = find.byType(ElevatedButton);
@@ -323,7 +350,7 @@ void main() {
       }
     });
 
-    testWidgets('displays incorrect answer feedback',
+    testQuiz('displays incorrect answer feedback',
         (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -332,6 +359,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Select wrong answer
       await tester.tap(find.text('var x = 5'));
@@ -347,7 +375,7 @@ void main() {
       }
     });
 
-    testWidgets('handles back button correctly', (WidgetTester tester) async {
+    testQuiz('handles back button correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -355,6 +383,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Look for back button
       final backButton = find.byIcon(Icons.arrow_back);

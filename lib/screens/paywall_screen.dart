@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:shared_core/shared_core.dart' show requireParentalGate;
 
 import '../providers/subscription_provider.dart';
 import '../utils/constants.dart';
@@ -15,6 +16,17 @@ class PaywallScreen extends ConsumerStatefulWidget {
 class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   bool _isLoading = false;
   bool _isYearlySelected = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // プラン(Offering)は購入/復元の後でしか取得されていなかったため、
+    // 課金画面を開いた時点で取得する（未取得だと「購読プランが利用できません」になる）
+    Future.microtask(() {
+      if (!mounted) return;
+      ref.read(subscriptionProvider.notifier).refreshSubscriptionStatus();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,13 +84,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       ),
                 ),
                 const SizedBox(height: 16),
-                _buildFeatureItem(
-                  context,
-                  icon: Icons.remove_circle,
-                  title: '広告なし',
-                  description: 'クイズ中の広告がなくなります',
-                ),
-                const SizedBox(height: 12),
                 _buildFeatureItem(
                   context,
                   icon: Icons.all_inclusive,
@@ -339,11 +344,22 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   }
 
   Future<void> _handlePurchase() async {
+    // 課金の前に、保護者(大人)であることを確認する。
+    // どの画面から課金画面に来ても、ここで必ずゲートを通る。
+    final passedGate = await requireParentalGate(
+      context,
+      description: 'これはアプリ内課金の操作です。\n下の計算の答えを入力してください。',
+    );
+    if (!passedGate || !mounted) return;
     setState(() => _isLoading = true);
 
     try {
-      final subscription = ref.read(subscriptionProvider);
-      final offerings = subscription.availableOfferings;
+      var offerings = ref.read(subscriptionProvider).availableOfferings;
+      if (offerings == null || offerings.isEmpty) {
+        // まだ取得できていなければ、ここで取得し直す
+        await ref.read(subscriptionProvider.notifier).refreshSubscriptionStatus();
+        offerings = ref.read(subscriptionProvider).availableOfferings;
+      }
 
       if (offerings == null || offerings.isEmpty) {
         throw Exception('購読プランが利用できません');

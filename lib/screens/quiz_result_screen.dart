@@ -10,6 +10,7 @@ import '../config/constants.dart';
 import '../config/theme.dart';
 import '../models/stage.dart';
 import '../providers/challenges_provider.dart';
+import '../reward_assets.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/profile_provider.dart';
 import '../providers/progress_provider.dart';
@@ -22,6 +23,7 @@ import 'badge_unlock_screen.dart';
 import 'flashcard_screen.dart' show FlashcardScreen, kFlashcards;
 import 'quiz_review_screen.dart';
 import 'quiz_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class QuizResultScreen extends ConsumerStatefulWidget {
   final Stage challenge;
@@ -638,10 +640,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                         // 結果絵文字（バウンスアニメーション）
                         ScaleTransition(
                           scale: _bounceAnimation,
-                          child: Text(
-                            _resultEmoji,
-                            style: const TextStyle(fontSize: 64),
-                          ),
+                          child: UkalabEmoji(_resultEmoji, size: 64),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -731,14 +730,31 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Text('⬆️', style: TextStyle(fontSize: 18)),
+                                  Image.asset(
+                                    'assets/celebrate/celebrate_trophy.webp',
+                                    key: const Key('levelUpTrophy'),
+                                    width: 32,
+                                    height: 32,
+                                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Image.asset(
+                                    'assets/celebrate/levelup_arrow.webp',
+                                    key: const Key('levelUpArrow'),
+                                    width: 28,
+                                    height: 28,
+                                    errorBuilder: (_, _, _) =>
+                                        const Text('⬆️', style: TextStyle(fontSize: 18)),
+                                  ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    'レベルアップ！ Lv.${widget.newLevel} になった！',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                  Flexible(
+                                    child: Text(
+                                      'レベルアップ！ Lv.${widget.newLevel} になった！',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -783,6 +799,8 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
             ),
           ),
           // 紙吹雪（RepaintBoundary: パーティクル毎フレーム描画を親から分離）
+          // 「アニメーションを減らす」設定では表示しない
+          if (!MediaQuery.disableAnimationsOf(context))
           Align(
             alignment: Alignment.topCenter,
             child: RepaintBoundary(
@@ -884,6 +902,34 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
               ),
             ),
           ),
+          if (widget.stars >= 1 && widget.totalCount > 0) ...[
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  rewardStickerAsset(widget.correctCount, widget.totalCount),
+                  width: 72,
+                  height: 72,
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                ),
+                for (final b in bonusStickerAssets(
+                  firstAttempt: widget.isFirstComplete,
+                  personalBest:
+                      !widget.isFirstComplete && widget.stars > widget.previousStars,
+                  firstPerfect: widget.stars == 3 && widget.previousStars < 3,
+                ))
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Image.asset(
+                      b,
+                      height: 48,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
+                  ),
+              ],
+            ),
+          ],
           // 全問正解パーフェクトバナー
           if (widget.stars == 3) ...[
             const SizedBox(height: 10),
@@ -1491,7 +1537,7 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 16)),
+        UkalabEmoji(icon, size: 16),
         const SizedBox(width: 10),
         Text(
           label,

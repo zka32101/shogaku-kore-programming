@@ -1,3 +1,4 @@
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -24,6 +25,7 @@ import '../widgets/shortcut_help.dart';
 import '../widgets/stat_item.dart';
 import '../widgets/weekly_chart.dart';
 import 'flashcard_screen.dart' show kFlashcards;
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -322,10 +324,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               border: Border.all(color: Colors.white, width: 3),
             ),
             child: Center(
-              child: Text(
-                profile.avatarEmoji,
-                style: const TextStyle(fontSize: 40),
-              ),
+              child: ProfileAvatar(profile.avatarEmoji, size: 64),
             ),
           ),
           const SizedBox(height: 10),
@@ -1616,7 +1615,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  Text(c.icon, style: const TextStyle(fontSize: 18)),
+                  UkalabEmoji(c.icon, size: 18),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(

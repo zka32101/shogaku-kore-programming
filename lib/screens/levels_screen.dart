@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/level.dart';
 import '../providers/level_provider.dart';
 import '../widgets/level_progress_widget.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// レベルシステム表示画面
 class LevelsScreen extends ConsumerStatefulWidget {
@@ -150,10 +151,7 @@ class _LevelsScreenState extends ConsumerState<LevelsScreen> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                levelData.emoji,
-                style: const TextStyle(fontSize: 28),
-              ),
+              UkalabEmoji(levelData.emoji, size: 28),
               const SizedBox(height: 4),
               Text(
                 'Lv$level',
@@ -219,10 +217,7 @@ class _LevelsScreenState extends ConsumerState<LevelsScreen> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      level.emoji,
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    UkalabEmoji(level.emoji, size: 16),
                     const SizedBox(height: 2),
                     Text(
                       '${level.levelNumber}',
@@ -270,10 +265,7 @@ class _LevelsScreenState extends ConsumerState<LevelsScreen> {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Text(
-              level.emoji,
-              style: const TextStyle(fontSize: 32),
-            ),
+            UkalabEmoji(level.emoji, size: 32),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

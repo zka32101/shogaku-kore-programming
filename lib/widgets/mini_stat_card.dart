@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// カラフルな統計ミニカード
 /// 背景色付きで、アイコン、値、ラベルを表示
@@ -23,13 +24,14 @@ class MiniStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
+        // 背景の絵が透けないよう、うす色を不透明な地の上に重ねる
+        color: Color.alphaBlend(color.withValues(alpha: 0.08), Theme.of(context).colorScheme.surface),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
+          UkalabEmoji(emoji, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Column(

@@ -1,7 +1,114 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/constants.dart' as constants;
+import '../config/constants.dart' show kBugHunterIdPrefix;
 import '../models/stage.dart';
+
+/// バグハンター（まちがいさがし）のステージ。本編の全ステージ数・全クリア判定には含めない
+/// 独立したステージ群（id が [kBugHunterIdPrefix] で始まる）。
+final bugHunterStagesProvider = Provider<List<Stage>>((ref) {
+  return buildBugHunterStages();
+});
+
+List<Stage> buildBugHunterStages() {
+  Stage stage(int n, String title, String description, String level,
+          List<Question> questions) =>
+      Stage(
+        id: '${kBugHunterIdPrefix}0$n',
+        stageNumber: 100 + n,
+        title: title,
+        description: description,
+        type: constants.ChallengeType.quiz,
+        level: level,
+        icon: '🐛',
+        isFree: true,
+        questions: questions,
+      );
+
+  return [
+    stage(1, 'バグハンター① まちがいを見つけよう', 'コードの中のまちがい(バグ)がある行をタップしよう！',
+        constants.StageLevel.beginner, [
+      Question.bugHunt(
+        id: 'bh_1_1',
+        text: '名前と年れいを表示したいのに、うまくいかないよ。バグの行をタップしよう！',
+        code: 'name = "たろう"\nage = 10\nprint("こんにちは " + name)\nprint("年れいは " + age)',
+        bugLine: 4,
+        explanation: '文字(" ")と数字(10)はそのままつなげられないよ。数字を文字にかえる str(age) を使って print("年れいは " + str(age)) にすると動くよ。',
+        hint: '文字と数字をつなげているところに注目！',
+      ),
+      Question.bugHunt(
+        id: 'bh_1_2',
+        text: '1から3までの合計を表示したいのに、エラーになるよ。バグの行をタップしよう！',
+        code: 'total = 0\nfor i in range(1, 4):\n    total = total + i\nprint(total',
+        bugLine: 4,
+        explanation: 'print( のカッコが とじられていないよ。最後に ) をつけて print(total) にしよう。',
+        hint: 'カッコは「ひらいたら、とじる」がルールだよ！',
+      ),
+      Question.bugHunt(
+        id: 'bh_1_3',
+        text: '60点以上なら「ごうかく！」と表示したいのに、エラーになるよ。バグの行をタップしよう！',
+        code: 'score = 80\nif score >= 60:\nprint("ごうかく！")',
+        bugLine: 3,
+        explanation: 'if の中でやることは、字下げ(スペース4つ)をしてそろえるルールだよ。print の前にスペースを入れよう。',
+        hint: 'if の下の行は、少し右にずらして書くよ！',
+      ),
+    ]),
+    stage(2, 'バグハンター② 動かないコード', 'エラーが出たり、止まらなくなったりするコードを直そう！',
+        constants.StageLevel.beginner, [
+      Question.bugHunt(
+        id: 'bh_2_1',
+        text: 'x と y をたした答えを表示したいのに、エラーになるよ。バグの行をタップしよう！',
+        code: 'x = 10\ny = 20\nz = x + y\nprint(Z)',
+        bugLine: 4,
+        explanation: 'Python は大文字と小文字をべつの文字として考えるよ。z と Z はちがうものなので、print(z) にしよう。',
+        hint: '名前の大文字・小文字を見くらべてみよう！',
+      ),
+      Question.bugHunt(
+        id: 'bh_2_2',
+        text: 'くだものを1つずつ表示したいのに、エラーになるよ。バグの行をタップしよう！',
+        code: 'fruits = ["りんご", "みかん", "バナナ"]\nfor f in fruits\n    print(f)',
+        bugLine: 2,
+        explanation: 'for の行の最後には「:(コロン)」が必要だよ。for f in fruits: にしよう。',
+        hint: 'for や if の行のおわりに、わすれものはないかな？',
+      ),
+      Question.bugHunt(
+        id: 'bh_2_3',
+        text: '0、1、2 と表示して止まってほしいのに、止まらなくなるよ。バグの行をタップしよう！',
+        code: 'count = 0\nwhile count < 3:\n    print(count)\n    count = count - 1',
+        bugLine: 4,
+        explanation: 'count が へっていくので、ずっと 3 より小さいままで止まらなくなるよ。count = count + 1 にして、1ずつ ふやそう。',
+        hint: 'ループが止まるには、count がどうかわればいいかな？',
+      ),
+    ]),
+    stage(3, 'バグハンター③ 答えがちがう!?', 'エラーは出ないのに、答えがまちがっているコードを直そう！',
+        constants.StageLevel.intermediate, [
+      Question.bugHunt(
+        id: 'bh_3_1',
+        text: '100円のものを3こ買った合計(300円)を出したいのに、答えがちがうよ。バグの行をタップしよう！',
+        code: 'price = 100\nn = 3\ntotal = price + n\nprint(total)',
+        bugLine: 3,
+        explanation: '合計は「ねだん × 個数」だよ。+ ではなく * を使って total = price * n にしよう。',
+        hint: '「何こ分」の計算は、たし算かな？ かけ算かな？',
+      ),
+      Question.bugHunt(
+        id: 'bh_3_2',
+        text: 'リストの 3つ目の数(7)を表示したいのに、エラーになるよ。バグの行をタップしよう！',
+        code: 'numbers = [3, 5, 7]\nprint(numbers[3])',
+        bugLine: 2,
+        explanation: 'リストの番号は 0 からはじまるよ。3つ目の数は numbers[2] だよ。numbers[3] は4つ目だから、ないのでエラーになるんだ。',
+        hint: 'リストの番号は 0、1、2… とかぞえるよ！',
+      ),
+      Question.bugHunt(
+        id: 'bh_3_3',
+        text: '2つの数をたす関数を使うのに、エラーになるよ。バグの行をタップしよう！',
+        code: 'def add(a, b):\n    return a + b\n\nprint(add(2))',
+        bugLine: 4,
+        explanation: 'add は a と b の 2つの数をうけとる関数だよ。add(2, 3) のように 2つわたそう。1つしかわたしていないのでエラーになるよ。',
+        hint: '関数をよぶときに わたす数は、いくつ必要かな？',
+      ),
+    ]),
+  ];
+}
 
 // 全ステージデータ
 final allChallengesProvider = Provider<List<Stage>>((ref) {
@@ -73,6 +180,7 @@ List<Stage> _buildChallenges() {
         ),
       ],
       goalCondition: {
+        'shape': 'line',
         'goalX': 3.5,
         'goalY': 3.5,
         'tolerance': 0.5,
@@ -103,14 +211,18 @@ List<Stage> _buildChallenges() {
       id: 'stage_03',
       stageNumber: 3,
       title: '四角を描こう',
-      description: '繰り返しを使って、4回同じ動きをして四角を描こう！',
+      description: '「前に進む」と「右に回転」で四角を描こう！繰り返しを使うと少ないブロックでできるよ',
       type: constants.ChallengeType.visual,
       level: constants.StageLevel.beginner,
       icon: '⬜',
       isFree: true,
       expectedOutput: 'repeat(4):\n  move_forward(100)\n  turn_right(90)',
-      hints: ['「繰り返す」ブロックを使おう', '中に「前に進む」と「右に回転」を入れよう'],
+      hints: [
+        '四角は辺が4本。「前に進む」と「右に回転(90度)」を4回ずつ使おう',
+        '「繰り返す」ブロックを使うと少ないブロックでできるよ（使わなくてもOK）',
+      ],
       goalCondition: {
+        'shape': 'square',
         'goalX': 3.5,
         'goalY': 3.5,
         'tolerance': 0.5,
@@ -993,13 +1105,14 @@ with open("data.txt", "r") as f:
       id: 'stage_13',
       stageNumber: 13,
       title: '三角を描こう',
-      description: '3回同じ動きを繰り返して三角形を描こう！120°ずつ回転するよ。',
+      description: '三角形を描こう！120°ずつ回転するよ。繰り返しを使うと少ないブロックでできるよ',
       type: constants.ChallengeType.visual,
       level: constants.StageLevel.beginner,
       icon: '🔺',
       isFree: true,
       expectedOutput: 'repeat(3):\n  move_forward(100)\n  turn_right(120)',
-      hints: ['繰り返しは3回だよ', '三角形は120°ずつ回るよ', '「前に進む」→「右に120°回転」を繰り返そう'],
+      hints: ['三角形は辺が3本。「前に進む」と「回転」を3回ずつ使おう', '三角形は120°ずつ回るよ', '「繰り返す」ブロックを3回にすると少ないブロックでできるよ（使わなくてもOK）'],
+      goalCondition: {'shape': 'triangle'},
     ),
     Stage(
       id: 'stage_14',
@@ -1012,6 +1125,7 @@ with open("data.txt", "r") as f:
       isFree: true,
       expectedOutput: 'move_forward(100)\nturn_right(45)\nmove_forward(100)\nturn_left(45)\nmove_forward(100)',
       hints: ['斜めに進んでから方向を変えよう', '右・左と交互に使うよ'],
+      goalCondition: {'shape': 'zigzag'},
     ),
     Stage(
       id: 'stage_15',

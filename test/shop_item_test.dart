@@ -3,8 +3,8 @@ import 'package:shogaku_kore_programming/models/shop_item.dart';
 
 void main() {
   group('kShopItems データ整合性', () {
-    test('アイテム総数は11個', () {
-      expect(kShopItems.length, 11);
+    test('アイテム総数は8個（背景・フレーム・エフェクトは別枠のきせかえ）', () {
+      expect(kShopItems.length, 8);
     });
 
     test('全アイテムのIDが一意', () {
@@ -54,6 +54,8 @@ void main() {
       expect(ShopCategory.background.label, '🖼️ 背景');
       expect(ShopCategory.sound.label, '🎵 サウンド');
       expect(ShopCategory.hint.label, '💡 ヒント');
+      expect(ShopCategory.frame.label, '🪞 フレーム');
+      expect(ShopCategory.effect.label, '✨ エフェクト');
     });
   });
 }

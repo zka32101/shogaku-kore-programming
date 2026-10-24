@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 /// Header stat widget displaying icon, value, and label
 class HeaderStat extends StatelessWidget {
@@ -17,7 +18,7 @@ class HeaderStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 20)),
+        UkalabEmoji(icon, size: 20),
         const SizedBox(height: 4),
         Text(
           value,

@@ -1,3 +1,5 @@
+import '../config/challenge_colors.dart';
+import '../widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -14,6 +16,7 @@ import '../services/haptic_service.dart';
 import '../utils/page_transitions.dart';
 import '../widgets/shortcut_help.dart';
 import 'friends_list_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class RankingScreen extends ConsumerStatefulWidget {
   const RankingScreen({super.key});
@@ -331,8 +334,7 @@ class _FriendRankingTab extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            Text(icon,
-                                style: const TextStyle(fontSize: 16)),
+                            ProfileAvatar(icon, size: 26),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -503,13 +505,12 @@ class _WeeklyChallengesCard extends ConsumerWidget {
               children: challenges.asMap().entries.map((entry) {
                 final i = entry.key;
                 final (emoji, title, desc, done) = entry.value;
+                final cc = ChallengeItemColors.of(dark: context.isDark, done: done);
                 return Container(
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
-                    color: done
-                        ? kPrimaryColor.withValues(alpha: 0.08)
-                        : context.shadowColor.withValues(alpha: 0.5),
+                    color: cc.background,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: done
@@ -519,7 +520,7 @@ class _WeeklyChallengesCard extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      Text(emoji, style: const TextStyle(fontSize: 16)),
+                      UkalabEmoji(emoji, size: 16),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Column(
@@ -530,16 +531,16 @@ class _WeeklyChallengesCard extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: context.textPrimary,
+                                color: cc.title,
                                 decoration: done ? TextDecoration.lineThrough : null,
-                                decorationColor: context.textSecondary,
+                                decorationColor: cc.desc,
                               ),
                             ),
                             Text(
                               desc,
                               style: TextStyle(
-                                fontSize: 10,
-                                color: context.textSecondary,
+                                fontSize: 11,
+                                color: cc.desc,
                               ),
                             ),
                           ],
@@ -610,7 +611,7 @@ class _MyStatsCard extends StatelessWidget {
               ),
             ),
             child: Center(
-              child: Text(icon, style: const TextStyle(fontSize: 22)),
+              child: ProfileAvatar(icon, size: 40),
             ),
           ),
           const SizedBox(width: 12),

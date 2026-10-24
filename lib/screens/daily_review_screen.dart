@@ -8,6 +8,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../utils/shuffle_choices.dart';
 import '../models/stage.dart';
 import '../providers/ai_programming_coach_provider.dart';
 import '../providers/challenges_provider.dart';
@@ -23,6 +24,7 @@ import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
 import 'quiz_result_screen.dart';
 import 'quiz_review_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 // ── 今日の復習 (Daily Review) ────────────────────────────────────────────────
 // 完了済みステージからランダムに5問を抽出する毎日リセット型の復習クイズ。
@@ -63,9 +65,13 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
   late ConfettiController _confettiController;
   final FocusNode _focusNode = FocusNode();
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -81,7 +87,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
     if (!_timeRecorded && _sessionStartTime != null) {
       final elapsed = DateTime.now().difference(_sessionStartTime!).inSeconds;
       if (elapsed >= 5) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _confettiController.dispose();
@@ -273,16 +279,16 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
     for (final c in allChallenges) {
       if (progressMap[c.id]?.isCompleted != true) continue;
       if ((c.questions?.isEmpty ?? true)) continue;
-      for (final q in c.questions ?? []) {
-        pool.add(_ReviewQuestion(question: q, challengeTitle: c.title));
+      for (final q in c.questions ?? const <Question>[]) {
+        pool.add(_ReviewQuestion(question: q.shuffled(), challengeTitle: c.title));
       }
     }
 
     if (pool.isEmpty) {
       // 完了済みステージがない場合は全ステージから
       for (final c in allChallenges) {
-        for (final q in c.questions ?? []) {
-          pool.add(_ReviewQuestion(question: q, challengeTitle: c.title));
+        for (final q in c.questions ?? const <Question>[]) {
+          pool.add(_ReviewQuestion(question: q.shuffled(), challengeTitle: c.title));
         }
       }
     }
@@ -1217,7 +1223,7 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
                 .fadeIn(duration: 300.ms),
             const SizedBox(height: 16),
           ],
-          Text(emoji, style: const TextStyle(fontSize: 72))
+          UkalabEmoji(emoji, size: 72)
               .animate()
               .scale(begin: const Offset(0, 0), curve: Curves.elasticOut, duration: 600.ms)
               .fadeIn(duration: 300.ms),

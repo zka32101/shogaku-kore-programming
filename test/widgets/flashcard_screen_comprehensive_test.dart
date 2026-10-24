@@ -10,6 +10,7 @@ import 'package:shogaku_kore_programming/providers/profile_provider.dart';
 import 'test_helpers.dart';
 
 void main() {
+  setUp(useReducedMotion);
   late ProviderContainer container;
 
   setUp(() {
@@ -40,31 +41,26 @@ void main() {
       testWidgets('displays AppBar with proper title', (WidgetTester tester) async {
         await tester.pumpWidget(
           const ProviderScope(
-            child: MaterialApp(
-              home: FlashcardScreen(),
-            ),
+            child: MaterialApp(home: FlashcardScreen()),
           ),
         );
-
         await tester.pumpAndSettle();
-
-        // AppBar should be present
-        expect(find.byType(AppBar), findsOneWidget);
+        // 独自ヘッダー（AppBar ではない）にタイトルと戻るボタンがある
+        expect(find.text('フラッシュカード'), findsOneWidget);
+        expect(find.byIcon(Icons.arrow_back), findsOneWidget);
       });
 
       testWidgets('displays first flashcard on load', (WidgetTester tester) async {
         await tester.pumpWidget(
           const ProviderScope(
-            child: MaterialApp(
-              home: FlashcardScreen(),
-            ),
+            child: MaterialApp(home: FlashcardScreen()),
           ),
         );
-
         await tester.pumpAndSettle();
-
-        // First flashcard should display
-        expect(find.byType(Card), findsWidgets);
+        // カード表面と、めくる操作が表示される
+        expect(find.text('📘'), findsOneWidget);
+        expect(find.text('タップして答えを見る →'), findsOneWidget);
+        expect(find.text('カードをめくる'), findsOneWidget);
       });
 
       testWidgets('displays card counter/progress', (WidgetTester tester) async {
@@ -118,15 +114,18 @@ void main() {
       testWidgets('displays flashcard with animation', (WidgetTester tester) async {
         await tester.pumpWidget(
           const ProviderScope(
-            child: MaterialApp(
-              home: FlashcardScreen(),
-            ),
+            child: MaterialApp(home: FlashcardScreen()),
           ),
         );
+        await tester.pumpAndSettle();
+        expect(find.text('タップして答えを見る →'), findsOneWidget);
 
+        await tester.tap(find.text('カードをめくる'));
         await tester.pumpAndSettle();
 
-        expect(find.byType(Card), findsWidgets);
+        // 裏返ると裏面が表示される
+        expect(find.text('裏面'), findsOneWidget);
+        expect(find.text('タップして答えを見る →'), findsNothing);
       });
 
       testWidgets('displays card category tag', (WidgetTester tester) async {
@@ -266,16 +265,16 @@ void main() {
       testWidgets('displays difficulty rating buttons', (WidgetTester tester) async {
         await tester.pumpWidget(
           const ProviderScope(
-            child: MaterialApp(
-              home: FlashcardScreen(),
-            ),
+            child: MaterialApp(home: FlashcardScreen()),
           ),
         );
-
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('カードをめくる'));
         await tester.pumpAndSettle();
 
-        // Rating buttons should be visible
-        expect(find.byType(ElevatedButton), findsWidgets);
+        // 自己評価ボタンは裏返したあとに表示される
+        expect(find.text('もう一度'), findsOneWidget);
+        expect(find.text('知ってた！'), findsOneWidget);
       });
 
       testWidgets('again button marks card for review', (WidgetTester tester) async {
@@ -399,20 +398,35 @@ void main() {
 
       testWidgets('navigates back with back button', (WidgetTester tester) async {
         await tester.pumpWidget(
-          const ProviderScope(
+          ProviderScope(
             child: MaterialApp(
-              home: FlashcardScreen(),
+              home: Builder(
+                builder: (context) => Scaffold(
+                  body: Center(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const FlashcardScreen(),
+                        ),
+                      ),
+                      child: const Text('open'),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         );
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
+        expect(find.byType(FlashcardScreen), findsOneWidget);
 
+        await tester.tap(find.byIcon(Icons.arrow_back));
         await tester.pumpAndSettle();
 
-        final backButton = find.byIcon(Icons.arrow_back);
-        if (backButton.evaluate().isNotEmpty) {
-          await tester.tap(backButton.first);
-          await tester.pumpAndSettle();
-        }
+        // 前の画面に戻る
+        expect(find.byType(FlashcardScreen), findsNothing);
+        expect(find.text('open'), findsOneWidget);
       });
     });
 
@@ -771,15 +785,12 @@ void main() {
       testWidgets('card visual styling displays correctly', (WidgetTester tester) async {
         await tester.pumpWidget(
           const ProviderScope(
-            child: MaterialApp(
-              home: FlashcardScreen(),
-            ),
+            child: MaterialApp(home: FlashcardScreen()),
           ),
         );
-
         await tester.pumpAndSettle();
-
-        expect(find.byType(Card), findsWidgets);
+        expect(find.text('📘'), findsOneWidget);
+        expect(find.text('タップして答えを見る →'), findsOneWidget);
       });
 
       testWidgets('animations display smoothly', (WidgetTester tester) async {
@@ -851,30 +862,23 @@ void main() {
       testWidgets('complete flashcard learning session', (WidgetTester tester) async {
         await tester.pumpWidget(
           const ProviderScope(
-            child: MaterialApp(
-              home: FlashcardScreen(),
-            ),
+            child: MaterialApp(home: FlashcardScreen()),
           ),
         );
-
         await tester.pumpAndSettle();
+        // セッション開始
+        expect(find.text('1/10'), findsOneWidget);
 
-        // Start session
-        expect(find.byType(Card), findsWidgets);
+        // カードをめくる
+        await tester.tap(find.text('カードをめくる'));
+        await tester.pumpAndSettle();
+        expect(find.text('裏面'), findsOneWidget);
 
-        // Flip card
-        final card = find.byType(Card);
-        if (card.evaluate().isNotEmpty) {
-          await tester.tap(card.first);
-          await tester.pumpAndSettle();
-        }
-
-        // Rate card
-        final buttons = find.byType(ElevatedButton);
-        if (buttons.evaluate().isNotEmpty) {
-          await tester.tap(buttons.first);
-          await tester.pumpAndSettle();
-        }
+        // 評価して次のカードへ
+        await tester.tap(find.text('知ってた！'));
+        await tester.pumpAndSettle();
+        expect(find.text('2/10'), findsOneWidget);
+        expect(find.text('おぼえた 1 / 40'), findsOneWidget);
       });
 
       testWidgets('keyboard-only flashcard session', (WidgetTester tester) async {

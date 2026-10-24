@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/theme.dart';
+import '../utils/shuffle_choices.dart';
 import '../models/stage.dart';
 import '../providers/ai_programming_coach_provider.dart';
 import '../providers/bgm_provider.dart';
@@ -13,6 +14,7 @@ import '../providers/challenges_provider.dart';
 import '../providers/coin_provider.dart';
 import '../providers/favorites_provider.dart';
 import '../providers/profile_provider.dart';
+import '../providers/my_character_provider.dart';
 import '../providers/progress_provider.dart';
 import '../providers/wrong_answers_provider.dart';
 import '../services/haptic_service.dart';
@@ -20,11 +22,14 @@ import '../services/sound_service.dart';
 import '../widgets/ai_response_dialog.dart';
 import '../providers/quiz_access_override_provider.dart';
 import '../widgets/app_dialog.dart';
+import '../widgets/bug_hunt_code_view.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
 import 'quiz_result_screen.dart';
+import '../data/explain_images.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
   final Stage challenge;
@@ -39,8 +44,13 @@ class QuizScreen extends ConsumerStatefulWidget {
 
 class _QuizScreenState extends ConsumerState<QuizScreen>
     with SingleTickerProviderStateMixin {
-  List<Question> get _questions =>
-      widget.overrideQuestions ?? widget.challenge.questions ?? [];
+  // 正解位置の偏りを避けるため、出題時に選択肢をシャッフルする（画面ごとに1回）。
+  late final List<Question> _questions = [
+    for (final q in widget.overrideQuestions ??
+        widget.challenge.questions ??
+        const <Question>[])
+      q.shuffled(),
+  ];
 
   int _currentQuestionIndex = 0;
   int? _selectedOptionIndex;
@@ -69,9 +79,15 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
   late AnimationController _autoAdvanceController;
   late Animation<double> _autoAdvanceAnim;
 
+  // dispose では ref を使えないため、initState で保持しておく
+  late final ProgressNotifier _progressNotifier;
+  late final BgmNotifier _bgmNotifier;
+
   @override
   void initState() {
     super.initState();
+    _progressNotifier = ref.read(progressProvider.notifier);
+    _bgmNotifier = ref.read(bgmProvider.notifier);
     _sessionStart = DateTime.now();
     _showConceptCard = widget.challenge.conceptExplanation != null;
     _autoAdvanceController = AnimationController(
@@ -98,12 +114,12 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
   void dispose() {
     _timer.cancel();
     // BGM を停止
-    ref.read(bgmProvider.notifier).stopBgm();
+    _bgmNotifier.stopBgm();
     // 通常完了以外（中途終了）の場合も学習時間を記録
     if (!_timeRecorded) {
       final elapsed = DateTime.now().difference(_sessionStart).inSeconds;
       if (elapsed >= 5) {
-        ref.read(progressProvider.notifier).recordLearningSeconds(elapsed);
+        _progressNotifier.recordLearningSeconds(elapsed);
       }
     }
     _focusNode.dispose();
@@ -171,6 +187,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
           _hintUsed = true;
           _hintVisible = !_hintVisible;
         });
+        _recordHintUse();
         return KeyEventResult.handled;
       }
     }
@@ -311,6 +328,11 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     });
   }
 
+  /// ヒントを使ったことを記録する（保護者向けメッセージで使う）。
+  void _recordHintUse() {
+    ref.read(progressProvider.notifier).recordHintUse(widget.challenge.id);
+  }
+
   void _selectOption(int index) {
     if (_hasAnswered) return;
     SoundService().playTap();
@@ -347,12 +369,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
         ref.read(progressProvider.notifier).addBonusPoints(5);
         _resolvedWrongCount++;
       }
-      // TODO: growFromCorrectAnswer not available in shared_core's CharacterNotifier
-      // キャラクター成長トリガー
-      // ref.read(characterProvider.notifier).growFromCorrectAnswer(
-      //   challengeType: _getStageType(widget.challenge),
-      //   difficulty: widget.challenge.level,
-      // );
+      // マイキャラが成長する（クイズの正解 = ちえ）
+      ref.read(myCharacterProvider.notifier).grow(2, focus: 'wisdom');
     }
 
     // スピードボーナス: タイマー有効かつ残り時間が元の75%以上（素早く回答）
@@ -675,7 +693,16 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                           ),
                         ),
                         const SizedBox(height: 16),
-                        if (question.codeSnippet != null) ...[
+                        if (question.codeSnippet != null && question.bugHunt) ...[
+                          BugHuntCodeView(
+                            lines: question.options,
+                            selectedIndex: _selectedOptionIndex,
+                            answered: _hasAnswered,
+                            correctIndex: question.correctIndex,
+                            onSelect: _selectOption,
+                          ),
+                          const SizedBox(height: 16),
+                        ] else if (question.codeSnippet != null) ...[
                           CodeHighlightWidget(code: question.codeSnippet!),
                           const SizedBox(height: 16),
                         ],
@@ -740,7 +767,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                     ).animate()
                      .fadeIn(duration: 250.ms)
                      .slideY(begin: 0.06, curve: Curves.easeOut, duration: 250.ms),
-                    // 選択肢
+                    // 選択肢（バグハンターはコードの行を直接タップするので出さない）
+                    if (!question.bugHunt)
                     ...question.options.asMap().entries.map((entry) {
                       final index = entry.key;
                       final option = entry.value;
@@ -1044,6 +1072,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                       _hintUsed = true;
                       _hintVisible = !_hintVisible;
                     });
+                    _recordHintUse();
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
@@ -1352,10 +1381,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
-                  child: Text(
-                    widget.challenge.icon,
-                    style: const TextStyle(fontSize: 28),
-                  ),
+                  child: UkalabEmoji(widget.challenge.icon, size: 28),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1381,6 +1407,20 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
             ],
           ).animate().fadeIn(duration: 300.ms).slideX(begin: -0.05, curve: Curves.easeOut),
           const SizedBox(height: 20),
+          // 説明画像（あるステージのみ）
+          if (explainImageForStage(widget.challenge.id) != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                explainImageForStage(widget.challenge.id)!,
+                height: 160,
+                width: double.infinity,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           // 説明本文
           ...lines.asMap().entries.map((e) {
             final line = e.value.trim();

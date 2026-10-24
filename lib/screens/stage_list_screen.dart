@@ -21,6 +21,7 @@ import 'editor_screen.dart';
 import 'flashcard_screen.dart';
 import 'paywall_screen.dart';
 import 'quiz_screen.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class StageListScreen extends ConsumerStatefulWidget {
   final String? initialLevel;
@@ -329,13 +330,20 @@ class _PathHeader extends ConsumerWidget {
                 )
               else
                 const SizedBox(width: 4),
+              // 戻るボタン等で幅が狭くなっても縦に折り返さず、収まらない分は縮小する
               const Expanded(
-                child: Text(
-                  'ステージ',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'ステージ',
+                    maxLines: 1,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -1070,21 +1078,30 @@ class _StageNodeState extends State<_StageNode>
     _scale = Tween<double>(begin: 1.0, end: 1.08)
         .chain(CurveTween(curve: Curves.easeInOut))
         .animate(_pulse);
+  }
 
-    if (widget.isCurrent) {
-      _pulse.repeat(reverse: true);
+  /// 現在のステージだけ脈動させる。「アニメーションを減らす」設定では止める
+  void _syncPulse() {
+    final shouldPulse =
+        widget.isCurrent && !MediaQuery.disableAnimationsOf(context);
+    if (shouldPulse) {
+      if (!_pulse.isAnimating) _pulse.repeat(reverse: true);
+    } else if (_pulse.isAnimating || _pulse.value != 0) {
+      _pulse.stop();
+      _pulse.reset();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncPulse();
   }
 
   @override
   void didUpdateWidget(_StageNode old) {
     super.didUpdateWidget(old);
-    if (widget.isCurrent && !old.isCurrent) {
-      _pulse.repeat(reverse: true);
-    } else if (!widget.isCurrent && old.isCurrent) {
-      _pulse.stop();
-      _pulse.reset();
-    }
+    if (widget.isCurrent != old.isCurrent) _syncPulse();
   }
 
   void _showContextMenu(BuildContext context) {
@@ -1110,7 +1127,7 @@ class _StageNodeState extends State<_StageNode>
             const SizedBox(height: 16),
             Row(
               children: [
-                Text(c.icon, style: const TextStyle(fontSize: 28)),
+                UkalabEmoji(c.icon, size: 28),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -1205,7 +1222,7 @@ class _StageNodeState extends State<_StageNode>
                     ),
                     title: Row(
                       children: [
-                        Text(c.icon, style: const TextStyle(fontSize: 24)),
+                        UkalabEmoji(c.icon, size: 24),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -1322,10 +1339,7 @@ class _StageNodeState extends State<_StageNode>
                       ? Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              widget.challenge.icon,
-                              style: const TextStyle(fontSize: 22),
-                            ),
+                            UkalabEmoji(widget.challenge.icon, size: 22),
                             // ミニ星
                             Row(
                               mainAxisSize: MainAxisSize.min,
@@ -1369,7 +1383,7 @@ class _StageNodeState extends State<_StageNode>
                   border: Border.all(color: context.cardBg, width: 1.5),
                 ),
                 child: Center(
-                  child: Text(typeEmoji, style: const TextStyle(fontSize: 9)),
+                  child: UkalabEmoji(typeEmoji, size: 9),
                 ),
               ),
             ),
@@ -1574,7 +1588,8 @@ class _StageInfoSheet extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1601,10 +1616,7 @@ class _StageInfoSheet extends ConsumerWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: Text(
-                    challenge.icon,
-                    style: const TextStyle(fontSize: 28),
-                  ),
+                  child: UkalabEmoji(challenge.icon, size: 28),
                 ),
               ),
               const SizedBox(width: 14),
@@ -1857,6 +1869,7 @@ class _StageInfoSheet extends ConsumerWidget {
               ),
         ],
       ),
+      ),
     );
   }
 }
@@ -1953,9 +1966,6 @@ class _PremiumGateSheet extends StatelessWidget {
                   const SizedBox(height: 6),
                   _BenefitRow(text: '上級Pythonコース')
                       .animate(delay: 390.ms).fadeIn(duration: 250.ms).slideX(begin: 0.05, curve: Curves.easeOut, duration: 250.ms),
-                  const SizedBox(height: 6),
-                  _BenefitRow(text: '広告なしで快適に学習')
-                      .animate(delay: 440.ms).fadeIn(duration: 250.ms).slideX(begin: 0.05, curve: Curves.easeOut, duration: 250.ms),
                 ],
               ),
             ).animate(delay: 320.ms).fadeIn(duration: 300.ms).slideY(begin: 0.06, curve: Curves.easeOut, duration: 300.ms),
@@ -2219,7 +2229,7 @@ class _LevelGoalCardState extends State<_LevelGoalCard> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: Row(
                 children: [
-                  Text(_headerEmoji, style: const TextStyle(fontSize: 16)),
+                  UkalabEmoji(_headerEmoji, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -2455,7 +2465,7 @@ class _StageSearchDelegate extends SearchDelegate<Stage?> {
               padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  Text(c.icon, style: const TextStyle(fontSize: 28)),
+                  UkalabEmoji(c.icon, size: 28),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

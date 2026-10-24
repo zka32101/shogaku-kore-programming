@@ -11,6 +11,8 @@ class EditorState {
   final String previewOutput;
   final bool isCorrect;
   final bool hasSubmitted;
+  /// 直近の不正解で出した具体的なヒント（正解・未提出のときは空）
+  final String hintText;
   // ロボットシミュレーション
   final List<Offset> robotPath;   // 正規化座標 (0–7)
   final double robotAngle;        // 最終角度（度）
@@ -20,6 +22,7 @@ class EditorState {
     this.previewOutput = '',
     this.isCorrect = false,
     this.hasSubmitted = false,
+    this.hintText = '',
     this.robotPath = const [],
     this.robotAngle = 0,
   });
@@ -29,6 +32,7 @@ class EditorState {
     String? previewOutput,
     bool? isCorrect,
     bool? hasSubmitted,
+    String? hintText,
     List<Offset>? robotPath,
     double? robotAngle,
   }) {
@@ -37,6 +41,7 @@ class EditorState {
       previewOutput: previewOutput ?? this.previewOutput,
       isCorrect: isCorrect ?? this.isCorrect,
       hasSubmitted: hasSubmitted ?? this.hasSubmitted,
+      hintText: hintText ?? this.hintText,
       robotPath: robotPath ?? this.robotPath,
       robotAngle: robotAngle ?? this.robotAngle,
     );
@@ -178,18 +183,29 @@ class EditorNotifier extends StateNotifier<EditorState> {
     );
   }
 
-  void submitScript(String expectedOutput) {
+  /// [shape] が指定されたステージは、使ったブロックではなくロボットの軌跡の形で採点する
+  /// （例: 'square' は繰り返しを使わなくても、四角が描ければ正解）。
+  /// 対応する形は robot_simulator.dart の shapeHint を参照。
+  void submitScript(String expectedOutput, {String? shape}) {
     final output = _generateOutput();
     final blockIds = state.scriptBlocks.map((b) => b.id.split('@').first).toList();
-    final correct = _checkAnswer(blockIds, expectedOutput);
     final (path, angle) = _simulateRobot(state.scriptBlocks);
+    String? shapeHint;
+    if (shape != null) {
+      // 形の判定は盤面の端で止めない本来の軌跡で行う（表示用の path は盤面内）
+      final (rawPath, _) = sim.simulateRobot(state.scriptBlocks, clamp: false);
+      shapeHint = sim.shapeHint(shape, rawPath);
+    }
+    final correct =
+        shape != null ? shapeHint == null : _checkAnswer(blockIds, expectedOutput);
 
     state = state.copyWith(
       previewOutput: correct
           ? '✅ 正解！素晴らしい！\n\n$output'
-          : '❌ もう一度試してみよう！\n\nヒント: ${_getHint(expectedOutput)}',
+          : '❌ もう一度試してみよう！\n\nヒント: ${shapeHint ?? _getHint(expectedOutput)}',
       isCorrect: correct,
       hasSubmitted: true,
+      hintText: correct ? '' : (shapeHint ?? _getHint(expectedOutput)),
       robotPath: path,
       robotAngle: angle,
     );

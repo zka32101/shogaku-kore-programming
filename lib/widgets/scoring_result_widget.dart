@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
 import '../providers/step_executor_provider.dart';
+import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class ScoringResultWidget extends StatelessWidget {
   final ScoringResult result;
@@ -110,7 +111,7 @@ class ScoringResultWidget extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(icon, style: const TextStyle(fontSize: 14)),
+            UkalabEmoji(icon, size: 14),
             const SizedBox(width: 8),
             Text(
               label,
