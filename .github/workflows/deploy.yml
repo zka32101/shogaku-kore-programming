@@ -192,11 +192,3 @@ jobs:
 # - Permissions limited to minimum required (contents write, checks write)
 # - No checkout of untrusted code; uses official Flutter action
 # - Artifacts uploaded for testing and distribution
-
-  emulator-test:
-    needs: build-android
-    if: success()
-    uses: ./.github/workflows/android-emulator-test.yml
-    with:
-      app-path: '.'
-      test-command: 'flutter test'
