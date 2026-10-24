@@ -199,7 +199,7 @@ jobs:
   emulator-test:
     needs: build-android
     if: success()
-    uses: zka32101/yourwish/.github/workflows/android-emulator-test.yml@main
+    uses: ./.github/workflows/android-emulator-test.yml
     with:
       app-path: '.'
       test-command: 'flutter test'
