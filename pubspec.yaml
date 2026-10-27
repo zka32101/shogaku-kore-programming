@@ -44,9 +44,6 @@ dependencies:
   # 環境変数
   flutter_dotenv: ^5.2.1
 
-  # Google Mobile Ads（広告システム）
-  # google_mobile_ads: ^6.0.0  # Temporary: Gradle 9.x compatibility issue
-
   # Share functionality
   share_plus: ^13.3.0
 

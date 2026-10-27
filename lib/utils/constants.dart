@@ -16,7 +16,7 @@ class AppConstants {
   // Pricing (for display)
   static const String monthlyPrice = '¥300';
   static const String yearlyPrice = '¥2,400';
-  static const int trialDays = 7;
+  static const int trialDays = 14; // 小学コレ共通の無料期間(14日)
 
   // App info
   static const String appName = '小学コレ！プログラミング';
