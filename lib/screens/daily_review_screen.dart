@@ -24,6 +24,7 @@ import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
 import 'quiz_result_screen.dart';
 import 'quiz_review_screen.dart';
+import '../services/retention_hooks.dart';
 import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 // ── 今日の復習 (Daily Review) ────────────────────────────────────────────────
@@ -361,6 +362,8 @@ class _DailyReviewScreenState extends ConsumerState<DailyReviewScreen> {
       _hasAnswered = true;
       _isCorrect = correct;
     });
+    // 定着率施策（連続正解ボーナス・週次チャレンジ・復習キュー・おしらせ）
+    onQuizAnswered(ref, quizId: q.question.id, correct: correct, context: mounted ? context : null);
     // 自動進行（設定が有効かつ正解時）
     if (correct && ref.read(profileProvider).autoAdvanceEnabled) {
       Future.delayed(const Duration(milliseconds: 1200), () {

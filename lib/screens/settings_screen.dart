@@ -20,6 +20,8 @@ import '../providers/daily_review_provider.dart';
 import '../services/sound_service.dart';
 import '../services/notification_service.dart';
 import '../services/haptic_service.dart';
+import '../widgets/reminder_switch.dart';
+import '../widgets/study_window_tile.dart';
 import 'profile_screen.dart';
 import 'paywall_screen.dart';
 import 'parent_dashboard_screen.dart';
@@ -278,6 +280,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with TickerProv
                     ),
                     if (profile.notificationsEnabled) ...[
                       _ReminderTimeTile(profile: profile),
+                      const ReminderSwitchTile(),
+                      const StudyWindowTile(),
                       _SwitchTile(
                         icon: '📊',
                         iconBg: const Color(0xFFE8F5E9),

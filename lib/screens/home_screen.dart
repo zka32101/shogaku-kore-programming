@@ -39,6 +39,7 @@ import 'shop_screen.dart';
 import 'stage_share_screen.dart';
 import 'time_attack_screen.dart';
 import 'wrong_answers_list_screen.dart';
+import '../widgets/retention_section.dart';
 import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -126,6 +127,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _buildTodayProgress(context, profile, progress),
               const SizedBox(height: 16),
               _buildMyCharacterCard(context),
+              const SizedBox(height: 16),
+              const RetentionSection(),
               const SizedBox(height: 16),
               _buildDailyReviewCard(context),
               const SizedBox(height: 16),

@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 通信（Firebase・広告・課金）に必要。debug/profile 以外の release にも付ける -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- 学習のおしらせ（ローカル通知）。Android 13+ で実行時に許可を求める -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:label="小学コレ！プログラミング"
         android:name="${applicationName}"

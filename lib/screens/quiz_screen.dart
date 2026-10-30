@@ -29,6 +29,7 @@ import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
 import 'quiz_result_screen.dart';
 import '../data/explain_images.dart';
+import '../services/retention_hooks.dart';
 import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class QuizScreen extends ConsumerStatefulWidget {
@@ -412,6 +413,9 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       if (correct) _correctCount++;
       _comboMessage = comboMsg;
     });
+
+    // 定着率施策（連続正解ボーナス・週次チャレンジ・復習キュー・おしらせ）
+    onQuizAnswered(ref, quizId: question.id, correct: correct, context: mounted ? context : null);
 
     // コンボ/スピードメッセージを2秒後にクリア
     if (comboMsg != null) {

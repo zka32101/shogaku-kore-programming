@@ -24,6 +24,7 @@ import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
 import 'quiz_result_screen.dart';
 import 'quiz_review_screen.dart';
+import '../services/retention_hooks.dart';
 import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 // ── タイムアタックモード ─────────────────────────────────────────────────────
@@ -637,6 +638,8 @@ class _TimeAttackScreenState extends ConsumerState<TimeAttackScreen>
       _isCorrect = correct;
       _showComboAnim = correct && _combo >= 2;
     });
+    // 定着率施策（連続正解ボーナス・週次チャレンジ・復習キュー・おしらせ）
+    onQuizAnswered(ref, quizId: q.question.id, correct: correct, context: mounted ? context : null);
   }
 
   void _nextQuestion() {
