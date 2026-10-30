@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'
 import 'package:shared_core/shared_core.dart'
 
     hide profileProvider, progressProvider, ProfileState, lessonProvider, LessonNotifier, RevenueCatService, coinProvider;
+import 'package:shared_core/shared_core.dart' as sc show coinProvider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'features/shop/decor/decor_scope.dart';
@@ -23,6 +24,8 @@ import 'services/auth_service.dart';
 import 'services/haptic_service.dart';
 import 'services/sound_service.dart';
 import 'services/notification_service.dart';
+import 'services/retention_coin_bridge.dart';
+import 'services/retention_hooks.dart';
 import 'services/revenue_cat_service.dart' as local_revenue_cat;
 import 'services/firestore_ranking_service.dart';
 import 'services/firestore_friend_service.dart';
@@ -45,6 +48,8 @@ Future<void> main() async {
       badgeProvider.overrideWith(() => BadgeNotifier()),
       // Phase 4.6: スクリーンタイム制限（ScreenTimeNotifier）
       screenTimeProvider.overrideWith(() => ScreenTimeNotifier()),
+      // 定着率施策のコインを、このアプリの残高（coin_provider.dart）へ橋渡しする
+      sc.coinProvider.overrideWith(RetentionCoinBridge.new),
       // Phase 4.7: 統一サブスクリプション管理（PremiumProvider）
       // TODO: PremiumNotifier override が shared_core の型と互換性がない
       // premiumProvider.overrideWith(PremiumNotifier.new),
@@ -107,6 +112,9 @@ Future<void> main() async {
   //     ..setExpiryHandler((userId) => revenueCatService.getSubscriptionExpirationDate(userId));
   //   unawaited(container.read(premiumProvider.notifier).checkSubscription(currentUserId));
   // }
+
+  // 定着率施策（初回7日間・復習キュー・週次チャレンジなど）の保存データを読み込む
+  await initRetention(container);
 
   runApp(
     UncontrolledProviderScope(

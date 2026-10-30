@@ -15,6 +15,10 @@ class NotificationService {
   final _plugin = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
 
+  /// 他の通知（学習のおしらせ）が同じプラグインを使い回すための公開口。
+  /// 使う前に [initialize] を呼ぶこと。
+  FlutterLocalNotificationsPlugin get plugin => _plugin;
+
   // 通知ID
   static const int _dailyReminderId       = 1;
   static const int _streakAlertId         = 2;

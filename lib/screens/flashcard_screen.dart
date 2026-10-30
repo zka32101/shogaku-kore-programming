@@ -15,6 +15,7 @@ import '../services/sound_service.dart';
 import '../widgets/code_highlight.dart';
 import '../widgets/shortcut_help.dart';
 import 'badge_unlock_screen.dart';
+import '../services/retention_hooks.dart';
 import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 // ─── データモデル ──────────────────────────────────────────────────────────────
@@ -486,6 +487,8 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen>
       _quizSelectedIndex = idx;
       _quizAnswered = true;
     });
+    // 定着率施策（単語カードは「にがて問題」で再出題できないので復習キューには入れない）
+    onQuizAnswered(ref, correct: isCorrect, context: context);
   }
 
   /// クイズモードで次へ（回答後）

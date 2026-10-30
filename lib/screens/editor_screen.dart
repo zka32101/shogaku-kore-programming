@@ -39,6 +39,7 @@ import '../widgets/variable_viewer.dart';
 import '../widgets/glossary_text.dart';
 import 'badge_unlock_screen.dart';
 import 'paywall_screen.dart';
+import '../services/retention_hooks.dart';
 import 'package:shogaku_kore_programming/widgets/ukalab_emoji.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
@@ -339,6 +340,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   Future<void> _showResult(bool isCorrect) async {
     _stopPlayback(); // 回答したら再生は止めて、結果の表示にする
+    // 定着率施策（ブロック問題は「にがて問題」で再出題できないので復習キューには入れない）
+    onQuizAnswered(ref, correct: isCorrect, context: context);
     final isFirstComplete =
         !(ref.read(progressProvider)[widget.challenge.id]?.isCompleted ?? false);
 
